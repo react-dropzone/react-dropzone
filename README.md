@@ -13,22 +13,20 @@ Simply `require()` the module and specify a `handler` property as a function tha
 Optionally pass in a CSS size for the dropzone using the `size` property and a message to be shown inside the dropzone using the `message` property.
 
 ```jsx
-
 var Dropzone = require('react-dropzone');
 
 var component = React.createClass({
 
   fileHandler: function(file) {
-      uploadScript(file, uploadURL, function(err, res) {
-        if (res.code == 200) {console.log("Upload success.")}
-      });
-    }
+    uploadScript(file, uploadURL, function(err, res) {
+      if (res.code == 200) {console.log("Upload success.")}
+    });
   },
-
+  
   render: function() {
     return (
       <div>
-        <Dropzone handler={this.fileHandler} size=200 message="Drag and drop a file here"/>
+        <Dropzone handler={this.fileHandler} size="200" message="Drag and drop a file here"/>
       </div>
     );
   }
