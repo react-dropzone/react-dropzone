@@ -34,7 +34,9 @@ var Dropzone = React.createClass({
      'cancelable': false
     });
     var node = e.target.getElementsByTagName('input')[0];
-    node.dispatchEvent(event);
+    if (node) {
+      node.dispatchEvent(event);
+    }
   },
 
   handleChange: function(e) {
