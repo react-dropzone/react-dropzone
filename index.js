@@ -26,6 +26,31 @@ var Dropzone = React.createClass({
     });
   },
 
+  handleClick: function(e) {
+    var event = new MouseEvent('click', {
+     'view': window,
+     'bubbles': true,
+     'cancelable': false
+    });
+    var node = e.target.getElementsByTagName('input')[0];
+    node.dispatchEvent(event);
+  },
+
+  handleChange: function(e) {
+    e.preventDefault();
+
+    this.setState({
+      isDragActive: false
+    });
+
+    if (this.props.handler) {
+      var file = e.target && e.target.files && e.target.files[0];
+      this.props.handler(file);
+    } else {
+      console.error('No handler specified to accept the file.');
+    }
+  },
+
   handleDrop: function(e) {
     e.preventDefault();
 
@@ -49,9 +74,10 @@ var Dropzone = React.createClass({
         borderRadius: "10%",
         borderWidth: "2pt",
         borderColor: "#666",
-        borderStyle: this.state.isDragActive ? "solid" : "dashed"
+        borderStyle: this.state.isDragActive ? "solid" : "dashed",
+        overflow: "hidden"
       };
-   
+
       var messageStyle = {
         display: "table-cell",
         width: size,
@@ -63,10 +89,16 @@ var Dropzone = React.createClass({
         color: "#666"
       };
 
+      var inputStyle = {
+        position: "absolute",
+        top: "-100px"
+      };
+
     return (
-      <div className="dropzone" style={dropzoneStyle} onDragLeave={this.handleDragLeave} onDragOver={this.handleDragOver} onDrop={this.handleDrop}>
+      <form className="dropzone" style={dropzoneStyle} onClick={this.handleClick} onChange={this.handleChange} onDragLeave={this.handleDragLeave} onDragOver={this.handleDragOver} onDrop={this.handleDrop}>
+        <input type="file"/>
         {this.props.children || <span style={messageStyle}>{this.props.message || "Drop Here"}</span>}
-      </div>
+      </form>
     );
   }
 
