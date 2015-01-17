@@ -27,6 +27,7 @@ var Dropzone = React.createClass({
   },
 
   handleClick: function(e) {
+    e.preventDefault();
     var event = new MouseEvent('click', {
      'view': window,
      'bubbles': true,
