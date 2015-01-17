@@ -74,10 +74,10 @@ var Dropzone = React.createClass({
         borderRadius: "10%",
         borderWidth: "2pt",
         borderColor: "#666",
-        borderStyle: this.state.isDragActive ? "solid" : "dashed",
-        overflow: "hidden",
-        cursor: "pointer"
+        borderStyle: this.state.isDragActive ? "solid" : "dashed"
       };
+      dropzoneStyle.overflow = "hidden";
+      dropzoneStyle.cursor = "pointer";
 
       var messageStyle = {
         display: "table-cell",
