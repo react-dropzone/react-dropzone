@@ -97,7 +97,7 @@ var Dropzone = React.createClass({
 
     return (
       <form className="dropzone" style={dropzoneStyle} onClick={this.handleClick} onChange={this.handleChange} onDragLeave={this.handleDragLeave} onDragOver={this.handleDragOver} onDrop={this.handleDrop}>
-        <input type="file"/>
+        <input type="file" style={inputStyle}/>
         {this.props.children || <span style={messageStyle}>{this.props.message || "Drop Here"}</span>}
       </form>
     );
