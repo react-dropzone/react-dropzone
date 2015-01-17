@@ -75,7 +75,8 @@ var Dropzone = React.createClass({
         borderWidth: "2pt",
         borderColor: "#666",
         borderStyle: this.state.isDragActive ? "solid" : "dashed",
-        overflow: "hidden"
+        overflow: "hidden",
+        cursor: "pointer"
       };
 
       var messageStyle = {
