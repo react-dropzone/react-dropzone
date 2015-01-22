@@ -28,7 +28,7 @@ var component = React.createClass({
   render: function() {
     return (
       <div>
-        <Dropzone handler={this.fileHandler} size=200 message="Drag and drop a file here"/>
+        <Dropzone handler={this.fileHandler} size={200} message="Drag and drop a file here"/>
       </div>
     );
   }
