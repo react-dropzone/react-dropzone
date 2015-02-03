@@ -51,7 +51,7 @@ var Dropzone = React.createClass({
     if (this.props.handler) {
       var files = this.props.inputFileMultiple ?
         e.dataTransfer && e.dataTransfer.files :
-        [e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]];
+        e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
 
       this.props.handler(files);
     } else {
