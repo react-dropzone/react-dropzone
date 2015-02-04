@@ -19,10 +19,9 @@ var Dropzone = require('react-dropzone');
 var component = React.createClass({
 
   fileHandler: function(file) {
-      uploadScript(file, uploadURL, function(err, res) {
-        if (res.code == 200) {console.log("Upload success.")}
-      });
-    }
+    uploadScript(file, uploadURL, function(err, res) {
+      if (res.code == 200) {console.log("Upload success.")}
+    });
   },
 
   render: function() {
@@ -44,13 +43,13 @@ var Dropzone = require('react-dropzone');
 var component = React.createClass({
 
   fileHandler: function(file) {
-      this.setState({
-        uploading: true
-      });
-      uploadScript(file, uploadURL, function(err, res) {
-        if (res.code == 200) {console.log("Upload success.")}
-      });
-    }
+    this.setState({
+      uploading: true
+    });
+    
+    uploadScript(file, uploadURL, function(err, res) {
+      if (res.code == 200) {console.log("Upload success.")}
+    });
   },
 
   render: function() {
