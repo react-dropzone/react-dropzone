@@ -3,66 +3,39 @@ react-dropzone
 
 Simple HTML5 drag-drop zone in React.js.
 
-![Screenshot of dropzone](https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png)
+[![Screenshot of Dropzone](https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png)](http://paramaggarwal.github.io/react-dropzone/)
 
+Demo: http://paramaggarwal.github.io/react-dropzone/
 Usage
 =====
 
-Simply `require()` the module and specify a `handler` property as a function that accepts the dropped file.
+Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. You can customize the content of the Dropzone by specifying children to the component.
 
-Optionally pass in a CSS size for the dropzone using the `size` property and a message to be shown inside the dropzone using the `message` property.
-
-```jsx
-
-var Dropzone = require('react-dropzone');
-
-var component = React.createClass({
-
-  fileHandler: function(file) {
-      uploadScript(file, uploadURL, function(err, res) {
-        if (res.code == 200) {console.log("Upload success.")}
-      });
-    }
-  },
-
-  render: function() {
-    return (
-      <div>
-        <Dropzone handler={this.fileHandler} size=200 message="Drag and drop a file here"/>
-      </div>
-    );
-  }
-});
-```
-
-If you'd like more customizability, you can specify children for the component and all the default styling will be overridden.
+You can also specify a `style` object to apply to the `Dropzone` component. Optionally pass in a `size` property to configure the size of the Dropzone.
 
 ```jsx
 
+/** @jsx React.DOM */
+var React = require('react');
 var Dropzone = require('react-dropzone');
 
-var component = React.createClass({
+var DropzoneDemo = React.createClass({
+    onDrop: function (files) {
+      console.log('Received files: ', files);
+    },
 
-  fileHandler: function(file) {
-      this.setState({
-        uploading: true
-      });
-      uploadScript(file, uploadURL, function(err, res) {
-        if (res.code == 200) {console.log("Upload success.")}
-      });
+    render: function () {
+      return (
+          <div>
+            <Dropzone onDrop={this.onDrop} size={150} >
+              <div>Try dropping some files here, or click to select files to upload.</div>
+            </Dropzone>
+          </div>
+      );
     }
-  },
-
-  render: function() {
-    return (
-      <div>
-        <Dropzone handler={this.fileHandler}>
-          <span>{this.state.uploading ? "Uploading... " : "Drop an image here."}</span>
-        </Dropzone>
-      </div>
-    );
-  }
 });
+
+React.render(<DropzoneDemo />, document.body);
 ```
 
 Author
