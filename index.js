@@ -11,13 +11,19 @@ var Dropzone = React.createClass({
     }
   },
 
-  handleDragLeave: function(e) {
+  propTypes: {
+    onDrop: React.PropTypes.func.isRequired,
+    size: React.PropTypes.number,
+    style: React.PropTypes.object
+  },
+
+  onDragLeave: function(e) {
     this.setState({
       isDragActive: false
     });
   },
 
-  handleDragOver: function(e) {
+  onDragOver: function(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "copy";
 
@@ -26,46 +32,46 @@ var Dropzone = React.createClass({
     });
   },
 
-  handleDrop: function(e) {
+  onDrop: function(e) {
     e.preventDefault();
 
     this.setState({
       isDragActive: false
     });
 
-    if (this.props.handler) {
-      var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-      this.props.handler(file);
-    } else {
-      console.error('No handler specified to accept the dropped file.');
+    var files;
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+
+    if (this.props.onDrop) {
+      this.props.onDrop(files);
     }
   },
+
+  onClick: function () {
+    this.refs.fileInput.getDOMNode().click();
+  },
+
   render: function() {
 
-    var size = this.props.size || "100pt";
-      var dropzoneStyle = this.props.children ? {} : {
-        width: size,
-        height: size,
-        borderRadius: "10%",
-        borderWidth: "2pt",
-        borderColor: "#666",
-        borderStyle: this.state.isDragActive ? "solid" : "dashed"
-      };
-   
-      var messageStyle = {
-        display: "table-cell",
-        width: size,
-        height: size,
-        textAlign: "center",
-        verticalAlign: "middle",
-        fontSize: "10pt",
-        textTransform: "uppercase",
-        color: "#666"
-      };
+    var className = 'dropzone';
+    if (this.state.isDragActive) {
+      className += ' active';
+    };
 
+    var style = {
+      width: this.props.size || 100,
+      height: this.props.size || 100,
+      borderStyle: this.state.isDragActive ? "solid" : "dashed"
+    };
+ 
     return (
-      <div className="dropzone" style={dropzoneStyle} onDragLeave={this.handleDragLeave} onDragOver={this.handleDragOver} onDrop={this.handleDrop}>
-        {this.props.children || <span style={messageStyle}>{this.props.message || "Drop Here"}</span>}
+      <div className={className} style={this.props.style || style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
+        <input style={{display: 'none' }} type='file' multiple ref='fileInput' onChange={this.onDrop} />
+        {this.props.children}
       </div>
     );
   }
