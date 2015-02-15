@@ -1,7 +1,3 @@
-/**
- * @jsx React.DOM
- */
-
 var React = require('react');
 
 var Dropzone = React.createClass({
@@ -47,6 +43,7 @@ var Dropzone = React.createClass({
     }
 
     if (this.props.onDrop) {
+      files = Array.prototype.slice.call(files);
       this.props.onDrop(files);
     }
   },
@@ -57,7 +54,7 @@ var Dropzone = React.createClass({
 
   render: function() {
 
-    var className = 'dropzone';
+    var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
       className += ' active';
     };
@@ -67,9 +64,13 @@ var Dropzone = React.createClass({
       height: this.props.size || 100,
       borderStyle: this.state.isDragActive ? "solid" : "dashed"
     };
- 
+
+    if (this.props.className) {
+      style = this.props.style;
+    }
+
     return (
-      <div className={className} style={this.props.style || style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
+      <div className={className} style={style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
         <input style={{display: 'none' }} type='file' multiple ref='fileInput' onChange={this.onDrop} />
         {this.props.children}
       </div>
