@@ -59,7 +59,7 @@ var Dropzone = React.createClass({
       className += ' active';
     };
 
-    var style = {
+    var style = this.props.style || {
       width: this.props.size || 100,
       height: this.props.size || 100,
       borderStyle: this.state.isDragActive ? "solid" : "dashed"
