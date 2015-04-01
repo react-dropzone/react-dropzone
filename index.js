@@ -42,6 +42,10 @@ var Dropzone = React.createClass({
       files = e.target.files;
     }
 
+    for (var i = 0; i < files.length; i++) {
+      files[i].preview = URL.createObjectURL(files[i]);
+    }
+
     if (this.props.onDrop) {
       files = Array.prototype.slice.call(files);
       this.props.onDrop(files);
