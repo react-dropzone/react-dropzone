@@ -70,10 +70,10 @@ var Dropzone = React.createClass({
     }
 
     return (
-      <div className={className} style={style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
-        <input style={{display: 'none' }} type='file' multiple ref='fileInput' onChange={this.onDrop} />
-        {this.props.children}
-      </div>
+        React.createElement("div", {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
+            React.createElement("input", {style: {display: 'none'}, type: "file", multiple: true, ref: "fileInput", onChange: this.onDrop}),
+            this.props.children
+        )
     );
   }
 
