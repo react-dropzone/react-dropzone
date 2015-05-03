@@ -6,6 +6,7 @@ Simple HTML5 drag-drop zone in React.js.
 [![Screenshot of Dropzone](https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png)](http://paramaggarwal.github.io/react-dropzone/)
 
 Demo: http://paramaggarwal.github.io/react-dropzone/
+
 Usage
 =====
 
@@ -38,10 +39,22 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
-Author
-======
 
-Param Aggarwal (paramaggarwal@gmail.com)
+Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
+
+The `onDrop` provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+
+```javascript
+    onDrop: function(files){
+        var req = request.post('/upload');
+        files.forEach((file)=> {
+            req.attach(file.name, file);
+        });
+        req.end(callback);
+    }
+```
+
+Starting `v1.1`, you can now immediately show a preview of the dropped file while it uploads. The `file.preview` property can be specified as the image source: `<img src={file.preview} />` to display a preview of the image dropped.
 
 License
 =======
