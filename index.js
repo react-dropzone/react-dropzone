@@ -26,12 +26,12 @@ var Dropzone = React.createClass({
   },
 
   onDragOver: function(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "copy";
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
 
-      this.setState({
-        isDragActive: true
-      });
+    this.setState({
+      isDragActive: true
+    });
 
     if( !this.state.isDragActive ) {
       if (this.props.onDragOver) {
