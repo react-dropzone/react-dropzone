@@ -69,9 +69,6 @@ var Dropzone = React.createClass({
       borderStyle: this.state.isDragActive ? "solid" : "dashed"
     };
 
-    if (this.props.className) {
-      style = this.props.style;
-    }
 
     return (
         React.createElement("div", {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
