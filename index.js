@@ -17,7 +17,8 @@ var Dropzone = React.createClass({
     onDrop: React.PropTypes.func.isRequired,
     size: React.PropTypes.number,
     style: React.PropTypes.object,
-    supportClick: React.PropTypes.bool
+    supportClick: React.PropTypes.bool,
+    accept: React.PropTypes.string
   },
 
   onDragLeave: function(e) {
@@ -81,7 +82,7 @@ var Dropzone = React.createClass({
 
     return (
         React.createElement("div", {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
-            React.createElement("input", {style: {display: 'none'}, type: "file", multiple: true, ref: "fileInput", onChange: this.onDrop}),
+            React.createElement("input", {style: {display: 'none'}, type: "file", multiple: true, ref: "fileInput", onChange: this.onDrop, accept: this.props.accept}),
             this.props.children
         )
     );
