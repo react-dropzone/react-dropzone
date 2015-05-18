@@ -1,6 +1,12 @@
 var React = require('react');
 
 var Dropzone = React.createClass({
+  getDefaultProps: function() {
+    return {
+      supportClick: true
+    };
+  },
+
   getInitialState: function() {
     return {
       isDragActive: false
@@ -10,7 +16,8 @@ var Dropzone = React.createClass({
   propTypes: {
     onDrop: React.PropTypes.func.isRequired,
     size: React.PropTypes.number,
-    style: React.PropTypes.object
+    style: React.PropTypes.object,
+    supportClick: React.PropTypes.bool
   },
 
   onDragLeave: function(e) {
@@ -53,7 +60,9 @@ var Dropzone = React.createClass({
   },
 
   onClick: function () {
-    this.refs.fileInput.getDOMNode().click();
+    if (this.props.supportClick === true) {
+      this.refs.fileInput.getDOMNode().click();
+    }
   },
 
   render: function() {
