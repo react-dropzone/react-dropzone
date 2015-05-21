@@ -62,8 +62,12 @@ var Dropzone = React.createClass({
 
   onClick: function () {
     if (this.props.supportClick === true) {
-      this.refs.fileInput.getDOMNode().click();
+        this.open();
     }
+  },
+
+  open: function() {
+      this.refs.fileInput.getDOMNode().click();
   },
 
   render: function() {
