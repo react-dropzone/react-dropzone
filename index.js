@@ -3,7 +3,8 @@ var React = require('react');
 var Dropzone = React.createClass({
   getDefaultProps: function() {
     return {
-      supportClick: true
+      supportClick: true,
+      inputName: 'fileInput'
     };
   },
 
@@ -86,7 +87,7 @@ var Dropzone = React.createClass({
 
     return (
         React.createElement("div", {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
-            React.createElement("input", {style: {display: 'none'}, type: "file", multiple: true, ref: "fileInput", onChange: this.onDrop, accept: this.props.accept}),
+            React.createElement("input", {style: {display: 'none'}, type: "file", multiple: true, name: this.props.inputName, ref: "fileInput", onChange: this.onDrop, accept: this.props.accept}),
             this.props.children
         )
     );
