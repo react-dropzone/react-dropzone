@@ -28,7 +28,7 @@ var DropzoneDemo = React.createClass({
     render: function () {
       return (
           <div>
-            <Dropzone onDrop={this.onDrop} size={150} >
+            <Dropzone onDrop={this.onDrop} size={150} inputName='myFileUpload' >
               <div>Try dropping some files here, or click to select files to upload.</div>
             </Dropzone>
           </div>
@@ -53,6 +53,9 @@ The `onDrop` provides you with an array of [Files](https://developer.mozilla.org
         req.end(callback);
     }
 ```
+The `onDrop` provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+
+The `inputName` attribute sets the file input name. This maybe useful for some other plugins for file upload. By default its `fileInput`.
 
 Starting `v1.1`, you can now immediately show a preview of the dropped file while it uploads. The `file.preview` property can be specified as the image source: `<img src={file.preview} />` to display a preview of the image dropped.
 
