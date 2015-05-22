@@ -59,7 +59,7 @@ var Dropzone = React.createClass({
 
     if (this.props.onDrop) {
       files = Array.prototype.slice.call(files, 0, maxFiles);
-      this.props.onDrop(files);
+      this.props.onDrop(files, e);
     }
   },
 
