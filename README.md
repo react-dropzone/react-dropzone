@@ -56,6 +56,45 @@ The `onDrop` provides you with an array of [Files](https://developer.mozilla.org
 
 Starting `v1.1`, you can now immediately show a preview of the dropped file while it uploads. The `file.preview` property can be specified as the image source: `<img src={file.preview} />` to display a preview of the image dropped.
 
+Triggers
+========
+
+It may be useful to trigger the dropzone manually (opening the file prompt), to do that, you can call the component's `open` function.
+
+For example:
+
+```jsx
+
+/** @jsx React.DOM */
+var React = require('react');
+var Dropzone = require('react-dropzone');
+
+var DropzoneDemo = React.createClass({
+    onDrop: function (files) {
+      console.log('Received files: ', files);
+    },
+
+    onOpenClick: function () {
+      this.refs.dropzone.open();
+    },
+
+    render: function () {
+      return (
+          <div>
+            <Dropzone ref="dropzone" onDrop={this.onDrop} size={150} >
+              <div>Try dropping some files here, or click to select files to upload.</div>
+            </Dropzone>
+            <button type="button" onClick={this.onOpenClick}>
+                Open Dropzone
+            </button>
+          </div>
+      );
+    }
+});
+
+React.render(<DropzoneDemo />, document.body);
+```
+
 License
 =======
 
