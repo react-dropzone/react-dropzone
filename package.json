@@ -13,10 +13,7 @@
   "browserify": {
     "transform": [
       [
-        "reactify",
-        {
-          "harmony": true
-        }
+        "babelify"
       ]
     ]
   },
