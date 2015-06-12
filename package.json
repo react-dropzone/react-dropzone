@@ -10,13 +10,6 @@
     "drop",
     "upload"
   ],
-  "browserify": {
-    "transform": [
-      [
-        "babelify"
-      ]
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git@github.com:paramaggarwal/react-dropzone.git"
