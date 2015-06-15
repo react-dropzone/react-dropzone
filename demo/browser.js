@@ -1,6 +1,5 @@
-/** @jsx React.DOM */
-var React = require('react');
 var Dropzone = require('../');
+var React = require('../node_modules/react');
 
 var DropzoneDemo = React.createClass({
     getInitialState: function () {
@@ -19,7 +18,7 @@ var DropzoneDemo = React.createClass({
     showFiles: function () {
       if (this.state.files.length <= 0) {
         return '';
-      };
+      }
 
       var files = this.state.files;
 
@@ -28,7 +27,7 @@ var DropzoneDemo = React.createClass({
           <h3>Dropped files: </h3>
           <ul>
             {[].map.call(files, function (f, i) {
-              return <li key={i}>{f.name + ' : ' + f.size + ' bytes.'}</li>
+              return <li key={i}>{f.name + ' : ' + f.size + ' bytes.'}</li>;
             })}
           </ul>
         </div>
