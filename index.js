@@ -4,7 +4,8 @@ var Dropzone = React.createClass({
   getDefaultProps: function() {
     return {
       supportClick: true,
-      multiple: true
+      multiple: true,
+      transparent: false
     };
   },
 
@@ -20,7 +21,8 @@ var Dropzone = React.createClass({
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
-    multiple: React.PropTypes.bool
+    multiple: React.PropTypes.bool,
+    transparent: React.PropTypes.bool
   },
 
   onDragLeave: function(e) {
@@ -82,12 +84,14 @@ var Dropzone = React.createClass({
       className += ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.size || 100,
-      height: this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
-
+    var style = this.props.style;
+    if (!style && !this.props.transparent) {
+      style = {
+        width: this.props.size || 100,
+        height: this.props.size || 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
         React.createElement('div', {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
