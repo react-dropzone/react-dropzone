@@ -36,6 +36,8 @@ var Dropzone = React.createClass({
     this.setState({
       isDragActive: true
     });
+
+    return false;
   },
 
   onDrop: function(e) {
