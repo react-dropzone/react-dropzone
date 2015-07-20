@@ -20,6 +20,7 @@ var Dropzone = React.createClass({
     onDragLeave: React.PropTypes.func,
     size: React.PropTypes.number,
     style: React.PropTypes.object,
+    styleFunc: React.PropTypes.func,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
     multiple: React.PropTypes.bool
@@ -80,6 +81,10 @@ var Dropzone = React.createClass({
     }
   },
 
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return this.state.isDragActive != nextState.isDragActive;
+  },
+
   open: function() {
     var fileInput = React.findDOMNode(this.refs.fileInput);
     fileInput.value = null;
@@ -99,6 +104,9 @@ var Dropzone = React.createClass({
       borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
     };
 
+    if (this.props.styleFunc) {
+      style = this.props.styleFunc(this.props, this.state);
+    }
 
     return (
         React.createElement('div', {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
