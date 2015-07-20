@@ -22,6 +22,7 @@ var Dropzone = React.createClass({
     width: React.PropTypes.number,
     height: React.PropTypes.number,
     style: React.PropTypes.object,
+    noDefaultStyles: React.PropTypes.bool,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
     multiple: React.PropTypes.bool
@@ -95,12 +96,14 @@ var Dropzone = React.createClass({
       className += ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.width || this.props.size || 100,
-      height: this.props.height || this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
-
+    var style = {};
+    if (!this.props.noDefaultStyles) {
+      var style = this.props.style || {
+        width: this.props.width || this.props.size || 100,
+        height: this.props.height || this.props.size || 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
       React.createElement(
