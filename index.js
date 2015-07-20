@@ -16,6 +16,8 @@ var Dropzone = React.createClass({
 
   propTypes: {
     onDrop: React.PropTypes.func.isRequired,
+    onDragOver: React.PropTypes.func,
+    onDragLeave: React.PropTypes.func,
     size: React.PropTypes.number,
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
@@ -27,6 +29,10 @@ var Dropzone = React.createClass({
     this.setState({
       isDragActive: false
     });
+
+    if (this.props.onDragLeave) {
+      this.props.onDragLeave(e);
+    }
   },
 
   onDragOver: function(e) {
@@ -36,6 +42,10 @@ var Dropzone = React.createClass({
     this.setState({
       isDragActive: true
     });
+
+    if (this.props.onDragOver) {
+      this.props.onDragOver(e);
+    }
   },
 
   onDrop: function(e) {
