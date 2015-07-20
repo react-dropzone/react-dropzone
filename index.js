@@ -31,13 +31,12 @@ var Dropzone = React.createClass({
 
   onDragOver: function(e) {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 
     this.setState({
       isDragActive: true
     });
-
-    return false;
   },
 
   onDrop: function(e) {
