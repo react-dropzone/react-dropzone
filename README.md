@@ -12,11 +12,11 @@ Usage
 
 Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. You can customize the content of the Dropzone by specifying children to the component.
 
-You can specify a `style` object to apply some basic styles to the `Dropzone` component. The style object includes `width`, `height`, and `borderStyle` properties (`width` and `height` can be integers, whereas `borderStyle` can be one of any CSS border-style).
+You can specify a `style` object to apply some basic styles to the `Dropzone` component, or alternatively use the `className` property to style the component with custom CSS.
 
-You can also specify a `size` property which is an integer that sets both `style.width` and `style.height` to the same value.
+If no `style` or `className` properties are defined, the style object will default to the `width` and `height` properties (or `100px` if they aren't defined) along with a `borderStyle` of "solid" or "dashed" depending on if drag actions are taking place.
 
-Finally, you can set `noDefaultStyles` to *true* to disable the default `style` object completely and allow your custom CSS from `className` to take over (see below).
+You can alternatively specify a `size` property which is an integer that sets both `style.width` and `style.height` to the same value.
 
 ```jsx
 
@@ -90,52 +90,6 @@ var DropzoneDemo = React.createClass({
             <button type="button" onClick={this.onOpenClick}>
                 Open Dropzone
             </button>
-          </div>
-      );
-    }
-});
-
-React.render(<DropzoneDemo />, document.body);
-```
-
-Custom CSS
-==========
-
-You may want to use your own, custom, CSS styles to control how the Dropzone element looks. You can add any classes you like to the `className` property and then disable the default style object by setting `noDefaultStyles` to *true*.
-
-For example, your custom stylesheet might have this class:
-
-```css
-
-.myCustomClass {
-  width: 480px;
-  height: 640px;
-  border: 3px dotted rgba(0, 0, 0, .5);
-  background-color: #fefefe;
-  color: #333;
-  cursor: pointer;
-}
-```
-
-You can apply your custom class to the Dropzone element like this:
-
-```jsx
-
-/** @jsx React.DOM */
-var React = require('react');
-var Dropzone = require('react-dropzone');
-
-var DropzoneDemo = React.createClass({
-    onDrop: function (files) {
-      console.log('Received files: ', files);
-    },
-
-    render: function () {
-      return (
-          <div>
-            <Dropzone className="myCustomClass" noDefaultStyles={true} onDrop={this.onDrop}>
-              <div>Try dropping some files here, or click to select files to upload.</div>
-            </Dropzone>
           </div>
       );
     }
