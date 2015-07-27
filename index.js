@@ -89,21 +89,24 @@ var Dropzone = React.createClass({
   },
 
   render: function() {
-
     var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
       className += ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.width || this.props.size || 100,
-      height: this.props.height || this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
+    var style = {};
+    if (this.props.style) { // user-defined inline styles take priority
+      style = this.props.style;
+    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      style = {
+        width: this.props.width || this.props.size || 100,
+        height: this.props.height || this.props.size || 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
-      React.createElement(
-        'div',
+      React.createElement('div',
         {
           className: className,
           style: style,
@@ -112,12 +115,9 @@ var Dropzone = React.createClass({
           onDragOver: this.onDragOver,
           onDrop: this.onDrop
         },
-        React.createElement(
-          'input',
+        React.createElement('input',
           {
-            style: {
-              display: 'none'
-            },
+            style: { display: 'none' },
             type: 'file',
             multiple: this.props.multiple,
             ref: 'fileInput',
