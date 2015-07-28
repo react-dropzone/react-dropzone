@@ -12,7 +12,11 @@ Usage
 
 Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. You can customize the content of the Dropzone by specifying children to the component.
 
-You can also specify a `style` object to apply to the `Dropzone` component. Optionally pass in a `size` property to configure the size of the Dropzone.
+You can specify a `style` object to apply some basic styles to the `Dropzone` component, or alternatively use the `className` property to style the component with custom CSS.
+
+If no `style` or `className` properties are defined, the style object will default to the `width` and `height` properties (or `100px` if they aren't defined) along with a `borderStyle` of "solid" or "dashed" depending on if drag actions are taking place.
+
+You can alternatively specify a `size` property which is an integer that sets both `style.width` and `style.height` to the same value.
 
 ```jsx
 
@@ -28,7 +32,7 @@ var DropzoneDemo = React.createClass({
     render: function () {
       return (
           <div>
-            <Dropzone onDrop={this.onDrop} size={150} >
+            <Dropzone onDrop={this.onDrop} width={150} height={100}>
               <div>Try dropping some files here, or click to select files to upload.</div>
             </Dropzone>
           </div>
@@ -38,7 +42,6 @@ var DropzoneDemo = React.createClass({
 
 React.render(<DropzoneDemo />, document.body);
 ```
-
 
 Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
 

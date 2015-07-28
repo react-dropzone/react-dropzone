@@ -19,6 +19,8 @@ var Dropzone = React.createClass({
     onDragOver: React.PropTypes.func,
     onDragLeave: React.PropTypes.func,
     size: React.PropTypes.number,
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
@@ -87,24 +89,44 @@ var Dropzone = React.createClass({
   },
 
   render: function() {
-
     var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
       className += ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.size || 100,
-      height: this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
-
+    var style = {};
+    if (this.props.style) { // user-defined inline styles take priority
+      style = this.props.style;
+    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      style = {
+        width: this.props.width || this.props.size || 100,
+        height: this.props.height || this.props.size || 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
-        React.createElement('div', {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
-            React.createElement('input', {style: {display: 'none'}, type: 'file', multiple: this.props.multiple, ref: 'fileInput', onChange: this.onDrop, accept: this.props.accept}),
-            this.props.children
-        )
+      React.createElement('div',
+        {
+          className: className,
+          style: style,
+          onClick: this.onClick,
+          onDragLeave: this.onDragLeave,
+          onDragOver: this.onDragOver,
+          onDrop: this.onDrop
+        },
+        React.createElement('input',
+          {
+            style: { display: 'none' },
+            type: 'file',
+            multiple: this.props.multiple,
+            ref: 'fileInput',
+            onChange: this.onDrop,
+            accept: this.props.accept
+          }
+        ),
+        this.props.children
+      )
     );
   }
 
