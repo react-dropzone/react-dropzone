@@ -42,6 +42,10 @@ var Dropzone = React.createClass({
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 
+    if (e.dataTransfer.allowedEffect !== 'all') {
+      return;
+    }
+
     this.setState({
       isDragActive: true
     });
