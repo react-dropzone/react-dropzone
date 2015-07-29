@@ -42,7 +42,11 @@ var Dropzone = React.createClass({
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 
-    if (e.dataTransfer.allowedEffect !== 'all') {
+    var allowedEffect = e.dataTransfer.allowedEffect;
+
+    // set active drag state only when file is dragged into
+    // (in mozilla when file is dragged effect is "uninitialized")
+    if (allowedEffect !== 'all' || allowedEffect !== 'uninitialized') {
       return;
     }
 
