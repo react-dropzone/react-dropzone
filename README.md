@@ -1,11 +1,18 @@
 react-dropzone
 =================
 
-Simple HTML5 drag-drop zone in React.js.
+Simple HTML5 drag-drop zone for file uploads in React.js.
 
 [![Screenshot of Dropzone](https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png)](http://paramaggarwal.github.io/react-dropzone/)
 
 Demo: http://paramaggarwal.github.io/react-dropzone/
+
+Installation
+=====
+The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
+```sh
+npm install --save react-dropzone
+```
 
 Usage
 =====
@@ -17,6 +24,13 @@ You can specify a `style` object to apply some basic styles to the `Dropzone` co
 If no `style` or `className` properties are defined, the style object will default to the `width` and `height` properties (or `100px` if they aren't defined) along with a `borderStyle` of "solid" or "dashed" depending on if drag actions are taking place.
 
 You can alternatively specify a `size` property which is an integer that sets both `style.width` and `style.height` to the same value.
+
+By default the drop zone can be clicked to bring up the browser file picker. To disable this the `supportClick` property should be set to `false`.
+
+Also multiple files can be uploaded to the drop zone, but this can be disabled by setting the `multiple` property to `false`. The allowed file types can be controlled by the `accept` property, using the same syntax as the [HTML <input> accept Attribute](http://www.w3schools.com/tags/att_input_accept.asp).
+
+Example
+=====
 
 ```jsx
 
