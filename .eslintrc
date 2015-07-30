@@ -1,0 +1,20 @@
+// http://eslint.org/docs/rules
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "strict": 0,
+    "quotes": [2, "single"],
+    "no-underscore-dangle": 0,
+    "no-unused-vars": 1,
+    "no-unused-expressions": 0,
+    "react/jsx-no-undef": 2,
+    "new-cap": 0,
+    "no-empty": 0
+  }
+}
