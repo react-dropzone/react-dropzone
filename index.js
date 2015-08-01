@@ -1,6 +1,9 @@
 var React = require('react');
 
 var Dropzone = React.createClass({
+
+  displayName: 'Dropzone',
+
   getDefaultProps: function() {
     return {
       supportClick: true,
