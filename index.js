@@ -22,8 +22,14 @@ var Dropzone = React.createClass({
     onDragOver: React.PropTypes.func,
     onDragLeave: React.PropTypes.func,
     size: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
+    width: React.PropTypes.oneOfType([
+      React.PropTypes.number, 
+      React.PropTypes.string
+    ]),
+    height: React.PropTypes.oneOfType([
+      React.PropTypes.number, 
+      React.PropTypes.string
+    ]),
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
