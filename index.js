@@ -110,8 +110,6 @@ var Dropzone = React.createClass({
     var style = {};
     if (this.props.style) { // user-defined inline styles take priority
       style = this.props.style;
-    } 
-    if (!this.props.className) { // if no class or inline styles defined, use defaults
       var defaultKeys = ['width', 'height', 'borderStyle'];
       var l = defaultKeys.length;
       for (i=0, i<l; i++) {
@@ -120,6 +118,8 @@ var Dropzone = React.createClass({
           style[key] = defaultStyle[key];
         }
       }
+    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      style = defaultStyle;
     }
 
     return (
