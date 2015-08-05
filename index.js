@@ -102,15 +102,24 @@ var Dropzone = React.createClass({
       className += ' active';
     }
 
+    var defaultStyle = {
+      width: this.props.width || this.props.size || 100,
+      height: this.props.height || this.props.size || 100,
+      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+    };
     var style = {};
     if (this.props.style) { // user-defined inline styles take priority
       style = this.props.style;
-    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
-      style = {
-        width: this.props.width || this.props.size || 100,
-        height: this.props.height || this.props.size || 100,
-        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-      };
+    } 
+    if (!this.props.className) { // if no class or inline styles defined, use defaults
+      var defaultKeys = ['width', 'height', 'borderStyle'];
+      var l = defaultKeys.length;
+      for (i=0, i<l; i++) {
+        var key = defaultKeys[i];
+        if (!(key in style)) {
+          style[key] = defaultStyle[key];
+        }
+      }
     }
 
     return (
