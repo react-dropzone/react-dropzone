@@ -27,7 +27,8 @@ var Dropzone = React.createClass({
     style: React.PropTypes.object,
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
-    multiple: React.PropTypes.bool
+    multiple: React.PropTypes.bool,
+    activeClassName: React.PropTypes.string
   },
 
   onDragLeave: function(e) {
@@ -99,7 +100,7 @@ var Dropzone = React.createClass({
   render: function() {
     var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
-      className += ' active';
+      className += this.props.activeClassName || ' active';
     }
 
     var style = {};
