@@ -114,7 +114,7 @@ var Dropzone = React.createClass({
     }
 
     return (
-      React.createElement('div',
+      React.createElement('button',
         {
           className: className,
           style: style,
