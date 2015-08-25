@@ -30,6 +30,10 @@ var Dropzone = React.createClass({
     multiple: React.PropTypes.bool
   },
 
+  componentDidMount: function(){
+    React.initializeTouchEvents(true);
+  },
+
   onDragLeave: function(e) {
     this.setState({
       isDragActive: false
@@ -114,14 +118,15 @@ var Dropzone = React.createClass({
     }
 
     return (
-      React.createElement('button',
+      React.createElement('div',
         {
           className: className,
           style: style,
           onClick: this.onClick,
           onDragLeave: this.onDragLeave,
           onDragOver: this.onDragOver,
-          onDrop: this.onDrop
+          onDrop: this.onDrop,
+          onTouchStart: this.onClick
         },
         React.createElement('input',
           {
