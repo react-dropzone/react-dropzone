@@ -21,14 +21,14 @@ var Dropzone = React.createClass({
     onDrop: React.PropTypes.func.isRequired,
     onDragOver: React.PropTypes.func,
     onDragLeave: React.PropTypes.func,
-    size: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
+
     style: React.PropTypes.object,
+    className: React.PropTypes.string,
+    activeClassName: React.PropTypes.string,
+
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
     multiple: React.PropTypes.bool,
-    activeClassName: React.PropTypes.string
   },
 
   onDragLeave: function(e) {
@@ -99,8 +99,8 @@ var Dropzone = React.createClass({
       style = this.props.style;
     } else if (!this.props.className) { // if no class or inline styles defined, use defaults
       style = {
-        width: this.props.width || this.props.size || 100,
-        height: this.props.height || this.props.size || 100,
+        width: 100,
+        height: 100,
         borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
       };
     }
