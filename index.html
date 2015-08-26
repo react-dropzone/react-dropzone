@@ -1,10 +1,148 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en-us">
+  <head>
     <meta charset="UTF-8">
-    <title>react-dropzone</title>
-</head>
-<body>
-    <script src="script.js"></script>
-</body>
+    <title>react-dropzone by paramaggarwal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">react-dropzone</h1>
+      <h2 class="project-tagline">Simple HTML5 drag-drop zone in React.js.</h2>
+      <a href="https://github.com/paramaggarwal/react-dropzone" class="btn">View on GitHub</a>
+      <a href="https://github.com/paramaggarwal/react-dropzone/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/paramaggarwal/react-dropzone/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><a href="http://paramaggarwal.github.io/react-dropzone/"><img src="https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png" alt="Screenshot of Dropzone"></a></p>
+
+<p>Demo: <a href="http://paramaggarwal.github.io/react-dropzone/">http://paramaggarwal.github.io/react-dropzone/</a></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using <a href="http://webpack.github.io/">Webpack</a>, <a href="http://browserify.org/">Browserify</a>, etc).</p>
+
+<pre><code>npm install --save react-dropzone
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Simply <code>require('react-dropzone')</code> and specify an <code>onDrop</code> method that accepts an array of dropped files. </p>
+
+<p>You can customize <code>&lt;Dropzone&gt;</code> by specifying children and passing a <code>style</code> or <code>className</code>. By default, the component picks up some default styling to get you started.</p>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<div class="highlight highlight-jsx"><pre>
+<span class="pl-c">/** @jsx React.DOM */</span>
+<span class="pl-k">var</span> React <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> Dropzone <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react-dropzone<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> DropzoneDemo <span class="pl-k">=</span> React.<span class="pl-c1">createClass</span>({
+    <span class="pl-en">onDrop</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">files</span>) {
+      <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">'</span>Received files: <span class="pl-pds">'</span></span>, files);
+    },
+
+    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+      <span class="pl-k">return</span> (
+          <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>Dropzone <span class="pl-c1">onDrop</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-c1">onDrop</span>}<span class="pl-k">&gt;</span>
+              <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>Try dropping some files here, or click to select files to upload.<span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>/Dropzone<span class="pl-k">&gt;</span>
+          <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+      );
+    }
+});
+
+React.<span class="pl-c1">render</span>(<span class="pl-k">&lt;</span>DropzoneDemo /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">body</span>);</pre></div>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>
+<code>supportClick</code> - Clicking the <code>&lt;Dropzone&gt;</code> brings up the browser file picker. To disable, set to <code>false</code>.</li>
+<li>
+<code>multiple</code> - To accept only a single file, set this to <code>false</code>.</li>
+<li>
+<code>accept</code> - The allowed file types can be controlled by the <code>accept</code> property, using the same syntax as the <a href="http://www.w3schools.com/tags/att_input_accept.asp">HTML  accept Attribute</a>.</li>
+</ul>
+
+<p>To show a preview of the dropped file while it uploads, use the <code>file.preview</code> property. Use <code>&lt;img src={file.preview} /&gt;</code> to display a preview of the image dropped.</p>
+
+<p>To trigger the dropzone manually (open the file prompt), call the component's <code>open</code> function.</p>
+
+<div class="highlight highlight-jsx"><pre><span class="pl-c">/** @jsx React.DOM */</span>
+<span class="pl-k">var</span> React <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> Dropzone <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react-dropzone<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> DropzoneDemo <span class="pl-k">=</span> React.<span class="pl-c1">createClass</span>({
+    <span class="pl-en">onDrop</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">files</span>) {
+      <span class="pl-v">this</span>.<span class="pl-c1">setState</span>({
+        files<span class="pl-k">:</span> files
+      });
+    },
+
+    <span class="pl-en">onOpenClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+      <span class="pl-v">this</span>.<span class="pl-c1">refs</span>.<span class="pl-c1">dropzone</span>.<span class="pl-c1">open</span>();
+    },
+
+    <span class="pl-en">render</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+      <span class="pl-k">return</span> (
+          <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>Dropzone ref<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>dropzone<span class="pl-pds">"</span></span> <span class="pl-c1">onDrop</span><span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-c1">onDrop</span>} <span class="pl-k">&gt;</span>
+              <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>Try dropping some files here, or click to select files to upload.<span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>/Dropzone<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>button type<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>button<span class="pl-pds">"</span></span> onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.<span class="pl-c1">onOpenClick</span>}<span class="pl-k">&gt;</span>
+                Open Dropzone
+            <span class="pl-k">&lt;</span>/button<span class="pl-k">&gt;</span>
+            {<span class="pl-v">this</span>.<span class="pl-c1">state</span>.<span class="pl-c1">files</span> <span class="pl-k">?</span> <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>h2<span class="pl-k">&gt;</span>Uploading {files.<span class="pl-c1">length</span>} files...<span class="pl-k">&lt;</span>/h2<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span><span class="pl-v">this</span>.<span class="pl-c1">state</span>.<span class="pl-c1">files</span>.<span class="pl-c1">map</span>((<span class="pl-smi">file</span>)<span class="pl-k"> =&gt;</span> <span class="pl-k">&lt;</span>img src<span class="pl-k">=</span>{file.<span class="pl-c1">preview</span>} /<span class="pl-k">&gt;</span>)<span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span> <span class="pl-k">:</span> <span class="pl-c1">null</span>}
+          <span class="pl-k">&lt;</span>/div<span class="pl-k">&gt;</span>
+      );
+    }
+});
+
+React.<span class="pl-c1">render</span>(<span class="pl-k">&lt;</span>DropzoneDemo /<span class="pl-k">&gt;</span>, <span class="pl-c1">document</span>.<span class="pl-c1">body</span>);</pre></div>
+
+<h2>
+<a id="uploads" class="anchor" href="#uploads" aria-hidden="true"><span class="octicon octicon-link"></span></a>Uploads</h2>
+
+<p>Using <code>react-dropzone</code> is similar to using a file form field, but instead of getting the <code>files</code> property from the field, you listen to the <code>onDrop</code> callback to handle the files. Simple explanation here: <a href="http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax">http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax</a></p>
+
+<p>Specifying the <code>onDrop</code> method, provides you with an array of <a href="https://developer.mozilla.org/en-US/docs/Web/API/File">Files</a> which you can then send to a server. For example, with <a href="https://github.com/visionmedia/superagent">SuperAgent</a> as a http/ajax library:</p>
+
+<div class="highlight highlight-javascript"><pre>    <span class="pl-en">onDrop</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">files</span>){
+        <span class="pl-k">var</span> req <span class="pl-k">=</span> request.<span class="pl-c1">post</span>(<span class="pl-s"><span class="pl-pds">'</span>/upload<span class="pl-pds">'</span></span>);
+        files.<span class="pl-c1">forEach</span>((<span class="pl-smi">file</span>)<span class="pl-k">=&gt;</span> {
+            req.<span class="pl-c1">attach</span>(file.<span class="pl-c1">name</span>, file);
+        });
+        req.<span class="pl-c1">end</span>(callback);
+    }</pre></div>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>MIT</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/paramaggarwal/react-dropzone">react-dropzone</a> is maintained by <a href="https://github.com/paramaggarwal">paramaggarwal</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
 </html>
