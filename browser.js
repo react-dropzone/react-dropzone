@@ -29,8 +29,8 @@ var DropzoneDemo = React.createClass({
             {[].map.call(files, function (f, i) {
               return (
                 <li key={i}>
-                  {f.name + ' : ' + f.size + ' bytes.'}
-                  <img src={f.preview} />
+                  <img src={f.preview} width={100}/>
+                  <div>{f.name + ' : ' + f.size + ' bytes.'}</div>
                 </li>
               );
             })}
@@ -41,15 +41,17 @@ var DropzoneDemo = React.createClass({
 
     render: function () {
       var styles = {
-        padding: 30
+        border: '2px black dashed',
+        borderRadius: 5,
+        margin: 30,
+        padding: 30,
+        width: 200,
       };
 
       return (
           <div>
-            <Dropzone onDrop={this.onDrop}>
-              <div style={styles}>
-                Try dropping some files here, or click to select files to upload.
-              </div>
+            <Dropzone onDrop={this.onDrop} style={styles}>
+              Try dropping some files here, or click to select files to upload.
             </Dropzone>
             {this.showFiles()}
           </div>
@@ -57,6 +59,6 @@ var DropzoneDemo = React.createClass({
     }
 });
 
-React.render(<DropzoneDemo />, document.body);
+React.render(<DropzoneDemo />, document.getElementById('example'));
 
 module.exports = DropzoneDemo;
