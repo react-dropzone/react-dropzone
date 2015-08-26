@@ -3,9 +3,7 @@ react-dropzone
 
 Simple HTML5 drag-drop zone for files in React.js.
 
-[![Screenshot of Dropzone](https://raw.githubusercontent.com/paramaggarwal/react-dropzone/master/screenshot.png)](http://paramaggarwal.github.io/react-dropzone/)
-
-Demo: http://paramaggarwal.github.io/react-dropzone/
+Try it out here: http://paramaggarwal.github.io/react-dropzone/
 
 Installation
 ============
