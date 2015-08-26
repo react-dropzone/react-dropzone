@@ -1,7 +1,7 @@
 {
   "name": "react-dropzone-demo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.3.0",
   "author": "Param Aggarwal",
   "license": "MIT",
   "browserify": {
@@ -12,10 +12,14 @@
     ]
   },
   "scripts": {
-    "prepublish": "cd .. && npm install react && cd - && browserify browser.js > script.js"
+    "build": "npm install && browserify browser.js > script.js"
   },
   "devDependencies": {
     "babelify": "^6.1.2",
     "browserify": "^10.2.4"
+  },
+  "dependencies": {
+    "react": "^0.13.3",
+    "react-dropzone": "^1.3.0"
   }
 }

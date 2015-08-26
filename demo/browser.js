@@ -1,5 +1,5 @@
-var Dropzone = require('../');
-var React = require('../node_modules/react');
+var Dropzone = require('react-dropzone');
+var React = require('react');
 
 var DropzoneDemo = React.createClass({
     getInitialState: function () {
@@ -16,18 +16,23 @@ var DropzoneDemo = React.createClass({
     },
 
     showFiles: function () {
-      if (this.state.files.length <= 0) {
+      var files = this.state.files;
+
+      if (files.length <= 0) {
         return '';
       }
-
-      var files = this.state.files;
 
       return (
         <div>
           <h3>Dropped files: </h3>
           <ul>
             {[].map.call(files, function (f, i) {
-              return <li key={i}>{f.name + ' : ' + f.size + ' bytes.'}</li>;
+              return (
+                <li key={i}>
+                  {f.name + ' : ' + f.size + ' bytes.'}
+                  <img src={f.preview} />
+                </li>
+              );
             })}
           </ul>
         </div>
@@ -35,14 +40,16 @@ var DropzoneDemo = React.createClass({
     },
 
     render: function () {
-      var styling = {
+      var styles = {
         padding: 30
       };
 
       return (
           <div>
-            <Dropzone onDrop={this.onDrop} size={150} >
-              <div style={styling}>Try dropping some files here, or click to select files to upload.</div>
+            <Dropzone onDrop={this.onDrop}>
+              <div style={styles}>
+                Try dropping some files here, or click to select files to upload.
+              </div>
             </Dropzone>
             {this.showFiles()}
           </div>

@@ -1,8 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var Dropzone = require('../');
-var React = require('../node_modules/react');
+var Dropzone = require('react-dropzone');
+var React = require('react');
 
 var DropzoneDemo = React.createClass({
   displayName: 'DropzoneDemo',
@@ -21,11 +21,11 @@ var DropzoneDemo = React.createClass({
   },
 
   showFiles: function showFiles() {
-    if (this.state.files.length <= 0) {
+    var files = this.state.files;
+
+    if (files.length <= 0) {
       return '';
     }
-
-    var files = this.state.files;
 
     return React.createElement(
       'div',
@@ -42,7 +42,8 @@ var DropzoneDemo = React.createClass({
           return React.createElement(
             'li',
             { key: i },
-            f.name + ' : ' + f.size + ' bytes.'
+            f.name + ' : ' + f.size + ' bytes.',
+            React.createElement('img', { src: f.preview })
           );
         })
       )
@@ -50,7 +51,7 @@ var DropzoneDemo = React.createClass({
   },
 
   render: function render() {
-    var styling = {
+    var styles = {
       padding: 30
     };
 
@@ -59,10 +60,10 @@ var DropzoneDemo = React.createClass({
       null,
       React.createElement(
         Dropzone,
-        { onDrop: this.onDrop, size: 150 },
+        { onDrop: this.onDrop },
         React.createElement(
           'div',
-          { style: styling },
+          { style: styles },
           'Try dropping some files here, or click to select files to upload.'
         )
       ),
@@ -75,7 +76,7 @@ React.render(React.createElement(DropzoneDemo, null), document.body);
 
 module.exports = DropzoneDemo;
 
-},{"../":3,"../node_modules/react":158}],2:[function(require,module,exports){
+},{"react":158,"react-dropzone":3}],2:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -171,6 +172,9 @@ process.umask = function() { return 0; };
 var React = require('react');
 
 var Dropzone = React.createClass({
+
+  displayName: 'Dropzone',
+
   getDefaultProps: function() {
     return {
       supportClick: true,
@@ -186,26 +190,36 @@ var Dropzone = React.createClass({
 
   propTypes: {
     onDrop: React.PropTypes.func.isRequired,
-    size: React.PropTypes.number,
+    onDragOver: React.PropTypes.func,
+    onDragLeave: React.PropTypes.func,
+
     style: React.PropTypes.object,
+    className: React.PropTypes.string,
+    activeClassName: React.PropTypes.string,
+
     supportClick: React.PropTypes.bool,
     accept: React.PropTypes.string,
-    multiple: React.PropTypes.bool
+    multiple: React.PropTypes.bool,
   },
 
   onDragLeave: function(e) {
     this.setState({
       isDragActive: false
     });
+
+    if (this.props.onDragLeave) {
+      this.props.onDragLeave(e);
+    }
   },
 
   onDragOver: function(e) {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 
-    this.setState({
-      isDragActive: true
-    });
+    if (this.props.onDragOver) {
+      this.props.onDragOver(e);
+    }
   },
 
   onDrop: function(e) {
@@ -240,28 +254,50 @@ var Dropzone = React.createClass({
   },
 
   open: function() {
-    React.findDOMNode(this.refs.fileInput).click();
+    var fileInput = React.findDOMNode(this.refs.fileInput);
+    fileInput.value = null;
+    fileInput.click();
   },
 
   render: function() {
-
     var className = this.props.className || 'dropzone';
     if (this.state.isDragActive) {
-      className += ' active';
+      className += (' ' + this.props.activeClassName) || ' active';
     }
 
-    var style = this.props.style || {
-      width: this.props.size || 100,
-      height: this.props.size || 100,
-      borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
-    };
-
+    var style = {};
+    if (this.props.style) { // user-defined inline styles take priority
+      style = this.props.style;
+    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      style = {
+        width: 100,
+        height: 100,
+        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+      };
+    }
 
     return (
-        React.createElement('div', {className: className, style: style, onClick: this.onClick, onDragLeave: this.onDragLeave, onDragOver: this.onDragOver, onDrop: this.onDrop},
-            React.createElement('input', {style: {display: 'none'}, type: 'file', multiple: this.props.multiple, ref: 'fileInput', onChange: this.onDrop, accept: this.props.accept}),
-            this.props.children
-        )
+      React.createElement('div',
+        {
+          className: className,
+          style: style,
+          onClick: this.onClick,
+          onDragLeave: this.onDragLeave,
+          onDragOver: this.onDragOver,
+          onDrop: this.onDrop
+        },
+        React.createElement('input',
+          {
+            style: { display: 'none' },
+            type: 'file',
+            multiple: this.props.multiple,
+            ref: 'fileInput',
+            onChange: this.onDrop,
+            accept: this.props.accept
+          }
+        ),
+        this.props.children
+      )
     );
   }
 
