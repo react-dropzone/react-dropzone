@@ -1,7 +1,7 @@
 react-dropzone
 ==============
 
-Simple HTML5 drag-drop zone for files in React.js.
+Simple HTML5 drag-drop zone for files with React.js.
 
 Try it out here: http://paramaggarwal.github.io/react-dropzone/
 
