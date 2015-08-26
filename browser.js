@@ -40,17 +40,26 @@ var DropzoneDemo = React.createClass({
     },
 
     render: function () {
-      var styles = {
-        border: '2px black dashed',
-        borderRadius: 5,
+      var style = {
+        borderWidth: 2,
+        borderColor: 'black',
+        borderStyle: 'dashed',
+        borderRadius: 4,
         margin: 30,
         padding: 30,
         width: 200,
+        transition: 'all 0.5s'
+      };
+
+      var activeStyle = {
+        borderStyle: 'solid',
+        backgroundColor: '#eee',
+        borderRadius: 8
       };
 
       return (
           <div>
-            <Dropzone onDrop={this.onDrop} style={styles}>
+            <Dropzone onDrop={this.onDrop} style={style} activeStyle={activeStyle}>
               Try dropping some files here, or click to select files to upload.
             </Dropzone>
             {this.showFiles()}

@@ -4,9 +4,10 @@ Demo
 ### Compile
 
 ```
+$ npm install
 $ npm run build
 ```
 
 ### Run
 
-Just open `index.html` in your browser.
+Open `index.html` in your browser.
