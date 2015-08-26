@@ -2,11 +2,9 @@ var React = require('react');
 
 var Dropzone = React.createClass({
 
-  displayName: 'Dropzone',
-
   getDefaultProps: function() {
     return {
-      supportClick: true,
+      disableClick: false,
       multiple: true
     };
   },
@@ -19,35 +17,43 @@ var Dropzone = React.createClass({
 
   propTypes: {
     onDrop: React.PropTypes.func.isRequired,
-    onDragOver: React.PropTypes.func,
+    onDragEnter: React.PropTypes.func,
     onDragLeave: React.PropTypes.func,
 
     style: React.PropTypes.object,
+    activeStyle: React.PropTypes.object,
     className: React.PropTypes.string,
     activeClassName: React.PropTypes.string,
 
-    supportClick: React.PropTypes.bool,
-    accept: React.PropTypes.string,
+    disableClick: React.PropTypes.bool,
     multiple: React.PropTypes.bool,
   },
 
+  onDragEnter: function(e) {
+    e.preventDefault();
+
+    this.setState({
+      isDragActive: true
+    });
+
+    if (this.props.onDragEnter) {
+      this.props.onDragEnter(e);
+    }
+  },
+
+  onDragOver: function (e) {
+    e.preventDefault();
+  },
+
   onDragLeave: function(e) {
+    e.preventDefault();
+
     this.setState({
       isDragActive: false
     });
 
     if (this.props.onDragLeave) {
       this.props.onDragLeave(e);
-    }
-  },
-
-  onDragOver: function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.dataTransfer.dropEffect = 'copy';
-
-    if (this.props.onDragOver) {
-      this.props.onDragOver(e);
     }
   },
 
@@ -58,26 +64,23 @@ var Dropzone = React.createClass({
       isDragActive: false
     });
 
-    var files;
-    if (e.dataTransfer) {
-      files = e.dataTransfer.files;
-    } else if (e.target) {
-      files = e.target.files;
-    }
+    var droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    var max = this.props.multiple ? droppedFiles.length : 1;
+    var files = [];
 
-    var maxFiles = (this.props.multiple) ? files.length : 1;
-    for (var i = 0; i < maxFiles; i++) {
-      files[i].preview = URL.createObjectURL(files[i]);
+    for (var i = 0; i < max; i++) {
+      var file = droppedFiles[i];
+      file.preview = URL.createObjectURL(file);
+      files.push(file);
     }
 
     if (this.props.onDrop) {
-      files = Array.prototype.slice.call(files, 0, maxFiles);
       this.props.onDrop(files, e);
     }
   },
 
   onClick: function () {
-    if (this.props.supportClick === true) {
+    if (!this.props.disableClick) {
       this.open();
     }
   },
@@ -89,44 +92,66 @@ var Dropzone = React.createClass({
   },
 
   render: function() {
-    var className = this.props.className || 'dropzone';
-    if (this.state.isDragActive) {
-      className += (' ' + this.props.activeClassName) || ' active';
-    }
 
-    var style = {};
-    if (this.props.style) { // user-defined inline styles take priority
+    var className;
+    if (this.props.className) {
+      className = this.props.className;
+      if (this.state.isDragActive) {
+        className += ' ' + this.props.activeClassName;
+      };
+    };
+
+    var style, activeStyle;
+    if (this.props.style) {
       style = this.props.style;
-    } else if (!this.props.className) { // if no class or inline styles defined, use defaults
+      activeStyle = this.props.activeStyle;
+    } else if (!className) {
       style = {
-        width: 100,
-        height: 100,
-        borderStyle: this.state.isDragActive ? 'solid' : 'dashed'
+        width: 200,
+        height: 200,
+        borderWidth: 2,
+        borderColor: '#666',
+        borderStyle: 'dashed',
+        borderRadius: 5,
+      };
+      activeStyle = {
+        borderStyle: 'solid',
+        backgroundColor: '#eee'
       };
     }
 
+    var appliedStyle;
+    if (style && this.state.isDragActive) {
+      appliedStyle = {
+        ...style,
+        ...activeStyle
+      };
+    } else {
+      appliedStyle = {
+        ...style
+      };
+    };
+
     return (
-      React.createElement('div',
-        {
-          className: className,
-          style: style,
-          onClick: this.onClick,
-          onDragLeave: this.onDragLeave,
-          onDragOver: this.onDragOver,
-          onDrop: this.onDrop
-        },
-        React.createElement('input',
-          {
-            style: { display: 'none' },
-            type: 'file',
-            multiple: this.props.multiple,
-            ref: 'fileInput',
-            onChange: this.onDrop,
-            accept: this.props.accept
-          }
-        ),
-        this.props.children
-      )
+      <div
+        className={className}
+        style={appliedStyle}
+        onClick={this.onClick}
+        onDragEnter={this.onDragEnter}
+        onDragOver={this.onDragOver}
+        onDragLeave={this.onDragLeave}
+        onDrop={this.onDrop}
+      >
+        <input
+          type='file'
+          ref='fileInput'
+          style={{ display: 'none' }}
+          multiple={this.props.multiple}
+          onChange={this.onDrop}
+        >
+          {this.props.children}
+        </input>
+      </div>
     );
   }
 
