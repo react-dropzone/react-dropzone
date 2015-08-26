@@ -19,7 +19,7 @@ Usage
 
 Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. 
 
-You can customize `<Dropzone>` by specifying children and passing a `style` or `className`. By default, the component picks up some default styling to get you started.
+By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
 
 Example
 =====
@@ -52,9 +52,8 @@ React.render(<DropzoneDemo />, document.body);
 Features
 ========
 
-- `supportClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `false`.
+- `disableClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `true`.
 - `multiple` - To accept only a single file, set this to `false`.
-- `accept` - The allowed file types can be controlled by the `accept` property, using the same syntax as the [HTML <input> accept Attribute](http://www.w3schools.com/tags/att_input_accept.asp).
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 
