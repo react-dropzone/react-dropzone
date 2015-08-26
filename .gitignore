@@ -4,3 +4,6 @@ logs
 
 # Dependency directory
 node_modules
+
+# Generated files
+lib

@@ -2,7 +2,11 @@
   "name": "react-dropzone",
   "version": "1.3.0",
   "description": "Simple HTML5 drag-drop zone with React.js",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel index.js --out-file lib/index.js"
+    "prepublish": "babel index.js --out-file lib/index.js"
+  },
   "keywords": [
     "react-component",
     "react",
@@ -19,5 +23,9 @@
   },
   "homepage": "https://github.com/paramaggarwal/react-dropzone",
   "author": "Param Aggarwal",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "babel": "^5.8.21"
+  }
 }
