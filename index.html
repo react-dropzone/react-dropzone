@@ -35,7 +35,7 @@
 
 <p>Simply <code>require('react-dropzone')</code> and specify an <code>onDrop</code> method that accepts an array of dropped files. </p>
 
-<p>You can customize <code>&lt;Dropzone&gt;</code> by specifying children and passing a <code>style</code> or <code>className</code>. By default, the component picks up some default styling to get you started.</p>
+<p>By default, the component picks up some default styling to get you started. You can customize <code>&lt;Dropzone&gt;</code> by specifying a <code>style</code> and <code>activeStyle</code> which is applied when a file is dragged over the zone. You can also specify <code>className</code> and <code>activeClassName</code> if you would rather style using CSS.</p>
 
 <h2>
 <a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
@@ -68,11 +68,9 @@ React.<span class="pl-c1">render</span>(<span class="pl-k">&lt;</span>DropzoneDe
 
 <ul>
 <li>
-<code>supportClick</code> - Clicking the <code>&lt;Dropzone&gt;</code> brings up the browser file picker. To disable, set to <code>false</code>.</li>
+<code>disableClick</code> - Clicking the <code>&lt;Dropzone&gt;</code> brings up the browser file picker. To disable, set to <code>true</code>.</li>
 <li>
 <code>multiple</code> - To accept only a single file, set this to <code>false</code>.</li>
-<li>
-<code>accept</code> - The allowed file types can be controlled by the <code>accept</code> property, using the same syntax as the <a href="http://www.w3schools.com/tags/att_input_accept.asp">HTML  accept Attribute</a>.</li>
 </ul>
 
 <p>To show a preview of the dropped file while it uploads, use the <code>file.preview</code> property. Use <code>&lt;img src={file.preview} /&gt;</code> to display a preview of the image dropped.</p>
