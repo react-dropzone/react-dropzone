@@ -65,6 +65,12 @@ var React = require('react');
 var Dropzone = require('react-dropzone');
 
 var DropzoneDemo = React.createClass({
+    getInitialState() {
+        return {
+          files: []
+        }
+    },
+
     onDrop: function (files) {
       this.setState({
         files: files
@@ -76,20 +82,20 @@ var DropzoneDemo = React.createClass({
     },
 
     render: function () {
-      return (
-          <div>
-            <Dropzone ref="dropzone" onDrop={this.onDrop} >
-              <div>Try dropping some files here, or click to select files to upload.</div>
-            </Dropzone>
-            <button type="button" onClick={this.onOpenClick}>
-                Open Dropzone
-            </button>
-            {this.state.files ? <div>
-            <h2>Uploading {files.length} files...</h2>
-            <div>this.state.files.map((file) => <img src={file.preview} />)</div>
-            </div> : null}
-          </div>
-      );
+        return (
+            <div>
+                <Dropzone ref="dropzone" onDrop={this.onDrop}>
+                    <div>Try dropping some files here, or click to select files to upload.</div>
+                </Dropzone>
+                <button type="button" onClick={this.onOpenClick}>
+                    Open Dropzone
+                </button>
+                {this.state.files.length > 0 ? <div>
+                <h2>Uploading {this.state.files.length} files...</h2>
+                <div>{this.state.files.map((file) => <img src={file.preview} /> )}</div>
+                </div> : null}
+            </div>
+        );
     }
 });
 
