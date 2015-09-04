@@ -65,10 +65,10 @@ var React = require('react');
 var Dropzone = require('react-dropzone');
 
 var DropzoneDemo = React.createClass({
-    getInitialState() {
+    getInitialState: function () {
         return {
           files: []
-        }
+        };
     },
 
     onDrop: function (files) {
