@@ -142,15 +142,14 @@ var Dropzone = React.createClass({
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
       >
+        {this.props.children}
         <input
           type='file'
           ref='fileInput'
           style={{ display: 'none' }}
           multiple={this.props.multiple}
           onChange={this.onDrop}
-        >
-          {this.props.children}
-        </input>
+        />
       </div>
     );
   }
