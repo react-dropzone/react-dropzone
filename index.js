@@ -1,4 +1,5 @@
 var React = require('react');
+var accept = require('attr-accept');
 
 var Dropzone = React.createClass({
 
@@ -16,7 +17,9 @@ var Dropzone = React.createClass({
   },
 
   propTypes: {
-    onDrop: React.PropTypes.func.isRequired,
+    onDrop: React.PropTypes.func,
+    onDropAccepted: React.PropTypes.func,
+    onDropRejected: React.PropTypes.func,
     onDragEnter: React.PropTypes.func,
     onDragLeave: React.PropTypes.func,
 
@@ -24,16 +27,26 @@ var Dropzone = React.createClass({
     activeStyle: React.PropTypes.object,
     className: React.PropTypes.string,
     activeClassName: React.PropTypes.string,
+    rejectClassName: React.PropTypes.string,
 
     disableClick: React.PropTypes.bool,
     multiple: React.PropTypes.bool,
+    accept: React.PropTypes.string,
+  },
+
+  allFilesAccepted: function(files) {
+    return files.every(file => accept(file, this.props.accept))
   },
 
   onDragEnter: function(e) {
     e.preventDefault();
 
+    var dataTransferItems = Array.prototype.slice.call(e.dataTransfer ? e.dataTransfer.items : e.target.files);
+    var allFilesAccepted = this.allFilesAccepted(dataTransferItems);
+
     this.setState({
-      isDragActive: true
+      isDragActive: allFilesAccepted,
+      isDragReject: !allFilesAccepted
     });
 
     if (this.props.onDragEnter) {
@@ -49,7 +62,8 @@ var Dropzone = React.createClass({
     e.preventDefault();
 
     this.setState({
-      isDragActive: false
+      isDragActive: false,
+      isDragReject: false
     });
 
     if (this.props.onDragLeave) {
@@ -61,7 +75,8 @@ var Dropzone = React.createClass({
     e.preventDefault();
 
     this.setState({
-      isDragActive: false
+      isDragActive: false,
+      isDragReject: false
     });
 
     var droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
@@ -76,6 +91,16 @@ var Dropzone = React.createClass({
 
     if (this.props.onDrop) {
       this.props.onDrop(files, e);
+    }
+
+    if (this.allFilesAccepted(files)) {
+      if (this.props.onDropAccepted) {
+        this.props.onDropAccepted(files, e);
+      }
+    } else {
+      if (this.props.onDropRejected) {
+        this.props.onDropRejected(files, e);
+      }
     }
   },
 
@@ -98,6 +123,9 @@ var Dropzone = React.createClass({
       className = this.props.className;
       if (this.state.isDragActive) {
         className += ' ' + this.props.activeClassName;
+      };
+      if (this.state.isDragReject) {
+        className += ' ' + this.props.rejectClassName;
       };
     };
 
@@ -148,6 +176,7 @@ var Dropzone = React.createClass({
           ref='fileInput'
           style={{ display: 'none' }}
           multiple={this.props.multiple}
+          accept={this.props.accept}
           onChange={this.onDrop}
         />
       </div>
