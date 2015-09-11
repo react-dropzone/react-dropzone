@@ -41,8 +41,13 @@ var Dropzone = React.createClass({
   onDragEnter: function(e) {
     e.preventDefault();
 
-    var dataTransferItems = Array.prototype.slice.call(e.dataTransfer ? e.dataTransfer.items : e.target.files);
-    var allFilesAccepted = this.allFilesAccepted(dataTransferItems);
+    // This is tricky. During the drag even the dataTransfer.files is null
+    // But Chrome implements some drag store, which is accesible via dataTransfer.items
+    var dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
+
+    // Now we need to convert the DataTransferList to Array
+    var itemsArray = Array.prototype.slice.call(dataTransferItems);
+    var allFilesAccepted = this.allFilesAccepted(itemsArray);
 
     this.setState({
       isDragActive: allFilesAccepted,
