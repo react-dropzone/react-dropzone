@@ -90,7 +90,7 @@ var Dropzone = React.createClass({
 
     for (var i = 0; i < max; i++) {
       var file = droppedFiles[i];
-      file.preview = URL.createObjectURL(file);
+      file.preview = window.URL.createObjectURL(file);
       files.push(file);
     }
 
