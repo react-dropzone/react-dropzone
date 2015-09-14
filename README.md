@@ -14,6 +14,12 @@ The easiest way to use react-dropzone is to install it from npm and include it i
 npm install --save react-dropzone
 ```
 
+Create a standalone module using *WebPack*:
+```
+> npm install
+> webpack
+```
+
 Usage
 =====
 

@@ -135,9 +135,13 @@ var Dropzone = React.createClass({
     };
 
     var style, activeStyle;
-    if (this.props.style) {
-      style = this.props.style;
-      activeStyle = this.props.activeStyle;
+    if (this.props.style || this.props.activeStyle) {
+      if (this.props.style) {
+        style = this.props.style;
+      }
+      if (this.props.activeStyle) {
+        activeStyle = this.props.activeStyle;
+      }
     } else if (!className) {
       style = {
         width: 200,
@@ -154,7 +158,7 @@ var Dropzone = React.createClass({
     }
 
     var appliedStyle;
-    if (style && this.state.isDragActive) {
+    if (activeStyle && this.state.isDragActive) {
       appliedStyle = {
         ...style,
         ...activeStyle
