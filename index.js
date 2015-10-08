@@ -1,4 +1,5 @@
 var React = require('react');
+var ReactDOM = require('react-dom');
 var accept = require('attr-accept');
 
 var Dropzone = React.createClass({
@@ -116,7 +117,7 @@ var Dropzone = React.createClass({
   },
 
   open: function() {
-    var fileInput = React.findDOMNode(this.refs.fileInput);
+    var fileInput = ReactDOM.findDOMNode(this.refs.fileInput);
     fileInput.value = null;
     fileInput.click();
   },
