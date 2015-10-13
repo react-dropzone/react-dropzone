@@ -34,12 +34,19 @@ var Dropzone = React.createClass({
     accept: React.PropTypes.string,
   },
 
+  componentDidMount: function() {
+    this.enterCounter = 0;
+  },
+
   allFilesAccepted: function(files) {
     return files.every(file => accept(file, this.props.accept))
   },
 
   onDragEnter: function(e) {
     e.preventDefault();
+
+    // Count the dropzone and any children that are entered.
+    ++this.enterCounter;
 
     // This is tricky. During the drag even the dataTransfer.files is null
     // But Chrome implements some drag store, which is accesible via dataTransfer.items
@@ -66,6 +73,11 @@ var Dropzone = React.createClass({
   onDragLeave: function(e) {
     e.preventDefault();
 
+    // Only deactivate once the dropzone and all children was left.
+    if (--this.enterCounter > 0) {
+      return;
+    }
+
     this.setState({
       isDragActive: false,
       isDragReject: false
@@ -78,6 +90,9 @@ var Dropzone = React.createClass({
 
   onDrop: function(e) {
     e.preventDefault();
+
+    // Reset the counter along with the drag on a drop.
+    this.enterCounter = 0;
 
     this.setState({
       isDragActive: false,
