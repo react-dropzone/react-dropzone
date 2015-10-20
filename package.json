@@ -28,7 +28,7 @@
     "react": ">=0.13"
   },
   "dependencies": {
-    "attr-accept": "^1.0.1"
+    "attr-accept": "^1.0.2"
   },
   "devDependencies": {
     "babel": "^5.8.21"
