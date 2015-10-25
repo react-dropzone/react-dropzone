@@ -141,10 +141,10 @@ var Dropzone = React.createClass({
     var className;
     if (this.props.className) {
       className = this.props.className;
-      if (this.state.isDragActive) {
+      if (this.state.isDragActive && this.props.activeClassName) {
         className += ' ' + this.props.activeClassName;
       };
-      if (this.state.isDragReject) {
+      if (this.state.isDragReject && this.props.rejectClassName) {
         className += ' ' + this.props.rejectClassName;
       };
     };
