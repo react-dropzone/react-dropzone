@@ -1,48 +1,29 @@
 var React = require('react');
 var accept = require('attr-accept');
 
-var Dropzone = React.createClass({
+class Dropzone extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.onClick = this.onClick.bind(this);
+    this.onDragEnter = this.onDragEnter.bind(this);
+    this.onDragLeave = this.onDragLeave.bind(this);
+    this.onDragOver = this.onDragOver.bind(this);
+    this.onDrop = this.onDrop.bind(this);
 
-  getDefaultProps: function() {
-    return {
-      disableClick: false,
-      multiple: true
-    };
-  },
-
-  getInitialState: function() {
-    return {
+    this.state = {
       isDragActive: false
     };
-  },
+  }
 
-  propTypes: {
-    onDrop: React.PropTypes.func,
-    onDropAccepted: React.PropTypes.func,
-    onDropRejected: React.PropTypes.func,
-    onDragEnter: React.PropTypes.func,
-    onDragLeave: React.PropTypes.func,
-
-    style: React.PropTypes.object,
-    activeStyle: React.PropTypes.object,
-    className: React.PropTypes.string,
-    activeClassName: React.PropTypes.string,
-    rejectClassName: React.PropTypes.string,
-
-    disableClick: React.PropTypes.bool,
-    multiple: React.PropTypes.bool,
-    accept: React.PropTypes.string,
-  },
-
-  componentDidMount: function() {
+  componentDidMount() {
     this.enterCounter = 0;
-  },
+  }
 
-  allFilesAccepted: function(files) {
+  allFilesAccepted(files) {
     return files.every(file => accept(file, this.props.accept))
-  },
+  }
 
-  onDragEnter: function(e) {
+  onDragEnter(e) {
     e.preventDefault();
 
     // Count the dropzone and any children that are entered.
@@ -64,13 +45,13 @@ var Dropzone = React.createClass({
     if (this.props.onDragEnter) {
       this.props.onDragEnter(e);
     }
-  },
+  }
 
-  onDragOver: function (e) {
+  onDragOver(e) {
     e.preventDefault();
-  },
+  }
 
-  onDragLeave: function(e) {
+  onDragLeave(e) {
     e.preventDefault();
 
     // Only deactivate once the dropzone and all children was left.
@@ -86,9 +67,9 @@ var Dropzone = React.createClass({
     if (this.props.onDragLeave) {
       this.props.onDragLeave(e);
     }
-  },
+  }
 
-  onDrop: function(e) {
+  onDrop(e) {
     e.preventDefault();
 
     // Reset the counter along with the drag on a drop.
@@ -122,34 +103,33 @@ var Dropzone = React.createClass({
         this.props.onDropRejected(files, e);
       }
     }
-  },
+  }
 
-  onClick: function () {
+  onClick() {
     if (!this.props.disableClick) {
       this.open();
     }
-  },
+  }
 
-  open: function() {
+  open() {
     var fileInput = this.refs.fileInput;
     fileInput.value = null;
     fileInput.click();
-  },
+  }
 
-  render: function() {
+  render() {
+    var className, style, activeStyle;
 
-    var className;
     if (this.props.className) {
       className = this.props.className;
       if (this.state.isDragActive && this.props.activeClassName) {
         className += ' ' + this.props.activeClassName;
-      };
+      }
       if (this.state.isDragReject && this.props.rejectClassName) {
         className += ' ' + this.props.rejectClassName;
-      };
-    };
+      }
+    }
 
-    var style, activeStyle;
     if (this.props.style || this.props.activeStyle) {
       if (this.props.style) {
         style = this.props.style;
@@ -164,7 +144,7 @@ var Dropzone = React.createClass({
         borderWidth: 2,
         borderColor: '#666',
         borderStyle: 'dashed',
-        borderRadius: 5,
+        borderRadius: 5
       };
       activeStyle = {
         borderStyle: 'solid',
@@ -182,7 +162,7 @@ var Dropzone = React.createClass({
       appliedStyle = {
         ...style
       };
-    };
+    }
 
     return (
       <div
@@ -206,7 +186,29 @@ var Dropzone = React.createClass({
       </div>
     );
   }
+}
 
-});
+Dropzone.defaultProps = {
+  disableClick: false,
+  multiple: true
+};
+
+Dropzone.propTypes = {
+  onDrop: React.PropTypes.func,
+  onDropAccepted: React.PropTypes.func,
+  onDropRejected: React.PropTypes.func,
+  onDragEnter: React.PropTypes.func,
+  onDragLeave: React.PropTypes.func,
+
+  style: React.PropTypes.object,
+  activeStyle: React.PropTypes.object,
+  className: React.PropTypes.string,
+  activeClassName: React.PropTypes.string,
+  rejectClassName: React.PropTypes.string,
+
+  disableClick: React.PropTypes.bool,
+  multiple: React.PropTypes.bool,
+  accept: React.PropTypes.string
+};
 
 module.exports = Dropzone;
