@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "babel index.js --out-file lib/index.js",
-    "prepublish": "babel index.js --out-file lib/index.js"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "react-component",
@@ -25,7 +25,7 @@
   "author": "Param Aggarwal",
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=0.13"
+    "react": "^0.14.0"
   },
   "dependencies": {
     "attr-accept": "^1.0.3"
