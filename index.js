@@ -114,7 +114,13 @@ class Dropzone extends React.Component {
   open() {
     var fileInput = this.refs.fileInput;
     fileInput.value = null;
-    fileInput.click();
+    if (fileInput.click && typeof fileInput.click === 'function'){
+      fileInput.click();
+    }
+    else {
+    fileInput.getDOMNode().click();
+  }
+  
   }
 
   render() {
