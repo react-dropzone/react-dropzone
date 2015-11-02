@@ -20,6 +20,15 @@ Create a standalone module using *WebPack*:
 > webpack
 ```
 
+React 0.13 users
+=====
+
+Vesion 3.x is not compatible with React 0.13. If you can't upgrade to React 0.14 right now, you should use v 2.x of this package.
+
+```
+npm install --save react-dropzone@2.x
+```
+
 Usage
 =====
 
