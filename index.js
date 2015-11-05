@@ -1,7 +1,6 @@
-const React = require('react');
-const accept = require('attr-accept');
+import React from 'react';
+import accept from 'attr-accept';
 
-// detect support for attribute that breaks older mobile devices
 const supportMultiple = 'multiple' in document.createElement('input');
 
 class Dropzone extends React.Component {
@@ -154,7 +153,7 @@ class Dropzone extends React.Component {
       };
     }
 
-    var appliedStyle;
+    let appliedStyle;
     if (activeStyle && this.state.isDragActive) {
       appliedStyle = {
         ...style,
