@@ -1,6 +1,7 @@
-import React from 'react';
-import accept from 'attr-accept';
+const React = require('react');
+const accept = require('attr-accept');
 
+// detect support for attribute that breaks older mobile devices
 const supportMultiple = 'multiple' in document.createElement('input');
 
 class Dropzone extends React.Component {
