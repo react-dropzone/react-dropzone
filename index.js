@@ -118,7 +118,7 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    var className, style, activeStyle, rejecStyle;
+    var className, style, activeStyle, rejectStyle;
 
     if (this.props.className) {
       className = this.props.className;
