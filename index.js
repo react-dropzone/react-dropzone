@@ -118,7 +118,7 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    var className, style, activeStyle;
+    var className, style, activeStyle, rejectStyle;
 
     if (this.props.className) {
       className = this.props.className;
@@ -130,12 +130,15 @@ class Dropzone extends React.Component {
       }
     }
 
-    if (this.props.style || this.props.activeStyle) {
+    if (this.props.style || this.props.activeStyle || this.props.rejectStyle) {
       if (this.props.style) {
         style = this.props.style;
       }
       if (this.props.activeStyle) {
         activeStyle = this.props.activeStyle;
+      }
+      if (this.props.rejectStyle) {
+        rejectStyle = this.props.rejectStyle;
       }
     } else if (!className) {
       style = {
@@ -150,6 +153,10 @@ class Dropzone extends React.Component {
         borderStyle: 'solid',
         backgroundColor: '#eee'
       };
+      rejectStyle = {
+        borderStyle: 'solid',
+        backgroundColor: '#ffdddd'
+      };
     }
 
     var appliedStyle;
@@ -158,7 +165,13 @@ class Dropzone extends React.Component {
         ...style,
         ...activeStyle
       };
-    } else {
+    }
+		else if (rejectStyle && this.state.isDragReject) {
+      appliedStyle = {
+        ...style,
+        ...rejectStyle
+      };
+		} else {
       appliedStyle = {
         ...style
       };
@@ -202,6 +215,7 @@ Dropzone.propTypes = {
 
   style: React.PropTypes.object,
   activeStyle: React.PropTypes.object,
+  rejectStyle: React.PropTypes.object,
   className: React.PropTypes.string,
   activeClassName: React.PropTypes.string,
   rejectClassName: React.PropTypes.string,
