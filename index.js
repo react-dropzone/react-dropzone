@@ -177,6 +177,11 @@ class Dropzone extends React.Component {
       };
     }
 
+    let inputAttr = {};
+    if (this.props.name) {
+      inputAttr.name = this.props.name;
+    }
+
     return (
       <div
         className={className}
@@ -195,6 +200,7 @@ class Dropzone extends React.Component {
           multiple={this.props.multiple}
           accept={this.props.accept}
           onChange={this.onDrop}
+          {...inputAttr}
         />
       </div>
     );
@@ -222,7 +228,8 @@ Dropzone.propTypes = {
 
   disableClick: React.PropTypes.bool,
   multiple: React.PropTypes.bool,
-  accept: React.PropTypes.string
+  accept: React.PropTypes.string,
+  name: React.PropTypes.string
 };
 
 module.exports = Dropzone;
