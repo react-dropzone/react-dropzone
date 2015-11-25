@@ -86,7 +86,7 @@ class Dropzone extends React.Component {
 
     for (var i = 0; i < max; i++) {
       var file = droppedFiles[i];
-      file.preview = window.URL.createObjectURL(file);
+      file.preview = (window.URL || window.webkitURL).createObjectURL(file);
       files.push(file);
     }
 
