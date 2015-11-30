@@ -86,7 +86,10 @@ class Dropzone extends React.Component {
 
     for (var i = 0; i < max; i++) {
       var file = droppedFiles[i];
-      file.preview = window.URL.createObjectURL(file);
+      // We might want to disable the preview creation to support big files
+      if (!this.disablePreview) {
+        file.preview = window.URL.createObjectURL(file);
+      }
       files.push(file);
     }
 
@@ -208,6 +211,7 @@ class Dropzone extends React.Component {
 }
 
 Dropzone.defaultProps = {
+  disablePreview: false,
   disableClick: false,
   multiple: true
 };
@@ -226,6 +230,7 @@ Dropzone.propTypes = {
   activeClassName: React.PropTypes.string,
   rejectClassName: React.PropTypes.string,
 
+  disablePreview: React.PropTypes.bool,
   disableClick: React.PropTypes.bool,
   multiple: React.PropTypes.bool,
   accept: React.PropTypes.string,

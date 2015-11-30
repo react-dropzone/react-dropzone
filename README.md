@@ -71,6 +71,7 @@ Features
 - `multiple` - To accept only a single file, set this to `false`.
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
+You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
 
 To trigger the dropzone manually (open the file prompt), call the component's `open` function.
 
