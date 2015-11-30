@@ -1,5 +1,9 @@
-var React = require('react');
-var accept = require('attr-accept');
+import React from 'react';
+import accept from 'attr-accept';
+
+const supportMultiple = document && docuemnt.createElement ?
+  'multiple' in document.createElement('input') :
+  true;
 
 class Dropzone extends React.Component {
   constructor(props, context) {
@@ -31,11 +35,10 @@ class Dropzone extends React.Component {
 
     // This is tricky. During the drag even the dataTransfer.files is null
     // But Chrome implements some drag store, which is accesible via dataTransfer.items
-    var dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
+    const dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
 
     // Now we need to convert the DataTransferList to Array
-    var itemsArray = Array.prototype.slice.call(dataTransferItems);
-    var allFilesAccepted = this.allFilesAccepted(itemsArray);
+    const allFilesAccepted = this.allFilesAccepted(Array.prototype.slice.call(dataTransferItems));
 
     this.setState({
       isDragActive: allFilesAccepted,
@@ -43,7 +46,7 @@ class Dropzone extends React.Component {
     });
 
     if (this.props.onDragEnter) {
-      this.props.onDragEnter(e);
+      this.props.onDragEnter.call(this, e);
     }
   }
 
@@ -65,7 +68,7 @@ class Dropzone extends React.Component {
     });
 
     if (this.props.onDragLeave) {
-      this.props.onDragLeave(e);
+      this.props.onDragLeave.call(this, e);
     }
   }
 
@@ -80,12 +83,12 @@ class Dropzone extends React.Component {
       isDragReject: false
     });
 
-    var droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-    var max = this.props.multiple ? droppedFiles.length : 1;
-    var files = [];
+    const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    const max = this.props.multiple ? droppedFiles.length : 1;
+    const files = [];
 
-    for (var i = 0; i < max; i++) {
-      var file = droppedFiles[i];
+    for (let i = 0; i < max; i++) {
+      let file = droppedFiles[i];
       // We might want to disable the preview creation to support big files
       if (!this.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
@@ -94,16 +97,16 @@ class Dropzone extends React.Component {
     }
 
     if (this.props.onDrop) {
-      this.props.onDrop(files, e);
+      this.props.onDrop.call(this, files, e);
     }
 
     if (this.allFilesAccepted(files)) {
       if (this.props.onDropAccepted) {
-        this.props.onDropAccepted(files, e);
+        this.props.onDropAccepted.call(this, files, e);
       }
     } else {
       if (this.props.onDropRejected) {
-        this.props.onDropRejected(files, e);
+        this.props.onDropRejected.call(this, files, e);
       }
     }
   }
@@ -115,13 +118,13 @@ class Dropzone extends React.Component {
   }
 
   open() {
-    var fileInput = this.refs.fileInput;
+    const fileInput = this.refs.fileInput;
     fileInput.value = null;
     fileInput.click();
   }
 
   render() {
-    var className, style, activeStyle, rejectStyle;
+    let className, style, activeStyle, rejectStyle;
 
     if (this.props.className) {
       className = this.props.className;
@@ -162,28 +165,34 @@ class Dropzone extends React.Component {
       };
     }
 
-    var appliedStyle;
+    let appliedStyle;
     if (activeStyle && this.state.isDragActive) {
       appliedStyle = {
         ...style,
         ...activeStyle
       };
     }
-		else if (rejectStyle && this.state.isDragReject) {
+  else if (rejectStyle && this.state.isDragReject) {
       appliedStyle = {
         ...style,
         ...rejectStyle
       };
-		} else {
+  } else {
       appliedStyle = {
         ...style
       };
     }
 
-    let inputAttr = {};
-    if (this.props.name) {
-      inputAttr.name = this.props.name;
-    }
+    const inputAttributes = {
+      type: 'file',
+      style: { display: 'none'},
+      ref: 'fileInput',
+      accept: this.props.accept,
+      onChange: this.onDrop
+    };
+
+    supportMultiple && (inputAttributes.multiple = this.props.multiple);
+    this.props.name && (inputAttributes.name = this.props.name);
 
     return (
       <div
@@ -196,15 +205,7 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
       >
         {this.props.children}
-        <input
-          type='file'
-          ref='fileInput'
-          style={{ display: 'none' }}
-          multiple={this.props.multiple}
-          accept={this.props.accept}
-          onChange={this.onDrop}
-          {...inputAttr}
-        />
+        <input {...inputAttributes} />
       </div>
     );
   }
@@ -237,4 +238,4 @@ Dropzone.propTypes = {
   name: React.PropTypes.string
 };
 
-module.exports = Dropzone;
+export default Dropzone;
