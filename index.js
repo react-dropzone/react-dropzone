@@ -89,7 +89,10 @@ class Dropzone extends React.Component {
 
     for (let i = 0; i < max; i++) {
       let file = droppedFiles[i];
-      file.preview = window.URL.createObjectURL(file);
+      // We might want to disable the preview creation to support big files
+      if (!this.disablePreview) {
+        file.preview = window.URL.createObjectURL(file);
+      }
       files.push(file);
     }
 
@@ -121,7 +124,7 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    let className, style, activeStyle;
+    let className, style, activeStyle, rejectStyle;
 
     if (this.props.className) {
       className = this.props.className;
@@ -133,12 +136,15 @@ class Dropzone extends React.Component {
       }
     }
 
-    if (this.props.style || this.props.activeStyle) {
+    if (this.props.style || this.props.activeStyle || this.props.rejectStyle) {
       if (this.props.style) {
         style = this.props.style;
       }
       if (this.props.activeStyle) {
         activeStyle = this.props.activeStyle;
+      }
+      if (this.props.rejectStyle) {
+        rejectStyle = this.props.rejectStyle;
       }
     } else if (!className) {
       style = {
@@ -153,6 +159,10 @@ class Dropzone extends React.Component {
         borderStyle: 'solid',
         backgroundColor: '#eee'
       };
+      rejectStyle = {
+        borderStyle: 'solid',
+        backgroundColor: '#ffdddd'
+      };
     }
 
     let appliedStyle;
@@ -161,13 +171,19 @@ class Dropzone extends React.Component {
         ...style,
         ...activeStyle
       };
-    } else {
+    }
+  else if (rejectStyle && this.state.isDragReject) {
+      appliedStyle = {
+        ...style,
+        ...rejectStyle
+      };
+  } else {
       appliedStyle = {
         ...style
       };
     }
 
-    const options = {
+    const inputAttributes = {
       type: 'file',
       style: { display: 'none'},
       ref: 'fileInput',
@@ -175,7 +191,8 @@ class Dropzone extends React.Component {
       onChange: this.onDrop
     };
 
-    supportMultiple && (options.multiple = this.props.multiple);
+    supportMultiple && (inputAttributes.multiple = this.props.multiple);
+    this.props.name && (inputAttributes.name = this.props.name);
 
     return (
       <div
@@ -188,13 +205,14 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
       >
         {this.props.children}
-        <input {...options} />
+        <input {...inputAttributes} />
       </div>
     );
   }
 }
 
 Dropzone.defaultProps = {
+  disablePreview: false,
   disableClick: false,
   multiple: true
 };
@@ -208,13 +226,16 @@ Dropzone.propTypes = {
 
   style: React.PropTypes.object,
   activeStyle: React.PropTypes.object,
+  rejectStyle: React.PropTypes.object,
   className: React.PropTypes.string,
   activeClassName: React.PropTypes.string,
   rejectClassName: React.PropTypes.string,
 
+  disablePreview: React.PropTypes.bool,
   disableClick: React.PropTypes.bool,
   multiple: React.PropTypes.bool,
-  accept: React.PropTypes.string
+  accept: React.PropTypes.string,
+  name: React.PropTypes.string
 };
 
 export default Dropzone;
