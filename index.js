@@ -1,7 +1,9 @@
 import React from 'react';
 import accept from 'attr-accept';
 
-const supportMultiple = 'multiple' in document.createElement('input');
+const supportMultiple = document && docuemnt.createElement ?
+  'multiple' in document.createElement('input') :
+  true;
 
 class Dropzone extends React.Component {
   constructor(props, context) {
