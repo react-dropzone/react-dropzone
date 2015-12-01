@@ -1,7 +1,7 @@
 import React from 'react';
 import accept from 'attr-accept';
 
-const supportMultiple = document && docuemnt.createElement ?
+const supportMultiple = document && document.createElement ?
   'multiple' in document.createElement('input') :
   true;
 
