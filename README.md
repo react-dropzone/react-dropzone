@@ -69,6 +69,7 @@ Features
 
 - `disableClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `true`.
 - `multiple` - To accept only a single file, set this to `false`.
+- `accept` - Filters the file types that are valid. It should have a valid MIME type according to [input element](http://www.w3.org/TR/html-markup/input.file.html), e.g. accept="application/pdf".
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
