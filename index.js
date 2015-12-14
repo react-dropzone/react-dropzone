@@ -90,7 +90,7 @@ class Dropzone extends React.Component {
     for (let i = 0; i < max; i++) {
       let file = droppedFiles[i];
       // We might want to disable the preview creation to support big files
-      if (!this.disablePreview) {
+      if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
       }
       files.push(file);
