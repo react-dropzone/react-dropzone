@@ -24,6 +24,13 @@
   },
   "homepage": "https://github.com/paramaggarwal/react-dropzone",
   "author": "Param Aggarwal",
+  "contributors": [
+    {
+      "name": "Andrey Okonetchnikov",
+      "email": "andrej.okonetschnikow@gmail.com",
+      "url": "http://okonet.ru"
+    }
+  ],
   "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0"
