@@ -1,5 +1,5 @@
 // import es6
-require('babel-core/register');
+require('babel/register');
 
 // jsdom
 var jsdom = require('jsdom');
