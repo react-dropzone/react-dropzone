@@ -1,5 +1,6 @@
-var Dropzone = require('react-dropzone');
 var React = require('react');
+var ReactDOM = require('react-dom');
+var Dropzone = require('react-dropzone');
 
 var DropzoneDemo = React.createClass({
     getInitialState: function () {
@@ -68,6 +69,6 @@ var DropzoneDemo = React.createClass({
     }
 });
 
-React.render(<DropzoneDemo />, document.getElementById('example'));
+ReactDOM.render(<DropzoneDemo />, document.getElementById('example'));
 
 module.exports = DropzoneDemo;
