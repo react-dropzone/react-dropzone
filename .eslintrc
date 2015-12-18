@@ -1,0 +1,25 @@
+{
+    "parser": "babel-eslint",
+    "extends": ["airbnb"],
+    "env": {
+        "browser": true, // We write for browser
+        "node": true, // using CommonJS imports
+        "mocha": true, // We use Mocha for tests
+        "es6": true // And we use ES6 features
+    },
+    "ecmaFeatures": {
+        "jsx": true
+    },
+    "rules": {
+        "indent": [2, 2, {
+            "SwitchCase": 1
+        }],
+        "comma-dangle": [2, "never"],
+        "jsx-quotes": [2, "prefer-double"],
+        "padded-blocks": [0, "never"],
+        "no-console": 2,
+        "no-debugger": 2,
+        "guard-for-in": 0,
+        "object-curly-spacing": [2, "always"]
+    }
+}
