@@ -118,9 +118,8 @@ class Dropzone extends React.Component {
   }
 
   open() {
-    const fileInput = this.refs.fileInput;
-    fileInput.value = null;
-    fileInput.click();
+    this.fileInputEl.value = null;
+    this.fileInputEl.click();
   }
 
   render() {
@@ -194,7 +193,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: 'fileInput',
+      ref: el => this.fileInputEl = el,
       onChange: this.onDrop
     };
 

@@ -24,6 +24,12 @@ describe('Dropzone', () => {
     expect(content.textContent).to.equal('some content');
   });
 
+  it('renders the input element', () => {
+    const dropzone = TestUtils.renderIntoDocument(<Dropzone><div className="dropzone-content">some content</div></Dropzone>);
+    const input = TestUtils.find(dropzone, 'input');
+    expect(input.length).to.equal(1);
+  });
+
   it('returns the url of the preview', () => {
     const dropSpy = spy();
     const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy}><div className="dropzone-content">some content</div></Dropzone>);
@@ -32,6 +38,16 @@ describe('Dropzone', () => {
     TestUtils.Simulate.drop(content, { dataTransfer: { files } });
     expect(dropSpy.callCount).to.equal(1);
     expect(dropSpy.firstCall.args[0][0]).to.have.property('preview');
+  });
+
+  describe('ref', () => {
+    it('sets ref properly', () => {
+      const dropzone = TestUtils.renderIntoDocument(<Dropzone/>);
+      const input = TestUtils.find(dropzone, 'input')[0];
+
+      expect(dropzone.fileInputEl).to.not.be.undefined;
+      expect(dropzone.fileInputEl).to.eql(input);
+    });
   });
 
   describe('props', () => {
