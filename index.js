@@ -124,28 +124,35 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    let className, style, activeStyle, rejectStyle;
+    const {
+      accept,
+      activeClassName,
+      inputProps,
+      multiple,
+      name,
+      rejectClassName,
+      ...rest
+    } = this.props;
+    let {
+      activeStyle,
+      className,
+      rejectStyle,
+      style,
+      ...props
+    } = rest;
 
-    className = this.props.className || '';
+    let { isDragActive, isDragReject } = this.state;
 
-    if (this.state.isDragActive && this.props.activeClassName) {
-      className += ' ' + this.props.activeClassName;
+    className = className || '';
+
+    if (isDragActive && activeClassName) {
+      className += ' ' + activeClassName;
     }
-    if (this.state.isDragReject && this.props.rejectClassName) {
-      className += ' ' + this.props.rejectClassName;
+    if (isDragReject && rejectClassName) {
+      className += ' ' + rejectClassName;
     }
 
-    if (this.props.style || this.props.activeStyle || this.props.rejectStyle) {
-      if (this.props.style) {
-        style = this.props.style;
-      }
-      if (this.props.activeStyle) {
-        activeStyle = this.props.activeStyle;
-      }
-      if (this.props.rejectStyle) {
-        rejectStyle = this.props.rejectStyle;
-      }
-    } else if (!className) {
+    if (!className && !style && !activeStyle && !rejectStyle) {
       style = {
         width: 200,
         height: 200,
@@ -165,38 +172,42 @@ class Dropzone extends React.Component {
     }
 
     let appliedStyle;
-    if (activeStyle && this.state.isDragActive) {
+    if (activeStyle && isDragActive) {
       appliedStyle = {
         ...style,
         ...activeStyle
       };
     }
-  else if (rejectStyle && this.state.isDragReject) {
+    else if (rejectStyle && isDragReject) {
       appliedStyle = {
         ...style,
         ...rejectStyle
       };
-  } else {
+    } else {
       appliedStyle = {
         ...style
       };
     }
 
+
     const inputAttributes = {
+      accept,
       type: 'file',
       style: { display: 'none'},
+      multiple: supportMultiple && multiple,
       ref: 'fileInput',
-      accept: this.props.accept,
       onChange: this.onDrop
     };
 
-    supportMultiple && (inputAttributes.multiple = this.props.multiple);
-    this.props.name && (inputAttributes.name = this.props.name);
+    if (name && name.length) {
+      inputAttributes.name = name;
+    }
 
     return (
       <div
         className={className}
         style={appliedStyle}
+        {...props /* expand user provided props first so event handlers are never overridden */}
         onClick={this.onClick}
         onDragEnter={this.onDragEnter}
         onDragOver={this.onDragOver}
@@ -204,7 +215,10 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
       >
         {this.props.children}
-        <input {...inputAttributes} />
+        <input
+          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {...inputAttributes}
+          />
       </div>
     );
   }
@@ -232,6 +246,8 @@ Dropzone.propTypes = {
 
   disablePreview: React.PropTypes.bool,
   disableClick: React.PropTypes.bool,
+
+  inputProps: React.PropTypes.object,
   multiple: React.PropTypes.bool,
   accept: React.PropTypes.string,
   name: React.PropTypes.string
