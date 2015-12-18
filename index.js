@@ -15,16 +15,23 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this);
 
     this.state = {
-      isDragActive: false
+      isDragActive: false,
     };
   }
 
   componentDidMount() {
     this.enterCounter = 0;
+
+    // Since the webkitdirectory and directory attributes are not allowed in react render
+    // Hence adding it in componentDidMount
+    if (this.props.onlyFolders) {
+      this.refs.fileInput.setAttribute('webkitdirectory', '');
+      this.refs.fileInput.setAttribute('directory', '');
+    }
   }
 
   allFilesAccepted(files) {
-    return files.every(file => accept(file, this.props.accept))
+    return files.every(file => accept(file, this.props.accept));
   }
 
   onDragEnter(e) {
@@ -42,7 +49,7 @@ class Dropzone extends React.Component {
 
     this.setState({
       isDragActive: allFilesAccepted,
-      isDragReject: !allFilesAccepted
+      isDragReject: !allFilesAccepted,
     });
 
     if (this.props.onDragEnter) {
@@ -64,7 +71,7 @@ class Dropzone extends React.Component {
 
     this.setState({
       isDragActive: false,
-      isDragReject: false
+      isDragReject: false,
     });
 
     if (this.props.onDragLeave) {
@@ -80,7 +87,7 @@ class Dropzone extends React.Component {
 
     this.setState({
       isDragActive: false,
-      isDragReject: false
+      isDragReject: false,
     });
 
     const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
@@ -89,10 +96,12 @@ class Dropzone extends React.Component {
 
     for (let i = 0; i < max; i++) {
       let file = droppedFiles[i];
+
       // We might want to disable the preview creation to support big files
       if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
       }
+
       files.push(file);
     }
 
@@ -131,6 +140,7 @@ class Dropzone extends React.Component {
     if (this.state.isDragActive && this.props.activeClassName) {
       className += ' ' + this.props.activeClassName;
     }
+
     if (this.state.isDragReject && this.props.rejectClassName) {
       className += ' ' + this.props.rejectClassName;
     }
@@ -139,9 +149,11 @@ class Dropzone extends React.Component {
       if (this.props.style) {
         style = this.props.style;
       }
+
       if (this.props.activeStyle) {
         activeStyle = this.props.activeStyle;
       }
+
       if (this.props.rejectStyle) {
         rejectStyle = this.props.rejectStyle;
       }
@@ -152,15 +164,15 @@ class Dropzone extends React.Component {
         borderWidth: 2,
         borderColor: '#666',
         borderStyle: 'dashed',
-        borderRadius: 5
+        borderRadius: 5,
       };
       activeStyle = {
         borderStyle: 'solid',
-        backgroundColor: '#eee'
+        backgroundColor: '#eee',
       };
       rejectStyle = {
         borderStyle: 'solid',
-        backgroundColor: '#ffdddd'
+        backgroundColor: '#ffdddd',
       };
     }
 
@@ -168,17 +180,16 @@ class Dropzone extends React.Component {
     if (activeStyle && this.state.isDragActive) {
       appliedStyle = {
         ...style,
-        ...activeStyle
+        ...activeStyle,
       };
-    }
-  else if (rejectStyle && this.state.isDragReject) {
+    }    else if (rejectStyle && this.state.isDragReject) {
       appliedStyle = {
         ...style,
-        ...rejectStyle
+        ...rejectStyle,
       };
-  } else {
+    } else {
       appliedStyle = {
-        ...style
+        ...style,
       };
     }
 
@@ -187,7 +198,7 @@ class Dropzone extends React.Component {
       style: { display: 'none'},
       ref: 'fileInput',
       accept: this.props.accept,
-      onChange: this.onDrop
+      onChange: this.onDrop,
     };
 
     supportMultiple && (inputAttributes.multiple = this.props.multiple);
@@ -213,7 +224,7 @@ class Dropzone extends React.Component {
 Dropzone.defaultProps = {
   disablePreview: false,
   disableClick: false,
-  multiple: true
+  multiple: true,
 };
 
 Dropzone.propTypes = {
@@ -234,7 +245,7 @@ Dropzone.propTypes = {
   disableClick: React.PropTypes.bool,
   multiple: React.PropTypes.bool,
   accept: React.PropTypes.string,
-  name: React.PropTypes.string
+  name: React.PropTypes.string,
 };
 
 export default Dropzone;
