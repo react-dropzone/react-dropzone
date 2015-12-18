@@ -1,4 +1,4 @@
-import accept from 'attr-accept';
+import accepts from 'attr-accept';
 import React from 'react';
 
 const supportMultiple = (typeof document !== 'undefined' && document && document.createElement) ?
@@ -21,10 +21,6 @@ class Dropzone extends React.Component {
 
   componentDidMount() {
     this.enterCounter = 0;
-  }
-
-  allFilesAccepted(files) {
-    return files.every(file => accept(file, this.props.accept))
   }
 
   onDragEnter(e) {
@@ -88,7 +84,7 @@ class Dropzone extends React.Component {
     const files = [];
 
     for (let i = 0; i < max; i++) {
-      let file = droppedFiles[i];
+      const file = droppedFiles[i];
       // We might want to disable the preview creation to support big files
       if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
@@ -117,6 +113,10 @@ class Dropzone extends React.Component {
     }
   }
 
+  allFilesAccepted(files) {
+    return files.every(file => accepts(file, this.props.accept));
+  }
+
   open() {
     const fileInput = this.refs.fileInput;
     fileInput.value = null;
@@ -133,15 +133,16 @@ class Dropzone extends React.Component {
       rejectClassName,
       ...rest
     } = this.props;
+
     let {
       activeStyle,
       className,
       rejectStyle,
       style,
-      ...props
+      ...props // eslint-disable-line prefer-const
     } = rest;
 
-    let { isDragActive, isDragReject } = this.state;
+    const { isDragActive, isDragReject } = this.state;
 
     className = className || '';
 
@@ -177,8 +178,7 @@ class Dropzone extends React.Component {
         ...style,
         ...activeStyle
       };
-    }
-    else if (rejectStyle && isDragReject) {
+    } else if (rejectStyle && isDragReject) {
       appliedStyle = {
         ...style,
         ...rejectStyle
@@ -189,11 +189,10 @@ class Dropzone extends React.Component {
       };
     }
 
-
     const inputAttributes = {
       accept,
       type: 'file',
-      style: { display: 'none'},
+      style: { display: 'none' },
       multiple: supportMultiple && multiple,
       ref: 'fileInput',
       onChange: this.onDrop
@@ -218,7 +217,7 @@ class Dropzone extends React.Component {
         <input
           {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
-          />
+        />
       </div>
     );
   }
@@ -237,6 +236,7 @@ Dropzone.propTypes = {
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
+  children: React.PropTypes.element,
   style: React.PropTypes.object,
   activeStyle: React.PropTypes.object,
   rejectStyle: React.PropTypes.object,
