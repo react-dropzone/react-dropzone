@@ -237,7 +237,7 @@ Dropzone.propTypes = {
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.element,
+  children: React.PropTypes.node,
   style: React.PropTypes.object,
   activeStyle: React.PropTypes.object,
   rejectStyle: React.PropTypes.object,
