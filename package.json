@@ -23,20 +23,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:paramaggarwal/react-dropzone.git"
+    "url": "git@github.com:okonet/react-dropzone.git"
   },
   "bugs": {
-    "url": "https://github.com/paramaggarwal/react-dropzone/issues"
+    "url": "https://github.com/okonet/react-dropzone/issues"
   },
-  "homepage": "https://github.com/paramaggarwal/react-dropzone",
-  "author": "Param Aggarwal",
-  "contributors": [
-    {
-      "name": "Andrey Okonetchnikov",
-      "email": "andrej.okonetschnikow@gmail.com",
-      "url": "http://okonet.ru"
-    }
-  ],
+  "homepage": "https://github.com/okonet/react-dropzone",
+  "author": "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
+  "contributors": ["Param Aggarwal"],
   "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0"
