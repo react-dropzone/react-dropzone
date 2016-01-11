@@ -4,7 +4,7 @@
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel ./src/index.js --out-dir ./lib",
+    "build": "babel ./src --out-dir ./lib",
     "prepublish": "npm run lint && npm test && npm run build",
     "test": "mocha --require ./mocha-environment.js './src/test.js'",
     "lint": "eslint ./src",
