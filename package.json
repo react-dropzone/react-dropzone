@@ -29,8 +29,9 @@
     "url": "https://github.com/okonet/react-dropzone/issues"
   },
   "homepage": "https://github.com/okonet/react-dropzone",
-  "author": "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
+  "author": "Param Aggarwal",
   "contributors": [
+    "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
     "Param Aggarwal"
   ],
   "license": "MIT",
