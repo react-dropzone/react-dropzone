@@ -4,17 +4,12 @@
   "version": "2.0.0",
   "author": "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
   "license": "MIT",
-  "browserify": {
-    "transform": [
-      [
-        "babelify"
-      ]
-    ]
-  },
   "scripts": {
-    "build": "browserify browser.js > script.js"
+    "build": "browserify -t babelify --presets [ es2015 react ] browser.js > script.js"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
     "babelify": "^6.1.2",
     "browserify": "^10.2.4"
   },
