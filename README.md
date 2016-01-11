@@ -1,4 +1,4 @@
-react-dropzone
+react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg)](https://travis-ci.org/okonet/react-dropzone)
 ==============
 
 Simple HTML5 drag-drop zone for files with React.js.
