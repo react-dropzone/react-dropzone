@@ -1,6 +1,6 @@
 {
   "name": "react-dropzone",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "lib/index.js",
   "scripts": {
@@ -30,7 +30,9 @@
   },
   "homepage": "https://github.com/okonet/react-dropzone",
   "author": "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
-  "contributors": ["Param Aggarwal"],
+  "contributors": [
+    "Param Aggarwal"
+  ],
   "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0"
