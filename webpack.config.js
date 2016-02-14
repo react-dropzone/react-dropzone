@@ -18,10 +18,6 @@ module.exports = {
                 ],
                 test: /\.js$/,
                 loader: 'babel-loader',
-                query: {
-                    presets: ['es2015','react','stage-0'],
-                    plugins: ['add-module-exports']
-                }
             }
         ]  
     },
@@ -35,7 +31,7 @@ module.exports = {
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
             compress: {
-                // does this actually do anything?
+                // does this actually compress anything?
                 warnings: false
             }
         }),
