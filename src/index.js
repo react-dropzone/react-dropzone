@@ -84,7 +84,7 @@ class Dropzone extends React.Component {
     const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     const files = [];
 
-    if (droppedFiles.length === 0) {
+    if (!droppedFiles || (droppedFiles.length === 0)) {
       return;
     }
 
