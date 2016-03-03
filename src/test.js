@@ -40,6 +40,15 @@ describe('Dropzone', () => {
     expect(dropSpy.firstCall.args[0][0]).to.have.property('preview');
   });
 
+  it('should not call onDrop when the droppedFiles array is empty', () => {
+    const dropSpy = spy();
+    const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy}><div className="dropzone-content">some content</div></Dropzone>);
+    const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+    TestUtils.Simulate.drop(content, { dataTransfer: { files: [] } });
+    expect(dropSpy.callCount).to.equal(0);
+  });
+
   describe('ref', () => {
     it('sets ref properly', () => {
       const dropzone = TestUtils.renderIntoDocument(<Dropzone/>);
