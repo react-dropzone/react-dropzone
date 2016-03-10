@@ -32,7 +32,7 @@ npm install --save react-dropzone@2.x
 Usage
 =====
 
-Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. 
+Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files.
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
 
@@ -69,6 +69,7 @@ Features
 
 - `disableClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `true`.
 - `multiple` - To accept only a single file, set this to `false`.
+- `global` - To make the whole browser window become the drop target, set this to `true`.
 - `accept` - Filters the file types that are valid. It should have a valid MIME type according to [input element](http://www.w3.org/TR/html-markup/input.file.html), for example:
   * `application/pdf`
   * `image/*`
