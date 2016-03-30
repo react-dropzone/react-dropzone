@@ -82,7 +82,7 @@ class Dropzone extends React.Component {
     });
 
     const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-    const max = this.props.multiple ? droppedFiles.length : 1;
+    const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
     const files = [];
 
     for (let i = 0; i < max; i++) {

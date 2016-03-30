@@ -40,6 +40,14 @@ describe('Dropzone', () => {
     expect(dropSpy.firstCall.args[0][0]).to.have.property('preview');
   });
 
+  it('does not throw an error when html is dropped instead of files and multiple is false', () => {
+    const dropzone = TestUtils.renderIntoDocument(<Dropzone multiple={false}><div className="dropzone-content">some content</div></Dropzone>);
+    const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+    const fn = () => TestUtils.Simulate.drop(content, { dataTransfer: { files: [] } });
+    expect(fn).not.to.throw();
+  });
+
   describe('ref', () => {
     it('sets ref properly', () => {
       const dropzone = TestUtils.renderIntoDocument(<Dropzone/>);
