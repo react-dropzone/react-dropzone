@@ -4,7 +4,8 @@
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "npm run clean && webpack",
+    "clean": "rimraf ./dist",
     "prepublish": "npm run lint && npm test && npm run build",
     "test": "mocha --require ./mocha-environment.js './src/test.js'",
     "lint": "eslint ./src ./*.js",
@@ -61,6 +62,7 @@
     "react-addons-test-utils": "^0.14.3",
     "react-dom": "^0.14.3",
     "react-testutils-additions": "^0.2.0",
+    "rimraf": "^2.5.2",
     "sinon": "^1.17.2",
     "webpack": "^1.12.11"
   }
