@@ -1,3 +1,7 @@
+# v3.3.4
+
+* fix issue Cannot find module "React" (#159) <Jonathan Sanchez Pando>
+
 # v3.3.3
 
 * More MIME type examples <Matija Marohnić>
