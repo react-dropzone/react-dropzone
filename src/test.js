@@ -4,7 +4,7 @@ import React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
-import Dropzone from './index';
+const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
 
 describe('Dropzone', () => {
 
