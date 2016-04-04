@@ -7,8 +7,8 @@
     "build": "webpack",
     "prepublish": "npm run lint && npm test && npm run build",
     "test": "mocha --require ./mocha-environment.js './src/test.js'",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint --fix ./src",
+    "lint": "eslint ./src ./*.js",
+    "lint:fix": "npm run lint -- --fix",
     "precommit-check": "npm run lint"
   },
   "pre-commit": [
