@@ -28,12 +28,5 @@ module.exports = {
   externals: {
     react: 'React'
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        // does this actually compress anything?
-        warnings: false
-      }
-    })
-  ]
+  plugins: []
 };
