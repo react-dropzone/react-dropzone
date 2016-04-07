@@ -32,7 +32,7 @@ npm install --save react-dropzone@2.x
 Usage
 =====
 
-Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files. 
+Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files.
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
 
@@ -77,7 +77,9 @@ Features
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
 
-To trigger the dropzone manually (open the file prompt), call the component's `open` function.
+#### Manual Upload
+* To trigger the dropzone manually (open the file prompt), call the component's `open` function.
+* The completion handler for the `open` function is also the `onDrop` function.
 
 ```jsx
 /** @jsx React.DOM */
