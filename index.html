@@ -75,7 +75,15 @@ React.<span class="pl-c1">render</span>(<span class="pl-k">&lt;</span>DropzoneDe
 
 <p>To show a preview of the dropped file while it uploads, use the <code>file.preview</code> property. Use <code>&lt;img src={file.preview} /&gt;</code> to display a preview of the image dropped.</p>
 
-<p>To trigger the dropzone manually (open the file prompt), call the component's <code>open</code> function.</p>
+<h4>
+<a id="manual" class="anchor" href="#manual" aria-hidden="true"><span class="octicon octicon-link"></span></a>Manual Upload</h4>
+
+<ul>
+<li>
+To trigger the dropzone manually (open the file prompt), call the component's <code>open</code> function.
+<li>
+The completion handler for the <code>open</code> function is also the <code>onDrop</code> function.
+</ul>
 
 <div class="highlight highlight-jsx"><pre><span class="pl-c">/** @jsx React.DOM */</span>
 <span class="pl-k">var</span> React <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>);
