@@ -1,3 +1,7 @@
+# v3.4.0
+
+* Added support for React 15.x <Nuno Campos>
+
 # v3.3.4
 
 * fix issue Cannot find module "React" (#159) <Jonathan Sanchez Pando>
