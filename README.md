@@ -69,6 +69,7 @@ Features
 
 - `disableClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `true`.
 - `multiple` - To accept only a single file, set this to `false`.
+- `global` - To make the whole browser window become the drop target, set this to `true`.
 - `accept` - Filters the file types that are valid. It should have a valid MIME type according to [input element](http://www.w3.org/TR/html-markup/input.file.html), for example:
   * `application/pdf`
   * `image/*`
