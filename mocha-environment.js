@@ -13,6 +13,6 @@ global.window.URL = {
     return 'data://' + arg.name;
   }
 };
-global.window.addEventListener('load', function () {
+global.window.addEventListener('load', function onLoad() {
   console.log('JSDOM Loaded'); // eslint-disable-line
 });
