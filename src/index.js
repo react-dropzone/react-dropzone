@@ -20,7 +20,16 @@ class Dropzone extends React.Component {
   }
 
   componentDidMount() {
+    const { multiple } = this.props;
+
     this.enterCounter = 0;
+
+    if (supportMultiple && multiple) {
+      // see https://github.com/okonet/react-dropzone/issues/134#issuecomment-206442049
+      ['webkitdirectory', 'mozdirectory', 'msdirectory', 'odirectory', 'directory'].forEach(attribute => {
+        this.fileInputEl.setAttribute(attribute, true);
+      });
+    }
   }
 
   onDragEnter(e) {
@@ -83,10 +92,11 @@ class Dropzone extends React.Component {
 
     let droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     const dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
-    const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
-    const files = [];
 
     const wrapup = () => {
+      const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
+      const files = [];
+
       for (let i = 0; i < max; i++) {
         const file = droppedFiles[i];
         // We might want to disable the preview creation to support big files
@@ -114,8 +124,8 @@ class Dropzone extends React.Component {
     if (dataTransferItems[0] && typeof dataTransferItems[0].webkitGetAsEntry === 'function') {
       const entry = dataTransferItems[0].webkitGetAsEntry();
 
-      return this.walkDirectory(entry.filesystem.root, result => {
-        droppedFiles = result;
+      return this.walkDirectory(entry.filesystem.root, walkedFiles => {
+        droppedFiles = walkedFiles;
         wrapup();
       });
     }
@@ -138,8 +148,13 @@ class Dropzone extends React.Component {
   }
 
   walkDirectory(directory, callback) {
-    const reader = directory.createReader();
     let results = [];
+
+    if (directory === null) {
+      return callback(results);
+    }
+
+    const reader = directory.createReader();
 
     reader.readEntries(read => {
       if (!read.length) {
@@ -150,18 +165,23 @@ class Dropzone extends React.Component {
 
       const processEntry = () => {
         const current = entries.shift();
+
         if (current === undefined) {
           return callback(results);
         }
 
-        if (!current.isDirectory) {
-          results.push(current);
-          return processEntry();
+        if (current.isDirectory) {
+          return this.walkDirectory(current, nestedResults => {
+            results = results.concat(nestedResults);
+            processEntry();
+          });
         }
 
-        this.walkDirectory(current, nestedResults => {
-          results = results.concat(nestedResults);
-          processEntry();
+        current.file(file => {
+          results.push(file);
+          return processEntry();
+        }, () => {
+          return processEntry();
         });
       };
       processEntry();
@@ -235,7 +255,7 @@ class Dropzone extends React.Component {
     }
 
     const inputAttributes = {
-      accept,
+      accept: !(supportMultiple && multiple) ? accept : null,
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
