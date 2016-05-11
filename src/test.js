@@ -13,7 +13,8 @@ describe('Dropzone', () => {
   beforeEach(() => {
     files = [{
       name: 'file1.pdf',
-      size: 1111
+      size: 1111,
+      type: 'application/pdf'
     }];
   });
 
@@ -84,6 +85,24 @@ describe('Dropzone', () => {
       const component = TestUtils.renderIntoDocument(<Dropzone className="my-dropzone" accept="image/jpeg" />);
       expect(TestUtils.find(component, 'input[type="file"][accept="image/jpeg"]')).to.have.length(1);
       expect(TestUtils.find(component, '[class="my-dropzone"][accept="image/jpeg"]')).to.have.length(0);
+    });
+
+    it('applies the accept prop to the dropped input', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234
+      }, {
+        name: 'dogs.jpg',
+        size: 2345
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy} accept="image/*"><div className="dropzone-content">some content</div></Dropzone>);
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(0);
+      TestUtils.Simulate.drop(content, { dataTransfer: { images } });
+      expect(dropSpy.callCount).to.equal(2);
     });
 
     it('applies the name prop to the child input', () => {
