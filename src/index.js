@@ -94,11 +94,11 @@ class Dropzone extends React.Component {
       files.push(file);
     }
 
-    if (this.props.onDrop) {
-      this.props.onDrop.call(this, files, e);
-    }
-
     if (this.allFilesAccepted(files)) {
+      if (this.props.onDrop) {
+        this.props.onDrop.call(this, files, e);
+      }
+
       if (this.props.onDropAccepted) {
         this.props.onDropAccepted.call(this, files, e);
       }
