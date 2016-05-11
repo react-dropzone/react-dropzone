@@ -81,32 +81,45 @@ class Dropzone extends React.Component {
       isDragReject: false
     });
 
-    const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    let droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+    const dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
     const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
     const files = [];
 
-    for (let i = 0; i < max; i++) {
-      const file = droppedFiles[i];
-      // We might want to disable the preview creation to support big files
-      if (!this.props.disablePreview) {
-        file.preview = window.URL.createObjectURL(file);
+    const wrapup = () => {
+      for (let i = 0; i < max; i++) {
+        const file = droppedFiles[i];
+        // We might want to disable the preview creation to support big files
+        if (!this.props.disablePreview) {
+          file.preview = window.URL.createObjectURL(file);
+        }
+        files.push(file);
       }
-      files.push(file);
-    }
 
-    if (this.props.onDrop) {
-      this.props.onDrop.call(this, files, e);
-    }
+      if (this.props.onDrop) {
+        this.props.onDrop.call(this, files, e);
+      }
 
-    if (this.allFilesAccepted(files)) {
-      if (this.props.onDropAccepted) {
-        this.props.onDropAccepted.call(this, files, e);
+      if (this.allFilesAccepted(files)) {
+        if (this.props.onDropAccepted) {
+          this.props.onDropAccepted.call(this, files, e);
+        }
+      } else {
+        if (this.props.onDropRejected) {
+          this.props.onDropRejected.call(this, files, e);
+        }
       }
-    } else {
-      if (this.props.onDropRejected) {
-        this.props.onDropRejected.call(this, files, e);
-      }
+    };
+
+    if (dataTransferItems[0] && typeof dataTransferItems[0].webkitGetAsEntry === 'function') {
+      const entry = dataTransferItems[0].webkitGetAsEntry();
+
+      return this.walkDirectory(entry.filesystem.root, result => {
+        droppedFiles = result;
+        wrapup();
+      });
     }
+    wrapup();
   }
 
   onClick() {
@@ -122,6 +135,37 @@ class Dropzone extends React.Component {
   open() {
     this.fileInputEl.value = null;
     this.fileInputEl.click();
+  }
+
+  walkDirectory(directory, callback) {
+    const reader = directory.createReader();
+    let results = [];
+
+    reader.readEntries(read => {
+      if (!read.length) {
+        return callback(results);
+      }
+
+      const entries = read.slice();
+
+      const processEntry = () => {
+        const current = entries.shift();
+        if (current === undefined) {
+          return callback(results);
+        }
+
+        if (!current.isDirectory) {
+          results.push(current);
+          return processEntry();
+        }
+
+        this.walkDirectory(current, nestedResults => {
+          results = results.concat(nestedResults);
+          processEntry();
+        });
+      };
+      processEntry();
+    });
   }
 
   render() {
