@@ -19,8 +19,26 @@ class Dropzone extends React.Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.global && typeof document) {
+      document.addEventListener('dragenter', this.onDragEnter);
+      document.addEventListener('dragover', this.onDragOver);
+      document.addEventListener('dragleave', this.onDragLeave);
+      document.addEventListener('drop', this.onDrop);
+    }
+  }
+
   componentDidMount() {
     this.enterCounter = 0;
+  }
+
+  componentWillUnmount() {
+    if (this.props.global && typeof document) {
+      document.removeEventListener('dragenter', this.onDragEnter);
+      document.removeEventListener('dragover', this.onDragOver);
+      document.removeEventListener('dragleave', this.onDragLeave);
+      document.removeEventListener('drop', this.onDrop);
+    }
   }
 
   onDragEnter(e) {
@@ -203,6 +221,14 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
+    if (this.props.global) {
+      return (
+        <div className={className} style={appliedStyle}>
+          {this.props.children}
+        </div>
+      );
+    }
+
     return (
       <div
         className={className}
@@ -227,7 +253,8 @@ class Dropzone extends React.Component {
 Dropzone.defaultProps = {
   disablePreview: false,
   disableClick: false,
-  multiple: true
+  multiple: true,
+  global: false
 };
 
 Dropzone.propTypes = {
@@ -251,7 +278,9 @@ Dropzone.propTypes = {
   inputProps: React.PropTypes.object,
   multiple: React.PropTypes.bool,
   accept: React.PropTypes.string,
-  name: React.PropTypes.string
+  name: React.PropTypes.string,
+
+  global: React.PropTypes.bool
 };
 
 export default Dropzone;
