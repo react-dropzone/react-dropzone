@@ -1,6 +1,6 @@
 {
-  "name": "react-dropzone",
-  "version": "3.4.0",
+  "name": "global-react-dropzone",
+  "version": "3.5.0",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "scripts": {
@@ -25,17 +25,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:okonet/react-dropzone.git"
+    "url": "git@github.com:dorsha/react-dropzone.git"
   },
   "bugs": {
-    "url": "https://github.com/okonet/react-dropzone/issues"
+    "url": "https://github.com/dorsha/react-dropzone/issues"
   },
-  "homepage": "https://github.com/okonet/react-dropzone",
-  "author": "Param Aggarwal",
-  "contributors": [
-    "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
-    "Param Aggarwal"
-  ],
+  "homepage": "https://github.com/dorsha/react-dropzone",
+  "author": "Doron Sharon",
   "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0"
