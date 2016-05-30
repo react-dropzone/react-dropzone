@@ -1,3 +1,7 @@
+# v3.5.0
+
+* Optionally handle onDragStart event [#181](https://github.com/okonet/react-dropzone/pull/181)
+
 # v3.4.0
 
 * Added support for React 15.x <Nuno Campos>
