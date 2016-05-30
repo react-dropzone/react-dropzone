@@ -10,12 +10,12 @@
     "release": "npmpub",
     "test": "mocha --require ./mocha-environment.js './src/test.js'",
     "test:build": "NODE_ENV=production npm run test",
-    "lint": "eslint ./src ./*.js",
-    "lint:fix": "npm run lint -- --fix",
-    "precommit-check": "npm run lint"
+    "eslint": "eslint ./src ./*.js",
+    "eslint:fix": "npm run lint -- --fix",
+    "eslint-staged": "eslint-staged"
   },
   "pre-commit": [
-    "precommit-check"
+    "eslint-staged"
   ],
   "keywords": [
     "react-component",
@@ -58,6 +58,7 @@
     "eslint-config-airbnb": "^2.1.1",
     "eslint-plugin-react": "^3.11.3",
     "jsdom": "^7.2.0",
+    "lint-staged": "^0.2.2",
     "mocha": "^2.3.4",
     "npmpub": "^3.1.0",
     "pre-commit": "^1.1.2",
