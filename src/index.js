@@ -9,6 +9,7 @@ class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
@@ -21,6 +22,12 @@ class Dropzone extends React.Component {
 
   componentDidMount() {
     this.enterCounter = 0;
+  }
+
+  onDragStart(e) {
+    if (this.props.onDragStart) {
+      this.props.onDragStart.call(this, e);
+    }
   }
 
   onDragEnter(e) {
@@ -209,6 +216,7 @@ class Dropzone extends React.Component {
         style={appliedStyle}
         {...props /* expand user provided props first so event handlers are never overridden */}
         onClick={this.onClick}
+        onDragStart={this.onDragStart}
         onDragEnter={this.onDragEnter}
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
@@ -234,6 +242,8 @@ Dropzone.propTypes = {
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
+
+  onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
