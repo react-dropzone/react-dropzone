@@ -8,8 +8,8 @@
     "clean": "rimraf ./dist",
     "prerelease": "npm run eslint && npm run build && npm run test:build",
     "release": "npmpub",
-    "test": "mocha --require ./mocha-environment.js './src/test.js'",
-    "test:build": "NODE_ENV=production npm run test",
+    "test": "mocha --require ./mocha-environment.js ./src/test.js",
+    "test:build": "NODE_ENV=production npm run build && npm run test",
     "eslint": "eslint ./src ./*.js",
     "eslint:fix": "npm run lint -- --fix",
     "eslint-staged": "eslint-staged"
