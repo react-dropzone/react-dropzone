@@ -106,6 +106,15 @@ describe('Dropzone', () => {
       expect(clickSpy).to.not.be.called;
     });
 
+    it('overrides onDragStart', () => {
+      const dragStartSpy = spy();
+      const component = TestUtils.renderIntoDocument(<Dropzone id="drag-example" onDragStart={dragStartSpy} />);
+      const content = TestUtils.find(component, '#drag-example')[0];
+
+      TestUtils.Simulate.dragStart(content);
+      expect(dragStartSpy.callCount).to.equal(1);
+    });
+
   });
 
 });
