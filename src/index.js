@@ -239,29 +239,31 @@ Dropzone.defaultProps = {
 };
 
 Dropzone.propTypes = {
+  // Overriding drop behavior
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
 
+  // Overriding drag behavior
   onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.node,
-  style: React.PropTypes.object,
-  activeStyle: React.PropTypes.object,
-  rejectStyle: React.PropTypes.object,
-  className: React.PropTypes.string,
-  activeClassName: React.PropTypes.string,
-  rejectClassName: React.PropTypes.string,
+  children: React.PropTypes.node, // Contents of the dropzone
+  style: React.PropTypes.object, // CSS styles to apply
+  activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
+  rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected
+  className: React.PropTypes.string, // Optional className
+  activeClassName: React.PropTypes.string, // className for accepted state
+  rejectClassName: React.PropTypes.string, // className for rejected state
 
-  disablePreview: React.PropTypes.bool,
-  disableClick: React.PropTypes.bool,
+  disablePreview: React.PropTypes.bool, // Enable/disable preview generation
+  disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
 
-  inputProps: React.PropTypes.object,
-  multiple: React.PropTypes.bool,
-  accept: React.PropTypes.string,
-  name: React.PropTypes.string
+  inputProps: React.PropTypes.object, // Pass additional attributes to the <file type="input"/> tag
+  multiple: React.PropTypes.bool, // Allow dropping multiple files
+  accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+  name: React.PropTypes.string // name attribute for the input tag
 };
 
 export default Dropzone;
