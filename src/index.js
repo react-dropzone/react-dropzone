@@ -1,3 +1,5 @@
+/* eslint prefer-template: 0 */
+
 import accepts from 'attr-accept';
 import React from 'react';
 
@@ -202,7 +204,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => this.fileInputEl = el,
+      ref: el => this.fileInputEl = el, // eslint-disable-line
       onChange: this.onDrop
     };
 
