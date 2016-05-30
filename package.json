@@ -12,7 +12,9 @@
     "test:build": "NODE_ENV=production npm run build && npm run test",
     "eslint": "eslint ./src ./*.js",
     "eslint:fix": "npm run lint -- --fix",
-    "eslint-staged": "eslint-staged"
+    "eslint-staged": "eslint-staged",
+    "deps": "npm-check -s",
+    "deps:update": "npm-check -u"
   },
   "pre-commit": [
     "eslint-staged"
