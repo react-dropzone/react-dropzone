@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npm run clean && webpack",
     "clean": "rimraf ./dist",
-    "prepublish": "npm run lint && npm run build && npm run test:build",
+    "prerelease": "npm run lint && npm run build && npm run test:build",
+    "release": "npmpub",
     "test": "mocha --require ./mocha-environment.js './src/test.js'",
     "test:build": "NODE_ENV=production npm run test",
     "lint": "eslint ./src ./*.js",
@@ -58,6 +59,7 @@
     "eslint-plugin-react": "^3.11.3",
     "jsdom": "^7.2.0",
     "mocha": "^2.3.4",
+    "npmpub": "^3.1.0",
     "pre-commit": "^1.1.2",
     "react": "^15.0.1",
     "react-addons-test-utils": "^15.0.1",
