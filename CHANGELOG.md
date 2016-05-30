@@ -1,6 +1,7 @@
 # v3.5.0
 
 * Optionally handle onDragStart event [#181](https://github.com/okonet/react-dropzone/pull/181)
+* Added lint-staged and npmpub to improve DX
 
 # v3.4.0
 
