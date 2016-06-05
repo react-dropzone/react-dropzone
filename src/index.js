@@ -262,7 +262,7 @@ Dropzone.propTypes = {
   disablePreview: React.PropTypes.bool, // Enable/disable preview generation
   disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
 
-  inputProps: React.PropTypes.object, // Pass additional attributes to the <file type="input"/> tag
+  inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
   name: React.PropTypes.string // name attribute for the input tag
