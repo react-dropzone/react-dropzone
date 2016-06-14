@@ -126,7 +126,11 @@ describe('Dropzone', () => {
         type: 'image/jpeg'
       }];
       const dropSpy = spy();
-      const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy} accept="image/*"><div className="dropzone-content">some content</div></Dropzone>);
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} accept="image/*">
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
@@ -147,7 +151,11 @@ describe('Dropzone', () => {
         type: 'image/jpeg'
       }];
       const dropSpy = spy();
-      const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy}><div className="dropzone-content">some content</div></Dropzone>);
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
