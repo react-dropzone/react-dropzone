@@ -13,7 +13,8 @@ describe('Dropzone', () => {
   beforeEach(() => {
     files = [{
       name: 'file1.pdf',
-      size: 1111
+      size: 1111,
+      type: 'application/pdf'
     }];
   });
 
@@ -112,6 +113,48 @@ describe('Dropzone', () => {
         .to.have.length(1);
       expect(TestUtils.find(component, '[class="my-dropzone"][accept="image/jpeg"]'))
         .to.have.length(0);
+    });
+
+    it('applies the accept prop to the dropped files', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234,
+        type: 'image/gif'
+      }, {
+        name: 'dogs.jpg',
+        size: 2345,
+        type: 'image/jpeg'
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy} accept="image/*"><div className="dropzone-content">some content</div></Dropzone>);
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(0);
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(2);
+    });
+
+    it('accepts all dropped files when no accept prop is specified', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234,
+        type: 'image/gif'
+      }, {
+        name: 'dogs.jpg',
+        size: 2345,
+        type: 'image/jpeg'
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(<Dropzone onDrop={dropSpy}><div className="dropzone-content">some content</div></Dropzone>);
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(1);
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
+      expect(dropSpy.callCount).to.equal(2);
+      expect(dropSpy.secondCall.args[0]).to.have.length(2);
     });
 
     it('applies the name prop to the child input', () => {
