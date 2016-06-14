@@ -1,3 +1,7 @@
+# 3.5.1
+
+* Fixed: `onDrop` is now called only if all files are passing the `accept` check. [#173](https://github.com/okonet/react-dropzone/pull/173) Closes #138, #145
+
 # 3.5.0
 
 * Optionally handle onDragStart event [#181](https://github.com/okonet/react-dropzone/pull/181)
