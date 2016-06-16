@@ -3,6 +3,9 @@
   "version": "3.5.1",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "npm run clean && webpack",
     "clean": "rimraf ./dist",
