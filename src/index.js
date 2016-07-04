@@ -149,6 +149,8 @@ class Dropzone extends React.Component {
       className,
       rejectStyle,
       style,
+      disablePreview, // eslint-disable-line no-unused-vars, prefer-const
+      disableClick, // eslint-disable-line no-unused-vars, prefer-const
       ...props // eslint-disable-line prefer-const
     } = rest;
 
