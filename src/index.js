@@ -212,7 +212,7 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
-    const divProps = Object.assign({}, props);
+    const divProps = { ...props };
     delete divProps.disablePreview;
     delete divProps.disableClick;
 
