@@ -90,6 +90,32 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[0][0]).to.not.have.property('preview');
     });
 
+    it('uses the disableClick property', () => {
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone disableClick>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      spy(dropzone, 'open');
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.click(content);
+      expect(dropzone.open.callCount).to.equal(0);
+    });
+
+    it('calls `open` if disableClick is not provided', () => {
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      spy(dropzone, 'open');
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.click(content);
+      expect(dropzone.open.callCount).to.equal(1);
+    });
+
     it('renders dynamic props on the root element', () => {
       const component = TestUtils.renderIntoDocument(
         <Dropzone hidden aria-hidden="hidden" title="Dropzone" />

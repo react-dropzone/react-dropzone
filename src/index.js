@@ -149,8 +149,6 @@ class Dropzone extends React.Component {
       className,
       rejectStyle,
       style,
-      disablePreview, // eslint-disable-line no-unused-vars, prefer-const
-      disableClick, // eslint-disable-line no-unused-vars, prefer-const
       ...props // eslint-disable-line prefer-const
     } = rest;
 
@@ -214,11 +212,15 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
+    const divProps = Object.assign({}, props);
+    delete divProps.disablePreview;
+    delete divProps.disableClick;
+
     return (
       <div
         className={className}
         style={appliedStyle}
-        {...props/* expand user provided props first so event handlers are never overridden */}
+        {...divProps/* expand user provided props first so event handlers are never overridden */}
         onClick={this.onClick}
         onDragStart={this.onDragStart}
         onDragEnter={this.onDragEnter}
