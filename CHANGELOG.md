@@ -1,3 +1,7 @@
+# 3.5.2
+
+- Fixed unknown props warning in React v15.2 #194. Closes #193 <@nuc>
+
 # 3.5.1
 
 * Fixed: `onDrop` is now called only if all files are passing the `accept` check. [#173](https://github.com/okonet/react-dropzone/pull/173) Closes #138, #145
