@@ -12,7 +12,7 @@ global.window = global.document.defaultView;
 global.navigator = global.window.navigator;
 
 global.window.URL = {
-  createObjectURL: function (arg) {
+  createObjectURL: function createObjectURL(arg) {
     return 'data://' + arg.name;
   }
 };
