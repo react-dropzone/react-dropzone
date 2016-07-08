@@ -18,7 +18,10 @@
     "deps:update": "npm-check -u"
   },
   "lint-staged": {
-    "*.js": ["eslint:fix", "git:add"]
+    "*.js": [
+      "eslint:fix",
+      "git:add"
+    ]
   },
   "pre-commit": [
     "lint-staged"
@@ -67,7 +70,7 @@
     "eslint-plugin-jsx-a11y": "^1.2.2",
     "eslint-plugin-react": "^5.1.1",
     "jsdom": "^9.2.1",
-    "lint-staged": "^2.0.0",
+    "lint-staged": "^2.0.1",
     "mocha": "^2.5.3",
     "npm-check": "^5.2.1",
     "npmpub": "^3.1.0",
