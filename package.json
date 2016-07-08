@@ -8,16 +8,17 @@
     "clean": "rimraf ./dist",
     "prerelease": "npm run eslint && npm run build && npm run test:build",
     "release": "npmpub",
-    "test": "npm run eslint && mocha --require ./mocha-environment.js ./src/test.js",
+    "test": "npm run eslint:src && mocha --require ./mocha-environment.js ./src/test.js",
     "test:build": "NODE_ENV=production npm run build && npm run test",
-    "eslint": "eslint ./src ./*.js",
-    "eslint:fix": "npm run eslint -- --fix",
+    "eslint:src": "eslint ./src ./*.js",
+    "eslint:fix": "eslint --fix",
+    "git:add": "git add",
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
     "deps:update": "npm-check -u"
   },
   "lint-staged": {
-    "eslint": "*.js"
+    "*.js": ["eslint:fix", "git:add"]
   },
   "pre-commit": [
     "lint-staged"
@@ -66,7 +67,7 @@
     "eslint-plugin-jsx-a11y": "^1.2.2",
     "eslint-plugin-react": "^5.1.1",
     "jsdom": "^9.2.1",
-    "lint-staged": "^1.0.2",
+    "lint-staged": "^2.0.0",
     "mocha": "^2.5.3",
     "npm-check": "^5.2.1",
     "npmpub": "^3.1.0",
