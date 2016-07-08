@@ -212,9 +212,10 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
+    // Remove custom properties before passing them to the wrapper div element
+    const customProps = ['disablePreview', 'disableClick', 'onDropAccepted', 'onDropRejected'];
     const divProps = { ...props };
-    delete divProps.disablePreview;
-    delete divProps.disableClick;
+    customProps.forEach(prop => delete divProps[prop]);
 
     return (
       <div
