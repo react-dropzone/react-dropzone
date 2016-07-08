@@ -1,3 +1,8 @@
+# 3.5.3
+
+- Fixed unknown props warning in React v15.2 #195. Closes #193 <@nuc>
+- Updated to the latest lint-staged (2.0.0)
+
 # 3.5.2
 
 - Fixed unknown props warning in React v15.2 #194. Closes #193 <@nuc>
