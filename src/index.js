@@ -103,7 +103,7 @@ class Dropzone extends React.Component {
       files.push(file);
     }
 
-    if (this.allFilesAccepted(files)) {
+    if (this.allFilesAccepted(files) && this.allFilesMatchSize(files)) {
       if (this.props.onDrop) {
         this.props.onDrop.call(this, files, e);
       }
@@ -126,6 +126,10 @@ class Dropzone extends React.Component {
 
   allFilesAccepted(files) {
     return files.every(file => accepts(file, this.props.accept));
+  }
+
+  allFilesMatchSize(files) {
+    return files.every(file => (file.size <= this.props.maxSize && file.size >= this.props.minSize));
   }
 
   open() {
@@ -242,7 +246,9 @@ class Dropzone extends React.Component {
 Dropzone.defaultProps = {
   disablePreview: false,
   disableClick: false,
-  multiple: true
+  multiple: true,
+  maxSize: Infinity,
+  minSize: 0
 };
 
 Dropzone.propTypes = {
@@ -270,7 +276,9 @@ Dropzone.propTypes = {
   inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
-  name: React.PropTypes.string // name attribute for the input tag
+  name: React.PropTypes.string, // name attribute for the input tag
+  maxSize: React.PropTypes.number,
+  minSize: React.PropTypes.number
 };
 
 export default Dropzone;
