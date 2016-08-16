@@ -1,5 +1,7 @@
-var webpack = require('webpack');  // eslint-disable-line
-var path = require('path');  // eslint-disable-line
+/* eslint prefer-template: 0 */
+/* eslint no-var: 0 */
+
+var path = require('path');
 
 module.exports = {
   entry: './src/index.js',

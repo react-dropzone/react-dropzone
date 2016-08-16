@@ -1,3 +1,5 @@
+/* eslint prefer-template: 0 */
+
 import accepts from 'attr-accept';
 import React from 'react';
 
@@ -9,6 +11,7 @@ class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
@@ -38,6 +41,12 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', this.onDragOver);
       document.removeEventListener('dragleave', this.onDragLeave);
       document.removeEventListener('drop', this.onDrop);
+    }
+  }
+
+  onDragStart(e) {
+    if (this.props.onDragStart) {
+      this.props.onDragStart.call(this, e);
     }
   }
 
@@ -112,11 +121,11 @@ class Dropzone extends React.Component {
       files.push(file);
     }
 
-    if (this.props.onDrop) {
-      this.props.onDrop.call(this, files, e);
-    }
-
     if (this.allFilesAccepted(files)) {
+      if (this.props.onDrop) {
+        this.props.onDrop.call(this, files, e);
+      }
+
       if (this.props.onDropAccepted) {
         this.props.onDropAccepted.call(this, files, e);
       }
@@ -213,13 +222,18 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => this.fileInputEl = el,
+      ref: el => this.fileInputEl = el, // eslint-disable-line
       onChange: this.onDrop
     };
 
     if (name && name.length) {
       inputAttributes.name = name;
     }
+
+    // Remove custom properties before passing them to the wrapper div element
+    const customProps = ['disablePreview', 'disableClick', 'onDropAccepted', 'onDropRejected'];
+    const divProps = { ...props };
+    customProps.forEach(prop => delete divProps[prop]);
 
     if (this.props.global) {
       return (
@@ -233,8 +247,9 @@ class Dropzone extends React.Component {
       <div
         className={className}
         style={appliedStyle}
-        {...props /* expand user provided props first so event handlers are never overridden */}
+        {...divProps/* expand user provided props first so event handlers are never overridden */}
         onClick={this.onClick}
+        onDragStart={this.onDragStart}
         onDragEnter={this.onDragEnter}
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
@@ -242,7 +257,7 @@ class Dropzone extends React.Component {
       >
         {this.props.children}
         <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
         />
       </div>
@@ -258,27 +273,31 @@ Dropzone.defaultProps = {
 };
 
 Dropzone.propTypes = {
+  // Overriding drop behavior
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
+
+  // Overriding drag behavior
+  onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.node,
-  style: React.PropTypes.object,
-  activeStyle: React.PropTypes.object,
-  rejectStyle: React.PropTypes.object,
-  className: React.PropTypes.string,
-  activeClassName: React.PropTypes.string,
-  rejectClassName: React.PropTypes.string,
+  children: React.PropTypes.node, // Contents of the dropzone
+  style: React.PropTypes.object, // CSS styles to apply
+  activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
+  rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected
+  className: React.PropTypes.string, // Optional className
+  activeClassName: React.PropTypes.string, // className for accepted state
+  rejectClassName: React.PropTypes.string, // className for rejected state
 
-  disablePreview: React.PropTypes.bool,
-  disableClick: React.PropTypes.bool,
+  disablePreview: React.PropTypes.bool, // Enable/disable preview generation
+  disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
 
-  inputProps: React.PropTypes.object,
-  multiple: React.PropTypes.bool,
-  accept: React.PropTypes.string,
-  name: React.PropTypes.string,
+  inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
+  multiple: React.PropTypes.bool, // Allow dropping multiple files
+  accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+  name: React.PropTypes.string, // name attribute for the input tag
 
   global: React.PropTypes.bool
 };
