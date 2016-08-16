@@ -1,3 +1,7 @@
+# 3.5.4
+
+- Added global
+
 # 3.5.3
 
 - Fixed unknown props warning in React v15.2 #195. Closes #193 <@nuc>
