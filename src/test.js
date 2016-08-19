@@ -191,6 +191,81 @@ describe('Dropzone', () => {
       expect(dropSpy.secondCall.args[0]).to.have.length(2);
     });
 
+    it('applies the maxSize prop to the dropped files', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234,
+        type: 'image/gif'
+      }, {
+        name: 'dogs.jpg',
+        size: 2345,
+        type: 'image/jpeg'
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} maxSize={1111}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(1);
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(1);
+    });
+
+    it('applies the minSize prop to the dropped files', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234,
+        type: 'image/gif'
+      }, {
+        name: 'dogs.jpg',
+        size: 2345,
+        type: 'image/jpeg'
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} minSize={1112}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(0);
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(2);
+    });
+
+    it('accepts all dropped files when no size prop is specified', () => {
+      const images = [{
+        name: 'cats.gif',
+        size: 1234,
+        type: 'image/gif'
+      }, {
+        name: 'dogs.jpg',
+        size: 2345,
+        type: 'image/jpeg'
+      }];
+      const dropSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      expect(dropSpy.callCount).to.equal(1);
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
+      expect(dropSpy.callCount).to.equal(2);
+      expect(dropSpy.secondCall.args[0]).to.have.length(2);
+    });
+
     it('applies the name prop to the child input', () => {
       const component = TestUtils.renderIntoDocument(
         <Dropzone className="my-dropzone" name="test-file-input" />
