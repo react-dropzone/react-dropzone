@@ -4,7 +4,9 @@ import React from 'react';
 import { expect } from 'chai';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
+import semver from 'semver';
 const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
+const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip;
 
 describe('Dropzone', () => {
 
@@ -276,7 +278,7 @@ describe('Dropzone', () => {
         .to.have.length(0);
     });
 
-    it.skip('does not apply the name prop if name is falsey', () => {
+    itConditional('does not apply the name prop if name is falsey', () => {
       const component = TestUtils.renderIntoDocument(
         <Dropzone className="my-dropzone" name="" />
       );
