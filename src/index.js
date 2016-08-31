@@ -58,6 +58,7 @@ class Dropzone extends React.Component {
   onDragOver(e) {
     e.preventDefault();
     e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
     return false;
   }
 
