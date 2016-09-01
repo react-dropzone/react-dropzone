@@ -67,14 +67,11 @@ React.render(<DropzoneDemo />, document.body);
 Features
 ========
 
-- `disableClick` - Clicking the `<Dropzone>` brings up the browser file picker. To disable, set to `true`.
-- `multiple` - To accept only a single file, set this to `false`.
-- `minSize` - To accept file(s) larger than a set minSize. File size measured in bytes.
-- `maxSize` - To accept file(s) smaller than a set maxSize. File size measured in bytes.
-- `accept` - Filters the file types that are valid. It should have a valid MIME type according to [input element](http://www.w3.org/TR/html-markup/input.file.html), for example:
-  * `application/pdf`
-  * `image/*`
-  * `audio/aiff,audio/midi`
+- `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
+- `multiple` `[Boolean | **true**]` — Accept multiple files
+- `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
+- `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
+- `accept` - Accept only specified mime types. Must be a valid MIME type according to [input element specification](http://www.w3.org/TR/html-markup/input.file.html), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
