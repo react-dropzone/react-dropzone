@@ -1,6 +1,7 @@
 # 3.6.0
 
 - Added `minSize` and `maxSize` props for file validation. #202 by @lemuelbarango
+- Fixed OS X drag'n'drop issues. Fixes #74, #195. #225 by @MaffooBristol
 
 # 3.5.3
 
