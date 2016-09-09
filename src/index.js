@@ -119,9 +119,13 @@ class Dropzone extends React.Component {
     }
   }
 
-  onClick() {
+  onClick(e) {
     if (!this.props.disableClick) {
       this.open();
+    }
+
+    if (this.props.onClick) {
+      this.props.onClick.call(this, e);
     }
   }
 
@@ -253,15 +257,18 @@ Dropzone.defaultProps = {
 };
 
 Dropzone.propTypes = {
-  // Overriding drop behavior
+  // Drop event callbacks
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
 
-  // Overriding drag behavior
+  // Drag event callbacks
   onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
+
+  // Click event callbacks
+  onClick: React.PropTypes.func,
 
   children: React.PropTypes.node, // Contents of the dropzone
   style: React.PropTypes.object, // CSS styles to apply
