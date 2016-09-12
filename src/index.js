@@ -138,8 +138,12 @@ class Dropzone extends React.Component {
   }
 
   open() {
+    const clickEvent = new MouseEvent('click', {
+      bubbles: false
+    });
+
     this.fileInputEl.value = null;
-    this.fileInputEl.click();
+    this.fileInputEl.dispatchEvent(clickEvent);
   }
 
   render() {
