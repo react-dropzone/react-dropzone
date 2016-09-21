@@ -16,7 +16,7 @@ class Dropzone extends React.Component {
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
-    this.handleOnCancel = this.handleOnCancel.bind(this);
+    this.onCancel = this.onCancel.bind(this);
 
     this.state = {
       isDragActive: false
@@ -25,10 +25,12 @@ class Dropzone extends React.Component {
 
   componentDidMount() {
     this.enterCounter = 0;
-    const { handleOnCancel } = this;
-    document.body.onfocus = (event) => {
-      handleOnCancel(event);
-    };
+    const { onCancel } = this;
+    document.body.addEventListener('onfocus', onCancel());
+  }
+
+  componentWillUnmount() {
+    document.body.removeEventListener('onfocus', () => {});
   }
 
   onDragStart(e) {
@@ -130,16 +132,18 @@ class Dropzone extends React.Component {
     }
   }
 
-  handleOnCancel() {
-    const { close } = this.props;
+  onCancel() {
+    const { onCancel } = this.props;
     const { fileInputEl } = this;
-    setTimeout(() => {
-      const FileList = fileInputEl.files;
-      if (!FileList.length) {
-        document.body.onfocus = null;
-        close();
-      }
-    }, 300);
+    if (onCancel) {
+      setTimeout(() => {
+        const FileList = fileInputEl.files;
+        if (!FileList.length) {
+          document.body.onfocus = null;
+          onCancel();
+        }
+      }, 300);
+    }
   }
 
   allFilesAccepted(files) {
@@ -290,7 +294,7 @@ Dropzone.propTypes = {
 
   disablePreview: React.PropTypes.bool, // Enable/disable preview generation
   disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
-  close: React.PropTypes.func,
+  onCancel: React.PropTypes.func,
 
   inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files

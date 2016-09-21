@@ -307,6 +307,16 @@ describe('Dropzone', () => {
       expect(dragStartSpy.callCount).to.equal(1);
     });
 
+    it('invokes onCancel method when file browse window is cancelled', () => {
+      const onCancelSpy = spy();
+      const component = TestUtils.renderIntoDocument(
+        <Dropzone id="on-cancel-example" onCancel={onCancelSpy} />
+      );
+      const content = TestUtils.find(component, '#on-cancel-example')[0];
+
+      // TestUtils.Simulate.focus()
+    });
+
   });
 
 });
