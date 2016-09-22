@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
 import semver from 'semver';
-const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
+const Dropzone = require('./index');
 const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip;
 
 describe('Dropzone', () => {
@@ -307,14 +307,15 @@ describe('Dropzone', () => {
       expect(dragStartSpy.callCount).to.equal(1);
     });
 
-    it('invokes onCancel method when file browse window is cancelled', () => {
+    it('invokes onCancel prop when file browse window is cancelled', () => {
       const onCancelSpy = spy();
-      const component = TestUtils.renderIntoDocument(
+      TestUtils.renderIntoDocument(
         <Dropzone id="on-cancel-example" onCancel={onCancelSpy} />
       );
-      const content = TestUtils.find(component, '#on-cancel-example')[0];
-
-      // TestUtils.Simulate.focus()
+      TestUtils.Simulate.focus(document.body);
+      setTimeout(() => {
+        expect(onCancelSpy.callCount).to.equal(1);
+      }, 300);
     });
 
   });
