@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
 import semver from 'semver';
-const Dropzone = require('./index');
+const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
 const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip;
 
 describe('Dropzone', () => {
@@ -324,7 +324,7 @@ describe('Dropzone', () => {
       }, 100);
     });
 
-    it('invoke onCancel prop when document body receives focus via cancel button', (done) => {
+    it('invoke onFileDialogCancel prop when document body receives focus via cancel button', (done) => {
       const onCancelSpy = spy();
 
       const component = TestUtils.renderIntoDocument(
