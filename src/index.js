@@ -16,21 +16,23 @@ class Dropzone extends React.Component {
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
-    this.onCancel = this.onCancel.bind(this);
+    this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
 
     this.state = {
-      isDragActive: false
+      isDragActive: false,
+      isFileDialogActive: false
     };
   }
 
   componentDidMount() {
     this.enterCounter = 0;
-    const { onCancel } = this;
-    document.body.addEventListener('onfocus', onCancel());
+    // Tried implementing addEventListener, but didn't work out
+    document.body.onfocus = this.onFileDialogCancel;
   }
 
   componentWillUnmount() {
-    document.body.removeEventListener('onfocus', () => {});
+    // Can be replaced with removeEventListener, if addEventListener works
+    document.body.onfocus = null;
   }
 
   onDragStart(e) {
@@ -124,24 +126,35 @@ class Dropzone extends React.Component {
         this.props.onDropRejected.call(this, files, e);
       }
     }
+    this.setState({
+      isFileDialogActive: false
+    });
   }
 
   onClick() {
     if (!this.props.disableClick) {
-      this.open();
+      this.setState({
+        isFileDialogActive: true
+      }, this.open());
     }
   }
 
-  onCancel() {
-    const { onCancel } = this.props;
+  onFileDialogCancel() {
+    // timeout will not recognize context of this method
+    const { onFileDialogCancel } = this.props;
     const { fileInputEl } = this;
-    if (onCancel) {
+    // execute the timeout only if the onFileDialogCancel is defined and FileDialog
+    // is opened in the browser
+    if (onFileDialogCancel && this.state.isFileDialogActive) {
       setTimeout(() => {
+        // Returns an object as FileList
         const FileList = fileInputEl.files;
         if (!FileList.length) {
-          onCancel();
+          this.setState({
+            isFileDialogActive: false
+          }, onFileDialogCancel());
         }
-      }, 300);
+      }, 100);
     }
   }
 
@@ -239,7 +252,7 @@ class Dropzone extends React.Component {
 
     // Remove custom properties before passing them to the wrapper div element
     const customProps = [
-      'disablePreview', 'disableClick', 'onDropAccepted', 'onDropRejected', 'maxSize', 'minSize', 'onCancel'
+      'disablePreview', 'disableClick', 'onDropAccepted', 'onDropRejected', 'maxSize', 'minSize', 'onFileDialogCancel'
     ];
     const divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
@@ -295,7 +308,7 @@ Dropzone.propTypes = {
 
   disablePreview: React.PropTypes.bool, // Enable/disable preview generation
   disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
-  onCancel: React.PropTypes.func,
+  onFileDialogCancel: React.PropTypes.func, // Provide a callback on clicking the cancel button of the file dialog
 
   inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files
