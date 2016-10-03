@@ -6,7 +6,6 @@ logs
 node_modules
 
 # Generated files
-dist
 
 #IDE
 .idea
