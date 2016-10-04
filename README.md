@@ -105,7 +105,7 @@ var DropzoneDemo = React.createClass({
     render: function () {
         return (
             <div>
-                <Dropzone ref={(el) => (this.dropzone = el)} onDrop={this.onDrop}>
+                <Dropzone ref={(node) => { this.dropzone = node; }} onDrop={this.onDrop}>
                     <div>Try dropping some files here, or click to select files to upload.</div>
                 </Dropzone>
                 <button type="button" onClick={this.onOpenClick}>
