@@ -99,13 +99,13 @@ var DropzoneDemo = React.createClass({
     },
 
     onOpenClick: function () {
-      this.refs.dropzone.open();
+      this.dropzone.open();
     },
 
     render: function () {
         return (
             <div>
-                <Dropzone ref="dropzone" onDrop={this.onDrop}>
+                <Dropzone ref={(el) => (this.dropzone = el)} onDrop={this.onDrop}>
                     <div>Try dropping some files here, or click to select files to upload.</div>
                 </Dropzone>
                 <button type="button" onClick={this.onOpenClick}>
