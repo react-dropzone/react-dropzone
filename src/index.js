@@ -93,7 +93,8 @@ class Dropzone extends React.Component {
 
     const droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
-    const files = [];
+    const acceptedFiles = [];
+    const rejectedFiles = [];
 
     for (let i = 0; i < max; i++) {
       const file = droppedFiles[i];
@@ -101,20 +102,25 @@ class Dropzone extends React.Component {
       if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
       }
-      files.push(file);
+
+      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+        acceptedFiles.push(file);
+      } else {
+        rejectedFiles.push(file);
+      }
     }
 
-    if (this.allFilesAccepted(files) && this.allFilesMatchSize(files)) {
-      if (this.props.onDrop) {
-        this.props.onDrop.call(this, files, e);
-      }
+    if (this.props.onDrop) {
+      this.props.onDrop.call(this, acceptedFiles, rejectedFiles, e);
+    }
 
-      if (this.props.onDropAccepted) {
-        this.props.onDropAccepted.call(this, files, e);
-      }
-    } else {
+    if (rejectedFiles.length > 0) {
       if (this.props.onDropRejected) {
-        this.props.onDropRejected.call(this, files, e);
+        this.props.onDropRejected.call(this, rejectedFiles, e);
+      }
+    } else if (acceptedFiles.length > 0) {
+      if (this.props.onDropAccepted) {
+        this.props.onDropAccepted.call(this, acceptedFiles, e);
       }
     }
   }
@@ -125,12 +131,16 @@ class Dropzone extends React.Component {
     }
   }
 
-  allFilesAccepted(files) {
-    return files.every(file => accepts(file, this.props.accept));
+  fileAccepted(file) {
+    return accepts(file, this.props.accept);
   }
 
-  allFilesMatchSize(files) {
-    return files.every(file => (file.size <= this.props.maxSize && file.size >= this.props.minSize));
+  fileMatchSize(file) {
+    return file.size <= this.props.maxSize && file.size >= this.props.minSize;
+  }
+
+  allFilesAccepted(files) {
+    return files.every(this.fileAccepted);
   }
 
   open() {

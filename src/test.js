@@ -11,12 +11,22 @@ const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip
 describe('Dropzone', () => {
 
   let files = [];
+  let images = [];
 
   beforeEach(() => {
     files = [{
       name: 'file1.pdf',
       size: 1111,
       type: 'application/pdf'
+    }];
+    images = [{
+      name: 'cats.gif',
+      size: 1234,
+      type: 'image/gif'
+    }, {
+      name: 'dogs.jpg',
+      size: 2345,
+      type: 'image/jpeg'
     }];
   });
 
@@ -144,68 +154,77 @@ describe('Dropzone', () => {
     });
 
     it('applies the accept prop to the dropped files', () => {
-      const images = [{
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      }, {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }];
       const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
       const dropzone = TestUtils.renderIntoDocument(
-        <Dropzone onDrop={dropSpy} accept="image/*">
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} accept="image/*">
           <div className="dropzone-content">some content</div>
         </Dropzone>
       );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(0);
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(0);
+      expect(dropSpy.firstCall.args[1]).to.have.length(1);
+
+      expect(dropAcceptedSpy.callCount).to.equal(0);
+
+      expect(dropRejectedSpy.callCount).to.equal(1);
+      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(1);
+    });
+
+    it('applies the accept prop to the dropped images', () => {
+      const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} accept="image/*">
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
       expect(dropSpy.callCount).to.equal(1);
       expect(dropSpy.firstCall.args[0]).to.have.length(2);
+      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+
+      expect(dropAcceptedSpy.callCount).to.equal(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(2);
+
+      expect(dropRejectedSpy.callCount).to.equal(0);
     });
 
-    it('accepts all dropped files when no accept prop is specified', () => {
-      const images = [{
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      }, {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }];
+    it('accepts all dropped files and images when no accept prop is specified', () => {
       const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
       const dropzone = TestUtils.renderIntoDocument(
-        <Dropzone onDrop={dropSpy}>
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy}>
           <div className="dropzone-content">some content</div>
         </Dropzone>
       );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
-      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: files.concat(images) } });
       expect(dropSpy.callCount).to.equal(1);
-      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
-      expect(dropSpy.callCount).to.equal(2);
-      expect(dropSpy.secondCall.args[0]).to.have.length(2);
+      expect(dropSpy.firstCall.args[0]).to.have.length(3);
+      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+
+      expect(dropAcceptedSpy.callCount).to.equal(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(3);
+
+      expect(dropRejectedSpy.callCount).to.equal(0);
     });
 
     it('applies the maxSize prop to the dropped files', () => {
-      const images = [{
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      }, {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }];
       const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
       const dropzone = TestUtils.renderIntoDocument(
-        <Dropzone onDrop={dropSpy} maxSize={1111}>
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} maxSize={1111}>
           <div className="dropzone-content">some content</div>
         </Dropzone>
       );
@@ -213,59 +232,101 @@ describe('Dropzone', () => {
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
       expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(1);
+      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+
+      expect(dropAcceptedSpy.callCount).to.equal(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(1);
+
+      expect(dropRejectedSpy.callCount).to.equal(0);
+    });
+
+    it('applies the maxSize prop to the dropped images', () => {
+      const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} maxSize={1111}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
       expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(0);
+      expect(dropSpy.firstCall.args[1]).to.have.length(2);
+
+      expect(dropAcceptedSpy.callCount).to.equal(0);
+
+      expect(dropRejectedSpy.callCount).to.equal(1);
+      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(2);
     });
 
     it('applies the minSize prop to the dropped files', () => {
-      const images = [{
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      }, {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }];
       const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
       const dropzone = TestUtils.renderIntoDocument(
-        <Dropzone onDrop={dropSpy} minSize={1112}>
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} minSize={1112}>
           <div className="dropzone-content">some content</div>
         </Dropzone>
       );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(0);
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(0);
+      expect(dropSpy.firstCall.args[1]).to.have.length(1);
+
+      expect(dropAcceptedSpy.callCount).to.equal(0);
+
+      expect(dropRejectedSpy.callCount).to.equal(1);
+      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(1);
+    });
+
+    it('applies the minSize prop to the dropped images', () => {
+      const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy} minSize={1112}>
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
       expect(dropSpy.callCount).to.equal(1);
       expect(dropSpy.firstCall.args[0]).to.have.length(2);
+      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+
+      expect(dropAcceptedSpy.callCount).to.equal(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(2);
+
+      expect(dropRejectedSpy.callCount).to.equal(0);
     });
 
-    it('accepts all dropped files when no size prop is specified', () => {
-      const images = [{
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      }, {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }];
+    it('accepts all dropped files and images when no size prop is specified', () => {
       const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
       const dropzone = TestUtils.renderIntoDocument(
-        <Dropzone onDrop={dropSpy}>
+        <Dropzone onDrop={dropSpy} onDropAccepted={dropAcceptedSpy} onDropRejected={dropRejectedSpy}>
           <div className="dropzone-content">some content</div>
         </Dropzone>
       );
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
-      TestUtils.Simulate.drop(content, { dataTransfer: { files } });
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: files.concat(images) } });
       expect(dropSpy.callCount).to.equal(1);
-      TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
-      expect(dropSpy.callCount).to.equal(2);
-      expect(dropSpy.secondCall.args[0]).to.have.length(2);
+      expect(dropSpy.firstCall.args[0]).to.have.length(3);
+      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+
+      expect(dropAcceptedSpy.callCount).to.equal(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(3);
+
+      expect(dropRejectedSpy.callCount).to.equal(0);
     });
 
     it('applies the name prop to the child input', () => {

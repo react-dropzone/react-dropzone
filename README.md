@@ -32,7 +32,9 @@ npm install --save react-dropzone@2.x
 Usage
 =====
 
-Simply `require('react-dropzone')` and specify an `onDrop` method that accepts an array of dropped files.
+Simply `require('react-dropzone')` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+
+The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
 
@@ -46,8 +48,9 @@ var React = require('react');
 var Dropzone = require('react-dropzone');
 
 var DropzoneDemo = React.createClass({
-    onDrop: function (files) {
-      console.log('Received files: ', files);
+    onDrop: function (acceptedFiles, rejectedFiles) {
+      console.log('Accepted files: ', acceptedFiles);
+      console.log('Rejected files: ', rejectedFiles);
     },
 
     render: function () {
@@ -92,9 +95,9 @@ var DropzoneDemo = React.createClass({
         };
     },
 
-    onDrop: function (files) {
+    onDrop: function (acceptedFiles) {
       this.setState({
-        files: files
+        files: acceptedFiles
       });
     },
 
@@ -131,9 +134,9 @@ Using `react-dropzone` is similar to using a file form field, but instead of get
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
 ```javascript
-    onDrop: function(files){
+    onDrop: function(acceptedFiles){
         var req = request.post('/upload');
-        files.forEach((file)=> {
+        acceptedFiles.forEach((file)=> {
             req.attach(file.name, file);
         });
         req.end(callback);
