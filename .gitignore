@@ -6,7 +6,9 @@ logs
 node_modules
 
 # Generated files
-dist
+-dist
 
 #IDE
 .idea
+
+.DS_Store

@@ -368,6 +368,49 @@ describe('Dropzone', () => {
       expect(dragStartSpy.callCount).to.equal(1);
     });
 
+    it('do not invoke onCancel prop everytime document body receives focus', (done) => {
+      const onCancelSpy = spy();
+      TestUtils.renderIntoDocument(
+        <Dropzone id="on-cancel-example" onFileDialogCancel={onCancelSpy} />
+      );
+      // Simulated DOM event - onfocus
+      document.body.addEventListener('focus', () => {});
+      const evt = document.createEvent('HTMLEvents');
+      evt.initEvent('focus', false, true);
+      document.body.dispatchEvent(evt);
+      // setTimeout to match the event callback from actual Component
+      setTimeout(() => {
+        expect(onCancelSpy.callCount).to.equal(0);
+        done();
+      }, 100);
+    });
+
+    it('invoke onFileDialogCancel prop when document body receives focus via cancel button', (done) => {
+      const onCancelSpy = spy();
+
+      const component = TestUtils.renderIntoDocument(
+        <Dropzone className="dropzone-content" onFileDialogCancel={onCancelSpy} />
+      );
+
+      // Test / invoke the click event
+      spy(component, 'open');
+      const content = TestUtils.findRenderedDOMComponentWithClass(component, 'dropzone-content');
+      TestUtils.Simulate.click(content);
+      expect(component.open.callCount).to.equal(1);
+
+      // Simulated DOM event - onfocus
+      document.body.addEventListener('focus', () => {});
+      const evt = document.createEvent('HTMLEvents');
+      evt.initEvent('focus', false, true);
+      document.body.dispatchEvent(evt);
+
+      // setTimeout to match the event callback from actual Component
+      setTimeout(() => {
+        expect(onCancelSpy.callCount).to.equal(1);
+        done();
+      }, 100);
+    });
+
   });
 
 });
