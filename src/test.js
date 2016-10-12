@@ -368,6 +368,17 @@ describe('Dropzone', () => {
       expect(dragStartSpy.callCount).to.equal(1);
     });
 
+    it('overrides onDragEnter', () => {
+      const dragEnterSpy = spy();
+      const component = TestUtils.renderIntoDocument(
+        <Dropzone id="drag-example" onDragEnter={dragEnterSpy} />
+      );
+      const content = TestUtils.find(component, '#drag-example')[0];
+
+      TestUtils.Simulate.dragEnter(content, { dataTransfer: { items: files } });
+      expect(dragEnterSpy.callCount).to.equal(1);
+    });
+
     it('do not invoke onCancel prop everytime document body receives focus', (done) => {
       const onCancelSpy = spy();
       TestUtils.renderIntoDocument(

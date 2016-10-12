@@ -17,6 +17,7 @@ class Dropzone extends React.Component {
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
+    this.fileAccepted = this.fileAccepted.bind(this);
 
     this.state = {
       isDragActive: false,
