@@ -140,9 +140,7 @@ class Dropzone extends React.Component {
 
   onClick() {
     if (!this.props.disableClick) {
-      this.setState({
-        isFileDialogActive: true
-      }, this.open());
+      this.open();
     }
   }
 
@@ -178,6 +176,7 @@ class Dropzone extends React.Component {
   }
 
   open() {
+    this.setState({ isFileDialogActive: true });
     this.fileInputEl.value = null;
     this.fileInputEl.click();
   }
