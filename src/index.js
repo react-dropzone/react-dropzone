@@ -138,11 +138,15 @@ class Dropzone extends React.Component {
     });
   }
 
-  onClick() {
+  onClick(e) {
     if (!this.props.disableClick) {
       this.setState({
         isFileDialogActive: true
       }, this.open());
+    }
+
+    if (this.props.onClick) {
+      this.props.onClick.call(this, e);
     }
   }
 
@@ -178,8 +182,12 @@ class Dropzone extends React.Component {
   }
 
   open() {
+    const clickEvent = new MouseEvent('click', {
+      bubbles: false
+    });
+
     this.fileInputEl.value = null;
-    this.fileInputEl.click();
+    this.fileInputEl.dispatchEvent(clickEvent);
   }
 
   render() {
@@ -299,15 +307,18 @@ Dropzone.defaultProps = {
 };
 
 Dropzone.propTypes = {
-  // Overriding drop behavior
+  // Drop event callbacks
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
 
-  // Overriding drag behavior
+  // Drag event callbacks
   onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
+
+  // Click event callbacks
+  onClick: React.PropTypes.func,
 
   children: React.PropTypes.node, // Contents of the dropzone
   style: React.PropTypes.object, // CSS styles to apply

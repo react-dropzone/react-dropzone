@@ -349,12 +349,12 @@ describe('Dropzone', () => {
     it('overrides onClick', () => {
       const clickSpy = spy();
       const component = TestUtils.renderIntoDocument(
-        <Dropzone id="example" onClick={clickSpy} />
+        <Dropzone id="click-example" onClick={clickSpy} />
       );
-      const content = TestUtils.find(component, '#example')[0];
+      const content = TestUtils.find(component, '#click-example')[0];
 
       TestUtils.Simulate.click(content);
-      expect(clickSpy).to.not.be.called;
+      expect(clickSpy.callCount).to.equal(1);
     });
 
     it('overrides onDragStart', () => {
