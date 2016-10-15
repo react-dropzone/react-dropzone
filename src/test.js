@@ -393,7 +393,7 @@ describe('Dropzone', () => {
       setTimeout(() => {
         expect(onCancelSpy.callCount).to.equal(0);
         done();
-      }, 100);
+      }, 300);
     });
 
     it('invoke onFileDialogCancel prop when document body receives focus via cancel button', (done) => {
@@ -419,7 +419,7 @@ describe('Dropzone', () => {
       setTimeout(() => {
         expect(onCancelSpy.callCount).to.equal(1);
         done();
-      }, 100);
+      }, 300);
     });
 
   });

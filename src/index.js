@@ -18,10 +18,10 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
     this.fileAccepted = this.fileAccepted.bind(this);
+    this.isFileDialogActive = false;
 
     this.state = {
-      isDragActive: false,
-      isFileDialogActive: false
+      isDragActive: false
     };
   }
 
@@ -133,16 +133,12 @@ class Dropzone extends React.Component {
         this.props.onDropAccepted.call(this, acceptedFiles, e);
       }
     }
-    this.setState({
-      isFileDialogActive: false
-    });
+    this.isFileDialogActive = false;
   }
 
   onClick() {
     if (!this.props.disableClick) {
-      this.setState({
-        isFileDialogActive: true
-      }, this.open());
+      this.open();
     }
   }
 
@@ -150,18 +146,18 @@ class Dropzone extends React.Component {
     // timeout will not recognize context of this method
     const { onFileDialogCancel } = this.props;
     const { fileInputEl } = this;
+    let { isFileDialogActive } = this;
     // execute the timeout only if the onFileDialogCancel is defined and FileDialog
     // is opened in the browser
-    if (onFileDialogCancel && this.state.isFileDialogActive) {
+    if (onFileDialogCancel && isFileDialogActive) {
       setTimeout(() => {
         // Returns an object as FileList
         const FileList = fileInputEl.files;
         if (!FileList.length) {
-          this.setState({
-            isFileDialogActive: false
-          }, onFileDialogCancel());
+          isFileDialogActive = false;
+          onFileDialogCancel();
         }
-      }, 100);
+      }, 300);
     }
   }
 
@@ -178,6 +174,7 @@ class Dropzone extends React.Component {
   }
 
   open() {
+    this.isFileDialogActive = true;
     this.fileInputEl.value = null;
     this.fileInputEl.click();
   }
