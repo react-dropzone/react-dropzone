@@ -108,14 +108,26 @@ class Dropzone extends React.Component {
 
     for (let i = 0; i < max; i++) {
       const file = droppedFiles[i];
+
       // We might want to disable the preview creation to support big files
       if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
       }
 
-      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+      let rejectionReason = null;
+
+      if (!this.fileAccepted(file)) {
+        rejectionReason = Dropzone.RejectionReason.InvalidFileType;
+      } else if (file.size > this.props.maxSize) {
+        rejectionReason = Dropzone.RejectionReason.AboveMaxSize;
+      } else if (file.size < this.props.minSize) {
+        rejectionReason = Dropzone.RejectionReason.BelowMinSize;
+      }
+
+      if (!rejectionReason) {
         acceptedFiles.push(file);
       } else {
+        file.rejectionReason = rejectionReason;
         rejectedFiles.push(file);
       }
     }
@@ -163,10 +175,6 @@ class Dropzone extends React.Component {
 
   fileAccepted(file) {
     return accepts(file, this.props.accept);
-  }
-
-  fileMatchSize(file) {
-    return file.size <= this.props.maxSize && file.size >= this.props.minSize;
   }
 
   allFilesAccepted(files) {
@@ -324,6 +332,12 @@ Dropzone.propTypes = {
   name: React.PropTypes.string, // name attribute for the input tag
   maxSize: React.PropTypes.number,
   minSize: React.PropTypes.number
+};
+
+Dropzone.RejectionReason = {
+  InvalidFileType: 1,
+  BelowMinSize: 2,
+  AboveMaxSize: 3
 };
 
 export default Dropzone;

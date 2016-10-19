@@ -307,6 +307,43 @@ describe('Dropzone', () => {
       expect(dropRejectedSpy.callCount).to.equal(0);
     });
 
+    it('gives the reason for rejection', () => {
+      const dropSpy = spy();
+      const dropAcceptedSpy = spy();
+      const dropRejectedSpy = spy();
+      const dropzone = TestUtils.renderIntoDocument(
+        <Dropzone
+          onDrop={dropSpy}
+          onDropAccepted={dropAcceptedSpy}
+          onDropRejected={dropRejectedSpy}
+          minSize={1112}
+          maxSize={1235}
+          accept={"image/jpeg,application/pdf"}
+        >
+
+          <div className="dropzone-content">some content</div>
+        </Dropzone>
+      );
+
+      const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
+
+      TestUtils.Simulate.drop(content, { dataTransfer: { files: files.concat(images) } });
+      expect(dropSpy.callCount).to.equal(1);
+      expect(dropSpy.firstCall.args[0]).to.have.length(0);
+      expect(dropSpy.firstCall.args[1]).to.have.length(3);
+
+      expect(dropSpy.firstCall.args[1][0].rejectionReason).to.equal(Dropzone.RejectionReason.BelowMinSize);
+      expect(dropSpy.firstCall.args[1][1].rejectionReason).to.equal(Dropzone.RejectionReason.InvalidFileType);
+      expect(dropSpy.firstCall.args[1][2].rejectionReason).to.equal(Dropzone.RejectionReason.AboveMaxSize);
+
+      expect(dropAcceptedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).to.equal(1);
+
+      expect(dropRejectedSpy.firstCall.args[0][0].rejectionReason).to.equal(Dropzone.RejectionReason.BelowMinSize);
+      expect(dropRejectedSpy.firstCall.args[0][1].rejectionReason).to.equal(Dropzone.RejectionReason.InvalidFileType);
+      expect(dropRejectedSpy.firstCall.args[0][2].rejectionReason).to.equal(Dropzone.RejectionReason.AboveMaxSize);
+    });
+
     it('accepts all dropped files and images when no size prop is specified', () => {
       const dropSpy = spy();
       const dropAcceptedSpy = spy();
