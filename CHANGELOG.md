@@ -1,3 +1,9 @@
+# 3.7.0
+
+- [feature] Added onCancel callback. Closes #199 <Anurag Sharma (CES)>
+- [feature] onDrop will be called with 2 arguments: acceptedFiles and rejectedFiles <Christian Kaps>
+- [docs] Update README examples to use ref callbacks <Kye Hohenberger>
+
 # 3.6.0
 
 - Added `minSize` and `maxSize` props for file validation. #202 by @lemuelbarango
