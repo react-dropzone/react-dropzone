@@ -70,11 +70,10 @@ class Dropzone extends React.Component {
     e.stopPropagation();
     
     try {
-      e.dataTransfer.dropEffect = 'copy'; // eslint-disable-line no-param-reassign		      
-    } catch (e) {
-      // continue regardless of error  
-    }    
-    
+      e.dataTransfer.dropEffect = 'copy'; // eslint-disable-line no-param-reassign
+    } catch (err) {
+      // continue regardless of error
+    }
     return false;
   }
 
