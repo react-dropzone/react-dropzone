@@ -1,6 +1,5 @@
 {
   "name": "react-dropzone",
-  "version": "3.7.0",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +14,8 @@
     "git:add": "git add",
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
-    "deps:update": "npm-check -u"
+    "deps:update": "npm-check -u",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "lint-staged": {
     "*.js": [
@@ -35,7 +35,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/okonet/react-dropzone.git"
+    "url": "https://github.com/okonet/react-dropzone.git"
   },
   "bugs": {
     "url": "https://github.com/okonet/react-dropzone/issues"
@@ -64,6 +64,7 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
     "chai": "^3.4.1",
+    "cz-conventional-changelog": "^1.2.0",
     "eslint": "^2.11.0",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.8.1",
@@ -80,8 +81,14 @@
     "react-dom": "^15.2.0",
     "react-testutils-additions": "^15.0.0",
     "rimraf": "^2.5.2",
+    "semantic-release": "^4.3.5",
     "semver": "^5.3.0",
     "sinon": "^1.17.4",
     "webpack": "^1.13.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
