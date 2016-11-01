@@ -3,11 +3,10 @@
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run clean && webpack",
     "clean": "rimraf ./dist",
-    "prepublish": "npm run eslint:src && npm run build && npm run test:build",
+    "build": "npm run clean && webpack",
+    "prepublish": "npm run build",
     "test": "npm run eslint:src && mocha --require ./mocha-environment.js ./src/test.js",
-    "test:build": "NODE_ENV=production npm run build && npm run test",
     "eslint:src": "eslint ./src ./*.js",
     "eslint:fix": "eslint --fix",
     "git:add": "git add",
