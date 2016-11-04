@@ -69,7 +69,7 @@
     "eslint-plugin-jsx-a11y": "^1.2.2",
     "eslint-plugin-react": "^5.1.1",
     "jsdom": "^9.2.1",
-    "lint-staged": "^2.0.1",
+    "lint-staged": "^3.2.1",
     "mocha": "^2.5.3",
     "npm-check": "^5.2.1",
     "pre-commit": "^1.1.3",
