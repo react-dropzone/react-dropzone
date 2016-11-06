@@ -36,6 +36,7 @@ class Dropzone extends React.Component {
   }
 
   componentWillUnmount() {
+    document.body.onfocus = null;
     if (this.props.global && typeof document) {
       document.removeEventListener('dragenter', this.onDragEnter);
       document.removeEventListener('dragover', this.onDragOver);
@@ -129,10 +130,8 @@ class Dropzone extends React.Component {
       if (this.props.onDropAccepted) {
         this.props.onDropAccepted.call(this, files, e);
       }
-    } else {
-      if (this.props.onDropRejected) {
-        this.props.onDropRejected.call(this, files, e);
-      }
+    } else if (this.props.onDropRejected) {
+      this.props.onDropRejected.call(this, files, e);
     }
   }
 
@@ -231,7 +230,17 @@ class Dropzone extends React.Component {
     }
 
     // Remove custom properties before passing them to the wrapper div element
-    const customProps = ['disablePreview', 'disableClick', 'onDropAccepted', 'onDropRejected', 'global'];
+    const customProps = [
+      'acceptedFiles',
+      'disablePreview',
+      'disableClick',
+      'onDropAccepted',
+      'onDropRejected',
+      'onFileDialogCancel',
+      'global',
+      'maxSize',
+      'minSize'
+    ];
     const divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
 
