@@ -17,6 +17,7 @@ class Dropzone extends React.Component {
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
+    this.onInputClick = this.onInputClick.bind(this);
     this.fileAccepted = this.fileAccepted.bind(this);
     this.isFileDialogActive = false;
     this.state = {
@@ -136,6 +137,10 @@ class Dropzone extends React.Component {
     if (!this.props.disableClick) {
       this.open();
     }
+  }
+  
+  onInputClick(e) {
+    e.stopPropagation();
   }
 
   onFileDialogCancel() {
@@ -284,6 +289,7 @@ class Dropzone extends React.Component {
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
+          onClick={this.onInputClick}
         />
       </div>
     );
