@@ -138,7 +138,7 @@ class Dropzone extends React.Component {
       this.open();
     }
   }
-  
+
   onInputClick(e) {
     e.stopPropagation();
   }
