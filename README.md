@@ -1,4 +1,4 @@
-react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone)
+react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone)
 ==============
 
 Simple HTML5 drag-drop zone for files with React.js.
