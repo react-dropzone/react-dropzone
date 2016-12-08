@@ -49,7 +49,7 @@ class Dropzone extends React.Component {
 
     // This is tricky. During the drag even the dataTransfer.files is null
     // But Chrome implements some drag store, which is accesible via dataTransfer.items
-    const dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
+    const dataTransferItems = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files : [];
 
     // Now we need to convert the DataTransferList to Array
     const allFilesAccepted = this.allFilesAccepted(Array.prototype.slice.call(dataTransferItems));
