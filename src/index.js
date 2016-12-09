@@ -1,3 +1,5 @@
+/* eslint prefer-template: 0 */
+
 import accepts from 'attr-accept';
 import React from 'react';
 
@@ -9,11 +11,14 @@ class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
-
+    this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
+    this.fileAccepted = this.fileAccepted.bind(this);
+    this.isFileDialogActive = false;
     this.state = {
       isDragActive: false
     };
@@ -29,6 +34,20 @@ class Dropzone extends React.Component {
       ['webkitdirectory', 'mozdirectory', 'msdirectory', 'odirectory', 'directory'].forEach(attribute => {
         this.fileInputEl.setAttribute(attribute, true);
       });
+    }
+
+    // Tried implementing addEventListener, but didn't work out
+    document.body.onfocus = this.onFileDialogCancel;
+  }
+
+  componentWillUnmount() {
+    // Can be replaced with removeEventListener, if addEventListener works
+    document.body.onfocus = null;
+  }
+
+  onDragStart(e) {
+    if (this.props.onDragStart) {
+      this.props.onDragStart.call(this, e);
     }
   }
 
@@ -58,6 +77,11 @@ class Dropzone extends React.Component {
   onDragOver(e) {
     e.preventDefault();
     e.stopPropagation();
+    try {
+      e.dataTransfer.dropEffect = 'copy'; // eslint-disable-line no-param-reassign
+    } catch (err) {
+      // continue regardless of error
+    }
     return false;
   }
 
@@ -119,7 +143,7 @@ class Dropzone extends React.Component {
           this.props.onDropRejected.call(this, files, e);
         }
       }
-    };
+    }
 
     if (dataTransferItems[0] && typeof dataTransferItems[0].webkitGetAsEntry === 'function') {
       const entry = dataTransferItems[0].webkitGetAsEntry();
@@ -130,6 +154,7 @@ class Dropzone extends React.Component {
       });
     }
     wrapup();
+    this.isFileDialogActive = false;
   }
 
   onClick() {
@@ -138,11 +163,39 @@ class Dropzone extends React.Component {
     }
   }
 
+  onFileDialogCancel() {
+    // timeout will not recognize context of this method
+    const { onFileDialogCancel } = this.props;
+    const { fileInputEl } = this;
+    let { isFileDialogActive } = this;
+    // execute the timeout only if the onFileDialogCancel is defined and FileDialog
+    // is opened in the browser
+    if (onFileDialogCancel && isFileDialogActive) {
+      setTimeout(() => {
+        // Returns an object as FileList
+        const FileList = fileInputEl.files;
+        if (!FileList.length) {
+          isFileDialogActive = false;
+          onFileDialogCancel();
+        }
+      }, 300);
+    }
+  }
+
+  fileAccepted(file) {
+    return accepts(file, this.props.accept);
+  }
+
+  fileMatchSize(file) {
+    return file.size <= this.props.maxSize && file.size >= this.props.minSize;
+  }
+
   allFilesAccepted(files) {
-    return files.every(file => accepts(file, this.props.accept));
+    return files.every(this.fileAccepted);
   }
 
   open() {
+    this.isFileDialogActive = true;
     this.fileInputEl.value = null;
     this.fileInputEl.click();
   }
@@ -259,7 +312,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => this.fileInputEl = el,
+      ref: el => this.fileInputEl = el, // eslint-disable-line
       onChange: this.onDrop
     };
 
@@ -267,12 +320,27 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
+    // Remove custom properties before passing them to the wrapper div element
+    const customProps = [
+      'acceptedFiles',
+      'disablePreview',
+      'disableClick',
+      'onDropAccepted',
+      'onDropRejected',
+      'onFileDialogCancel',
+      'maxSize',
+      'minSize'
+    ];
+    const divProps = { ...props };
+    customProps.forEach(prop => delete divProps[prop]);
+
     return (
       <div
         className={className}
         style={appliedStyle}
-        {...props /* expand user provided props first so event handlers are never overridden */}
+        {...divProps/* expand user provided props first so event handlers are never overridden */}
         onClick={this.onClick}
+        onDragStart={this.onDragStart}
         onDragEnter={this.onDragEnter}
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
@@ -280,7 +348,7 @@ class Dropzone extends React.Component {
       >
         {this.props.children}
         <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
         />
       </div>
@@ -291,31 +359,40 @@ class Dropzone extends React.Component {
 Dropzone.defaultProps = {
   disablePreview: false,
   disableClick: false,
-  multiple: true
+  multiple: true,
+  maxSize: Infinity,
+  minSize: 0
 };
 
 Dropzone.propTypes = {
+  // Overriding drop behavior
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
+
+  // Overriding drag behavior
+  onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.node,
-  style: React.PropTypes.object,
-  activeStyle: React.PropTypes.object,
-  rejectStyle: React.PropTypes.object,
-  className: React.PropTypes.string,
-  activeClassName: React.PropTypes.string,
-  rejectClassName: React.PropTypes.string,
+  children: React.PropTypes.node, // Contents of the dropzone
+  style: React.PropTypes.object, // CSS styles to apply
+  activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
+  rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected
+  className: React.PropTypes.string, // Optional className
+  activeClassName: React.PropTypes.string, // className for accepted state
+  rejectClassName: React.PropTypes.string, // className for rejected state
 
-  disablePreview: React.PropTypes.bool,
-  disableClick: React.PropTypes.bool,
+  disablePreview: React.PropTypes.bool, // Enable/disable preview generation
+  disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
+  onFileDialogCancel: React.PropTypes.func, // Provide a callback on clicking the cancel button of the file dialog
 
-  inputProps: React.PropTypes.object,
-  multiple: React.PropTypes.bool,
-  accept: React.PropTypes.string,
-  name: React.PropTypes.string
+  inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
+  multiple: React.PropTypes.bool, // Allow dropping multiple files
+  accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+  name: React.PropTypes.string, // name attribute for the input tag
+  maxSize: React.PropTypes.number,
+  minSize: React.PropTypes.number
 };
 
 export default Dropzone;
