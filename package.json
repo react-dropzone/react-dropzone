@@ -69,7 +69,7 @@
     "eslint": "^3.11.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.1",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.7.1",
     "jest": "^17.0.3",
     "lint-staged": "^3.2.1",
