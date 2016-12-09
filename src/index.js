@@ -64,7 +64,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDragOver(e) {
+  onDragOver(e) { // eslint-disable-line class-methods-use-this
     e.preventDefault();
     e.stopPropagation();
     try {
