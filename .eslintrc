@@ -4,7 +4,7 @@
     "env": {
         "browser": true, // We write for browser
         "node": true, // using CommonJS imports
-        "mocha": true, // We use Mocha for tests
+        "jest": true, // We use Mocha for tests
         "es6": true // And we use ES6 features
     },
     "ecmaFeatures": {
