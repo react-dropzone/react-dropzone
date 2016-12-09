@@ -3,9 +3,7 @@
 import React from 'react';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
-import semver from 'semver';
 const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
-const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip;
 
 describe('Dropzone', () => {
 
@@ -336,13 +334,6 @@ describe('Dropzone', () => {
         .toHaveLength(1);
       expect(TestUtils.find(component, '[class="my-dropzone"][name="test-file-input"]'))
         .toHaveLength(0);
-    });
-
-    itConditional('does not apply the name prop if name is falsey', () => {
-      const component = TestUtils.renderIntoDocument(
-        <Dropzone className="my-dropzone" name="" />
-      );
-      expect(TestUtils.find(component, 'input[type="file"][name]')).toHaveLength(0);
     });
 
     it('overrides onClick', () => {

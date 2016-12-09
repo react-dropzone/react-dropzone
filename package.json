@@ -81,7 +81,6 @@
     "react-testutils-additions": "^15.0.0",
     "rimraf": "^2.5.2",
     "semantic-release": "^4.3.5",
-    "semver": "^5.3.0",
     "sinon": "^1.17.4",
     "webpack": "^1.13.1"
   },
