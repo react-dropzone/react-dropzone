@@ -123,7 +123,6 @@ class Dropzone extends React.Component {
 
     const processDrop = () => {
       const {
-        accept,
         disablePreview,
         multiple,
         onDrop,
@@ -137,7 +136,7 @@ class Dropzone extends React.Component {
       for (let i = 0; i < max; i++) {
         const file = droppedFiles[i];
 
-        if (!accepts(file, accept)) {
+        if (!this.fileAccepted(file) || !this.fileMatchSize(file)) {
           rejectedFiles.push(file);
           continue;
         }
@@ -347,7 +346,7 @@ class Dropzone extends React.Component {
     }
 
     const inputAttributes = {
-      accept: !(supportMultiple && multiple) ? accept : null,
+      accept,
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
