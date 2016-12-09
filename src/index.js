@@ -123,6 +123,11 @@ class Dropzone extends React.Component {
 
       for (let i = 0; i < max; i++) {
         const file = droppedFiles[i];
+
+        if (!accepts(file, this.props.accept)) {
+          continue;
+        }
+
         // We might want to disable the preview creation to support big files
         if (!this.props.disablePreview) {
           file.preview = window.URL.createObjectURL(file);
@@ -134,21 +139,15 @@ class Dropzone extends React.Component {
         this.props.onDrop.call(this, files, e);
       }
 
-      if (this.allFilesAccepted(files)) {
-        if (this.props.onDropAccepted) {
-          this.props.onDropAccepted.call(this, files, e);
-        }
-      } else {
-        if (this.props.onDropRejected) {
-          this.props.onDropRejected.call(this, files, e);
-        }
+      if (this.props.onDropAccepted) {
+        this.props.onDropAccepted.call(this, files, e);
       }
     }
 
     if (dataTransferItems[0] && typeof dataTransferItems[0].webkitGetAsEntry === 'function') {
       const entry = dataTransferItems[0].webkitGetAsEntry();
 
-      return this.walkDirectory(entry.filesystem.root, walkedFiles => {
+      return this[walkDirectory](entry.filesystem.root, walkedFiles => {
         droppedFiles = walkedFiles;
         wrapup();
       });
@@ -200,21 +199,19 @@ class Dropzone extends React.Component {
     this.fileInputEl.click();
   }
 
-  walkDirectory(directory, callback) {
+  [walkDirectory](directory, callback) {
     let results = [];
 
     if (directory === null) {
       return callback(results);
     }
 
-    const reader = directory.createReader();
-
-    reader.readEntries(read => {
-      if (!read.length) {
-        return callback(results);
+    this[readEntries](directory, (err, result) => {
+      if (err) {
+        return callback(err);
       }
 
-      const entries = read.slice();
+      const entries = result.slice();
 
       const processEntry = () => {
         const current = entries.shift();
@@ -224,7 +221,7 @@ class Dropzone extends React.Component {
         }
 
         if (current.isDirectory) {
-          return this.walkDirectory(current, nestedResults => {
+          return this[walkDirectory](current, nestedResults => {
             results = results.concat(nestedResults);
             processEntry();
           });
@@ -239,6 +236,37 @@ class Dropzone extends React.Component {
       };
       processEntry();
     });
+  }
+
+  [readEntries](directory, callback, reader) {
+    let entries = [];
+
+    // reader should not be present on initial call
+    if (!reader) {
+      reader = directory.createReader();
+    }
+
+    reader.readEntries(results => {
+      if (!results.length) {
+        return callback(null, entries);
+      }
+
+      entries = entries.concat(this[toArray](results));
+      this[readEntries](directory, (err, additionalEntries) => {
+        if (err) {
+          return callback(err);
+        }
+
+        entries = entries.concat(additionalEntries);
+        callback(null, entries);
+      }, reader);
+    }, err => {
+      callback(err);
+    });
+  }
+
+  [toArray](obj) {
+    return Array.prototype.slice.call(obj || [], 0);
   }
 
   render() {
