@@ -159,7 +159,7 @@ class Dropzone extends React.Component {
       if (onDropAccepted && acceptedFiles.length) {
         onDropAccepted.call(this, acceptedFiles, e);
       }
-    }
+    };
 
     if (dataTransferItems[0] && typeof dataTransferItems[0].webkitGetAsEntry === 'function') {
       const entry = dataTransferItems[0].webkitGetAsEntry();
@@ -171,6 +171,7 @@ class Dropzone extends React.Component {
     }
     processDrop();
     this.isFileDialogActive = false;
+    return false;
   }
 
   onClick() {
@@ -223,7 +224,7 @@ class Dropzone extends React.Component {
       return callback(results);
     }
 
-    this[readEntries](directory, (err, result) => {
+    return this[readEntries](directory, (err, result) => {
       if (err) {
         return callback(err);
       }
@@ -244,42 +245,35 @@ class Dropzone extends React.Component {
           });
         }
 
-        current.file(file => {
+        return current.file(file => {
           results.push(file);
           return processEntry();
-        }, () => {
-          return processEntry();
-        });
+        }, processEntry);
       };
-      processEntry();
+      return processEntry();
     });
   }
 
-  [readEntries](directory, callback, reader) {
+  [readEntries](directory, callback, readerSupplied) {
     let entries = [];
-
     // reader should not be present on initial call
-    if (!reader) {
-      reader = directory.createReader();
-    }
+    const reader = readerSupplied || directory.createReader();
 
-    reader.readEntries(results => {
+    return reader.readEntries(results => {
       if (!results.length) {
         return callback(null, entries);
       }
 
       entries = entries.concat(this[toArray](results));
-      this[readEntries](directory, (err, additionalEntries) => {
+      return this[readEntries](directory, (err, additionalEntries) => {
         if (err) {
           return callback(err);
         }
 
         entries = entries.concat(additionalEntries);
-        callback(null, entries);
+        return callback(null, entries);
       }, reader);
-    }, err => {
-      callback(err);
-    });
+    }, callback);
   }
 
   [toArray](obj) {
