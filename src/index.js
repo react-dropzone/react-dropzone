@@ -7,6 +7,10 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   'multiple' in document.createElement('input') :
   true;
 
+const walkDirectory = Symbol('walk directory');
+const readEntries = Symbol('read entries');
+const toArray = Symbol('to array');
+
 class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -117,30 +121,43 @@ class Dropzone extends React.Component {
     let droppedFiles = e.dataTransfer ? e.dataTransfer.files : e.target.files;
     const dataTransferItems = e.dataTransfer && e.dataTransfer.items ? e.dataTransfer.items : [];
 
-    const wrapup = () => {
-      const max = this.props.multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
-      const files = [];
+    const processDrop = () => {
+      const {
+        accept,
+        disablePreview,
+        multiple,
+        onDrop,
+        onDropAccepted,
+        onDropRejected
+      } = this.props;
+      const max = multiple ? droppedFiles.length : Math.min(droppedFiles.length, 1);
+      const acceptedFiles = [];
+      const rejectedFiles = [];
 
       for (let i = 0; i < max; i++) {
         const file = droppedFiles[i];
 
-        if (!accepts(file, this.props.accept)) {
+        if (!accepts(file, accept)) {
+          rejectedFiles.push(file);
           continue;
         }
 
         // We might want to disable the preview creation to support big files
-        if (!this.props.disablePreview) {
+        if (!disablePreview) {
           file.preview = window.URL.createObjectURL(file);
         }
-        files.push(file);
+        acceptedFiles.push(file);
       }
 
-      if (this.props.onDrop) {
-        this.props.onDrop.call(this, files, e);
+      if (onDrop) {
+        onDrop.call(this, acceptedFiles, rejectedFiles, e);
       }
 
-      if (this.props.onDropAccepted) {
-        this.props.onDropAccepted.call(this, files, e);
+      if (onDropRejected && rejectedFiles.length) {
+        onDropRejected.call(this, rejectedFiles, e);
+      }
+      if (onDropAccepted && acceptedFiles.length) {
+        onDropAccepted.call(this, acceptedFiles, e);
       }
     }
 
@@ -149,10 +166,10 @@ class Dropzone extends React.Component {
 
       return this[walkDirectory](entry.filesystem.root, walkedFiles => {
         droppedFiles = walkedFiles;
-        wrapup();
+        processDrop();
       });
     }
-    wrapup();
+    processDrop();
     this.isFileDialogActive = false;
   }
 
