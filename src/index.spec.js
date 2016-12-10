@@ -1,12 +1,9 @@
 /* eslint no-unused-expressions: 0 */
 
 import React from 'react';
-import { expect } from 'chai';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
-import semver from 'semver';
 const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
-const itConditional = semver.satisfies(React.version, '>=15.2.1') ? it : it.skip;
 
 describe('Dropzone', () => {
 
@@ -37,7 +34,7 @@ describe('Dropzone', () => {
       </Dropzone>
     );
     const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
-    expect(content.textContent).to.equal('some content');
+    expect(content.textContent).toEqual('some content');
   });
 
   it('renders the input element', () => {
@@ -47,7 +44,7 @@ describe('Dropzone', () => {
       </Dropzone>
     );
     const input = TestUtils.find(dropzone, 'input');
-    expect(input.length).to.equal(1);
+    expect(input.length).toEqual(1);
   });
 
   it('returns the url of the preview', () => {
@@ -60,8 +57,8 @@ describe('Dropzone', () => {
     const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
     TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-    expect(dropSpy.callCount).to.equal(1);
-    expect(dropSpy.firstCall.args[0][0]).to.have.property('preview');
+    expect(dropSpy.callCount).toEqual(1);
+    expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview');
   });
 
   it('does not throw an error when html is dropped instead of files and multiple is false', () => {
@@ -73,7 +70,7 @@ describe('Dropzone', () => {
     const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
     const fn = () => TestUtils.Simulate.drop(content, { dataTransfer: { files: [] } });
-    expect(fn).not.to.throw();
+    expect(fn).not.toThrow();
   });
 
   describe('ref', () => {
@@ -81,8 +78,8 @@ describe('Dropzone', () => {
       const dropzone = TestUtils.renderIntoDocument(<Dropzone />);
       const input = TestUtils.find(dropzone, 'input')[0];
 
-      expect(dropzone.fileInputEl).to.not.be.undefined;
-      expect(dropzone.fileInputEl).to.eql(input);
+      expect(dropzone.fileInputEl).not.toBeUndefined();
+      expect(dropzone.fileInputEl).toEqual(input);
     });
   });
 
@@ -98,8 +95,8 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0][0]).to.not.have.property('preview');
+      expect(dropSpy.callCount).toEqual(1);
+      expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview');
     });
 
     it('uses the disableClick property', () => {
@@ -112,7 +109,7 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.click(content);
-      expect(dropzone.open.callCount).to.equal(0);
+      expect(dropzone.open.callCount).toEqual(0);
     });
 
     it('calls `open` if disableClick is not provided', () => {
@@ -125,7 +122,7 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.click(content);
-      expect(dropzone.open.callCount).to.equal(1);
+      expect(dropzone.open.callCount).toEqual(1);
     });
 
     it('renders dynamic props on the root element', () => {
@@ -133,14 +130,14 @@ describe('Dropzone', () => {
         <Dropzone hidden aria-hidden="hidden" title="Dropzone" />
       );
       expect(TestUtils.find(component, '[hidden][aria-hidden="hidden"][title="Dropzone"]'))
-        .to.have.length(1);
+        .toHaveLength(1);
     });
 
     it('renders dynamic props on the input element', () => {
       const component = TestUtils.renderIntoDocument(
         <Dropzone inputProps={{ id: 'hiddenFileInput' }} />
       );
-      expect(TestUtils.find(component, '#hiddenFileInput')).to.have.length(1);
+      expect(TestUtils.find(component, '#hiddenFileInput')).toHaveLength(1);
     });
 
     it('applies the accept prop to the child input', () => {
@@ -148,9 +145,9 @@ describe('Dropzone', () => {
         <Dropzone className="my-dropzone" accept="image/jpeg" />
       );
       expect(TestUtils.find(component, 'input[type="file"][accept="image/jpeg"]'))
-        .to.have.length(1);
+        .toHaveLength(1);
       expect(TestUtils.find(component, '[class="my-dropzone"][accept="image/jpeg"]'))
-        .to.have.length(0);
+        .toHaveLength(0);
     });
 
     it('applies the accept prop to the dropped files', () => {
@@ -165,14 +162,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(0);
-      expect(dropSpy.firstCall.args[1]).to.have.length(1);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(0);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(1);
 
-      expect(dropAcceptedSpy.callCount).to.equal(0);
+      expect(dropAcceptedSpy.callCount).toEqual(0);
 
-      expect(dropRejectedSpy.callCount).to.equal(1);
-      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(1);
+      expect(dropRejectedSpy.callCount).toEqual(1);
+      expect(dropRejectedSpy.firstCall.args[0]).toHaveLength(1);
     });
 
     it('applies the accept prop to the dropped images', () => {
@@ -187,14 +184,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(2);
-      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(2);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
 
-      expect(dropAcceptedSpy.callCount).to.equal(1);
-      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(2);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
 
-      expect(dropRejectedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
     it('accepts all dropped files and images when no accept prop is specified', () => {
@@ -209,14 +206,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files: files.concat(images) } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(3);
-      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(3);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
 
-      expect(dropAcceptedSpy.callCount).to.equal(1);
-      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(3);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(3);
 
-      expect(dropRejectedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
     it('applies the maxSize prop to the dropped files', () => {
@@ -231,14 +228,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(1);
-      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(1);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
 
-      expect(dropAcceptedSpy.callCount).to.equal(1);
-      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(1);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(1);
 
-      expect(dropRejectedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
     it('applies the maxSize prop to the dropped images', () => {
@@ -253,14 +250,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(0);
-      expect(dropSpy.firstCall.args[1]).to.have.length(2);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(0);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(2);
 
-      expect(dropAcceptedSpy.callCount).to.equal(0);
+      expect(dropAcceptedSpy.callCount).toEqual(0);
 
-      expect(dropRejectedSpy.callCount).to.equal(1);
-      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(2);
+      expect(dropRejectedSpy.callCount).toEqual(1);
+      expect(dropRejectedSpy.firstCall.args[0]).toHaveLength(2);
     });
 
     it('applies the minSize prop to the dropped files', () => {
@@ -275,14 +272,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(0);
-      expect(dropSpy.firstCall.args[1]).to.have.length(1);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(0);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(1);
 
-      expect(dropAcceptedSpy.callCount).to.equal(0);
+      expect(dropAcceptedSpy.callCount).toEqual(0);
 
-      expect(dropRejectedSpy.callCount).to.equal(1);
-      expect(dropRejectedSpy.firstCall.args[0]).to.have.length(1);
+      expect(dropRejectedSpy.callCount).toEqual(1);
+      expect(dropRejectedSpy.firstCall.args[0]).toHaveLength(1);
     });
 
     it('applies the minSize prop to the dropped images', () => {
@@ -297,14 +294,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files: images } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(2);
-      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(2);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
 
-      expect(dropAcceptedSpy.callCount).to.equal(1);
-      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(2);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
 
-      expect(dropRejectedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
     it('accepts all dropped files and images when no size prop is specified', () => {
@@ -319,14 +316,14 @@ describe('Dropzone', () => {
       const content = TestUtils.findRenderedDOMComponentWithClass(dropzone, 'dropzone-content');
 
       TestUtils.Simulate.drop(content, { dataTransfer: { files: files.concat(images) } });
-      expect(dropSpy.callCount).to.equal(1);
-      expect(dropSpy.firstCall.args[0]).to.have.length(3);
-      expect(dropSpy.firstCall.args[1]).to.have.length(0);
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(3);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
 
-      expect(dropAcceptedSpy.callCount).to.equal(1);
-      expect(dropAcceptedSpy.firstCall.args[0]).to.have.length(3);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(3);
 
-      expect(dropRejectedSpy.callCount).to.equal(0);
+      expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
     it('applies the name prop to the child input', () => {
@@ -334,16 +331,9 @@ describe('Dropzone', () => {
         <Dropzone className="my-dropzone" name="test-file-input" />
       );
       expect(TestUtils.find(component, 'input[type="file"][name="test-file-input"]'))
-        .to.have.length(1);
+        .toHaveLength(1);
       expect(TestUtils.find(component, '[class="my-dropzone"][name="test-file-input"]'))
-        .to.have.length(0);
-    });
-
-    itConditional('does not apply the name prop if name is falsey', () => {
-      const component = TestUtils.renderIntoDocument(
-        <Dropzone className="my-dropzone" name="" />
-      );
-      expect(TestUtils.find(component, 'input[type="file"][name]')).to.have.length(0);
+        .toHaveLength(0);
     });
 
     it('overrides onClick', () => {
@@ -354,7 +344,7 @@ describe('Dropzone', () => {
       const content = TestUtils.find(component, '#example')[0];
 
       TestUtils.Simulate.click(content);
-      expect(clickSpy).to.not.be.called;
+      expect(clickSpy.callCount).toEqual(0);
     });
 
     it('overrides onDragStart', () => {
@@ -365,7 +355,7 @@ describe('Dropzone', () => {
       const content = TestUtils.find(component, '#drag-example')[0];
 
       TestUtils.Simulate.dragStart(content);
-      expect(dragStartSpy.callCount).to.equal(1);
+      expect(dragStartSpy.callCount).toEqual(1);
     });
 
     it('overrides onDragEnter', () => {
@@ -376,7 +366,7 @@ describe('Dropzone', () => {
       const content = TestUtils.find(component, '#drag-example')[0];
 
       TestUtils.Simulate.dragEnter(content, { dataTransfer: { items: files } });
-      expect(dragEnterSpy.callCount).to.equal(1);
+      expect(dragEnterSpy.callCount).toEqual(1);
     });
 
     it('do not invoke onCancel prop everytime document body receives focus', (done) => {
@@ -391,7 +381,7 @@ describe('Dropzone', () => {
       document.body.dispatchEvent(evt);
       // setTimeout to match the event callback from actual Component
       setTimeout(() => {
-        expect(onCancelSpy.callCount).to.equal(0);
+        expect(onCancelSpy.callCount).toEqual(0);
         done();
       }, 300);
     });
@@ -407,7 +397,7 @@ describe('Dropzone', () => {
       spy(component, 'open');
       const content = TestUtils.findRenderedDOMComponentWithClass(component, 'dropzone-content');
       TestUtils.Simulate.click(content);
-      expect(component.open.callCount).to.equal(1);
+      expect(component.open.callCount).toEqual(1);
 
       // Simulated DOM event - onfocus
       document.body.addEventListener('focus', () => {});
@@ -417,7 +407,7 @@ describe('Dropzone', () => {
 
       // setTimeout to match the event callback from actual Component
       setTimeout(() => {
-        expect(onCancelSpy.callCount).to.equal(1);
+        expect(onCancelSpy.callCount).toEqual(1);
         done();
       }, 300);
     });

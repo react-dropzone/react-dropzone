@@ -12,6 +12,7 @@ before_install:
 before_script:
   - npm prune
 after_success:
+  - bash <(curl -s https://codecov.io/bash)
   - npm run semantic-release
 branches:
   except:

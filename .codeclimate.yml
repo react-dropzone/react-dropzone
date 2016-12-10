@@ -10,4 +10,6 @@ engines:
 ratings:
  paths:
  - "**.js"
-#exclude_paths:
+exclude_paths:
+ - "dist/"
+ - "src/*.spec.js"
