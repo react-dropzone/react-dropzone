@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "npm run clean && webpack",
-    "prepublish": "npm run build",
+    "prepublish": "NODE_ENV=production npm run build && jest",
     "test": "npm run eslint:src && jest --coverage",
     "eslint:src": "eslint ./src ./*.js",
     "eslint:fix": "eslint --fix",
