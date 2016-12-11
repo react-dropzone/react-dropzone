@@ -3,7 +3,8 @@
 import React from 'react';
 import { spy } from 'sinon';
 import TestUtils from 'react-testutils-additions';
-const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index');
+
+const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index'); // eslint-disable-line import/no-dynamic-require
 
 describe('Dropzone', () => {
 
@@ -127,9 +128,9 @@ describe('Dropzone', () => {
 
     it('renders dynamic props on the root element', () => {
       const component = TestUtils.renderIntoDocument(
-        <Dropzone hidden aria-hidden="hidden" title="Dropzone" />
+        <Dropzone hidden aria-hidden title="Dropzone" />
       );
-      expect(TestUtils.find(component, '[hidden][aria-hidden="hidden"][title="Dropzone"]'))
+      expect(TestUtils.find(component, '[hidden][aria-hidden][title="Dropzone"]'))
         .toHaveLength(1);
     });
 
