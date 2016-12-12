@@ -282,7 +282,8 @@ class Dropzone extends React.Component {
       'onDropRejected',
       'onFileDialogCancel',
       'maxSize',
-      'minSize'
+      'minSize',
+      'fullscreen',
     ];
     const divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
