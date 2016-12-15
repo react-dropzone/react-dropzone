@@ -71,7 +71,7 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.7.1",
-    "jest": "^17.0.3",
+    "jest": "^18.0.0",
     "lint-staged": "^3.2.1",
     "npm-check": "^5.2.1",
     "pre-commit": "^1.1.3",
