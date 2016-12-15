@@ -1,0 +1,1 @@
+exports[`Dropzone basics should render children 1`] = `"<div class=\"\" style=\"width: 200px; height: 200px; border-width: 2px; border-color: #666; border-style: dashed; border-radius: 5px;\"><p>some content</p><input type=\"file\" multiple=\"\" style=\"display: none;\"></div>"`;
