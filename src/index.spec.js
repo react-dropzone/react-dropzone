@@ -48,6 +48,21 @@ describe('Dropzone', () => {
     expect(input.length).toEqual(1);
   });
 
+  it('renders dropzone in anywhere mode', () => {
+    const dropzone = TestUtils.renderIntoDocument(
+      <Dropzone className="test" dropAnywhere>
+        <div className="dropzone-content">some content</div>
+      </Dropzone>
+    );
+    const input = TestUtils.find(dropzone, 'input');
+    const testClass = TestUtils.find(dropzone, '.test');
+    const children = TestUtils.find(dropzone, '.dropzone-content');
+
+    expect(input.length).toEqual(0);
+    expect(testClass.length).toEqual(1);
+    expect(children.length).toEqual(1);
+  });
+
   it('returns the url of the preview', () => {
     const dropSpy = spy();
     const dropzone = TestUtils.renderIntoDocument(
