@@ -1,5 +1,4 @@
 /* eslint prefer-template: 0 */
-
 import accepts from 'attr-accept';
 import React from 'react';
 
@@ -127,15 +126,14 @@ class Dropzone extends React.Component {
       this.props.onDrop.call(this, acceptedFiles, rejectedFiles, e);
     }
 
-    if (rejectedFiles.length > 0) {
-      if (this.props.onDropRejected) {
-        this.props.onDropRejected.call(this, rejectedFiles, e);
-      }
-    } else if (acceptedFiles.length > 0) {
-      if (this.props.onDropAccepted) {
-        this.props.onDropAccepted.call(this, acceptedFiles, e);
-      }
+    if (rejectedFiles.length > 0 && this.props.onDropRejected) {
+      this.props.onDropRejected.call(this, rejectedFiles, e);
     }
+
+    if (acceptedFiles.length > 0 && this.props.onDropAccepted) {
+      this.props.onDropAccepted.call(this, acceptedFiles, e);
+    }
+
     this.isFileDialogActive = false;
   }
 

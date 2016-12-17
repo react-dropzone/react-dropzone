@@ -345,10 +345,10 @@ describe('Dropzone', () => {
       expect(dropAcceptedSpy.callCount).toEqual(0);
       dropzone.simulate('drop', { dataTransfer: { files: images } });
       expect(dropAcceptedSpy.callCount).toEqual(1);
-      expect(dropAcceptedSpy.lastCall.args[0]).toHaveLength(2);
+      expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images]);
       dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
       expect(dropAcceptedSpy.callCount).toEqual(2);
-      expect(dropAcceptedSpy.lastCall.args[0]).toHaveLength(2);
+      expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images]);
     });
 
     it('should call onDropRejected callback if some files were rejected', () => {
