@@ -24,6 +24,15 @@ class Dropzone extends React.Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.dropAnywhere && typeof document) {
+      document.addEventListener('dragenter', this.onDragEnter);
+      document.addEventListener('dragover', this.onDragOver);
+      document.addEventListener('dragleave', this.onDragLeave);
+      document.addEventListener('drop', this.onDrop);
+    }
+  }
+
   componentDidMount() {
     this.enterCounter = 0;
     // Tried implementing addEventListener, but didn't work out
@@ -33,6 +42,13 @@ class Dropzone extends React.Component {
   componentWillUnmount() {
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null;
+
+    if (this.props.dropAnywhere && typeof document) {
+      document.removeEventListener('dragenter', this.onDragEnter);
+      document.removeEventListener('dragover', this.onDragOver);
+      document.removeEventListener('dragleave', this.onDragLeave);
+      document.removeEventListener('drop', this.onDrop);
+    }
   }
 
   onDragStart(e) {
@@ -261,6 +277,14 @@ class Dropzone extends React.Component {
       inputAttributes.name = name;
     }
 
+    if (this.props.dropAnywhere) {
+      return (
+        <div className={className} style={appliedStyle}>
+          {this.props.children}
+        </div>
+      );
+    }
+
     // Remove custom properties before passing them to the wrapper div element
     const customProps = [
       'acceptedFiles',
@@ -270,7 +294,8 @@ class Dropzone extends React.Component {
       'onDropRejected',
       'onFileDialogCancel',
       'maxSize',
-      'minSize'
+      'minSize',
+      'dropAnywhere'
     ];
     const divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
@@ -302,7 +327,8 @@ Dropzone.defaultProps = {
   disableClick: false,
   multiple: true,
   maxSize: Infinity,
-  minSize: 0
+  minSize: 0,
+  dropAnywhere: false
 };
 
 Dropzone.propTypes = {
@@ -333,7 +359,9 @@ Dropzone.propTypes = {
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
   name: React.PropTypes.string, // name attribute for the input tag
   maxSize: React.PropTypes.number,
-  minSize: React.PropTypes.number
+  minSize: React.PropTypes.number,
+
+  dropAnywhere: React.PropTypes.bool // Allow drop anywhere mode
 };
 
 export default Dropzone;

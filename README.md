@@ -76,6 +76,7 @@ Features
 - `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
 - `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
 - `accept` - Accept only specified mime types. Must be a valid MIME type according to [input element specification](http://www.w3.org/TR/html-markup/input.file.html), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
+- `anywhere` - Allow drag & drop anywhere in the page.
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
