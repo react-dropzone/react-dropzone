@@ -15,7 +15,9 @@
     "deps:update": "npm-check -u",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
-    "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo"
+    "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
+    "styleguide:server": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "lint-staged": {
     "*.js": [
@@ -89,6 +91,7 @@
     "react": "^15.4.1",
     "react-addons-test-utils": "^15.4.1",
     "react-dom": "^15.4.1",
+    "react-styleguidist": "^5.0.0-beta1",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.2",
     "sinon": "^1.17.4",
