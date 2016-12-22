@@ -138,6 +138,27 @@ describe('Dropzone', () => {
       dropzone.simulate('click');
       expect(clickSpy.callCount).toEqual(2);
     });
+
+    it('should not invoke onClick on the wrapper', () => {
+      const onClickOuterSpy = spy();
+      const onClickInnerSpy = spy();
+      const component = mount(
+        <div onClick={onClickOuterSpy}>
+          <Dropzone onClick={onClickInnerSpy} />
+        </div>
+      );
+
+      component.simulate('click');
+      expect(onClickOuterSpy.callCount).toEqual(1);
+      expect(onClickInnerSpy.callCount).toEqual(0);
+
+      onClickOuterSpy.reset();
+      onClickInnerSpy.reset();
+
+      component.find('Dropzone').simulate('click');
+      expect(onClickOuterSpy.callCount).toEqual(0);
+      expect(onClickInnerSpy.callCount).toEqual(1);
+    });
   });
 
   describe('drag-n-drop', () => {
