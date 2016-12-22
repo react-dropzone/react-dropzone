@@ -132,9 +132,13 @@ class Dropzone extends React.Component {
     });
   }
 
-  onClick() {
-    if (!this.props.disableClick) {
+  onClick(e) {
+    const { onClick, disableClick } = this.props;
+    if (!disableClick) {
       this.open();
+      if (onClick) {
+        onClick.call(this, e);
+      }
     }
   }
 
@@ -299,12 +303,10 @@ Dropzone.defaultProps = {
 };
 
 Dropzone.propTypes = {
-  // Overriding drop behavior
+  onClick: React.PropTypes.func,
   onDrop: React.PropTypes.func,
   onDropAccepted: React.PropTypes.func,
   onDropRejected: React.PropTypes.func,
-
-  // Overriding drag behavior
   onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,

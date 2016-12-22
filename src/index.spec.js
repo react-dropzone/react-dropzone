@@ -99,16 +99,6 @@ describe('Dropzone', () => {
       expect(dropzone.instance().open.callCount).toEqual(1);
     });
 
-    it.skip('should call `onClick` callback if provided', () => {
-      const clickSpy = spy();
-      const dropzone = mount(
-        <Dropzone onClick={clickSpy} />
-      );
-      dropzone.simulate('click');
-      expect(dropzone.instance().open.callCount).toEqual(1);
-      expect(clickSpy.callCount).toEqual(1);
-    });
-
     it('should not call `open` if disableClick prop is true', () => {
       const dropzone = mount(
         <Dropzone disableClick />
@@ -116,6 +106,17 @@ describe('Dropzone', () => {
       spy(dropzone.instance(), 'open');
       dropzone.simulate('click');
       expect(dropzone.instance().open.callCount).toEqual(0);
+    });
+
+    it('should call `onClick` callback if provided', () => {
+      const clickSpy = spy();
+      const dropzone = mount(
+        <Dropzone onClick={clickSpy} />
+      );
+      spy(dropzone.instance(), 'open');
+      dropzone.simulate('click');
+      expect(dropzone.instance().open.callCount).toEqual(1);
+      expect(clickSpy.callCount).toEqual(1);
     });
 
     it('should reset the value of input', () => {
