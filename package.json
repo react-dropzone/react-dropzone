@@ -13,7 +13,9 @@
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
     "deps:update": "npm-check -u",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "styleguide:server": "styleguidist server",
+    "styleguide:build": "styleguidist build"
   },
   "lint-staged": {
     "*.js": [
@@ -65,8 +67,8 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
-    "enzyme": "^2.6.0",
     "cz-conventional-changelog": "^1.2.0",
+    "enzyme": "^2.6.0",
     "eslint": "^3.11.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -79,6 +81,7 @@
     "react": "^15.4.1",
     "react-addons-test-utils": "^15.4.1",
     "react-dom": "^15.4.1",
+    "react-styleguidist": "^5.0.0-beta1",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.2",
     "sinon": "^1.17.4",
