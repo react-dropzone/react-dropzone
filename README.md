@@ -1,37 +1,26 @@
-react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone)
-
-==============
+# react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone)
 
 Simple HTML5 drag-drop zone for files with React.js.
 
 Try it out here: http://okonet.ru/react-dropzone/
 
-Installation
-============
+## Installation
 
 The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
-```
+```bash
 npm install --save react-dropzone
 ```
 
-Create a standalone module using *WebPack*:
-```
-> npm install
-> webpack
-```
-
-React 0.13 users
-=====
+## React 0.13 users
 
 Vesion 3.x is not compatible with React 0.13. If you can't upgrade to React 0.14 right now, you should use v 2.x of this package.
 
-```
+```bash
 npm install --save react-dropzone@2.x
 ```
 
-Usage
-=====
+## Usage
 
 Simply `require('react-dropzone')` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
 
@@ -39,12 +28,9 @@ The `onDrop` method gets always called if a file was uploaded, regardless if it 
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
 
-Example
-=====
+## Example
 
 ```jsx
-
-/** @jsx React.DOM */
 var React = require('react');
 var Dropzone = require('react-dropzone');
 
@@ -68,8 +54,7 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
-Features
-========
+## Features
 
 - `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
 - `multiple` `[Boolean | **true**]` — Accept multiple files
@@ -80,7 +65,7 @@ Features
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
 
-#### Manual Upload
+## Manual Upload
 * To trigger the dropzone manually (open the file prompt), call the component's `open` function.
 * The completion handler for the `open` function is also the `onDrop` function.
 
@@ -127,8 +112,7 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
-Uploads
-=======
+## Uploads
 
 Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
 
@@ -144,7 +128,6 @@ Specifying the `onDrop` method, provides you with an array of [Files](https://de
     }
 ```
 
-License
-=======
+## License
 
 MIT
