@@ -111,6 +111,10 @@ class Dropzone extends React.Component {
 
     for (let i = 0; i < max; i++) {
       const file = droppedFiles[i];
+      
+      // Let's add inputName to file, so we can differentiate multiple dropzones
+      file.inputName = this.props.name ? this.props.name : '';
+      
       // We might want to disable the preview creation to support big files
       if (!this.props.disablePreview) {
         file.preview = window.URL.createObjectURL(file);
