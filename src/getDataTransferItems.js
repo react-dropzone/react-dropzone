@@ -1,15 +1,15 @@
 export default function getDataTransferFiles(event, isMultipleAllowed = true) {
   let dataTransferItemsList = [];
-  if (event.hasOwnProperty('dataTransfer')) {
+  if (event.dataTransfer) {
     const dt = event.dataTransfer;
-    if (dt.hasOwnProperty('files')) {
+    if (dt.files && dt.files.length) {
       dataTransferItemsList = dt.files;
-    } else if (dt.hasOwnProperty('items')) {
+    } else if (dt.items && dt.items.length) {
       // During the drag even the dataTransfer.files is null
       // but Chrome implements some drag store, which is accesible via dataTransfer.items
       dataTransferItemsList = dt.items;
     }
-  } else if (event.hasOwnProperty('target')) {
+  } else if (event.target && event.target.files) {
     dataTransferItemsList = event.target.files;
   }
 
