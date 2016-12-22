@@ -4,16 +4,22 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf ./dist",
+    "test": "npm run eslint:src && jest --coverage",
     "build": "npm run clean && webpack",
     "prepublish": "NODE_ENV=production npm run build && jest",
-    "test": "npm run eslint:src && jest --coverage",
+    "release": "sr-changelog && sr-changelog commit",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "eslint:src": "eslint ./src ./*.js",
     "eslint:fix": "eslint --fix",
     "git:add": "git add",
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
-    "deps:update": "npm-check -u",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "deps:update": "npm-check -u"
+  },
+  "release": {
+    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
+    "generateNotes": "semantic-release-tamia/generateNotes",
+    "verifyRelease": "semantic-release-tamia/verifyRelease"
   },
   "lint-staged": {
     "*.js": [
@@ -65,7 +71,6 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
-    "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.11.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
@@ -81,12 +86,8 @@
     "react-testutils-additions": "^15.0.0",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.2",
+    "semantic-release-tamia": "github:okonet/semantic-release-tamia",
     "sinon": "^1.17.4",
     "webpack": "^1.13.1"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
