@@ -37,7 +37,15 @@ module.exports = {
   webpackConfig: {
     entry: [
       path.join(__dirname, 'examples/theme.css')
-    ]
+    ],
+    module: {
+      loaders: [
+        {
+          test: /\.css$/,
+          loader: 'style!css'
+        }
+      ]
+    }
   },
   updateWebpackConfig(config) {
     delete config.externals; // eslint-disable-line
