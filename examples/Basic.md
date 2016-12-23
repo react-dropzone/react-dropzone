@@ -2,6 +2,7 @@ This example shows Dropzone with default properties and displays list of the dro
 ```
 class DropzoneDemo extends React.Component {
   constructor() {
+    super()
     this.state = {
       files: []
     }
