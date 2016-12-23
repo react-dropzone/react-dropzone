@@ -1,6 +1,5 @@
-### Basic example 
 ```
-class DropzoneDemo extends React.Component {
+class FullScreenDropzone extends React.Component {
     onDrop(acceptedFiles, rejectedFiles) {
       console.log('Accepted files: ', acceptedFiles);
       console.log('Rejected files: ', rejectedFiles);
@@ -17,7 +16,5 @@ class DropzoneDemo extends React.Component {
     }
 };
 
-<DropzoneDemo />
+<FullScreenDropzone />
 ```
-
-###
