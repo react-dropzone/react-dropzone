@@ -3,6 +3,7 @@ This dropzone will not accept files bigger than 10KB
 ```
 class DropzoneDemo extends React.Component {
   constructor() {
+    super()
     this.state = {
       files: []
     }
