@@ -1,11 +1,18 @@
+This dropzone will not accept files bigger than 10KB
+
 ```
-class MyDropzone extends React.Component {
+class DropzoneDemo extends React.Component {
   constructor() {
+    this.state = {
+      files: []
+    }
     this.onDropAccepted = this.onDropAccepted.bind(this)
     this.onDropRejected = this.onDropRejected.bind(this)
   }
-  onDropAccepted() {
+    
+  onDropAccepted(files) {
     this.setState({
+      files,
       showError: false
     })
   }
@@ -18,18 +25,31 @@ class MyDropzone extends React.Component {
 
   render() {
     return (
-      <Dropzone 
-        onDropAccepted={this.onDropAccepted} 
-        onDropRejected={this.onDropRejected} 
-        maxSize={10 * 1024}
-      >
-        <p>
-          This dropzone will not accept files bigger than 10KB
-        </p>
-      </Dropzone>
-    )
+      <section>
+        <div className="dropzone">
+          { 
+            this.state.showError && <p>File is bigger than 10KB</p> 
+          } 
+          <Dropzone
+            onDropAccepted={this.onDropAccepted} 
+            onDropRejected={this.onDropRejected} 
+            maxSize={10 * 1024}
+          >
+            <p>Try dropping some files here, or click to select files to upload.</p>
+          </Dropzone>
+        </div>
+        <aside>
+          <h2>Dropped files</h2>
+          <ul>
+            {
+              this.state.files.map(f => <li>{f.name} - {f.size} bytes</li>)
+            }
+          </ul>
+        </aside>
+      </section>
+    );
   }
-}
+};
 
-<MyDropzone />
+<DropzoneDemo />
 ```

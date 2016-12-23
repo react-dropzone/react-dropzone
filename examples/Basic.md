@@ -17,9 +17,11 @@ class DropzoneDemo extends React.Component {
   render() {
     return (
       <section>
-        <Dropzone onDrop={this.onDrop}>
-          <div>Try dropping some files here, or click to select files to upload.</div>
-        </Dropzone>
+        <div className="dropzone">
+          <Dropzone onDrop={this.onDrop}>
+            <p>Try dropping some files here, or click to select files to upload.</p>
+          </Dropzone>
+        </div>
         <aside>
           <h2>Dropped files</h2>
           <ul>
