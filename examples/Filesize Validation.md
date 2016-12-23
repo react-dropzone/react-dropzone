@@ -48,9 +48,9 @@ class DropzoneDemo extends React.Component {
           </ul>
         </aside>
       </section>
-    );
+    )
   }
-};
+}
 
 <DropzoneDemo />
 ```

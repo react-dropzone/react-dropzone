@@ -1,3 +1,5 @@
+This example shows how to wrap the whole app into the dropzone.
+
 ```
 class DropzoneDemo extends React.Component {
   constructor() {
@@ -7,8 +9,8 @@ class DropzoneDemo extends React.Component {
       dropzoneActive: false
     }
     this.onDrop = this.onDrop.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this);
-    this.onDragLeave = this.onDragLeave.bind(this);
+    this.onDragEnter = this.onDragEnter.bind(this)
+    this.onDragLeave = this.onDragLeave.bind(this)
   }
   
   onDragEnter() {
@@ -67,9 +69,9 @@ class DropzoneDemo extends React.Component {
           </aside>
         </section>
       </Dropzone>
-    );
+    )
   }
-};
+}
 
 <DropzoneDemo />
 ```
