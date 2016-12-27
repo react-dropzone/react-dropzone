@@ -21,6 +21,7 @@ module.exports = {
       }
     }
   ],
+  webpackConfigFile: './webpack.config.js',
   webpackConfig: {
     entry: [
       path.join(__dirname, 'examples/theme.css')
@@ -33,9 +34,5 @@ module.exports = {
         }
       ]
     }
-  },
-  updateWebpackConfig(config) {
-    delete config.externals; // eslint-disable-line
-    return config;
   }
 };
