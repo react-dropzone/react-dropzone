@@ -1,18 +1,18 @@
-This example shows Dropzone with default properties and displays list of the dropped files.
-```
-class DropzoneDemo extends React.Component {
+import React from 'react';
+
+export default class Basic extends React.Component {
   constructor() {
-    super()
+    super();
     this.state = {
       files: []
-    }
-    this.onDrop = this.onDrop.bind(this)
+    };
+    this.onDrop = this.onDrop.bind(this);
   }
-  
+
   onDrop(files) {
     this.setState({
       files
-    })
+    });
   }
 
   render() {
@@ -32,9 +32,6 @@ class DropzoneDemo extends React.Component {
           </ul>
         </aside>
       </section>
-    )
+    );
   }
 }
-
-<DropzoneDemo />
-```

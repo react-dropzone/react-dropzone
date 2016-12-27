@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
-  showCode: true,
+  showCode: false,
   sections: [
     {
       name: 'Installation',
@@ -15,23 +15,10 @@ module.exports = {
     },
     {
       name: 'Examples',
+      components: './examples/**/*.js',
       context: {
         Dropzone: './src/index'
-      },
-      sections: [
-        {
-          name: 'Basic',
-          content: 'examples/Basic.md'
-        },
-        {
-          name: 'Filesize Validation',
-          content: 'examples/Filesize Validation.md'
-        },
-        {
-          name: 'Full Screen',
-          content: 'examples/Full Screen.md'
-        }
-      ]
+      }
     }
   ],
   webpackConfig: {
