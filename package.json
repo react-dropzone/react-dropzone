@@ -68,7 +68,7 @@
     "enzyme": "^2.6.0",
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.11.0",
-    "eslint-config-airbnb": "^13.0.0",
+    "eslint-config-airbnb": "^14.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.7.1",
