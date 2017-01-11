@@ -538,7 +538,7 @@ describe('Dropzone', () => {
   });
 
   describe('preview', () => {
-    it.skip('should not generate previews for non-images', () => {
+    it('should not generate previews for non-images', () => {
       const dropSpy = spy();
       const dropzone = mount(
         <Dropzone onDrop={dropSpy} />
