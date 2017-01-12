@@ -67,6 +67,10 @@ class Dropzone extends React.Component {
     } catch (err) {
       // continue regardless of error
     }
+
+    if (this.props.onDragOver) {
+      this.props.onDragOver.call(this, e);
+    }
     return false;
   }
 
@@ -310,6 +314,7 @@ Dropzone.propTypes = {
   onDropRejected: React.PropTypes.func,
   onDragStart: React.PropTypes.func,
   onDragEnter: React.PropTypes.func,
+  onDragOver: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
   children: React.PropTypes.node, // Contents of the dropzone
