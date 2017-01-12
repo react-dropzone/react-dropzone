@@ -165,19 +165,23 @@ describe('Dropzone', () => {
     it('should override onDrag* methods', () => {
       const dragStartSpy = spy();
       const dragEnterSpy = spy();
+      const dragOverSpy = spy();
       const dragLeaveSpy = spy();
       const component = mount(
         <Dropzone
           onDragStart={dragStartSpy}
           onDragEnter={dragEnterSpy}
+          onDragOver={dragOverSpy}
           onDragLeave={dragLeaveSpy}
         />
       );
       component.simulate('dragStart');
       component.simulate('dragEnter', { dataTransfer: { items: files } });
+      component.simulate('dragOver', { dataTransfer: { items: files } });
       component.simulate('dragLeave', { dataTransfer: { items: files } });
       expect(dragStartSpy.callCount).toEqual(1);
       expect(dragEnterSpy.callCount).toEqual(1);
+      expect(dragOverSpy.callCount).toEqual(1);
       expect(dragLeaveSpy.callCount).toEqual(1);
     });
 
