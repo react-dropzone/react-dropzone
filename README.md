@@ -75,7 +75,7 @@ Features
 - `multiple` `[Boolean | **true**]` — Accept multiple files
 - `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
 - `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
-- `accept` - Accept only specified mime types. Must be a valid MIME type according to [input element specification](http://www.w3.org/TR/html-markup/input.file.html), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
+- `accept` - Accept only specified mime types. Must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
