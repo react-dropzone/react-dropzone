@@ -542,13 +542,14 @@ describe('Dropzone', () => {
   });
 
   describe('preview', () => {
-    it('should not generate previews for non-images', () => {
+    it('should generate previews for non-images', () => {
       const dropSpy = spy();
       const dropzone = mount(
         <Dropzone onDrop={dropSpy} />
       );
       dropzone.simulate('drop', { dataTransfer: { files } });
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview');
+      expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview');
+      expect(dropSpy.firstCall.args[0][0].preview).toContain('data://file1.pdf');
     });
 
     it('should generate previews for images', () => {
