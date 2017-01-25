@@ -137,9 +137,9 @@ class Dropzone extends React.Component {
   }
 
   onClick(e) {
-    e.stopPropagation();
     const { onClick, disableClick } = this.props;
     if (!disableClick) {
+      e.stopPropagation();
       this.open();
       if (onClick) {
         onClick.call(this, e);
