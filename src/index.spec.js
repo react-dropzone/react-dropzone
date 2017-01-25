@@ -159,6 +159,18 @@ describe('Dropzone', () => {
       expect(onClickOuterSpy.callCount).toEqual(0);
       expect(onClickInnerSpy.callCount).toEqual(1);
     });
+
+    it('should invoke onClick on the wrapper if disableClick is set', () => {
+      const onClickOuterSpy = spy();
+      const component = mount(
+        <div onClick={onClickOuterSpy}>
+          <Dropzone disableClick />
+        </div>
+      );
+
+      component.find('Dropzone').simulate('click');
+      expect(onClickOuterSpy.callCount).toEqual(1);
+    });
   });
 
   describe('drag-n-drop', () => {
