@@ -278,7 +278,7 @@ class Dropzone extends React.Component {
     customProps.forEach(prop => delete divProps[prop]);
 
     return (
-      <div
+      <button
         className={className}
         style={appliedStyle}
         {...divProps/* expand user provided props first so event handlers are never overridden */}
@@ -294,7 +294,7 @@ class Dropzone extends React.Component {
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
         />
-      </div>
+      </button>
     );
   }
 }
@@ -334,7 +334,9 @@ Dropzone.propTypes = {
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
   name: React.PropTypes.string, // name attribute for the input tag
   maxSize: React.PropTypes.number,
-  minSize: React.PropTypes.number
+  minSize: React.PropTypes.number,
+
+  tabIndex: React.PropTypes.number
 };
 
 export default Dropzone;
