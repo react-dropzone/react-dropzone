@@ -643,14 +643,37 @@ describe('Dropzone', () => {
 
   });
 
-  describe('behavior', () => {
-    it('does not throw an error when html is dropped instead of files and multiple is false', () => {
-      const dropzone = mount(
-        <Dropzone multiple={false} />
-      );
+  describe('edge cases', () => {
+    describe('when a DOM element is dragged/dropped instead of files', () => {
+      it('does not throw an error when multiple is false', () => {
+        const dropzone = mount(
+          <Dropzone multiple={false} />
+        );
 
-      const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [] } });
-      expect(fn).not.toThrow();
+        const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(fn).not.toThrow();
+      });
+
+      it('skips drag enter', () => {
+        const onDragEnter = spy();
+        const dropzone = mount(
+          <Dropzone onDragEnter={onDragEnter} />
+        );
+
+        dropzone.simulate('dragEnter', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(dropzone.state().isDragActive).toEqual(false);
+        expect(onDragEnter.called).not.toBeTruthy();
+      });
+
+      it.only('does not drop the items', () => {
+        const onDrop = spy();
+        const dropzone = mount(
+          <Dropzone onDrop={onDrop} />
+        );
+
+        dropzone.simulate('drop', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(onDrop.called).not.toBeTruthy();
+      });
     });
   });
 
