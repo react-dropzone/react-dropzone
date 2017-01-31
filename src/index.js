@@ -106,6 +106,10 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = false;
 
     fileList.forEach((file) => {
+      if (file instanceof window.DataTransferItem) {
+        return;
+      }
+
       if (!disablePreview) {
         file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
       }

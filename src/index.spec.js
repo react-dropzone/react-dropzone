@@ -6,6 +6,7 @@ const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index'
 
 let files;
 let images;
+let other;
 
 describe('Dropzone', () => {
 
@@ -25,6 +26,10 @@ describe('Dropzone', () => {
       size: 2345,
       type: 'image/jpeg'
     }];
+
+    other = [
+      new DataTransferItem({ kind: 'string', type: 'plain/text' })
+    ];
   });
 
   describe('basics', () => {
@@ -314,6 +319,18 @@ describe('Dropzone', () => {
       dropzone.simulate('drop', { dataTransfer: { files } });
       expect(dropzone.state().isDragActive).toEqual(false);
       expect(dropzone.state().isDragReject).toEqual(false);
+    });
+
+    it('should ignore non-files', () => {
+      const dropzone = mount(
+        <Dropzone
+          onDrop={dropSpy}
+          multiple
+        />
+      );
+
+      dropzone.simulate('drop', { dataTransfer: { files: other } });
+      expect(dropSpy.firstCall.args[0]).toHaveLength(0);
     });
 
     it('should take all dropped files if multiple is true', () => {

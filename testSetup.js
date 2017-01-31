@@ -5,3 +5,8 @@ global.window.URL = {
     return 'data://' + arg.name;
   }
 };
+
+global.window.DataTransferItem = function DataTransferItem(arg) {
+  this.kind = arg.kind;
+  this.type = arg.type;
+};
