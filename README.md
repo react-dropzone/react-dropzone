@@ -5,25 +5,19 @@ Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
 ## Installation
 
-The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
+Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
 ```bash
 npm install --save react-dropzone
 ```
 
-## React 0.13 users
-
-Vesion 3.x is not compatible with React 0.13. If you can't upgrade to React 0.14 right now, you should use v 2.x of this package.
-
-```bash
-npm install --save react-dropzone@2.x
-```
-
 ## Usage
 
-Simply `require('react-dropzone')` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+`import Dropzone from 'react-dropzone'` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
 
-The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
+Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
+
+Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
 ## Reacting to user input
 
