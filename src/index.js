@@ -106,7 +106,7 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = false;
 
     fileList.forEach((file) => {
-      if (file instanceof window.DataTransferItem) {
+      if (!(file instanceof window.File)) {
         return;
       }
 
