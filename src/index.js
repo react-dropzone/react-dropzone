@@ -18,6 +18,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
     this.fileAccepted = this.fileAccepted.bind(this);
+    this.renderChildren = this.renderChildren.bind(this);
     this.isFileDialogActive = false;
     this.state = {
       isDragActive: false
@@ -184,6 +185,14 @@ class Dropzone extends React.Component {
     this.fileInputEl.click();
   }
 
+  renderChildren() {
+    let { children } = this.props;
+    if (typeof children === 'function') {
+      children = children(this.state);
+    }
+    return children;
+  }
+
   render() {
     const {
       accept,
@@ -289,7 +298,7 @@ class Dropzone extends React.Component {
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
       >
-        {this.props.children}
+        {this.renderChildren()}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
@@ -317,7 +326,10 @@ Dropzone.propTypes = {
   onDragOver: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.node, // Contents of the dropzone
+  children: React.PropTypes.oneOfType([
+    React.PropTypes.node,
+    React.PropTypes.func
+  ]), // Contents of the dropzone
   style: React.PropTypes.object, // CSS styles to apply
   activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
   rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected
