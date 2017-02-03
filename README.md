@@ -88,7 +88,7 @@ You have a third option : providing a function that returns the component's chil
       <div style={{ color: color }}>
         {text}
       </div>
-    )
+    );
   }}
 </Dropzone>
 ```
