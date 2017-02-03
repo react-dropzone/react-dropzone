@@ -9,17 +9,10 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
 
 class Dropzone extends React.Component {
   static renderChildren(children, isDragActive, isDragReject) {
-    if (!children) {
-      return children;
-    }
-    let renderedChildren = children;
-    const props = { isDragActive, isDragReject };
     if (typeof children === 'function') {
-      renderedChildren = children(props);
+      return children({ isDragActive, isDragReject });
     }
-    // a warning gets printed because we are giving unkown props to some children (<p>some content</p> for instance)
-    renderedChildren = React.cloneElement(renderedChildren, props);
-    return renderedChildren;
+    return children;
   }
 
   constructor(props, context) {
