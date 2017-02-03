@@ -216,7 +216,7 @@ describe('Dropzone', () => {
             case 'dataTransfer':
               throw new Error('IE does not support rrror');
             default:
-              return function () {};
+              return function () {}; // eslint-disable-line func-names
           }
         }
       });
