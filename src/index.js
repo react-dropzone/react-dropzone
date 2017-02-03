@@ -9,11 +9,17 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
 
 class Dropzone extends React.Component {
   static renderChildren(children, isDragActive, isDragReject) {
-    let renderedChildren = children;
-    if (typeof children === 'function') {
-      renderedChildren = children(this.state);
+    if (!children) {
+      return children;
     }
-    return React.cloneElement(renderedChildren, { isDragActive, isDragReject });
+    let renderedChildren = children;
+    const props = { isDragActive, isDragReject };
+    if (typeof children === 'function') {
+      renderedChildren = children(props);
+    }
+    // a warning gets printed because we are giving unkown props to some children (<p>some content</p> for instance)
+    renderedChildren = React.cloneElement(renderedChildren, props);
+    return renderedChildren;
   }
 
   constructor(props, context) {
@@ -26,7 +32,6 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
     this.fileAccepted = this.fileAccepted.bind(this);
-    this.renderChildren = this.renderChildren.bind(this);
     this.isFileDialogActive = false;
     this.state = {
       isDragActive: false
