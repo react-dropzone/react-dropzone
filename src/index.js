@@ -8,6 +8,14 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   true;
 
 class Dropzone extends React.Component {
+  static renderChildren(children, isDragActive, isDragReject) {
+    let renderedChildren = children;
+    if (typeof children === 'function') {
+      renderedChildren = children(this.state);
+    }
+    return React.cloneElement(renderedChildren, { isDragActive, isDragReject });
+  }
+
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
@@ -185,14 +193,6 @@ class Dropzone extends React.Component {
     this.fileInputEl.click();
   }
 
-  renderChildren() {
-    let { children } = this.props;
-    if (typeof children === 'function') {
-      children = children(this.state);
-    }
-    return children;
-  }
-
   render() {
     const {
       accept,
@@ -201,6 +201,7 @@ class Dropzone extends React.Component {
       multiple,
       name,
       rejectClassName,
+      children,
       ...rest
     } = this.props;
 
@@ -298,7 +299,7 @@ class Dropzone extends React.Component {
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
       >
-        {this.renderChildren()}
+        {Dropzone.renderChildren(children, isDragActive, isDragReject)}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
