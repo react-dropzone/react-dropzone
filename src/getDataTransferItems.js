@@ -1,4 +1,5 @@
-export default function getDataTransferFiles(event, isMultipleAllowed = true) {
+/* @flow */
+export default function getDataTransferFiles(event: Object, isMultipleAllowed: boolean = true) {
   let dataTransferItemsList = [];
   if (event.dataTransfer) {
     const dt = event.dataTransfer;
