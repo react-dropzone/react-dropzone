@@ -66,7 +66,7 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
-Style
+Reacting to user input
 =====
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
@@ -76,19 +76,13 @@ You have a third option : providing a function that returns the component's chil
 ```
 <Dropzone>
   {({ isDragActive, isDragReject }) => {
-    let color = "black", text = "Try dropping some files";
     if (isDragActive) {
-      color = "green";
-      text = "This file is authorized";
-    } else if (isDragReject) {
-      color = "red";
-      text = "This file is not authorized";
+      return "This file is authorized";
     }
-    return (
-      <div style={{ color: color }}>
-        {text}
-      </div>
-    );
+    if (isDragReject) {
+      return "This file is not authorized";
+    }
+    return "Try dropping some files";
   }}
 </Dropzone>
 ```

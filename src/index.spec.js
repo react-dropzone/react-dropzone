@@ -302,20 +302,20 @@ describe('Dropzone', () => {
         <Dropzone accept="image/*">
           {({ isDragActive, isDragReject }) => {
             if (isDragReject) {
-              return <div id="rejected">Rejected</div>;
+              return 'Rejected';
             }
             if (isDragActive) {
-              return <div id="active">Active</div>;
+              return 'Active';
             }
-            return <div id="blank">some content</div>;
+            return 'Empty';
           }}
         </Dropzone>
       );
-      expect(dropzone.find('#blank')).not.toBeUndefined();
+      expect(dropzone.text()).toEqual('Empty');
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-      expect(dropzone.find('#active')).not.toBeUndefined();
+      expect(dropzone.text()).toEqual('Active');
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.find('#rejected')).not.toBeUndefined();
+      expect(dropzone.text()).toEqual('Rejected');
     });
   });
 
