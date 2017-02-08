@@ -303,7 +303,9 @@ class Dropzone extends React.Component {
 
 Dropzone.propTypes = {
   /**
-   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
+   * Keep in mind that mime type determination is not reliable accross platforms. CSV files,
+   * for example, are reported as text/plain under macos but as application/vnd.ms-excel.
    */
   accept: React.PropTypes.string,
 
