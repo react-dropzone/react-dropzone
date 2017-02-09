@@ -39,8 +39,6 @@ Simply `require('react-dropzone')` and specify an `onDrop` method which accepts 
 
 The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
-By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
-
 Example
 =====
 
@@ -68,6 +66,27 @@ var DropzoneDemo = React.createClass({
 });
 
 React.render(<DropzoneDemo />, document.body);
+```
+
+Reacting to user input
+=====
+
+By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
+
+You have a third option : providing a function that returns the component's children.
+
+```
+<Dropzone>
+  {({ isDragActive, isDragReject }) => {
+    if (isDragActive) {
+      return "This file is authorized";
+    }
+    if (isDragReject) {
+      return "This file is not authorized";
+    }
+    return "Try dropping some files";
+  }}
+</Dropzone>
 ```
 
 Features

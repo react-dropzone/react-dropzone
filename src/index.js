@@ -8,6 +8,13 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   true;
 
 class Dropzone extends React.Component {
+  static renderChildren(children, isDragActive, isDragReject) {
+    if (typeof children === 'function') {
+      return children({ isDragActive, isDragReject });
+    }
+    return children;
+  }
+
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
@@ -192,6 +199,7 @@ class Dropzone extends React.Component {
       multiple,
       name,
       rejectClassName,
+      children,
       ...rest
     } = this.props;
 
@@ -289,7 +297,7 @@ class Dropzone extends React.Component {
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
       >
-        {this.props.children}
+        {Dropzone.renderChildren(children, isDragActive, isDragReject)}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
@@ -317,7 +325,10 @@ Dropzone.propTypes = {
   onDragOver: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
-  children: React.PropTypes.node, // Contents of the dropzone
+  children: React.PropTypes.oneOfType([
+    React.PropTypes.node,
+    React.PropTypes.func
+  ]), // Contents of the dropzone
   style: React.PropTypes.object, // CSS styles to apply
   activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
   rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected

@@ -87,6 +87,21 @@ describe('Dropzone', () => {
       expect(Object.keys(component.find('input').attr())).toContain('name');
       expect(component.find('input').attr('name')).toEqual('test-file-input');
     });
+
+    it('should render children function', () => {
+      const content = <p>some content</p>;
+      const dropzone = mount(
+        <Dropzone>
+          {content}
+        </Dropzone>
+      );
+      const dropzoneWithFunction = mount(
+        <Dropzone>
+          {() => content}
+        </Dropzone>
+      );
+      expect(dropzoneWithFunction.html()).toEqual(dropzone.html());
+    });
   });
 
   describe('onClick', () => {
@@ -280,6 +295,27 @@ describe('Dropzone', () => {
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
       expect(dropzone.state().isDragActive).toEqual(true);
       expect(dropzone.state().isDragReject).toEqual(false);
+    });
+
+    it('should expose state to children', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*">
+          {({ isDragActive, isDragReject }) => {
+            if (isDragReject) {
+              return 'Rejected';
+            }
+            if (isDragActive) {
+              return 'Active';
+            }
+            return 'Empty';
+          }}
+        </Dropzone>
+      );
+      expect(dropzone.text()).toEqual('Empty');
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+      expect(dropzone.text()).toEqual('Active');
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      expect(dropzone.text()).toEqual('Rejected');
     });
   });
 
