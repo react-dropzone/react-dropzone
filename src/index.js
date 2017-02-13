@@ -282,7 +282,7 @@ class Dropzone extends React.Component {
       'maxSize',
       'minSize'
     ];
-    const divProps = { ...props };
+    let divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
 
     return (
