@@ -1,4 +1,5 @@
 /* eslint prefer-template: 0 */
+
 import React from 'react';
 import accepts from 'attr-accept';
 import getDataTransferItems from './getDataTransferItems';
