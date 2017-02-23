@@ -185,6 +185,11 @@ class Dropzone extends React.Component {
     return files.every(this.fileAccepted);
   }
 
+  /**
+   * Open system file upload dialog.
+   *
+   * @public
+   */
   open() {
     this.isFileDialogActive = true;
     this.fileInputEl.value = null;
