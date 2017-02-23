@@ -1,6 +1,7 @@
 /* eslint prefer-template: 0 */
 import React from 'react';
 import accepts from 'attr-accept';
+import { deprecate } from 'react-is-deprecated';
 import getDataTransferItems from './getDataTransferItems';
 
 const supportMultiple = (typeof document !== 'undefined' && document && document.createElement) ?
@@ -325,16 +326,47 @@ Dropzone.propTypes = {
   onDragOver: React.PropTypes.func,
   onDragLeave: React.PropTypes.func,
 
+  // Contents of the dropzone
   children: React.PropTypes.oneOfType([
     React.PropTypes.node,
     React.PropTypes.func
-  ]), // Contents of the dropzone
-  style: React.PropTypes.object, // CSS styles to apply
-  activeStyle: React.PropTypes.object, // CSS styles to apply when drop will be accepted
-  rejectStyle: React.PropTypes.object, // CSS styles to apply when drop will be rejected
-  className: React.PropTypes.string, // Optional className
-  activeClassName: React.PropTypes.string, // className for accepted state
-  rejectClassName: React.PropTypes.string, // className for rejected state
+  ]),
+
+  // CSS styles to apply
+  style: deprecate(
+    React.PropTypes.object,
+    'Prop style is deprecated. Use function as children to style dropzone and its contents.'
+  ),
+
+  // CSS styles to apply when drop will be accepted
+  activeStyle: deprecate(
+    React.PropTypes.object,
+    'Prop activeStyle is deprecated. Use function as children to style dropzone and its contents.'
+  ),
+
+  // CSS styles to apply when drop will be rejected
+  rejectStyle: deprecate(
+    React.PropTypes.object,
+    'Prop rejectStyle is deprecated. Use function as children to style dropzone and its contents.'
+  ),
+
+  // Optional className
+  className: deprecate(
+    React.PropTypes.string,
+    'Prop className is deprecated. Use function as children to style dropzone and its contents.'
+  ),
+
+  // className for accepted state
+  activeClassName: deprecate(
+    React.PropTypes.string,
+    'Prop activeClassName is deprecated. Use function as children to style dropzone and its contents.'
+  ),
+
+  // className for rejected state
+  rejectClassName: deprecate(
+    React.PropTypes.string,
+    'Prop rejectClassName is deprecated. Use function as children to style dropzone and its contents.'
+  ),
 
   disablePreview: React.PropTypes.bool, // Enable/disable preview generation
   disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
@@ -344,8 +376,14 @@ Dropzone.propTypes = {
   multiple: React.PropTypes.bool, // Allow dropping multiple files
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
   name: React.PropTypes.string, // name attribute for the input tag
-  maxSize: React.PropTypes.number,
-  minSize: React.PropTypes.number
+  maxSize: deprecate(
+    React.PropTypes.number,
+    'Prop maxSize is deprecated and will be removed in the next major release'
+  ),
+  minSize: deprecate(
+    React.PropTypes.number,
+    'Prop minSize is deprecated and will be removed in the next major release'
+  )
 };
 
 export default Dropzone;
