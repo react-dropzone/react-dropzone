@@ -8,42 +8,29 @@ This example shows how to wrap the whole app into the dropzone.
 import React from 'react';
 
 export default class FullScreen extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      accept: '',
-      files: [],
-      dropzoneActive: false
-    };
-    this.onDrop = this.onDrop.bind(this);
-    this.onDragEnter = this.onDragEnter.bind(this);
-    this.onDragLeave = this.onDragLeave.bind(this);
-    this.onClick = this.onClick.bind(this);
-    this.applyMimeTypes = this.applyMimeTypes.bind(this);
+  state = {
+    accept: '',
+    files: [],
+    dropzoneActive: false
   }
 
-  onDragEnter() {
+  onDragEnter = () => {
     this.setState({
       dropzoneActive: true
     });
   }
 
-  onDragLeave() {
+  onDragLeave = () => {
     this.setState({
       dropzoneActive: false
     });
   }
 
-  onDrop(files) {
+  onDrop = (files) => {
     this.setState({
       files,
       dropzoneActive: false
     });
-  }
-
-  onClick() {
-    // You can programmatically open file dialog
-    this.dropzone.open();
   }
 
   applyMimeTypes(event) {
@@ -52,18 +39,15 @@ export default class FullScreen extends React.Component {
     });
   }
 
-  render() {
+  render = () => {
     const { accept, files, dropzoneActive } = this.state;
-    const style = {
-      position: 'relative'
-    };
     const overlayStyle = {
       position: 'absolute',
       top: 0,
+      right: 0,
+      bottom: 0,
       left: 0,
       padding: '2.5em 0',
-      width: '100%',
-      height: '100%',
       background: 'rgba(0,0,0,0.5)',
       textAlign: 'center',
       color: '#fff'
@@ -71,14 +55,13 @@ export default class FullScreen extends React.Component {
     return (
       <Dropzone
         disableClick
-        ref={(node) => { this.dropzone = node; }}
-        style={style}
+        style={{}}
         accept={accept}
         onDrop={this.onDrop}
         onDragEnter={this.onDragEnter}
         onDragLeave={this.onDragLeave}
       >
-        { dropzoneActive && <p style={overlayStyle}>Drop files...</p> }
+        { dropzoneActive && <div style={overlayStyle}>Drop files...</div> }
         <div>
           <h1>My awesome app</h1>
           <label htmlFor="mimetypes">Enter mime types you want to accept: </label>
@@ -87,7 +70,6 @@ export default class FullScreen extends React.Component {
             id="mimetypes"
             onChange={this.applyMimeTypes}
           />
-          <button onClick={this.onClick}>Upload files...</button>
 
           <h2>Dropped files</h2>
           <ul>
@@ -101,5 +83,4 @@ export default class FullScreen extends React.Component {
     );
   }
 }
-
 ```
