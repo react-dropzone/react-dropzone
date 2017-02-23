@@ -1,4 +1,5 @@
 /* eslint prefer-template: 0 */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import accepts from 'attr-accept';
