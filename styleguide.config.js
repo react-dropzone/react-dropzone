@@ -4,13 +4,16 @@ module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
   showCode: false,
+  showSidebar: false,
+  serverPort: 8080,
   sections: [
     {
-      name: 'Installation',
+      content: 'examples/Readme.md'
+    },
+    {
       content: 'README.md'
     },
     {
-      name: 'PropTypes',
       components: './src/index.js'
     },
     {
@@ -20,19 +23,5 @@ module.exports = {
         Dropzone: './src/index'
       }
     }
-  ],
-  webpackConfigFile: './webpack.config.js',
-  webpackConfig: {
-    entry: [
-      path.join(__dirname, 'examples/theme.css')
-    ],
-    module: {
-      loaders: [
-        {
-          test: /\.css$/,
-          loader: 'style!css'
-        }
-      ]
-    }
-  }
+  ]
 };
