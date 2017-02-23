@@ -8,15 +8,10 @@ This example shows Dropzone with default properties and displays list of the dro
 import React from 'react';
 
 export default class Basic extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      files: []
-    };
-    this.onDrop = this.onDrop.bind(this);
-  }
 
-  onDrop(files) {
+  state = { files: [] }
+
+  onDrop = (files) => {
     this.setState({
       files
     });
