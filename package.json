@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "attr-accept": "^1.0.3",
+    "exif-js": "^2.1.1",
     "react-is-deprecated": "^0.1.2"
   },
   "devDependencies": {
