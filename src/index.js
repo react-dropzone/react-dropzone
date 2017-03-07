@@ -26,6 +26,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
     this.fileAccepted = this.fileAccepted.bind(this);
+    this.setRef = this.setRef.bind(this);
     this.isFileDialogActive = false;
     this.state = {
       isDragActive: false
@@ -33,7 +34,7 @@ class Dropzone extends React.Component {
   }
 
   componentDidMount() {
-    this.enterCounter = 0;
+    this.dragTargets = [];
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel;
   }
@@ -53,7 +54,9 @@ class Dropzone extends React.Component {
     e.preventDefault();
 
     // Count the dropzone and any children that are entered.
-    ++this.enterCounter;
+    if (this.dragTargets.indexOf(e.target) === -1) {
+      this.dragTargets.push(e.target);
+    }
 
     const allFilesAccepted = this.allFilesAccepted(getDataTransferItems(e, this.props.multiple));
 
@@ -85,8 +88,9 @@ class Dropzone extends React.Component {
   onDragLeave(e) {
     e.preventDefault();
 
-    // Only deactivate once the dropzone and all children was left.
-    if (--this.enterCounter > 0) {
+    // Only deactivate once the dropzone and all children have been left.
+    this.dragTargets = this.dragTargets.filter(el => el !== e.target && this.node.contains(el));
+    if (this.dragTargets.length > 0) {
       return;
     }
 
@@ -110,7 +114,7 @@ class Dropzone extends React.Component {
     e.preventDefault();
 
     // Reset the counter along with the drag on a drop.
-    this.enterCounter = 0;
+    this.dragTargets = [];
     this.isFileDialogActive = false;
 
     fileList.forEach((file) => {
@@ -172,6 +176,10 @@ class Dropzone extends React.Component {
         }
       }, 300);
     }
+  }
+
+  setRef(ref) {
+    this.node = ref;
   }
 
   fileAccepted(file) {
@@ -297,6 +305,7 @@ class Dropzone extends React.Component {
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
+        ref={this.setRef}
       >
         {Dropzone.renderChildren(children, isDragActive, isDragReject)}
         <input
