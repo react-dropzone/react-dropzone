@@ -92,6 +92,7 @@ You have a third option : providing a function that returns the component's chil
 Features
 ========
 
+- `preventDropOnDocument` `[Boolean | **true**]` — When a file is dropped outside of any `<Dropzone>` instance, whether to prevent the browser from navigating to it.
 - `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
 - `multiple` `[Boolean | **true**]` — Accept multiple files
 - `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.

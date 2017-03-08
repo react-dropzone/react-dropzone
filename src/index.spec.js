@@ -104,6 +104,81 @@ describe('Dropzone', () => {
     });
   });
 
+  describe('document drop protection', () => {
+    let dropzone;
+    let addEventCalls;
+    let savedAddEventListener;
+    let savedRemoveEventListener;
+
+    beforeEach(() => {
+      savedAddEventListener = document.addEventListener;
+      savedRemoveEventListener = document.removeEventListener;
+      document.addEventListener = spy();
+      document.removeEventListener = spy();
+    });
+
+    afterEach(() => {
+      document.addEventListener = savedAddEventListener;
+      document.removeEventListener = savedRemoveEventListener;
+    });
+
+    // Collect the list of addEventListener/removeEventListener spy calls into an object keyed by event name.
+    function collectEventListenerCalls(calls) {
+      return calls.reduce((acc, [eventName, ...rest]) => {
+        acc[eventName] = rest; // eslint-disable-line no-param-reassign
+        return acc;
+      }, {});
+    }
+
+    it('installs hooks to prevent stray drops from taking over the browser window', () => {
+      dropzone = mount(<Dropzone><p>Content</p></Dropzone>);
+      expect(dropzone.html()).toMatchSnapshot();
+      expect(document.addEventListener.callCount).toEqual(2);
+      addEventCalls = collectEventListenerCalls(document.addEventListener.args);
+      Object.keys(addEventCalls).forEach((eventName) => {
+        expect(addEventCalls[eventName][0]).toBeDefined();
+        expect(addEventCalls[eventName][1]).toBe(false);
+      });
+    });
+
+    it('terminates drags and drops on elements outside our dropzone', () => {
+      const event = { preventDefault: spy() };
+      Dropzone.onDocumentDragOver(event);
+      expect(event.preventDefault.callCount).toEqual(1);
+      event.preventDefault.reset();
+
+      dropzone.getNode().onDocumentDrop(event);
+      expect(event.preventDefault.callCount).toEqual(1);
+    });
+
+    it('permits drags and drops on elements inside our dropzone', () => {
+      const instanceEvent = {
+        preventDefault: spy(),
+        target: dropzone.getDOMNode()
+      };
+      dropzone.getNode().onDocumentDrop(instanceEvent);
+      expect(instanceEvent.preventDefault.callCount).toEqual(0);
+    });
+
+    it('removes document hooks when unmounted', () => {
+      dropzone.unmount();
+      expect(document.removeEventListener.callCount).toEqual(2);
+      const removeEventCalls = collectEventListenerCalls(document.removeEventListener.args);
+      Object.keys(addEventCalls).forEach((eventName) => {
+        expect(removeEventCalls[eventName][0]).toEqual(addEventCalls[eventName][0]);
+      });
+    });
+
+    it('does not prevent stray drops when preventDropOnDocument is false', () => {
+      dropzone = mount(<Dropzone preventDropOnDocument={false} />);
+      expect(dropzone.html()).toMatchSnapshot();
+      expect(document.addEventListener.callCount).toEqual(0);
+
+      dropzone.unmount();
+      expect(document.removeEventListener.callCount).toEqual(0);
+    });
+  });
+
   describe('onClick', () => {
     it('should call `open` method', () => {
       const dropzone = mount(
