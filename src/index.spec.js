@@ -7,6 +7,13 @@ const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index'
 let files;
 let images;
 
+function fileDataTransfer(props) {
+  return {
+    ...props,
+    types: ['Files']
+  };
+}
+
 describe('Dropzone', () => {
 
   beforeEach(() => {
@@ -203,9 +210,9 @@ describe('Dropzone', () => {
         />
       );
       component.simulate('dragStart');
-      component.simulate('dragEnter', { dataTransfer: { items: files } });
-      component.simulate('dragOver', { dataTransfer: { items: files } });
-      component.simulate('dragLeave', { dataTransfer: { items: files } });
+      component.simulate('dragEnter', { dataTransfer: fileDataTransfer({ items: files }) });
+      component.simulate('dragOver', { dataTransfer: fileDataTransfer({ items: files }) });
+      component.simulate('dragLeave', { dataTransfer: fileDataTransfer({ items: files }) });
       expect(dragStartSpy.callCount).toEqual(1);
       expect(dragEnterSpy.callCount).toEqual(1);
       expect(dragOverSpy.callCount).toEqual(1);
@@ -231,7 +238,7 @@ describe('Dropzone', () => {
             case 'dataTransfer':
               throw new Error('IE does not support rrror');
             default:
-              return function () {};
+              return function noop() {};
           }
         }
       });
@@ -243,10 +250,10 @@ describe('Dropzone', () => {
         component.instance().onDragOver(eventProxy)
       );
 
-      component.simulate('dragStart', { dataTransfer: { items: files } });
-      component.simulate('dragEnter', { dataTransfer: { items: files } });
-      component.simulate('dragOver', { dataTransfer: { items: files } });
-      component.simulate('dragLeave', { dataTransfer: { items: files } });
+      component.simulate('dragStart', { dataTransfer: fileDataTransfer({ items: files }) });
+      component.simulate('dragEnter', { dataTransfer: fileDataTransfer({ items: files }) });
+      component.simulate('dragOver', { dataTransfer: fileDataTransfer({ items: files }) });
+      component.simulate('dragLeave', { dataTransfer: fileDataTransfer({ items: files }) });
       expect(dragStartSpy.callCount).toEqual(1);
       expect(dragEnterSpy.callCount).toEqual(1);
       expect(dragLeaveSpy.callCount).toEqual(1);
@@ -259,7 +266,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone />
       );
-      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      dropzone.simulate('dragEnter', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropzone.state().isDragActive).toEqual(true);
       expect(dropzone.state().isDragReject).toEqual(false);
     });
@@ -268,7 +275,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*" />
       );
-      dropzone.simulate('dragEnter', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('dragEnter', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropzone.state().isDragActive).toEqual(false);
       expect(dropzone.state().isDragReject).toEqual(true);
     });
@@ -280,7 +287,7 @@ describe('Dropzone', () => {
           multiple={false}
         />
       );
-      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      dropzone.simulate('dragEnter', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropzone.state().isDragActive).toEqual(false);
       expect(dropzone.state().isDragReject).toEqual(true);
     });
@@ -292,7 +299,7 @@ describe('Dropzone', () => {
           multiple={false}
         />
       );
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+      dropzone.simulate('dragEnter', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropzone.state().isDragActive).toEqual(true);
       expect(dropzone.state().isDragReject).toEqual(false);
     });
@@ -344,10 +351,10 @@ describe('Dropzone', () => {
           onDropRejected={dropRejectedSpy}
         />
       );
-      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      dropzone.simulate('dragEnter', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropzone.state().isDragActive).toEqual(true);
       expect(dropzone.state().isDragReject).toEqual(false);
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropzone.state().isDragActive).toEqual(false);
       expect(dropzone.state().isDragReject).toEqual(false);
     });
@@ -359,7 +366,7 @@ describe('Dropzone', () => {
           multiple
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.firstCall.args[0]).toHaveLength(2);
       expect(dropSpy.firstCall.args[0][0].name).toEqual(images[0].name);
       expect(dropSpy.firstCall.args[0][1].name).toEqual(images[1].name);
@@ -372,7 +379,7 @@ describe('Dropzone', () => {
           multiple={false}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.firstCall.args[0]).toHaveLength(1);
       expect(dropSpy.firstCall.args[0][0].name).toEqual(images[0].name);
     });
@@ -382,7 +389,7 @@ describe('Dropzone', () => {
         <Dropzone />
       );
       dropzone.instance().isFileDialogActive = true;
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropzone.instance().isFileDialogActive).toEqual(false);
     });
 
@@ -395,13 +402,13 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toEqual([], [...files]);
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.callCount).toEqual(2);
       expect(dropSpy.lastCall.args[0]).toEqual([...images], []);
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropSpy.callCount).toEqual(3);
       expect(dropSpy.lastCall.args[0]).toEqual([...images], [...files]);
     });
@@ -415,12 +422,12 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropAcceptedSpy.callCount).toEqual(0);
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropAcceptedSpy.callCount).toEqual(1);
       expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images]);
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropAcceptedSpy.callCount).toEqual(2);
       expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images]);
     });
@@ -434,12 +441,12 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropRejectedSpy.callCount).toEqual(1);
       expect(dropRejectedSpy.lastCall.args[0]).toEqual([...files]);
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropRejectedSpy.callCount).toEqual(1);
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropRejectedSpy.callCount).toEqual(2);
       expect(dropRejectedSpy.lastCall.args[0]).toEqual([...files]);
     });
@@ -453,7 +460,7 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(0);
       expect(dropSpy.firstCall.args[1]).toHaveLength(1);
@@ -472,7 +479,7 @@ describe('Dropzone', () => {
         />
       );
 
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(2);
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
@@ -489,7 +496,7 @@ describe('Dropzone', () => {
           onDropRejected={dropRejectedSpy}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(3);
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
@@ -508,7 +515,7 @@ describe('Dropzone', () => {
         />
       );
 
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(1);
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
@@ -526,7 +533,7 @@ describe('Dropzone', () => {
           maxSize={1111}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(0);
       expect(dropSpy.firstCall.args[1]).toHaveLength(2);
@@ -544,7 +551,7 @@ describe('Dropzone', () => {
           minSize={1112}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(0);
       expect(dropSpy.firstCall.args[1]).toHaveLength(1);
@@ -562,7 +569,7 @@ describe('Dropzone', () => {
           minSize={1112}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(2);
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
@@ -579,7 +586,7 @@ describe('Dropzone', () => {
           onDropRejected={dropRejectedSpy}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: files.concat(images) }) });
       expect(dropSpy.callCount).toEqual(1);
       expect(dropSpy.firstCall.args[0]).toHaveLength(3);
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
@@ -595,7 +602,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone onDrop={dropSpy} />
       );
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview');
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://file1.pdf');
     });
@@ -605,7 +612,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone onDrop={dropSpy} />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
       expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview');
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif');
     });
@@ -618,8 +625,8 @@ describe('Dropzone', () => {
           onDrop={dropSpy}
         />
       );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
-      dropzone.simulate('drop', { dataTransfer: { files } });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files: images }) });
+      dropzone.simulate('drop', { dataTransfer: fileDataTransfer({ files }) });
       expect(dropSpy.callCount).toEqual(2);
       expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview');
       expect(Object.keys(dropSpy.lastCall.args[0][0])).not.toContain('preview');
@@ -672,14 +679,37 @@ describe('Dropzone', () => {
 
   });
 
-  describe('behavior', () => {
-    it('does not throw an error when html is dropped instead of files and multiple is false', () => {
-      const dropzone = mount(
-        <Dropzone multiple={false} />
-      );
+  describe('edge cases', () => {
+    describe('when a DOM element is dragged/dropped instead of files', () => {
+      it('does not throw an error when multiple is false', () => {
+        const dropzone = mount(
+          <Dropzone multiple={false} />
+        );
 
-      const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [] } });
-      expect(fn).not.toThrow();
+        const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(fn).not.toThrow();
+      });
+
+      it('skips drag enter', () => {
+        const onDragEnter = spy();
+        const dropzone = mount(
+          <Dropzone onDragEnter={onDragEnter} />
+        );
+
+        dropzone.simulate('dragEnter', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(dropzone.state().isDragActive).toEqual(false);
+        expect(onDragEnter.called).not.toBeTruthy();
+      });
+
+      it.only('does not drop the items', () => {
+        const onDrop = spy();
+        const dropzone = mount(
+          <Dropzone onDrop={onDrop} />
+        );
+
+        dropzone.simulate('drop', { dataTransfer: { files: [], types: ['text/uri-list'] } });
+        expect(onDrop.called).not.toBeTruthy();
+      });
     });
   });
 

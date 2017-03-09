@@ -52,6 +52,14 @@ class Dropzone extends React.Component {
   onDragEnter(e) {
     e.preventDefault();
 
+    const dt = e.dataTransfer;
+
+    // If the object isn't a file (dom element, link, etc.)
+    if (!(dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') !== -1 : dt.types.contains('Files')))) {
+      this.setState({ isDragActive: false });
+      return;
+    }
+
     // Count the dropzone and any children that are entered.
     ++this.enterCounter;
 
@@ -108,6 +116,11 @@ class Dropzone extends React.Component {
 
     // Stop default browser behavior
     e.preventDefault();
+
+    // If there are no files (i.e. if you drag a DOM element or image from within the browser)
+    if (fileList.length === 0) {
+      return;
+    }
 
     // Reset the counter along with the drag on a drop.
     this.enterCounter = 0;
