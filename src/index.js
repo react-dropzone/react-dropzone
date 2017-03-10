@@ -9,13 +9,6 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   true;
 
 class Dropzone extends React.Component {
-  static renderChildren(children, isDragActive, isDragReject) {
-    if (typeof children === 'function') {
-      return children({ isDragActive, isDragReject });
-    }
-    return children;
-  }
-
   constructor(props, context) {
     super(props, context);
     this.onClick = this.onClick.bind(this);
@@ -28,7 +21,9 @@ class Dropzone extends React.Component {
     this.fileAccepted = this.fileAccepted.bind(this);
     this.isFileDialogActive = false;
     this.state = {
-      isDragActive: false
+      isDragActive: false,
+      acceptedFiles: [],
+      rejectedFiles: []
     };
   }
 
@@ -140,7 +135,9 @@ class Dropzone extends React.Component {
     // Reset drag state
     this.setState({
       isDragActive: false,
-      isDragReject: false
+      isDragReject: false,
+      acceptedFiles,
+      rejectedFiles
     });
   }
 
@@ -190,6 +187,13 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = true;
     this.fileInputEl.value = null;
     this.fileInputEl.click();
+  }
+
+  renderChildren = (children) => {
+    if (typeof children === 'function') {
+      return children(this.state);
+    }
+    return children;
   }
 
   render() {
@@ -298,7 +302,7 @@ class Dropzone extends React.Component {
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
       >
-        {Dropzone.renderChildren(children, isDragActive, isDragReject)}
+        {this.renderChildren(children)}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
