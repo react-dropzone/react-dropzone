@@ -1,4 +1,4 @@
-react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 
@@ -77,14 +77,16 @@ You have a third option : providing a function that returns the component's chil
 
 ```
 <Dropzone>
-  {({ isDragActive, isDragReject }) => {
+  {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
     if (isDragActive) {
       return "This file is authorized";
     }
     if (isDragReject) {
       return "This file is not authorized";
     }
-    return "Try dropping some files";
+    return acceptedFiles.length || rejectedFiles.length
+      ? `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`
+      : "Try dropping some files";
   }}
 </Dropzone>
 ```
