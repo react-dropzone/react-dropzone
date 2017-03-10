@@ -231,7 +231,7 @@ describe('Dropzone', () => {
             case 'dataTransfer':
               throw new Error('IE does not support rrror');
             default:
-              return function () {};
+              return function noop() {};
           }
         }
       });
@@ -316,6 +316,34 @@ describe('Dropzone', () => {
       expect(dropzone.text()).toEqual('Active');
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
       expect(dropzone.text()).toEqual('Rejected');
+    });
+
+    it('should reset the dragActive/dragReject state when leaving after a child goes away', () => {
+      const DragActiveComponent = () => <p>Active</p>;
+      const ChildComponent = () => <p>Child component content</p>;
+      const dropzone = mount(
+        <Dropzone>
+          {({ isDragActive, isDragReject }) => {
+            if (isDragReject) {
+              return 'Rejected';
+            }
+            if (isDragActive) {
+              return <DragActiveComponent />;
+            }
+            return <ChildComponent />;
+          }}
+        </Dropzone>
+      );
+      dropzone.find(ChildComponent).simulate('dragEnter', { dataTransfer: { files } });
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      // make sure we handle any duplicate dragEnter events that the browser may send us
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      expect(dropzone.state().isDragActive).toEqual(true);
+      expect(dropzone.state().isDragReject).toEqual(false);
+
+      dropzone.simulate('dragLeave', { dataTransfer: { files } });
+      expect(dropzone.state().isDragActive).toEqual(false);
+      expect(dropzone.state().isDragReject).toEqual(false);
     });
   });
 
@@ -670,6 +698,93 @@ describe('Dropzone', () => {
       }, 300);
     });
 
+  });
+
+  describe('nested Dropzone component behavior', () => {
+    let outerDropzone;
+    let innerDropzone;
+    let outerDropSpy;
+    let outerDropAcceptedSpy;
+    let outerDropRejectedSpy;
+    let innerDropSpy;
+    let innerDropAcceptedSpy;
+    let innerDropRejectedSpy;
+
+    const InnerDragAccepted = () => <p>Accepted</p>;
+    const InnerDragRejected = () => <p>Rejected</p>;
+    const InnerDropzone = () => (
+      <Dropzone
+        onDrop={innerDropSpy}
+        onDropAccepted={innerDropAcceptedSpy}
+        onDropRejected={innerDropRejectedSpy}
+        accept="image/*"
+      >
+        {({ isDragActive, isDragReject }) => {
+          if (isDragReject) return <InnerDragRejected />;
+          if (isDragActive) return <InnerDragAccepted />;
+          return <p>No drag</p>;
+        }}
+      </Dropzone>
+    );
+
+    describe('dropping on the inner dropzone', () => {
+      it('mounts both dropzones', () => {
+        outerDropSpy = spy();
+        outerDropAcceptedSpy = spy();
+        outerDropRejectedSpy = spy();
+        innerDropSpy = spy();
+        innerDropAcceptedSpy = spy();
+        innerDropRejectedSpy = spy();
+        outerDropzone = mount(
+          <Dropzone
+            onDrop={outerDropSpy}
+            onDropAccepted={outerDropAcceptedSpy}
+            onDropRejected={outerDropRejectedSpy}
+            accept="image/*"
+          >
+            <p>Outer content</p>
+            <InnerDropzone />
+          </Dropzone>
+        );
+        innerDropzone = outerDropzone.find(InnerDropzone);
+      });
+
+      it('does dragEnter on both dropzones', () => {
+        innerDropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+        expect(outerDropzone.state().isDragActive).toEqual(true);
+        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(true);
+        expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
+      });
+
+      it('drops on the child dropzone', () => {
+        innerDropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      });
+
+      it('accepts the drop on the inner dropzone', () => {
+        expect(innerDropSpy.callCount).toEqual(1);
+        expect(innerDropSpy.firstCall.args[0]).toHaveLength(2);
+        expect(innerDropSpy.firstCall.args[1]).toHaveLength(1);
+        expect(innerDropAcceptedSpy.callCount).toEqual(1);
+        expect(innerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
+        expect(innerDropRejectedSpy.callCount).toEqual(1);
+        expect(innerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
+        expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(false);
+        expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
+      });
+
+      it('also accepts the drop on the outer dropzone', () => {
+        expect(outerDropSpy.callCount).toEqual(1);
+        expect(outerDropSpy.firstCall.args[0]).toHaveLength(2);
+        expect(outerDropSpy.firstCall.args[1]).toHaveLength(1);
+        expect(outerDropAcceptedSpy.callCount).toEqual(1);
+        expect(outerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
+        expect(outerDropRejectedSpy.callCount).toEqual(1);
+        expect(outerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
+        expect(outerDropzone.state().isDragActive).toEqual(false);
+        expect(outerDropzone.state().isDragReject).toEqual(false);
+      });
+    });
   });
 
   describe('behavior', () => {
