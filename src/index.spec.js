@@ -455,6 +455,21 @@ describe('Dropzone', () => {
       expect(dropzone.state().isDragReject).toEqual(false);
     });
 
+    it('should expose acceptedFiles and rejectedFiles to children', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          multiple={false}
+        >
+          {({ acceptedFiles, rejectedFiles }) => JSON.stringify([acceptedFiles, rejectedFiles])}
+        </Dropzone>
+      );
+      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      expect(dropzone.text()).toEqual(JSON.stringify([images.slice(0, 1), []]));
+      dropzone.simulate('drop', { dataTransfer: { files } });
+      expect(dropzone.text()).toEqual(JSON.stringify([[], files.slice(0, 1)]));
+    });
+
     it('should take all dropped files if multiple is true', () => {
       const dropzone = mount(
         <Dropzone
