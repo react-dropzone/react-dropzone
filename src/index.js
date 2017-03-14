@@ -206,7 +206,7 @@ class Dropzone extends React.Component {
   }
 
   fileAccepted(file) {
-    return accepts(file, this.props.accept);
+    return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
   }
 
   fileMatchSize(file) {
