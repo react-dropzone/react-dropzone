@@ -13,7 +13,8 @@
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
     "deps:update": "npm-check -u",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "watch": "npm run clean && webpack --watch"
   },
   "lint-staged": {
     "*.js": [
