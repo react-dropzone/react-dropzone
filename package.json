@@ -82,7 +82,7 @@
     "react-dom": "^15.4.1",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.2",
-    "sinon": "^1.17.4",
+    "sinon": "^2.0.0",
     "webpack": "^1.13.1"
   },
   "config": {
