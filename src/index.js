@@ -2,6 +2,7 @@
 import React from 'react';
 import accepts from 'attr-accept';
 import { deprecate } from 'react-is-deprecated';
+import EXIF from 'exif-js';
 import getDataTransferItems from './getDataTransferItems';
 
 const supportMultiple = (typeof document !== 'undefined' && document && document.createElement) ?
@@ -12,6 +13,38 @@ class Dropzone extends React.Component {
   static onDocumentDragOver(e) {
     // allow the entire document to be a drag target
     e.preventDefault();
+  }
+  static resetImageOrientation(image, callback) {
+    const img = new Image();
+    img.onload = () => {
+      EXIF.getData(img, function orientationReset() {
+        const width = img.width;
+        const height = img.height;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const srcOrientation = EXIF.getTag(this, 'Orientation');
+        if ([5, 6, 7, 8].indexOf(srcOrientation) > -1) {
+          canvas.width = height;
+          canvas.height = width;
+        } else {
+          canvas.width = width;
+          canvas.height = height;
+        }
+        switch (srcOrientation) {
+          case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+          case 3: ctx.transform(-1, 0, 0, -1, width, height); break;
+          case 4: ctx.transform(1, 0, 0, -1, 0, height); break;
+          case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+          case 6: ctx.transform(0, 1, -1, 0, height, 0); break;
+          case 7: ctx.transform(0, -1, -1, 0, height, width); break;
+          case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+          default: ctx.transform(1, 0, 0, 1, 0, 0);
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => callback(URL.createObjectURL(blob)));
+      });
+    };
+    img.src = URL.createObjectURL(image);
   }
 
   constructor(props, context) {
@@ -139,28 +172,28 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = false;
 
     fileList.forEach((file) => {
-      if (!disablePreview) {
-        file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
-      }
+      Dropzone.resetImageOrientation(file, (blob) => {
+        if (!disablePreview) {
+          file.preview = blob; // eslint-disable-line no-param-reassign
+        }
+        if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+          acceptedFiles.push(file);
+        } else {
+          rejectedFiles.push(file);
+        }
+        if (onDrop) {
+          onDrop.call(this, acceptedFiles, rejectedFiles, e);
+        }
 
-      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
-        acceptedFiles.push(file);
-      } else {
-        rejectedFiles.push(file);
-      }
+        if (rejectedFiles.length > 0 && onDropRejected) {
+          onDropRejected.call(this, rejectedFiles, e);
+        }
+
+        if (acceptedFiles.length > 0 && onDropAccepted) {
+          onDropAccepted.call(this, acceptedFiles, e);
+        }
+      });
     });
-
-    if (onDrop) {
-      onDrop.call(this, acceptedFiles, rejectedFiles, e);
-    }
-
-    if (rejectedFiles.length > 0 && onDropRejected) {
-      onDropRejected.call(this, rejectedFiles, e);
-    }
-
-    if (acceptedFiles.length > 0 && onDropAccepted) {
-      onDropAccepted.call(this, acceptedFiles, e);
-    }
 
     // Reset drag state
     this.setState({
