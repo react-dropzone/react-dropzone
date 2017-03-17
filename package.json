@@ -53,8 +53,7 @@
     "react": "^0.14.0 || ^15.0.0"
   },
   "dependencies": {
-    "attr-accept": "^1.0.3",
-    "react-is-deprecated": "^0.1.2"
+    "attr-accept": "^1.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
