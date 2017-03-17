@@ -206,6 +206,8 @@ class Dropzone extends React.Component {
   }
 
   fileAccepted(file) {
+    // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
+    // that MIME type will always be accepted
     return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
   }
 
