@@ -221,7 +221,6 @@ class Dropzone extends React.Component {
   open() {
     this.isFileDialogActive = true;
     this.fileInputEl.value = null;
-    this.fileInputEl.click();
   }
 
   renderChildren = (children) => {
@@ -269,7 +268,8 @@ class Dropzone extends React.Component {
         borderWidth: 2,
         borderColor: '#666',
         borderStyle: 'dashed',
-        borderRadius: 5
+        borderRadius: 5,
+        position: 'relative'
       };
       activeStyle = {
         borderStyle: 'solid',
@@ -298,10 +298,22 @@ class Dropzone extends React.Component {
       };
     }
 
+    // as input will fill completely its parent, make sure parent has a position set
+    appliedStyle.position = appliedStyle.position || 'relative';
+
     const inputAttributes = {
       accept,
       type: 'file',
-      style: { display: 'none' },
+      style: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: '0',
+        right: '0',
+        left: '0',
+        opacity: '0',
+        cursor: 'pointer'
+      },
       multiple: supportMultiple && multiple,
       ref: el => this.fileInputEl = el, // eslint-disable-line
       onChange: this.onDrop
