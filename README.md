@@ -99,7 +99,7 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
-*Important*: `react-dropzone` doesn't manage dropped files by itself. You need to destroyed the object URL yourself whenever you don't need to preview by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leak.
+*Important*: `react-dropzone` doesn't manage dropped files by itself. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
 
 ## Uploads
 
