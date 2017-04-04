@@ -752,17 +752,14 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif');
     });
 
-    it('should not generate preview for rejected files', () => {
+    it('should not throw error when preview cannot be created', () => {
       const dropSpy = spy();
       const dropzone = mount(
         <Dropzone onDrop={dropSpy} />
       );
 
-      class UnacceptableClass { }
 
-      const somethingUnacceptable = new UnacceptableClass();
-
-      dropzone.simulate('drop', { dataTransfer: { files: [somethingUnacceptable] } });
+      dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } });
 
       expect(Object.keys(dropSpy.firstCall.args[1][0])).not.toContain('preview');
     });

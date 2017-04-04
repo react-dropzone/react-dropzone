@@ -138,10 +138,15 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = false;
 
     fileList.forEach((file) => {
-      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
-        if (!disablePreview) {
+      if (!disablePreview) {
+        try {
           file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
+        } catch (err) {
+          // Continue regardless of error
         }
+      }
+
+      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
         acceptedFiles.push(file);
       } else {
         rejectedFiles.push(file);
