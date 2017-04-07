@@ -142,7 +142,10 @@ class Dropzone extends React.Component {
         try {
           file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
         } catch (err) {
-          // Continue regardless of error
+          if (process.env.NODE_ENV !== 'production') {
+            const c = console;
+            c.error('Failed to generate preview for file', file, err);
+          }
         }
       }
 
