@@ -752,6 +752,18 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif');
     });
 
+    it('should not throw error when preview cannot be created', () => {
+      const dropSpy = spy();
+      const dropzone = mount(
+        <Dropzone onDrop={dropSpy} />
+      );
+
+
+      dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } });
+
+      expect(Object.keys(dropSpy.firstCall.args[1][0])).not.toContain('preview');
+    });
+
     it('should not generate previews if disablePreview is true', () => {
       const dropSpy = spy();
       const dropzone = mount(
