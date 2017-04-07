@@ -223,7 +223,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone />
       );
-      const clickSpy = spy(dropzone.instance().fileInputEl, 'click');
+      const clickSpy = spy(dropzone.instance(), 'open');
       dropzone.simulate('click');
       dropzone.simulate('click');
       expect(clickSpy.callCount).toEqual(2);
