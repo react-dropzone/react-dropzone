@@ -79,6 +79,15 @@ describe('Dropzone', () => {
       expect(component.find('input').attr('accept')).toEqual('image/jpeg');
     });
 
+    it('applies the accept prop to the child input as a string', () => {
+      const component = render(
+        <Dropzone className="my-dropzone" accept={['image/jpeg', 'image/png']} />
+      );
+      expect(component.find('.my-dropzone').attr()).not.toContain('accept');
+      expect(Object.keys(component.find('input').attr())).toContain('accept');
+      expect(component.find('input').attr('accept')).toEqual('image/jpeg,image/png');
+    });
+
     it('applies the name prop to the child input', () => {
       const component = render(
         <Dropzone className="my-dropzone" name="test-file-input" />

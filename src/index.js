@@ -392,7 +392,10 @@ Dropzone.propTypes = {
 
   inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files
-  accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+  accept: React.PropTypes.oneOfType([  // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
+    React.PropTypes.string,
+    React.PropTypes.arrayOf(React.PropTypes.string)
+  ]),
   name: React.PropTypes.string, // name attribute for the input tag
   maxSize: React.PropTypes.number,
   minSize: React.PropTypes.number
