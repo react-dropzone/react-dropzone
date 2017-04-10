@@ -43,6 +43,12 @@ class Dropzone extends React.Component {
     }
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel;
+    if (this.props.fullscreen) {
+     document.addEventListener('dragenter', this.onDragEnter);
+     document.addEventListener('dragover', this.onDragOver);
+     document.addEventListener('dragleave', this.onDragLeave);
+     document.addEventListener('drop', this.onDrop);
+   }
   }
 
   componentWillUnmount() {
@@ -53,6 +59,12 @@ class Dropzone extends React.Component {
     }
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null;
+    if (this.props.fullscreen) {
+      document.removeEventListener('dragenter', this.onDragEnter);
+      document.removeEventListener('dragover', this.onDragOver);
+      document.removeEventListener('dragleave', this.onDragLeave);
+      document.removeEventListener('drop', this.onDrop);
+    }
   }
 
   onDocumentDrop(e) {
@@ -327,7 +339,8 @@ class Dropzone extends React.Component {
       'onDropRejected',
       'onFileDialogCancel',
       'maxSize',
-      'minSize'
+      'minSize',
+      'fullscreen',
     ];
     const divProps = { ...props };
     customProps.forEach(prop => delete divProps[prop]);
@@ -361,7 +374,8 @@ Dropzone.defaultProps = {
   disableClick: false,
   multiple: true,
   maxSize: Infinity,
-  minSize: 0
+  minSize: 0,
+  fullscreen: false
 };
 
 Dropzone.propTypes = {
@@ -392,6 +406,7 @@ Dropzone.propTypes = {
 
   inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
   multiple: React.PropTypes.bool, // Allow dropping multiple files
+  fullscreen: React.PropTypes.bool, // Fullscreen support
   accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
   name: React.PropTypes.string, // name attribute for the input tag
   maxSize: React.PropTypes.number,
