@@ -375,7 +375,7 @@ Dropzone.propTypes = {
   onDragOver: PropTypes.func,
   onDragLeave: PropTypes.func,
 
-  children: React.PropTypes.oneOfType([
+  children: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.func
   ]), // Contents of the dropzone
