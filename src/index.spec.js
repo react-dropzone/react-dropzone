@@ -369,7 +369,7 @@ describe('Dropzone', () => {
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
       expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.state().isDragReject).toEqual(true);
     });
 
     it('should expose state to children', () => {

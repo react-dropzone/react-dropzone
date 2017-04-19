@@ -79,11 +79,14 @@ class Dropzone extends React.Component {
       this.dragTargets.push(e.target);
     }
 
-    const allFilesAccepted = this.allFilesAccepted(getDataTransferItems(e, this.props.multiple));
+    // validate all files regardless if they are in multi file mode.
+    const files = getDataTransferItems(e, true);
+    const allFilesAccepted = this.allFilesAccepted(files);
+    const isMultipleNotAllowed = this.props.multiple ? false : files.length > 1;
 
     this.setState({
       isDragActive: allFilesAccepted,
-      isDragReject: !allFilesAccepted
+      isDragReject: !allFilesAccepted || isMultipleNotAllowed
     });
 
     if (this.props.onDragEnter) {
