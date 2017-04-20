@@ -129,7 +129,7 @@ class Dropzone extends React.Component {
 
   onDrop(e) {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview } = this.props;
-    const fileList = getDataTransferItems(e, multiple);
+    const fileList = getDataTransferItems(e);
     const acceptedFiles = [];
     const rejectedFiles = [];
 
@@ -157,6 +157,11 @@ class Dropzone extends React.Component {
         rejectedFiles.push(file);
       }
     });
+
+    if (!multiple) {
+      // if not in multi mode add any extra accepted files to rejected.  This will allow end users to easily ignore a multi file drop in "single" mode.
+      rejectedFiles.push(...acceptedFiles.splice(1));
+    }
 
     if (onDrop) {
       onDrop.call(this, acceptedFiles, rejectedFiles, e);

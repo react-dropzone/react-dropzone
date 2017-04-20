@@ -455,19 +455,45 @@ describe('Dropzone', () => {
       expect(dropzone.state().isDragReject).toEqual(false);
     });
 
-    it('should expose acceptedFiles and rejectedFiles to children', () => {
+    it('multiple false valid files adds to rejected files on a multple drop', () => {
       const dropzone = mount(
         <Dropzone
           accept="image/*"
+          onDrop={dropSpy}
           multiple={false}
-        >
-          {({ acceptedFiles, rejectedFiles }) => JSON.stringify([acceptedFiles, rejectedFiles])}
-        </Dropzone>
+        />
       );
       dropzone.simulate('drop', { dataTransfer: { files: images } });
-      expect(dropzone.text()).toEqual(JSON.stringify([images.slice(0, 1), []]));
-      dropzone.simulate('drop', { dataTransfer: { files } });
-      expect(dropzone.text()).toEqual(JSON.stringify([[], files.slice(0, 1)]));
+      const rejected = dropSpy.firstCall.args[0];
+      expect(rejected.length).toEqual(1);
+    });
+
+    it('multiple false with invalid are added files to rejected', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          onDrop={dropSpy}
+          multiple={false}
+        />
+      );
+      dropzone.simulate('drop', { dataTransfer: { files: images.concat(files) } });
+      const rejected = dropSpy.firstCall.args[1];
+      expect(rejected.length).toEqual(2);
+    });
+
+    it('multiple false allows single files to be dropped', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          onDrop={dropSpy}
+          multiple={false}
+        />
+      );
+
+      dropzone.simulate('drop', { dataTransfer: { files: [images[0]] } });
+      const [accepted, rejected] = dropSpy.firstCall.args;
+      expect(accepted.length).toEqual(1);
+      expect(rejected.length).toEqual(0);
     });
 
     it('should take all dropped files if multiple is true', () => {
@@ -481,18 +507,6 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[0]).toHaveLength(2);
       expect(dropSpy.firstCall.args[0][0].name).toEqual(images[0].name);
       expect(dropSpy.firstCall.args[0][1].name).toEqual(images[1].name);
-    });
-
-    it('should take first file out of dropped files if multiple is false', () => {
-      const dropzone = mount(
-        <Dropzone
-          onDrop={dropSpy}
-          multiple={false}
-        />
-      );
-      dropzone.simulate('drop', { dataTransfer: { files: images } });
-      expect(dropSpy.firstCall.args[0]).toHaveLength(1);
-      expect(dropSpy.firstCall.args[0][0].name).toEqual(images[0].name);
     });
 
     it('should set this.isFileDialogActive to false', () => {
