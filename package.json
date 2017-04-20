@@ -92,7 +92,7 @@
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.2",
     "sinon": "^1.17.4",
-    "webpack": "^1.13.1"
+    "webpack": "^2.2.1"
   },
   "config": {
     "commitizen": {
