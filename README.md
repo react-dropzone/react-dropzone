@@ -97,6 +97,8 @@ Features
 - `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
 - `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
 - `accept` - Accept only specified mime types. Must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
+- `name` `[String | '']` — `name` attribute for the input field.
+- `inputProps` `[Object]` — Attributes will be provided to input field. Note that, these properties will be overriden by [system defaults](https://github.com/okonet/react-dropzone/blob/68f39d7f9a7fd16860f93471678e5b96c8954154/src/index.js#L251-L258).
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
