@@ -13,12 +13,18 @@
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
     "deps:update": "npm-check -u",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "logo": "cd logo && sketchtool export artboards logo.sketch",
+    "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo"
   },
   "lint-staged": {
     "*.js": [
       "eslint:fix",
       "git:add"
+    ],
+    "*.{svg,png}": [
+      "imagemin",
+      "git add"
     ]
   },
   "pre-commit": [
@@ -74,6 +80,8 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.7.1",
+    "imagemin-cli": "^3.0.0",
+    "imagemin-pngquant": "^5.0.0",
     "jest": "^18.0.0",
     "lint-staged": "^3.2.1",
     "npm-check": "^5.2.1",
