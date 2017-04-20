@@ -1,60 +1,9 @@
 {
-  "parser": "babel-eslint",
   "extends": [
-    "airbnb"
+    "okonet"
   ],
-  "env": {
-    // We write for browser
-    "browser": true,
-    // using CommonJS imports
-    "node": true,
-    // We use Jest for tests
-    "jest": true,
-    // And we use ES6 features
-    "es6": true
-  },
-  "ecmaFeatures": {
-    "jsx": true
-  },
   "rules": {
-    "indent": [
-      2,
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "comma-dangle": [
-      2,
-      "never"
-    ],
-    "jsx-quotes": [
-      2,
-      "prefer-double"
-    ],
-    "padded-blocks": [
-      0,
-      "never"
-    ],
-    "no-console": 2,
-    "no-debugger": 2,
-    "no-plusplus": 0,
-    "no-prototype-builtins": 0,
-    "guard-for-in": 0,
-    "object-curly-spacing": [
-      2,
-      "always"
-    ],
-    "max-len": [
-      2,
-      {
-        "code": 120,
-        "ignoreComments": true
-      }
-    ],
-
     // React
-    "react/jsx-filename-extension": 0,
     "react/forbid-prop-types": [
       2,
       {
