@@ -1,83 +1,53 @@
-<div align="center">
-
-![react-dropzone logo](logo/logo.png)
+![react-dropzone logo](logo/logo.svg)
 
 # react-dropzone
 
 [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/rect-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
-
-Simple HTML5 drag-drop zone for files with React.js.
+Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
 Demo: http://okonet.ru/react-dropzone/
-</div>
 
 ---
 
 ## Installation
 
-The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
+Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
-```
+```bash
 npm install --save react-dropzone
-```
-
-Create a standalone module using *WebPack*:
-```
-> npm install
-> webpack
-```
-
-### React 0.13 users
-
-Vesion 3.x is not compatible with React 0.13. If you can't upgrade to React 0.14 right now, you should use v 2.x of this package.
-
-```
-npm install --save react-dropzone@2.x
 ```
 
 ## Usage
 
-Simply `require('react-dropzone')` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+Import `Dropzone` in your React component:
 
-The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
+```javascript
+import Dropzone from 'react-dropzone'
+``` 
+  
+  and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+  
+```javascript
+function onDrop(acceptedFiles, rejectedFiles) {
+  // do stuff with files...
+}
+``` 
 
-## Example
+Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
 
-```jsx
+Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
-/** @jsx React.DOM */
-var React = require('react');
-var Dropzone = require('react-dropzone');
-
-var DropzoneDemo = React.createClass({
-    onDrop: function (acceptedFiles, rejectedFiles) {
-      console.log('Accepted files: ', acceptedFiles);
-      console.log('Rejected files: ', rejectedFiles);
-    },
-
-    render: function () {
-      return (
-          <div>
-            <Dropzone onDrop={this.onDrop}>
-              <div>Try dropping some files here, or click to select files to upload.</div>
-            </Dropzone>
-          </div>
-      );
-    }
-});
-
-React.render(<DropzoneDemo />, document.body);
-```
-
-### Reacting to user input
+## Styling Dropzone
 
 By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style`, `activeStyle` or `rejectStyle` which is applied when a file is dragged over the zone. You can also specify `className`,  `activeClassName` or `rejectClassName` if you would rather style using CSS.
 
-You have a third option : providing a function that returns the component's children.
+## Updating styles and contents based on user input
 
-```
+By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
+
+```javascript
 <Dropzone>
   {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
     if (isDragActive) {
@@ -93,21 +63,7 @@ You have a third option : providing a function that returns the component's chil
 </Dropzone>
 ```
 
-## Features
-
-- `preventDropOnDocument` `[Boolean | **true**]` — When a file is dropped outside of any `<Dropzone>` instance, whether to prevent the browser from navigating to it.
-- `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
-- `multiple` `[Boolean | **true**]` — Accept multiple files
-- `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
-- `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
-- `accept` - Accept only specified mime types. Must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
-- `name` `[String | '']` — `name` attribute for the input field.
-- `inputProps` `[Object]` — Attributes will be provided to input field. Note that, these properties will be overriden by [system defaults](https://github.com/okonet/react-dropzone/blob/68f39d7f9a7fd16860f93471678e5b96c8954154/src/index.js#L251-L258).
-
-To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
-You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
-
-### Manual Upload
+## Programmatically open the file dialog
 * To trigger the dropzone manually (open the file prompt), call the component's `open` function.
 * The completion handler for the `open` function is also the `onDrop` function.
 
@@ -154,6 +110,8 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
+*Important*: `react-dropzone` doesn't manage dropped files by itself. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
+
 ## Uploads
 
 Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
@@ -161,9 +119,9 @@ Using `react-dropzone` is similar to using a file form field, but instead of get
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
 ```javascript
-    onDrop: function(acceptedFiles){
-        var req = request.post('/upload');
-        acceptedFiles.forEach((file)=> {
+    onDrop: acceptedFiles => {
+        const req = request.post('/upload');
+        acceptedFiles.forEach(file => {
             req.attach(file.name, file);
         });
         req.end(callback);

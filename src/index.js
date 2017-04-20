@@ -1,4 +1,5 @@
 /* eslint prefer-template: 0 */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import accepts from 'attr-accept';
@@ -225,6 +226,11 @@ class Dropzone extends React.Component {
     return files.every(this.fileAccepted);
   }
 
+  /**
+   * Open system file upload dialog.
+   *
+   * @public
+   */
   open() {
     this.isFileDialogActive = true;
     this.fileInputEl.value = null;
@@ -280,11 +286,13 @@ class Dropzone extends React.Component {
       };
       activeStyle = {
         borderStyle: 'solid',
+        borderColor: '#6c6',
         backgroundColor: '#eee'
       };
       rejectStyle = {
         borderStyle: 'solid',
-        backgroundColor: '#ffdddd'
+        borderColor: '#c66',
+        backgroundColor: '#eee'
       };
     }
 
@@ -356,6 +364,141 @@ class Dropzone extends React.Component {
   }
 }
 
+Dropzone.propTypes = {
+  /**
+   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
+   * Keep in mind that mime type determination is not reliable accross platforms. CSV files,
+   * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
+   * Windows. In some cases there might not be a mime type set at all.
+   * See: https://github.com/okonet/react-dropzone/issues/276
+   */
+  accept: PropTypes.string,
+
+  /**
+   * Contents of the dropzone
+   */
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.func
+  ]),
+
+  /**
+   * Disallow clicking on the dropzone container to open file dialog
+   */
+  disableClick: PropTypes.bool,
+
+  /**
+   * Enable/disable preview generation
+   */
+  disablePreview: PropTypes.bool,
+
+  /**
+   * If false, allow dropped items to take over the current browser window
+   */
+  preventDropOnDocument: PropTypes.bool,
+
+  /**
+   * Pass additional attributes to the `<input type="file"/>` tag
+   */
+  inputProps: PropTypes.object,
+
+  /**
+   * Allow dropping multiple files
+   */
+  multiple: PropTypes.bool,
+
+  /**
+   * `name` attribute for the input tag
+   */
+  name: PropTypes.string,
+
+  /**
+   * Maximum file size
+   */
+  maxSize: PropTypes.number,
+
+  /**
+   * Minimum file size
+   */
+  minSize: PropTypes.number,
+
+  /**
+   * className
+   */
+  className: PropTypes.string,
+
+  /**
+   * className for accepted state
+   */
+  activeClassName: PropTypes.string,
+
+  /**
+   * className for rejected state
+   */
+  rejectClassName: PropTypes.string,
+
+  /**
+   * CSS styles to apply
+   */
+  style: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drop will be accepted
+   */
+  activeStyle: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drop will be rejected
+   */
+  rejectStyle: PropTypes.object,
+
+  /**
+   * onClick callback
+   * @param {Event} event
+   */
+  onClick: PropTypes.func,
+
+  /**
+   * onDrop callback
+   */
+  onDrop: PropTypes.func,
+
+  /**
+   * onDropAccepted callback
+   */
+  onDropAccepted: PropTypes.func,
+
+  /**
+   * onDropRejected callback
+   */
+  onDropRejected: PropTypes.func,
+
+  /**
+   * onDragStart callback
+   */
+  onDragStart: PropTypes.func,
+
+  /**
+   * onDragEnter callback
+   */
+  onDragEnter: PropTypes.func,
+
+  /**
+   * onDragOver callback
+   */
+  onDragOver: PropTypes.func,
+
+  /**
+   * onDragLeave callback
+   */
+  onDragLeave: PropTypes.func,
+
+  /**
+   * Provide a callback on clicking the cancel button of the file dialog
+   */
+  onFileDialogCancel: PropTypes.func
+};
+
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disablePreview: false,
@@ -363,40 +506,6 @@ Dropzone.defaultProps = {
   multiple: true,
   maxSize: Infinity,
   minSize: 0
-};
-
-Dropzone.propTypes = {
-  onClick: PropTypes.func,
-  onDrop: PropTypes.func,
-  onDropAccepted: PropTypes.func,
-  onDropRejected: PropTypes.func,
-  onDragStart: PropTypes.func,
-  onDragEnter: PropTypes.func,
-  onDragOver: PropTypes.func,
-  onDragLeave: PropTypes.func,
-
-  children: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.func
-  ]), // Contents of the dropzone
-  style: PropTypes.object, // CSS styles to apply
-  activeStyle: PropTypes.object, // CSS styles to apply when drop will be accepted
-  rejectStyle: PropTypes.object, // CSS styles to apply when drop will be rejected
-  className: PropTypes.string, // Optional className
-  activeClassName: PropTypes.string, // className for accepted state
-  rejectClassName: PropTypes.string, // className for rejected state
-
-  preventDropOnDocument: PropTypes.bool, // If false, allow dropped items to take over the current browser window
-  disablePreview: PropTypes.bool, // Enable/disable preview generation
-  disableClick: PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
-  onFileDialogCancel: PropTypes.func, // Provide a callback on clicking the cancel button of the file dialog
-
-  inputProps: PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
-  multiple: PropTypes.bool, // Allow dropping multiple files
-  accept: PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
-  name: PropTypes.string, // name attribute for the input tag
-  maxSize: PropTypes.number,
-  minSize: PropTypes.number
 };
 
 export default Dropzone;
