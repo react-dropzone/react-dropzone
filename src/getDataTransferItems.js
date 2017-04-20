@@ -1,4 +1,4 @@
-export default function getDataTransferFiles(event, isMultipleAllowed = true) {
+export default function getDataTransferFiles(event) {
   let dataTransferItemsList = [];
   if (event.dataTransfer) {
     const dt = event.dataTransfer;
@@ -12,11 +12,6 @@ export default function getDataTransferFiles(event, isMultipleAllowed = true) {
   } else if (event.target && event.target.files) {
     dataTransferItemsList = event.target.files;
   }
-
-  if (dataTransferItemsList.length > 0) {
-    dataTransferItemsList = isMultipleAllowed ? dataTransferItemsList : [dataTransferItemsList[0]];
-  }
-
   // Convert from DataTransferItemsList to the native Array
   return Array.prototype.slice.call(dataTransferItemsList);
 }
