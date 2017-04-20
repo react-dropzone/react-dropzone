@@ -1,7 +1,8 @@
 /* eslint prefer-template: 0 */
+
 import React from 'react';
+import PropTypes from 'prop-types';
 import accepts from 'attr-accept';
-import { deprecate } from 'react-is-deprecated';
 import getDataTransferItems from './getDataTransferItems';
 
 const supportMultiple = (typeof document !== 'undefined' && document && document.createElement) ?
@@ -140,7 +141,13 @@ class Dropzone extends React.Component {
 
     fileList.forEach((file) => {
       if (!disablePreview) {
-        file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
+        try {
+          file.preview = window.URL.createObjectURL(file); // eslint-disable-line no-param-reassign
+        } catch (err) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error('Failed to generate preview for file', file, err); // eslint-disable-line no-console
+          }
+        }
       }
 
       if (this.fileAccepted(file) && this.fileMatchSize(file)) {
@@ -206,7 +213,9 @@ class Dropzone extends React.Component {
   }
 
   fileAccepted(file) {
-    return accepts(file, this.props.accept);
+    // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
+    // that MIME type will always be accepted
+    return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
   }
 
   fileMatchSize(file) {
@@ -217,6 +226,11 @@ class Dropzone extends React.Component {
     return files.every(this.fileAccepted);
   }
 
+  /**
+   * Open system file upload dialog.
+   *
+   * @public
+   */
   open() {
     this.isFileDialogActive = true;
     this.fileInputEl.value = null;
@@ -272,11 +286,13 @@ class Dropzone extends React.Component {
       };
       activeStyle = {
         borderStyle: 'solid',
+        borderColor: '#6c6',
         backgroundColor: '#eee'
       };
       rejectStyle = {
         borderStyle: 'solid',
-        backgroundColor: '#ffdddd'
+        borderColor: '#c66',
+        backgroundColor: '#eee'
       };
     }
 
@@ -348,6 +364,141 @@ class Dropzone extends React.Component {
   }
 }
 
+Dropzone.propTypes = {
+  /**
+   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
+   * Keep in mind that mime type determination is not reliable accross platforms. CSV files,
+   * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
+   * Windows. In some cases there might not be a mime type set at all.
+   * See: https://github.com/okonet/react-dropzone/issues/276
+   */
+  accept: PropTypes.string,
+
+  /**
+   * Contents of the dropzone
+   */
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.func
+  ]),
+
+  /**
+   * Disallow clicking on the dropzone container to open file dialog
+   */
+  disableClick: PropTypes.bool,
+
+  /**
+   * Enable/disable preview generation
+   */
+  disablePreview: PropTypes.bool,
+
+  /**
+   * If false, allow dropped items to take over the current browser window
+   */
+  preventDropOnDocument: PropTypes.bool,
+
+  /**
+   * Pass additional attributes to the `<input type="file"/>` tag
+   */
+  inputProps: PropTypes.object,
+
+  /**
+   * Allow dropping multiple files
+   */
+  multiple: PropTypes.bool,
+
+  /**
+   * `name` attribute for the input tag
+   */
+  name: PropTypes.string,
+
+  /**
+   * Maximum file size
+   */
+  maxSize: PropTypes.number,
+
+  /**
+   * Minimum file size
+   */
+  minSize: PropTypes.number,
+
+  /**
+   * className
+   */
+  className: PropTypes.string,
+
+  /**
+   * className for accepted state
+   */
+  activeClassName: PropTypes.string,
+
+  /**
+   * className for rejected state
+   */
+  rejectClassName: PropTypes.string,
+
+  /**
+   * CSS styles to apply
+   */
+  style: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drop will be accepted
+   */
+  activeStyle: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drop will be rejected
+   */
+  rejectStyle: PropTypes.object,
+
+  /**
+   * onClick callback
+   * @param {Event} event
+   */
+  onClick: PropTypes.func,
+
+  /**
+   * onDrop callback
+   */
+  onDrop: PropTypes.func,
+
+  /**
+   * onDropAccepted callback
+   */
+  onDropAccepted: PropTypes.func,
+
+  /**
+   * onDropRejected callback
+   */
+  onDropRejected: PropTypes.func,
+
+  /**
+   * onDragStart callback
+   */
+  onDragStart: PropTypes.func,
+
+  /**
+   * onDragEnter callback
+   */
+  onDragEnter: PropTypes.func,
+
+  /**
+   * onDragOver callback
+   */
+  onDragOver: PropTypes.func,
+
+  /**
+   * onDragLeave callback
+   */
+  onDragLeave: PropTypes.func,
+
+  /**
+   * Provide a callback on clicking the cancel button of the file dialog
+   */
+  onFileDialogCancel: PropTypes.func
+};
+
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disablePreview: false,
@@ -355,77 +506,6 @@ Dropzone.defaultProps = {
   multiple: true,
   maxSize: Infinity,
   minSize: 0
-};
-
-Dropzone.propTypes = {
-  onClick: React.PropTypes.func,
-  onDrop: React.PropTypes.func,
-  onDropAccepted: React.PropTypes.func,
-  onDropRejected: React.PropTypes.func,
-  onDragStart: React.PropTypes.func,
-  onDragEnter: React.PropTypes.func,
-  onDragOver: React.PropTypes.func,
-  onDragLeave: React.PropTypes.func,
-
-  // Contents of the dropzone
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.node,
-    React.PropTypes.func
-  ]),
-
-  // CSS styles to apply
-  style: deprecate(
-    React.PropTypes.object,
-    'Prop style is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  // CSS styles to apply when drop will be accepted
-  activeStyle: deprecate(
-    React.PropTypes.object,
-    'Prop activeStyle is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  // CSS styles to apply when drop will be rejected
-  rejectStyle: deprecate(
-    React.PropTypes.object,
-    'Prop rejectStyle is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  // Optional className
-  className: deprecate(
-    React.PropTypes.string,
-    'Prop className is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  // className for accepted state
-  activeClassName: deprecate(
-    React.PropTypes.string,
-    'Prop activeClassName is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  // className for rejected state
-  rejectClassName: deprecate(
-    React.PropTypes.string,
-    'Prop rejectClassName is deprecated. Use function as children to style dropzone and its contents.'
-  ),
-
-  preventDropOnDocument: React.PropTypes.bool, // If false, allow dropped items to take over the current browser window
-  disablePreview: React.PropTypes.bool, // Enable/disable preview generation
-  disableClick: React.PropTypes.bool, // Disallow clicking on the dropzone container to open file dialog
-  onFileDialogCancel: React.PropTypes.func, // Provide a callback on clicking the cancel button of the file dialog
-
-  inputProps: React.PropTypes.object, // Pass additional attributes to the <input type="file"/> tag
-  multiple: React.PropTypes.bool, // Allow dropping multiple files
-  accept: React.PropTypes.string, // Allow specific types of files. See https://github.com/okonet/attr-accept for more information
-  name: React.PropTypes.string, // name attribute for the input tag
-  maxSize: deprecate(
-    React.PropTypes.number,
-    'Prop maxSize is deprecated and will be removed in the next major release'
-  ),
-  minSize: deprecate(
-    React.PropTypes.number,
-    'Prop minSize is deprecated and will be removed in the next major release'
-  )
 };
 
 export default Dropzone;

@@ -599,6 +599,30 @@ describe('Dropzone', () => {
       expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
+    it('accepts a dropped image when Firefox provides a bogus file type', () => {
+      const dropzone = mount(
+        <Dropzone
+          onDrop={dropSpy}
+          onDropAccepted={dropAcceptedSpy}
+          onDropRejected={dropRejectedSpy}
+          accept="image/*"
+        />
+      );
+      const bogusImages = [{
+        name: 'bogus.gif',
+        size: 1234,
+        type: 'application/x-moz-file'
+      }];
+
+      dropzone.simulate('drop', { dataTransfer: { files: bogusImages } });
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(1);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(1);
+      expect(dropRejectedSpy.callCount).toEqual(0);
+    });
+
     it('accepts all dropped files and images when no accept prop is specified', () => {
       const dropzone = mount(
         <Dropzone
@@ -726,6 +750,18 @@ describe('Dropzone', () => {
       dropzone.simulate('drop', { dataTransfer: { files: images } });
       expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview');
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif');
+    });
+
+    it('should not throw error when preview cannot be created', () => {
+      const dropSpy = spy();
+      const dropzone = mount(
+        <Dropzone onDrop={dropSpy} />
+      );
+
+
+      dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } });
+
+      expect(Object.keys(dropSpy.firstCall.args[1][0])).not.toContain('preview');
     });
 
     it('should not generate previews if disablePreview is true', () => {
