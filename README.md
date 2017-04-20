@@ -1,6 +1,4 @@
-<div align="center">
-
-![react-dropzone logo](logo/logo.png)
+![react-dropzone logo](logo/logo.svg)
 
 # react-dropzone
 
@@ -10,7 +8,6 @@
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
 Demo: http://okonet.ru/react-dropzone/
-</div>
 
 ---
 
