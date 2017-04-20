@@ -1,8 +1,5 @@
-react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+# react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/rect-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
-
-
-==============
 
 Simple HTML5 drag-drop zone for files with React.js.
 
@@ -39,8 +36,6 @@ Simply `require('react-dropzone')` and specify an `onDrop` method which accepts 
 
 The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
-By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
-
 Example
 =====
 
@@ -70,14 +65,40 @@ var DropzoneDemo = React.createClass({
 React.render(<DropzoneDemo />, document.body);
 ```
 
+Reacting to user input
+=====
+
+By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style`, `activeStyle` or `rejectStyle` which is applied when a file is dragged over the zone. You can also specify `className`,  `activeClassName` or `rejectClassName` if you would rather style using CSS.
+
+You have a third option : providing a function that returns the component's children.
+
+```
+<Dropzone>
+  {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
+    if (isDragActive) {
+      return "This file is authorized";
+    }
+    if (isDragReject) {
+      return "This file is not authorized";
+    }
+    return acceptedFiles.length || rejectedFiles.length
+      ? `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`
+      : "Try dropping some files";
+  }}
+</Dropzone>
+```
+
 Features
 ========
 
+- `preventDropOnDocument` `[Boolean | **true**]` — When a file is dropped outside of any `<Dropzone>` instance, whether to prevent the browser from navigating to it.
 - `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
 - `multiple` `[Boolean | **true**]` — Accept multiple files
 - `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
 - `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
 - `accept` - Accept only specified mime types. Must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
+- `name` `[String | '']` — `name` attribute for the input field.
+- `inputProps` `[Object]` — Attributes will be provided to input field. Note that, these properties will be overriden by [system defaults](https://github.com/okonet/react-dropzone/blob/68f39d7f9a7fd16860f93471678e5b96c8954154/src/index.js#L251-L258).
 
 To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
 You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.

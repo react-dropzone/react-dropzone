@@ -87,6 +87,96 @@ describe('Dropzone', () => {
       expect(Object.keys(component.find('input').attr())).toContain('name');
       expect(component.find('input').attr('name')).toEqual('test-file-input');
     });
+
+    it('should render children function', () => {
+      const content = <p>some content</p>;
+      const dropzone = mount(
+        <Dropzone>
+          {content}
+        </Dropzone>
+      );
+      const dropzoneWithFunction = mount(
+        <Dropzone>
+          {() => content}
+        </Dropzone>
+      );
+      expect(dropzoneWithFunction.html()).toEqual(dropzone.html());
+    });
+  });
+
+  describe('document drop protection', () => {
+    let dropzone;
+    let addEventCalls;
+    let savedAddEventListener;
+    let savedRemoveEventListener;
+
+    beforeEach(() => {
+      savedAddEventListener = document.addEventListener;
+      savedRemoveEventListener = document.removeEventListener;
+      document.addEventListener = spy();
+      document.removeEventListener = spy();
+    });
+
+    afterEach(() => {
+      document.addEventListener = savedAddEventListener;
+      document.removeEventListener = savedRemoveEventListener;
+    });
+
+    // Collect the list of addEventListener/removeEventListener spy calls into an object keyed by event name.
+    function collectEventListenerCalls(calls) {
+      return calls.reduce((acc, [eventName, ...rest]) => {
+        acc[eventName] = rest; // eslint-disable-line no-param-reassign
+        return acc;
+      }, {});
+    }
+
+    it('installs hooks to prevent stray drops from taking over the browser window', () => {
+      dropzone = mount(<Dropzone><p>Content</p></Dropzone>);
+      expect(dropzone.html()).toMatchSnapshot();
+      expect(document.addEventListener.callCount).toEqual(2);
+      addEventCalls = collectEventListenerCalls(document.addEventListener.args);
+      Object.keys(addEventCalls).forEach((eventName) => {
+        expect(addEventCalls[eventName][0]).toBeDefined();
+        expect(addEventCalls[eventName][1]).toBe(false);
+      });
+    });
+
+    it('terminates drags and drops on elements outside our dropzone', () => {
+      const event = { preventDefault: spy() };
+      Dropzone.onDocumentDragOver(event);
+      expect(event.preventDefault.callCount).toEqual(1);
+      event.preventDefault.reset();
+
+      dropzone.getNode().onDocumentDrop(event);
+      expect(event.preventDefault.callCount).toEqual(1);
+    });
+
+    it('permits drags and drops on elements inside our dropzone', () => {
+      const instanceEvent = {
+        preventDefault: spy(),
+        target: dropzone.getDOMNode()
+      };
+      dropzone.getNode().onDocumentDrop(instanceEvent);
+      expect(instanceEvent.preventDefault.callCount).toEqual(0);
+    });
+
+    it('removes document hooks when unmounted', () => {
+      dropzone.unmount();
+      expect(document.removeEventListener.callCount).toEqual(2);
+      const removeEventCalls = collectEventListenerCalls(document.removeEventListener.args);
+      Object.keys(addEventCalls).forEach((eventName) => {
+        expect(removeEventCalls[eventName][0]).toEqual(addEventCalls[eventName][0]);
+      });
+    });
+
+    it('does not prevent stray drops when preventDropOnDocument is false', () => {
+      dropzone = mount(<Dropzone preventDropOnDocument={false} />);
+      expect(dropzone.html()).toMatchSnapshot();
+      expect(document.addEventListener.callCount).toEqual(0);
+
+      dropzone.unmount();
+      expect(document.removeEventListener.callCount).toEqual(0);
+    });
   });
 
   describe('onClick', () => {
@@ -216,7 +306,7 @@ describe('Dropzone', () => {
             case 'dataTransfer':
               throw new Error('IE does not support rrror');
             default:
-              return function () {};
+              return function noop() {};
           }
         }
       });
@@ -281,6 +371,55 @@ describe('Dropzone', () => {
       expect(dropzone.state().isDragActive).toEqual(true);
       expect(dropzone.state().isDragReject).toEqual(false);
     });
+
+    it('should expose state to children', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*">
+          {({ isDragActive, isDragReject }) => {
+            if (isDragReject) {
+              return 'Rejected';
+            }
+            if (isDragActive) {
+              return 'Active';
+            }
+            return 'Empty';
+          }}
+        </Dropzone>
+      );
+      expect(dropzone.text()).toEqual('Empty');
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+      expect(dropzone.text()).toEqual('Active');
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      expect(dropzone.text()).toEqual('Rejected');
+    });
+
+    it('should reset the dragActive/dragReject state when leaving after a child goes away', () => {
+      const DragActiveComponent = () => <p>Active</p>;
+      const ChildComponent = () => <p>Child component content</p>;
+      const dropzone = mount(
+        <Dropzone>
+          {({ isDragActive, isDragReject }) => {
+            if (isDragReject) {
+              return 'Rejected';
+            }
+            if (isDragActive) {
+              return <DragActiveComponent />;
+            }
+            return <ChildComponent />;
+          }}
+        </Dropzone>
+      );
+      dropzone.find(ChildComponent).simulate('dragEnter', { dataTransfer: { files } });
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      // make sure we handle any duplicate dragEnter events that the browser may send us
+      dropzone.simulate('dragEnter', { dataTransfer: { files } });
+      expect(dropzone.state().isDragActive).toEqual(true);
+      expect(dropzone.state().isDragReject).toEqual(false);
+
+      dropzone.simulate('dragLeave', { dataTransfer: { files } });
+      expect(dropzone.state().isDragActive).toEqual(false);
+      expect(dropzone.state().isDragReject).toEqual(false);
+    });
   });
 
   describe('onDrop', () => {
@@ -314,6 +453,21 @@ describe('Dropzone', () => {
       dropzone.simulate('drop', { dataTransfer: { files } });
       expect(dropzone.state().isDragActive).toEqual(false);
       expect(dropzone.state().isDragReject).toEqual(false);
+    });
+
+    it('should expose acceptedFiles and rejectedFiles to children', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          multiple={false}
+        >
+          {({ acceptedFiles, rejectedFiles }) => JSON.stringify([acceptedFiles, rejectedFiles])}
+        </Dropzone>
+      );
+      dropzone.simulate('drop', { dataTransfer: { files: images } });
+      expect(dropzone.text()).toEqual(JSON.stringify([images.slice(0, 1), []]));
+      dropzone.simulate('drop', { dataTransfer: { files } });
+      expect(dropzone.text()).toEqual(JSON.stringify([[], files.slice(0, 1)]));
     });
 
     it('should take all dropped files if multiple is true', () => {
@@ -442,6 +596,30 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[1]).toHaveLength(0);
       expect(dropAcceptedSpy.callCount).toEqual(1);
       expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
+      expect(dropRejectedSpy.callCount).toEqual(0);
+    });
+
+    it('accepts a dropped image when Firefox provides a bogus file type', () => {
+      const dropzone = mount(
+        <Dropzone
+          onDrop={dropSpy}
+          onDropAccepted={dropAcceptedSpy}
+          onDropRejected={dropRejectedSpy}
+          accept="image/*"
+        />
+      );
+      const bogusImages = [{
+        name: 'bogus.gif',
+        size: 1234,
+        type: 'application/x-moz-file'
+      }];
+
+      dropzone.simulate('drop', { dataTransfer: { files: bogusImages } });
+      expect(dropSpy.callCount).toEqual(1);
+      expect(dropSpy.firstCall.args[0]).toHaveLength(1);
+      expect(dropSpy.firstCall.args[1]).toHaveLength(0);
+      expect(dropAcceptedSpy.callCount).toEqual(1);
+      expect(dropAcceptedSpy.firstCall.args[0]).toHaveLength(1);
       expect(dropRejectedSpy.callCount).toEqual(0);
     });
 
@@ -574,6 +752,18 @@ describe('Dropzone', () => {
       expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif');
     });
 
+    it('should not throw error when preview cannot be created', () => {
+      const dropSpy = spy();
+      const dropzone = mount(
+        <Dropzone onDrop={dropSpy} />
+      );
+
+
+      dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } });
+
+      expect(Object.keys(dropSpy.firstCall.args[1][0])).not.toContain('preview');
+    });
+
     it('should not generate previews if disablePreview is true', () => {
       const dropSpy = spy();
       const dropzone = mount(
@@ -634,6 +824,93 @@ describe('Dropzone', () => {
       }, 300);
     });
 
+  });
+
+  describe('nested Dropzone component behavior', () => {
+    let outerDropzone;
+    let innerDropzone;
+    let outerDropSpy;
+    let outerDropAcceptedSpy;
+    let outerDropRejectedSpy;
+    let innerDropSpy;
+    let innerDropAcceptedSpy;
+    let innerDropRejectedSpy;
+
+    const InnerDragAccepted = () => <p>Accepted</p>;
+    const InnerDragRejected = () => <p>Rejected</p>;
+    const InnerDropzone = () => (
+      <Dropzone
+        onDrop={innerDropSpy}
+        onDropAccepted={innerDropAcceptedSpy}
+        onDropRejected={innerDropRejectedSpy}
+        accept="image/*"
+      >
+        {({ isDragActive, isDragReject }) => {
+          if (isDragReject) return <InnerDragRejected />;
+          if (isDragActive) return <InnerDragAccepted />;
+          return <p>No drag</p>;
+        }}
+      </Dropzone>
+    );
+
+    describe('dropping on the inner dropzone', () => {
+      it('mounts both dropzones', () => {
+        outerDropSpy = spy();
+        outerDropAcceptedSpy = spy();
+        outerDropRejectedSpy = spy();
+        innerDropSpy = spy();
+        innerDropAcceptedSpy = spy();
+        innerDropRejectedSpy = spy();
+        outerDropzone = mount(
+          <Dropzone
+            onDrop={outerDropSpy}
+            onDropAccepted={outerDropAcceptedSpy}
+            onDropRejected={outerDropRejectedSpy}
+            accept="image/*"
+          >
+            <p>Outer content</p>
+            <InnerDropzone />
+          </Dropzone>
+        );
+        innerDropzone = outerDropzone.find(InnerDropzone);
+      });
+
+      it('does dragEnter on both dropzones', () => {
+        innerDropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+        expect(outerDropzone.state().isDragActive).toEqual(true);
+        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(true);
+        expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
+      });
+
+      it('drops on the child dropzone', () => {
+        innerDropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } });
+      });
+
+      it('accepts the drop on the inner dropzone', () => {
+        expect(innerDropSpy.callCount).toEqual(1);
+        expect(innerDropSpy.firstCall.args[0]).toHaveLength(2);
+        expect(innerDropSpy.firstCall.args[1]).toHaveLength(1);
+        expect(innerDropAcceptedSpy.callCount).toEqual(1);
+        expect(innerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
+        expect(innerDropRejectedSpy.callCount).toEqual(1);
+        expect(innerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
+        expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(false);
+        expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
+      });
+
+      it('also accepts the drop on the outer dropzone', () => {
+        expect(outerDropSpy.callCount).toEqual(1);
+        expect(outerDropSpy.firstCall.args[0]).toHaveLength(2);
+        expect(outerDropSpy.firstCall.args[1]).toHaveLength(1);
+        expect(outerDropAcceptedSpy.callCount).toEqual(1);
+        expect(outerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
+        expect(outerDropRejectedSpy.callCount).toEqual(1);
+        expect(outerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
+        expect(outerDropzone.state().isDragActive).toEqual(false);
+        expect(outerDropzone.state().isDragReject).toEqual(false);
+      });
+    });
   });
 
   describe('behavior', () => {

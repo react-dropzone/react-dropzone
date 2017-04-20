@@ -45,6 +45,7 @@
   "author": "Param Aggarwal",
   "contributors": [
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
+    "Mike Olson <me@mwolson.org>",
     "Param Aggarwal"
   ],
   "license": "MIT",
@@ -52,7 +53,8 @@
     "react": "^0.14.0 || ^15.0.0"
   },
   "dependencies": {
-    "attr-accept": "^1.0.3"
+    "attr-accept": "^1.0.3",
+    "prop-types": "^15.5.7"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
@@ -65,8 +67,8 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
-    "enzyme": "^2.6.0",
     "cz-conventional-changelog": "^1.2.0",
+    "enzyme": "^2.6.0",
     "eslint": "^3.11.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
