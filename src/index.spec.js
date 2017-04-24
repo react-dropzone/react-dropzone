@@ -455,7 +455,7 @@ describe('Dropzone', () => {
       expect(dropzone.state().isDragReject).toEqual(false);
     });
 
-    it('multiple false valid files adds to rejected files on a multple drop', () => {
+    it('should add valid files to rejected files on a multple drop when multiple false', () => {
       const dropzone = mount(
         <Dropzone
           accept="image/*"
@@ -468,7 +468,7 @@ describe('Dropzone', () => {
       expect(rejected.length).toEqual(1);
     });
 
-    it('multiple false with invalid are added files to rejected', () => {
+    it('should add invalid files to rejected when multiple is false', () => {
       const dropzone = mount(
         <Dropzone
           accept="image/*"
@@ -481,7 +481,7 @@ describe('Dropzone', () => {
       expect(rejected.length).toEqual(2);
     });
 
-    it('multiple false allows single files to be dropped', () => {
+    it('should allow single files to be dropped if multiple is false', () => {
       const dropzone = mount(
         <Dropzone
           accept="image/*"

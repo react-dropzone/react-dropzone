@@ -159,7 +159,8 @@ class Dropzone extends React.Component {
     });
 
     if (!multiple) {
-      // if not in multi mode add any extra accepted files to rejected.  This will allow end users to easily ignore a multi file drop in "single" mode.
+      // if not in multi mode add any extra accepted files to rejected.
+      // This will allow end users to easily ignore a multi file drop in "single" mode.
       rejectedFiles.push(...acceptedFiles.splice(1));
     }
 
