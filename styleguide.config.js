@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
-  showCode: false,
+  showCode: true,
   showSidebar: false,
   serverPort: 8080,
   sections: [
@@ -11,6 +11,7 @@ module.exports = {
       content: 'README.md'
     },
     {
+      name: 'PropTypes',
       components: './src/index.js'
     },
     {

@@ -1,25 +1,28 @@
 import React from 'react';
 
 export default class FullScreen extends React.Component {
-  state = {
-    accept: '',
-    files: [],
-    dropzoneActive: false
+  constructor() {
+    super();
+    this.state = {
+      accept: '',
+      files: [],
+      dropzoneActive: false
+    };
   }
 
-  onDragEnter = () => {
+  onDragEnter() {
     this.setState({
       dropzoneActive: true
     });
   }
 
-  onDragLeave = () => {
+  onDragLeave() {
     this.setState({
       dropzoneActive: false
     });
   }
 
-  onDrop = (files) => {
+  onDrop(files) {
     this.setState({
       files,
       dropzoneActive: false
@@ -32,7 +35,7 @@ export default class FullScreen extends React.Component {
     });
   }
 
-  render = () => {
+  render() {
     const { accept, files, dropzoneActive } = this.state;
     const overlayStyle = {
       position: 'absolute',
@@ -50,9 +53,9 @@ export default class FullScreen extends React.Component {
         disableClick
         style={{}}
         accept={accept}
-        onDrop={this.onDrop}
-        onDragEnter={this.onDragEnter}
-        onDragLeave={this.onDragLeave}
+        onDrop={this.onDrop.bind(this)}
+        onDragEnter={this.onDragEnter.bind(this)}
+        onDragLeave={this.onDragLeave.bind(this)}
       >
         { dropzoneActive && <div style={overlayStyle}>Drop files...</div> }
         <div>
@@ -61,7 +64,7 @@ export default class FullScreen extends React.Component {
           <input
             type="text"
             id="mimetypes"
-            onChange={this.applyMimeTypes}
+            onChange={this.applyMimeTypes.bind(this)}
           />
 
           <h2>Dropped files</h2>

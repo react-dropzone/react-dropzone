@@ -1,9 +1,13 @@
-import React from 'react';
+Dropzone with default properties and displays list of the dropped files.
 
-export default class Accept extends React.Component {
-  state = {
-    accepted: [],
-    rejected: []
+```
+class Accept extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      accepted: [],
+      rejected: []
+    }
   }
 
   render() {
@@ -36,3 +40,6 @@ export default class Accept extends React.Component {
     );
   }
 }
+
+<Accept />
+```
