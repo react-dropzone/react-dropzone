@@ -1,4 +1,4 @@
-Wrap the whole app into the dropzone.
+You can wrap the whole app into the dropzone. This will make the whole app a Dropzone target.
 
 ```
 class FullScreen extends React.Component {

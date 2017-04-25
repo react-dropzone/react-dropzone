@@ -1,12 +1,22 @@
-import React from 'react';
+By providing `accept`  prop you can make Dropzone to accept specifi file types and reject the others.
 
-export default class Accept extends React.Component {
+The value must be a comma-separated list of unique content type specifiers:
+* A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
+* A valid MIME type with no extensions.
+* audio/* representing sound files.
+* video/* representing video files.
+* image/* representing image files.
+
+For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input
+
+```
+class Accept extends React.Component {
   constructor() {
-    super();
+    super()
     this.state = {
       accepted: [],
       rejected: []
-    };
+    }
   }
 
   render() {
@@ -39,3 +49,10 @@ export default class Accept extends React.Component {
     );
   }
 }
+
+<Accept />
+```
+
+### Warning
+Keep in mind that mime type determination is not reliable accross platforms. CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows. In some cases there might not be a mime type set at all.
+
