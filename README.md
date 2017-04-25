@@ -7,7 +7,7 @@
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
-Demo: http://okonet.ru/react-dropzone/
+Documentation and examples: https://react-dropzone.netlify.com
 
 ---
 
@@ -39,81 +39,6 @@ Files accepted or rejected based on `accept` prop. This must be a valid [MIME ty
 
 Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
-## Styling Dropzone
-
-By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style`, `activeStyle` or `rejectStyle` which is applied when a file is dragged over the zone. You can also specify `className`,  `activeClassName` or `rejectClassName` if you would rather style using CSS.
-
-## Updating styles and contents based on user input
-
-By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
-
-```javascript
-<Dropzone>
-  {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
-    if (isDragActive) {
-      return "This file is authorized";
-    }
-    if (isDragReject) {
-      return "This file is not authorized";
-    }
-    return acceptedFiles.length || rejectedFiles.length
-      ? `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`
-      : "Try dropping some files";
-  }}
-</Dropzone>
-```
-
-## Programmatically open the file dialog
-* To trigger the dropzone manually (open the file prompt), call the component's `open` function.
-* The completion handler for the `open` function is also the `onDrop` function.
-
-```jsx
-/** @jsx React.DOM */
-var React = require('react');
-var Dropzone = require('react-dropzone');
-
-var DropzoneDemo = React.createClass({
-    getInitialState: function () {
-        return {
-          files: []
-        };
-    },
-
-    onDrop: function (acceptedFiles) {
-      this.setState({
-        files: acceptedFiles
-      });
-    },
-
-    onOpenClick: function () {
-      this.dropzone.open();
-    },
-
-    render: function () {
-        return (
-            <div>
-                <Dropzone ref={(node) => { this.dropzone = node; }} onDrop={this.onDrop}>
-                    <div>Try dropping some files here, or click to select files to upload.</div>
-                </Dropzone>
-                <button type="button" onClick={this.onOpenClick}>
-                    Open Dropzone
-                </button>
-                {this.state.files.length > 0 ? <div>
-                <h2>Uploading {this.state.files.length} files...</h2>
-                <div>{this.state.files.map((file) => <img src={file.preview} /> )}</div>
-                </div> : null}
-            </div>
-        );
-    }
-});
-
-React.render(<DropzoneDemo />, document.body);
-```
-
-*Important*: `react-dropzone` doesn't manage dropped files by itself. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
-
-## Uploads
-
 Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
 
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
@@ -127,6 +52,14 @@ Specifying the `onDrop` method, provides you with an array of [Files](https://de
         req.end(callback);
     }
 ```
+
+## PropTypes
+
+See https://react-dropzone.netlify.com/#proptypes
+
+### Word of caution when working with previews
+
+*Important*: `react-dropzone` doesn't manage dropped files. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
 
 ## Support
 
