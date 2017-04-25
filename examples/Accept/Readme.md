@@ -1,16 +1,22 @@
-This example shows Dropzone with default properties and displays list of the dropped files.
+By providing `accept`  prop you can make Dropzone to accept specifi file types and reject the others.
+
+The value must be a comma-separated list of unique content type specifiers:
+* A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
+* A valid MIME type with no extensions.
+* audio/* representing sound files.
+* video/* representing video files.
+* image/* representing image files.
+
+For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input
 
 ```
- <Accept />
-```
-
-```jsx
-import React from 'react';
-
-export default class Accept extends React.Component {
-  state = {
-    accepted: [],
-    rejected: []
+class Accept extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      accepted: [],
+      rejected: []
+    }
   }
 
   render() {
@@ -19,7 +25,7 @@ export default class Accept extends React.Component {
         <div className="dropzone">
           <Dropzone
             accept="image/jpeg, image/png"
-            onDrop={(accepted, rejected) => { this.setState({ accepted, rejected }) }}
+            onDrop={(accepted, rejected) => { this.setState({ accepted, rejected }); }}
           >
             <p>Try dropping some files here, or click to select files to upload.</p>
             <p>Only *.jpeg and *.png images will be accepted</p>
@@ -44,4 +50,9 @@ export default class Accept extends React.Component {
   }
 }
 
+<Accept />
 ```
+
+### Warning
+Keep in mind that mime type determination is not reliable accross platforms. CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows. In some cases there might not be a mime type set at all.
+
