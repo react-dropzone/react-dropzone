@@ -53,6 +53,47 @@ class Accept extends React.Component {
 <Accept />
 ```
 
-### Warning
-Keep in mind that mime type determination is not reliable accross platforms. CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows. In some cases there might not be a mime type set at all.
+### Browser limitations
+
+Because of HTML5 File API differences across different browsers during the drag, Dropzone will only display `rejected` styles in Chrome (and Chromium based browser). It isn't working in Safari nor IE.
+
+Also, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
+
+```
+<Dropzone
+  accept=".jpeg,.png"
+>
+  {({ isDragActive, isDragReject }) => {
+    if (isDragActive) {
+      return "All files will be accepted";
+    }
+    if (isDragReject) {
+      return "Some files will be rejected";
+    }
+    return "Dropping some files here...";
+  }}
+</Dropzone>
+```
+
+but this one will:
+
+```
+<Dropzone
+  accept="image/jpeg, image/png"
+>
+  {({ isDragActive, isDragReject }) => {
+    if (isDragActive) {
+      return "All files will be accepted";
+    }
+    if (isDragReject) {
+      return "Some files will be rejected";
+    }
+    return "Dropping some files here...";
+  }}
+</Dropzone>
+```
+
+### Notes
+
+Mime type determination is not reliable accross platforms. CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows. In some cases there might not be a mime type set at all.
 
