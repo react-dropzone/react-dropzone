@@ -73,20 +73,6 @@ describe('getDataTransferFiles', () => {
     expect(res).toHaveLength(2);
   });
 
-  it('should return first file if isMultipleAllowed is false', () => {
-    const event = {
-      target: {
-        files
-      },
-      dataTransfer: {
-        files
-      }
-    };
-    const res = getDataTransferFiles(event, false);
-    expect(res).toHaveLength(1);
-    expect(res[0].name).toEqual(files[0].name);
-  });
-
   it('should not mutate data', () => {
     const event = {
       dataTransfer: {
