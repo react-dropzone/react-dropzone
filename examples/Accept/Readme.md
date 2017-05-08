@@ -1,4 +1,4 @@
-By providing `accept`  prop you can make Dropzone to accept specifi file types and reject the others.
+By providing `accept` prop you can make Dropzone to accept specific file types and reject the others.
 
 The value must be a comma-separated list of unique content type specifiers:
 * A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
