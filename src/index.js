@@ -30,6 +30,7 @@ class Dropzone extends React.Component {
     this.isFileDialogActive = false;
     this.state = {
       isDragActive: false,
+      isDragReject: false,
       acceptedFiles: [],
       rejectedFiles: []
     };
@@ -45,6 +46,19 @@ class Dropzone extends React.Component {
     }
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // If the accept setting has changed, and component is currently in the accept or reject states
+    if (nextProps.accept !== this.props.accept && (this.state.isDragActive || this.state.isDragReject)) {
+      const allFilesAccepted = this.allFilesAccepted(this.draggedFiles, nextProps);
+      const isMultipleAllowed = nextProps.multiple || this.draggedFiles.length <= 1;
+
+      this.setState({
+        isDragActive: allFilesAccepted,
+        isDragReject: !allFilesAccepted || !isMultipleAllowed
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -80,9 +94,9 @@ class Dropzone extends React.Component {
       this.dragTargets.push(e.target);
     }
 
-    const files = getDataTransferItems(e);
-    const allFilesAccepted = this.allFilesAccepted(files);
-    const isMultipleAllowed = this.props.multiple || files.length <= 1;
+    this.draggedFiles = getDataTransferItems(e);
+    const allFilesAccepted = this.allFilesAccepted(this.draggedFiles);
+    const isMultipleAllowed = this.props.multiple || this.draggedFiles.length <= 1;
 
     this.setState({
       isDragActive: allFilesAccepted,
@@ -122,6 +136,9 @@ class Dropzone extends React.Component {
       isDragActive: false,
       isDragReject: false
     });
+
+    // Clear files value
+    this.draggedFiles = null;
 
     if (this.props.onDragLeave) {
       this.props.onDragLeave.call(this, e);
@@ -177,6 +194,9 @@ class Dropzone extends React.Component {
       onDropAccepted.call(this, acceptedFiles, e);
     }
 
+    // Clear files value
+    this.draggedFiles = null;
+
     // Reset drag state
     this.setState({
       isDragActive: false,
@@ -220,18 +240,18 @@ class Dropzone extends React.Component {
     this.node = ref;
   }
 
-  fileAccepted(file) {
+  fileAccepted(file, props = this.props) {
     // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
     // that MIME type will always be accepted
-    return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
+    return file.type === 'application/x-moz-file' || accepts(file, props.accept);
   }
 
   fileMatchSize(file) {
     return file.size <= this.props.maxSize && file.size >= this.props.minSize;
   }
 
-  allFilesAccepted(files) {
-    return files.every(this.fileAccepted);
+  allFilesAccepted(files, props = this.props) {
+    return files.every(file => this.fileAccepted(file, props));
   }
 
   /**

@@ -372,6 +372,19 @@ describe('Dropzone', () => {
       expect(dropzone.state().isDragReject).toEqual(true);
     });
 
+    it('should set proper dragActive state if accept prop changes mid-drag', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" />
+      );
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+      expect(dropzone.state().isDragActive).toEqual(true);
+      expect(dropzone.state().isDragReject).toEqual(false);
+
+      dropzone.setProps({ accept: 'text/*' });
+      expect(dropzone.state().isDragActive).toEqual(false);
+      expect(dropzone.state().isDragReject).toEqual(true);
+    });
+
     it('should expose state to children', () => {
       const dropzone = mount(
         <Dropzone accept="image/*">
