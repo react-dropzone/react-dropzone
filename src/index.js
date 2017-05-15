@@ -9,6 +9,14 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   'multiple' in document.createElement('input') :
   true;
 
+const defaultStyle = {
+  width: 200,
+  height: 200,
+  borderWidth: 2,
+  borderColor: '#666',
+  borderStyle: 'dashed',
+  borderRadius: 5
+};
 class Dropzone extends React.Component {
   static onDocumentDragOver(e) {
     // allow the entire document to be a drag target
@@ -283,15 +291,7 @@ class Dropzone extends React.Component {
       className += ' ' + rejectClassName;
     }
 
-    if (!className && !style && !activeStyle && !rejectStyle) {
-      style = {
-        width: 200,
-        height: 200,
-        borderWidth: 2,
-        borderColor: '#666',
-        borderStyle: 'dashed',
-        borderRadius: 5
-      };
+    if (!className && !activeStyle && !rejectStyle) {
       activeStyle = {
         borderStyle: 'solid',
         borderColor: '#6c6',
@@ -307,16 +307,19 @@ class Dropzone extends React.Component {
     let appliedStyle;
     if (activeStyle && isDragActive) {
       appliedStyle = {
+        ...defaultStyle,
         ...style,
         ...activeStyle
       };
     } else if (rejectStyle && isDragReject) {
       appliedStyle = {
+        ...defaultStyle,
         ...style,
         ...rejectStyle
       };
     } else {
       appliedStyle = {
+        ...defaultStyle,
         ...style
       };
     }
