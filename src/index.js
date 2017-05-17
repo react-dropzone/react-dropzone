@@ -29,8 +29,7 @@ class Dropzone extends React.Component {
     this.setRef = this.setRef.bind(this);
     this.isFileDialogActive = false;
     this.state = {
-      isDragActive: false,
-      isDragReject: false,
+      draggedFiles: [],
       acceptedFiles: [],
       rejectedFiles: []
     };
@@ -46,19 +45,6 @@ class Dropzone extends React.Component {
     }
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel;
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // If the accept setting has changed, and component is currently in the accept or reject states
-    if (nextProps.accept !== this.props.accept && (this.state.isDragActive || this.state.isDragReject)) {
-      const allFilesAccepted = this.allFilesAccepted(this.draggedFiles, nextProps);
-      const isMultipleAllowed = nextProps.multiple || this.draggedFiles.length <= 1;
-
-      this.setState({
-        isDragActive: allFilesAccepted,
-        isDragReject: !allFilesAccepted || !isMultipleAllowed
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -94,14 +80,7 @@ class Dropzone extends React.Component {
       this.dragTargets.push(e.target);
     }
 
-    this.draggedFiles = getDataTransferItems(e);
-    const allFilesAccepted = this.allFilesAccepted(this.draggedFiles);
-    const isMultipleAllowed = this.props.multiple || this.draggedFiles.length <= 1;
-
-    this.setState({
-      isDragActive: allFilesAccepted,
-      isDragReject: !allFilesAccepted || !isMultipleAllowed
-    });
+    this.setState({ draggedFiles: getDataTransferItems(e) });
 
     if (this.props.onDragEnter) {
       this.props.onDragEnter.call(this, e);
@@ -132,13 +111,8 @@ class Dropzone extends React.Component {
       return;
     }
 
-    this.setState({
-      isDragActive: false,
-      isDragReject: false
-    });
-
-    // Clear files value
-    this.draggedFiles = null;
+    // Clear dragging files state
+    this.setState({ draggedFiles: [] });
 
     if (this.props.onDragLeave) {
       this.props.onDragLeave.call(this, e);
@@ -199,8 +173,7 @@ class Dropzone extends React.Component {
 
     // Reset drag state
     this.setState({
-      isDragActive: false,
-      isDragReject: false,
+      draggedFiles: [],
       acceptedFiles,
       rejectedFiles
     });
@@ -240,18 +213,18 @@ class Dropzone extends React.Component {
     this.node = ref;
   }
 
-  fileAccepted(file, props = this.props) {
+  fileAccepted(file) {
     // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
     // that MIME type will always be accepted
-    return file.type === 'application/x-moz-file' || accepts(file, props.accept);
+    return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
   }
 
   fileMatchSize(file) {
     return file.size <= this.props.maxSize && file.size >= this.props.minSize;
   }
 
-  allFilesAccepted(files, props = this.props) {
-    return files.every(file => this.fileAccepted(file, props));
+  allFilesAccepted(files) {
+    return files.every(file => this.fileAccepted(file));
   }
 
   /**
@@ -265,9 +238,9 @@ class Dropzone extends React.Component {
     this.fileInputEl.click();
   }
 
-  renderChildren = (children) => {
+  renderChildren = (children, isDragActive, isDragReject) => {
     if (typeof children === 'function') {
-      return children(this.state);
+      return children({ ...this.state, isDragActive, isDragReject });
     }
     return children;
   }
@@ -292,7 +265,10 @@ class Dropzone extends React.Component {
       ...props // eslint-disable-line prefer-const
     } = rest;
 
-    const { isDragActive, isDragReject } = this.state;
+    const { draggedFiles } = this.state;
+    const isMultipleAllowed = multiple || draggedFiles.length <= 1;
+    const isDragActive = draggedFiles.length !== 0 && this.allFilesAccepted(draggedFiles);
+    const isDragReject = draggedFiles.length !== 0 && (!isDragActive || !isMultipleAllowed);
 
     className = className || '';
 
@@ -382,7 +358,7 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
         ref={this.setRef}
       >
-        {this.renderChildren(children)}
+        {this.renderChildren(children, isDragActive, isDragReject)}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}

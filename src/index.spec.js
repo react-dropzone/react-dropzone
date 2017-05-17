@@ -6,6 +6,10 @@ const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index'
 
 let files;
 let images;
+const classConfig = {
+  activeClassName: 'test_active',
+  rejectClassName: 'test_reject'
+};
 
 describe('Dropzone', () => {
 
@@ -332,57 +336,59 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone />
+        <Dropzone {...classConfig} />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
     });
 
     it('should set proper dragReject state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*" />
+        <Dropzone {...classConfig} accept="image/*" />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files: files.concat(images) } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(true);
     });
 
     it('should set proper dragActive state if multiple is false', () => {
       const dropzone = mount(
         <Dropzone
+          {...classConfig}
           accept="image/*"
           multiple={false}
         />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(true);
     });
 
     it('should set proper dragActive state if multiple is false', () => {
       const dropzone = mount(
         <Dropzone
+          {...classConfig}
           accept="image/*"
           multiple={false}
         />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(true);
     });
 
     it('should set proper dragActive state if accept prop changes mid-drag', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*" />
+        <Dropzone {...classConfig} accept="image/*" />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
 
       dropzone.setProps({ accept: 'text/*' });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(true);
     });
 
     it('should expose state to children', () => {
@@ -410,7 +416,7 @@ describe('Dropzone', () => {
       const DragActiveComponent = () => <p>Active</p>;
       const ChildComponent = () => <p>Child component content</p>;
       const dropzone = mount(
-        <Dropzone>
+        <Dropzone {...classConfig}>
           {({ isDragActive, isDragReject }) => {
             if (isDragReject) {
               return 'Rejected';
@@ -426,12 +432,12 @@ describe('Dropzone', () => {
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
       // make sure we handle any duplicate dragEnter events that the browser may send us
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
 
       dropzone.simulate('dragLeave', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
     });
   });
 
@@ -455,17 +461,18 @@ describe('Dropzone', () => {
     it('should reset the dragActive/dragReject state', () => {
       const dropzone = mount(
         <Dropzone
+          {...classConfig}
           onDrop={dropSpy}
           onDropAccepted={dropAcceptedSpy}
           onDropRejected={dropRejectedSpy}
         />
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
       dropzone.simulate('drop', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
     });
 
     it('should add valid files to rejected files on a multple drop when multiple false', () => {
@@ -890,6 +897,7 @@ describe('Dropzone', () => {
         innerDropRejectedSpy = spy();
         outerDropzone = mount(
           <Dropzone
+            {...classConfig}
             onDrop={outerDropSpy}
             onDropAccepted={outerDropAcceptedSpy}
             onDropRejected={outerDropRejectedSpy}
@@ -904,8 +912,8 @@ describe('Dropzone', () => {
 
       it('does dragEnter on both dropzones', () => {
         innerDropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-        expect(outerDropzone.state().isDragActive).toEqual(true);
-        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(outerDropzone.hasClass(classConfig.activeClassName)).toEqual(true);
+        expect(outerDropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
         expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(true);
         expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
       });
@@ -934,8 +942,8 @@ describe('Dropzone', () => {
         expect(outerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
         expect(outerDropRejectedSpy.callCount).toEqual(1);
         expect(outerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
-        expect(outerDropzone.state().isDragActive).toEqual(false);
-        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(outerDropzone.hasClass(classConfig.activeClassName)).toEqual(false);
+        expect(outerDropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
       });
     });
   });
