@@ -224,7 +224,7 @@ class Dropzone extends React.Component {
   }
 
   allFilesAccepted(files) {
-    return files.every(file => this.fileAccepted(file));
+    return files.every(this.fileAccepted);
   }
 
   /**
