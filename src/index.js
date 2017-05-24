@@ -9,6 +9,12 @@ const supportMultiple = (typeof document !== 'undefined' && document && document
   'multiple' in document.createElement('input') :
   true;
 
+function fileAccepted(file, accept) {
+  // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
+  // that MIME type will always be accepted
+  return file.type === 'application/x-moz-file' || accepts(file, accept);
+}
+
 class Dropzone extends React.Component {
   static onDocumentDragOver(e) {
     // allow the entire document to be a drag target
@@ -25,7 +31,6 @@ class Dropzone extends React.Component {
     this.onDragOver = this.onDragOver.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this);
-    this.fileAccepted = this.fileAccepted.bind(this);
     this.setRef = this.setRef.bind(this);
     this.isFileDialogActive = false;
     this.state = {
@@ -120,7 +125,7 @@ class Dropzone extends React.Component {
   }
 
   onDrop(e) {
-    const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview } = this.props;
+    const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props;
     const fileList = getDataTransferItems(e);
     const acceptedFiles = [];
     const rejectedFiles = [];
@@ -143,7 +148,7 @@ class Dropzone extends React.Component {
         }
       }
 
-      if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+      if (fileAccepted(file, accept) && this.fileMatchSize(file)) {
         acceptedFiles.push(file);
       } else {
         rejectedFiles.push(file);
@@ -213,18 +218,12 @@ class Dropzone extends React.Component {
     this.node = ref;
   }
 
-  fileAccepted(file) {
-    // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
-    // that MIME type will always be accepted
-    return file.type === 'application/x-moz-file' || accepts(file, this.props.accept);
-  }
-
   fileMatchSize(file) {
     return file.size <= this.props.maxSize && file.size >= this.props.minSize;
   }
 
   allFilesAccepted(files) {
-    return files.every(this.fileAccepted);
+    return files.every(file => fileAccepted(file, this.props.accept));
   }
 
   /**
@@ -266,9 +265,10 @@ class Dropzone extends React.Component {
     } = rest;
 
     const { draggedFiles } = this.state;
-    const isMultipleAllowed = multiple || draggedFiles.length <= 1;
-    const isDragActive = draggedFiles.length !== 0 && this.allFilesAccepted(draggedFiles);
-    const isDragReject = draggedFiles.length !== 0 && (!isDragActive || !isMultipleAllowed);
+    const filesCount = draggedFiles.length;
+    const isMultipleAllowed = multiple || filesCount <= 1;
+    const isDragActive = filesCount > 0 && this.allFilesAccepted(draggedFiles);
+    const isDragReject = filesCount > 0 && (!isDragActive || !isMultipleAllowed);
 
     className = className || '';
 

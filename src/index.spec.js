@@ -336,11 +336,20 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone {...classConfig} />
+        <Dropzone {...classConfig}>
+          {({ isDragActive, isDragReject }) => {
+            if (isDragReject) {
+              return 'Rejected';
+            }
+            if (isDragActive) {
+              return 'Active';
+            }
+            return 'Empty';
+          }}
+        </Dropzone>
       );
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.hasClass(classConfig.activeClassName)).toEqual(true);
-      expect(dropzone.hasClass(classConfig.rejectClassName)).toEqual(false);
+      expect(dropzone.text()).toEqual('Active');
     });
 
     it('should set proper dragReject state on dragEnter', () => {
