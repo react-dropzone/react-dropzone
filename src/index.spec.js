@@ -3,6 +3,7 @@ import { mount, render } from 'enzyme';
 import { spy, stub } from 'sinon';
 
 const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index'); // eslint-disable-line import/no-dynamic-require
+const DummyChildComponent = () => null;
 
 let files;
 let images;
@@ -332,20 +333,26 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone />
+        <Dropzone>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       );
+      const child = dropzone.find(DummyChildComponent);
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(child).toHaveProp('isDragActive', true);
+      expect(child).toHaveProp('isDragReject', false);
     });
 
     it('should set proper dragReject state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*" />
+        <Dropzone accept="image/*">
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       );
+      const child = dropzone.find(DummyChildComponent);
       dropzone.simulate('dragEnter', { dataTransfer: { files: files.concat(images) } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(child).toHaveProp('isDragActive', false);
+      expect(child).toHaveProp('isDragReject', true);
     });
 
     it('should set proper dragActive state if multiple is false', () => {
@@ -353,11 +360,14 @@ describe('Dropzone', () => {
         <Dropzone
           accept="image/*"
           multiple={false}
-        />
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       );
+      const child = dropzone.find(DummyChildComponent);
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(child).toHaveProp('isDragActive', false);
+      expect(child).toHaveProp('isDragReject', true);
     });
 
     it('should set proper dragActive state if multiple is false', () => {
@@ -365,11 +375,30 @@ describe('Dropzone', () => {
         <Dropzone
           accept="image/*"
           multiple={false}
-        />
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       );
+      const child = dropzone.find(DummyChildComponent);
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(true);
+      expect(child).toHaveProp('isDragActive', true);
+      expect(child).toHaveProp('isDragReject', true);
+    });
+
+    it('should set proper dragActive state if accept prop changes mid-drag', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*">
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      );
+      const child = dropzone.find(DummyChildComponent);
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } });
+      expect(child).toHaveProp('isDragActive', true);
+      expect(child).toHaveProp('isDragReject', false);
+
+      dropzone.setProps({ accept: 'text/*' });
+      expect(child).toHaveProp('isDragActive', false);
+      expect(child).toHaveProp('isDragReject', true);
     });
 
     it('should expose state to children', () => {
@@ -403,22 +432,36 @@ describe('Dropzone', () => {
               return 'Rejected';
             }
             if (isDragActive) {
-              return <DragActiveComponent />;
+              return (
+                <DragActiveComponent
+                  isDragActive={isDragActive}
+                  isDragReject={isDragReject}
+                />
+              );
             }
-            return <ChildComponent />;
+            return (
+              <ChildComponent
+                isDragActive={isDragActive}
+                isDragReject={isDragReject}
+              />
+            );
           }}
         </Dropzone>
       );
-      dropzone.find(ChildComponent).simulate('dragEnter', { dataTransfer: { files } });
+      const child = dropzone.find(ChildComponent);
+      child.simulate('dragEnter', { dataTransfer: { files } });
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
       // make sure we handle any duplicate dragEnter events that the browser may send us
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      const dragActiveChild = dropzone.find(DragActiveComponent);
+      expect(dragActiveChild).toBePresent();
+      expect(dragActiveChild).toHaveProp('isDragActive', true);
+      expect(dragActiveChild).toHaveProp('isDragReject', false);
 
       dropzone.simulate('dragLeave', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(dropzone.find(DragActiveComponent)).toBeEmpty();
+      expect(child).toHaveProp('isDragActive', false);
+      expect(child).toHaveProp('isDragReject', false);
     });
   });
 
@@ -445,14 +488,17 @@ describe('Dropzone', () => {
           onDrop={dropSpy}
           onDropAccepted={dropAcceptedSpy}
           onDropRejected={dropRejectedSpy}
-        />
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       );
+      const child = dropzone.find(DummyChildComponent);
       dropzone.simulate('dragEnter', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(true);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(child).toHaveProp('isDragActive', true);
+      expect(child).toHaveProp('isDragReject', false);
       dropzone.simulate('drop', { dataTransfer: { files } });
-      expect(dropzone.state().isDragActive).toEqual(false);
-      expect(dropzone.state().isDragReject).toEqual(false);
+      expect(child).toHaveProp('isDragActive', false);
+      expect(child).toHaveProp('isDragReject', false);
     });
 
     it('should add valid files to rejected files on a multple drop when multiple false', () => {
@@ -882,8 +928,7 @@ describe('Dropzone', () => {
             onDropRejected={outerDropRejectedSpy}
             accept="image/*"
           >
-            <p>Outer content</p>
-            <InnerDropzone />
+            {props => <InnerDropzone {...props} />}
           </Dropzone>
         );
         innerDropzone = outerDropzone.find(InnerDropzone);
@@ -891,8 +936,8 @@ describe('Dropzone', () => {
 
       it('does dragEnter on both dropzones', () => {
         innerDropzone.simulate('dragEnter', { dataTransfer: { files: images } });
-        expect(outerDropzone.state().isDragActive).toEqual(true);
-        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(innerDropzone).toHaveProp('isDragActive', true);
+        expect(innerDropzone).toHaveProp('isDragReject', false);
         expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(true);
         expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false);
       });
@@ -921,8 +966,8 @@ describe('Dropzone', () => {
         expect(outerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2);
         expect(outerDropRejectedSpy.callCount).toEqual(1);
         expect(outerDropRejectedSpy.firstCall.args[0]).toHaveLength(1);
-        expect(outerDropzone.state().isDragActive).toEqual(false);
-        expect(outerDropzone.state().isDragReject).toEqual(false);
+        expect(innerDropzone).toHaveProp('isDragActive', false);
+        expect(innerDropzone).toHaveProp('isDragReject', false);
       });
     });
   });
