@@ -1,5 +1,5 @@
 /* eslint prefer-template: 0 */
-import 'jest-enzyme';
+require('jest-enzyme');
 
 global.window.URL = {
   createObjectURL: function createObjectURL(arg) {

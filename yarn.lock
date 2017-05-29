@@ -2380,9 +2380,9 @@ entities@^1.1.1, entities@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/entities/-/entities-1.1.1.tgz#6e5c2d0a5621b5dadaecef80b90edfb5cd7772f0"
 
-enzyme-matchers@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/enzyme-matchers/-/enzyme-matchers-3.1.1.tgz#445411f8c50c5642a670aad5734dc8d4442d0757"
+enzyme-matchers@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/enzyme-matchers/-/enzyme-matchers-3.2.0.tgz#4718779a3b9eb5e8ebad46804f8d3e66045d0181"
   dependencies:
     deep-equal-ident "^1.1.1"
 
@@ -4349,12 +4349,12 @@ jest-environment-node@^20.0.1:
     jest-mock "^20.0.1"
     jest-util "^20.0.1"
 
-jest-enzyme@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/jest-enzyme/-/jest-enzyme-3.1.1.tgz#3c27708230bb606ddea16a77011c0cdb66677ad4"
+jest-enzyme@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/jest-enzyme/-/jest-enzyme-3.2.0.tgz#cc0ea320a9fe98548097f87f972cc225571feb13"
   dependencies:
     "@types/react" "^15.0.22"
-    enzyme-matchers "^3.1.1"
+    enzyme-matchers "^3.2.0"
     enzyme-to-json "^1.5.0"
 
 jest-haste-map@^20.0.1:
