@@ -29,7 +29,7 @@ class Dropzone extends React.Component {
     this.setRef = this.setRef.bind(this);
     this.isFileDialogActive = false;
     this.state = {
-      isDragActive: false,
+      draggedFiles: [],
       acceptedFiles: [],
       rejectedFiles: []
     };
@@ -80,14 +80,7 @@ class Dropzone extends React.Component {
       this.dragTargets.push(e.target);
     }
 
-    const files = getDataTransferItems(e);
-    const allFilesAccepted = this.allFilesAccepted(files);
-    const isMultipleAllowed = this.props.multiple || files.length <= 1;
-
-    this.setState({
-      isDragActive: allFilesAccepted,
-      isDragReject: !allFilesAccepted || !isMultipleAllowed
-    });
+    this.setState({ draggedFiles: getDataTransferItems(e) });
 
     if (this.props.onDragEnter) {
       this.props.onDragEnter.call(this, e);
@@ -118,10 +111,8 @@ class Dropzone extends React.Component {
       return;
     }
 
-    this.setState({
-      isDragActive: false,
-      isDragReject: false
-    });
+    // Clear dragging files state
+    this.setState({ draggedFiles: [] });
 
     if (this.props.onDragLeave) {
       this.props.onDragLeave.call(this, e);
@@ -177,10 +168,12 @@ class Dropzone extends React.Component {
       onDropAccepted.call(this, acceptedFiles, e);
     }
 
+    // Clear files value
+    this.draggedFiles = null;
+
     // Reset drag state
     this.setState({
-      isDragActive: false,
-      isDragReject: false,
+      draggedFiles: [],
       acceptedFiles,
       rejectedFiles
     });
@@ -245,9 +238,9 @@ class Dropzone extends React.Component {
     this.fileInputEl.click();
   }
 
-  renderChildren = (children) => {
+  renderChildren = (children, isDragActive, isDragReject) => {
     if (typeof children === 'function') {
-      return children(this.state);
+      return children({ ...this.state, isDragActive, isDragReject });
     }
     return children;
   }
@@ -272,7 +265,10 @@ class Dropzone extends React.Component {
       ...props // eslint-disable-line prefer-const
     } = rest;
 
-    const { isDragActive, isDragReject } = this.state;
+    const { draggedFiles } = this.state;
+    const isMultipleAllowed = multiple || draggedFiles.length <= 1;
+    const isDragActive = draggedFiles.length !== 0 && this.allFilesAccepted(draggedFiles);
+    const isDragReject = draggedFiles.length !== 0 && (!isDragActive || !isMultipleAllowed);
 
     className = className || '';
 
@@ -362,7 +358,7 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
         ref={this.setRef}
       >
-        {this.renderChildren(children)}
+        {this.renderChildren(children, isDragActive, isDragReject)}
         <input
           {...inputProps/* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
