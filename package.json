@@ -86,6 +86,7 @@
     "imagemin-cli": "^3.0.0",
     "imagemin-pngquant": "^5.0.0",
     "jest": "^20.0.1",
+    "jest-enzyme": "^3.2.0",
     "lint-staged": "^3.2.1",
     "markdownlint-cli": "^0.2.0",
     "npm-check": "^5.2.1",

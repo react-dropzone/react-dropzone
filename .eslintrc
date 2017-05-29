@@ -75,7 +75,7 @@
         "devDependencies": [
           "**/webpack*.js",
           "**/*.spec.js",
-          "./mocha-environment.js"
+          "testSetup.js"
         ]
       }
     ]
