@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
   title: 'react-dropzone',
@@ -43,4 +43,4 @@ module.exports = {
       ]
     }
   ]
-};
+}

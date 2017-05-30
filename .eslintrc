@@ -22,9 +22,9 @@
       2,
       {
         "devDependencies": [
-          "**/webpack*.js",
+          "webpack*.js",
           "**/*.spec.js",
-          "testSetup.js"
+          "**/testSetup.js"
         ]
       }
     ]
