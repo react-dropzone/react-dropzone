@@ -2,12 +2,7 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 
 module.exports = wallaby => ({
-  files: [
-    'package.json',
-    'src/*.js',
-    'src/**/*.js.snap',
-    '!src/*.spec.js'
-  ],
+  files: ['package.json', 'src/*.js', 'src/**/*.js.snap', '!src/*.spec.js'],
 
   tests: ['src/*.spec.js'],
 
@@ -26,7 +21,6 @@ module.exports = wallaby => ({
   testFramework: 'jest',
 
   setup: () => {
-    wallaby.testFramework.configure(require('./package.json').jest);
+    wallaby.testFramework.configure(require('./package.json').jest)
   }
-
-});
+})
