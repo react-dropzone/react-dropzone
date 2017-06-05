@@ -39,6 +39,10 @@ module.exports = {
         {
           name: 'Full Screen Dropzone',
           content: 'examples/Fullscreen/Readme.md'
+        },
+        {
+          name: 'Directories with Dropzone',
+          content: 'examples/Directory/Readme.md'
         }
       ]
     }
