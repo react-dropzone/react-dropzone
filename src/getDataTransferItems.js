@@ -72,13 +72,15 @@ export default function getDataTransferItems(evt) {
 
   if (evt.dataTransfer) {
     files = evt.dataTransfer.files
-    if (files.length) {
-      items = evt.dataTransfer.items
+    items = evt.dataTransfer.items
+    if (files && files.length) {
       if (items && items.length && items[0].webkitGetAsEntry != null) {
         dataTransferItemsList = addFilesFromItems(items)
       } else {
         dataTransferItemsList = Array.prototype.slice.call(files)
       }
+    } else if (items && items.length) {
+      dataTransferItemsList = Array.prototype.slice.call(items)
     }
   } else if (evt.target && evt.target.files) {
     dataTransferItemsList = Array.prototype.slice.call(evt.target.files)

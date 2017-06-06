@@ -19,13 +19,16 @@ const files = [
 ]
 
 describe('getDataTransferFiles', () => {
-  it('should return an array', () => {
+  it('should return an promise with an array', done => {
     const res = getDataTransferFiles({})
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(0)
+    expect(res).toBeInstanceOf(Promise)
+    res.then(data => {
+      expect(data).toBeInstanceOf(Array)
+      done()
+    })
   })
 
-  it('should get dataTransfer before using target', () => {
+  it('should get dataTransfer before using target', done => {
     const event = {
       target: {
         files
@@ -35,11 +38,13 @@ describe('getDataTransferFiles', () => {
       }
     }
     const res = getDataTransferFiles(event)
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(3)
+    res.then(data => {
+      expect(data).toHaveLength(3)
+      done()
+    })
   })
 
-  it('should use dataTransfer.items if files is not defined', () => {
+  it('should use dataTransfer.items if files is not defined', done => {
     const event = {
       target: {
         files: [{}]
@@ -49,22 +54,26 @@ describe('getDataTransferFiles', () => {
       }
     }
     const res = getDataTransferFiles(event)
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(3)
+    res.then(data => {
+      expect(data).toHaveLength(3)
+      done()
+    })
   })
 
-  it('should use event.target if dataTransfer is not defined', () => {
+  it('should use event.target if dataTransfer is not defined', done => {
     const event = {
       target: {
         files
       }
     }
     const res = getDataTransferFiles(event)
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(3)
+    res.then(data => {
+      expect(data).toHaveLength(3)
+      done()
+    })
   })
 
-  it('should prioritize dataTransfer.files over .files', () => {
+  it('should prioritize dataTransfer.files over .files', done => {
     const event = {
       dataTransfer: {
         files: [{}, {}],
@@ -72,18 +81,22 @@ describe('getDataTransferFiles', () => {
       }
     }
     const res = getDataTransferFiles(event)
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(2)
+    res.then(data => {
+      expect(data).toHaveLength(2)
+      done()
+    })
   })
 
-  it('should not mutate data', () => {
+  it('should not mutate data', done => {
     const event = {
       dataTransfer: {
         files
       }
     }
     expect(Object.keys(files[2])).toHaveLength(3)
-    getDataTransferFiles(event, true)
-    expect(Object.keys(files[2])).toHaveLength(3)
+    getDataTransferFiles(event).then(() => {
+      expect(Object.keys(files[2])).toHaveLength(3)
+      done()
+    })
   })
 })

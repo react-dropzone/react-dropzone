@@ -89,11 +89,11 @@ class Dropzone extends React.Component {
 
     itemsPromise.then(data => {
       this.setState({ draggedFiles: data })
-
-      if (this.props.onDragEnter) {
-        this.props.onDragEnter.call(this, evt)
-      }
     })
+
+    if (this.props.onDragEnter) {
+      this.props.onDragEnter.call(this, evt)
+    }
   }
 
   onDragOver(evt) {
