@@ -32,6 +32,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.setRef = this.setRef.bind(this)
+    this.onFileInputElClick = this.onFileInputElClick.bind(this)
     this.isFileDialogActive = false
     this.state = {
       draggedFiles: [],
@@ -48,6 +49,7 @@ class Dropzone extends React.Component {
       document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
+    this.fileInputEl.addEventListener('click', this.onFileInputElClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
@@ -58,6 +60,7 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
+    this.fileInputEl.removeEventListener('click', this.onFileInputElClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
   }
@@ -196,6 +199,13 @@ class Dropzone extends React.Component {
     }
   }
 
+  onFileInputElClick(evt) {
+    evt.stopPropagation()
+    if (this.props.inputProps && this.props.inputProps.onClick) {
+      this.props.inputProps.onClick()
+    }
+  }
+
   onFileDialogCancel() {
     // timeout will not recognize context of this method
     const { onFileDialogCancel } = this.props
@@ -323,15 +333,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => {
-        this.fileInputEl = el
-        this.fileInputEl.onclick = event => {
-          event.stopPropagation()
-          if (inputProps.onClick) {
-            inputProps.onClick()
-          }
-        }
-      },
+      ref: el => this.fileInputEl = el,  // eslint-disable-line
       onChange: this.onDrop
     }
 
