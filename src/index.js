@@ -333,7 +333,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => this.fileInputEl = el,  // eslint-disable-line
+      ref: el => this.fileInputEl = el, // eslint-disable-line
       onChange: this.onDrop
     }
 
