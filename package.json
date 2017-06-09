@@ -9,9 +9,7 @@
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
     "test": "npm run eslint:src && jest --coverage",
-    "eslint:src": "eslint ./src ./*.js",
-    "eslint:fix": "eslint --fix",
-    "git:add": "git add",
+    "eslint:src": "eslint ./src ./examples ./*.js",
     "lint-staged": "lint-staged",
     "deps": "npm-check -s",
     "deps:update": "npm-check -u",
@@ -21,8 +19,8 @@
   },
   "lint-staged": {
     "*.js": [
-      "eslint:fix",
-      "git:add"
+      "eslint --fix",
+      "git add"
     ],
     "*.{svg,png}": [
       "imagemin",
@@ -79,30 +77,30 @@
     "cz-conventional-changelog": "^1.2.0",
     "enzyme": "^2.6.0",
     "eslint": "^3.11.0",
-    "eslint-config-airbnb": "^13.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.7.1",
+    "eslint-config-okonet": "^4.0.2",
     "imagemin-cli": "^3.0.0",
     "imagemin-pngquant": "^5.0.0",
     "jest": "^20.0.1",
+    "jest-enzyme": "^3.2.0",
     "lint-staged": "^3.2.1",
     "markdownlint-cli": "^0.2.0",
     "npm-check": "^5.2.1",
     "pre-commit": "^1.1.3",
+    "prettier": "^1.3.1",
     "react": "^15.4.1",
     "react-addons-test-utils": "^15.4.1",
     "react-dom": "^15.4.1",
-    "react-styleguidist": "^5.1.2",
+    "react-styleguidist": "^5.4.0",
     "rimraf": "^2.5.2",
-    "semantic-release": "^6.3.2",
+    "semantic-release": "^6.3.6",
     "sinon": "^2.3.1",
-    "style-loader": "^0.13.1",
+    "style-loader": "^0.17.0",
     "webpack": "^1.13.1"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  }
+  },
+  "version": "0.0.0-development"
 }
