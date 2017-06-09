@@ -1,172 +1,68 @@
-react-dropzone [![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+![react-dropzone logo](https://raw.githubusercontent.com/okonet/react-dropzone/master/logo/logo.png)
+
+# react-dropzone
+
+[![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
+Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
-==============
+Documentation and examples: https://react-dropzone.netlify.com
 
-Simple HTML5 drag-drop zone for files with React.js.
+---
 
-Try it out here: http://okonet.ru/react-dropzone/
+## Installation
 
-Installation
-============
+Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
-The easiest way to use react-dropzone is to install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
-
-```
+```bash
 npm install --save react-dropzone
 ```
 
-Create a standalone module using *WebPack*:
-```
-> npm install
-> webpack
-```
+## Usage
 
-React 0.13 users
-=====
+Import `Dropzone` in your React component:
 
-Vesion 3.x is not compatible with React 0.13. If you can't upgrade to React 0.14 right now, you should use v 2.x of this package.
+```javascript
+import Dropzone from 'react-dropzone'
+``` 
+  
+  and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+  
+```javascript
+function onDrop(acceptedFiles, rejectedFiles) {
+  // do stuff with files...
+}
+``` 
 
-```
-npm install --save react-dropzone@2.x
-```
+Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
 
-Usage
-=====
-
-Simply `require('react-dropzone')` and specify an `onDrop` method which accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
-
-The `onDrop` method gets always called if a file was uploaded, regardless if it was accepted or rejected. The library provides two additional methods named `onDropAccepted` and `onDropRejected`. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
-
-Example
-=====
-
-```jsx
-
-/** @jsx React.DOM */
-var React = require('react');
-var Dropzone = require('react-dropzone');
-
-var DropzoneDemo = React.createClass({
-    onDrop: function (acceptedFiles, rejectedFiles) {
-      console.log('Accepted files: ', acceptedFiles);
-      console.log('Rejected files: ', rejectedFiles);
-    },
-
-    render: function () {
-      return (
-          <div>
-            <Dropzone onDrop={this.onDrop}>
-              <div>Try dropping some files here, or click to select files to upload.</div>
-            </Dropzone>
-          </div>
-      );
-    }
-});
-
-React.render(<DropzoneDemo />, document.body);
-```
-
-Reacting to user input
-=====
-
-By default, the component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style` and `activeStyle` which is applied when a file is dragged over the zone. You can also specify `className` and `activeClassName` if you would rather style using CSS.
-
-You have a third option : providing a function that returns the component's children.
-
-```
-<Dropzone>
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "This file is authorized";
-    }
-    if (isDragReject) {
-      return "This file is not authorized";
-    }
-    return "Try dropping some files";
-  }}
-</Dropzone>
-```
-
-Features
-========
-
-- `disableClick` `[Boolean | **false**]` — Clicking the `<Dropzone>` brings up the browser file picker.
-- `multiple` `[Boolean | **true**]` — Accept multiple files
-- `minSize` `[Number | **0**]` —  Only accept file(s) larger than  `minSize` bytes.
-- `maxSize` `[Number | **Infinity**]` — Only accept file(s) smaller than  `maxSize` bytes.
-- `accept` - Accept only specified mime types. Must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file), for example `application/pdf`, `image/*`, `audio/aiff,audio/midi`
-
-To show a preview of the dropped file while it uploads, use the `file.preview` property. Use `<img src={file.preview} />` to display a preview of the image dropped.
-You can disable the creation of the preview (for example if you drop big files) by setting the `disablePreview` prop to `true`.
-
-#### Manual Upload
-* To trigger the dropzone manually (open the file prompt), call the component's `open` function.
-* The completion handler for the `open` function is also the `onDrop` function.
-
-```jsx
-/** @jsx React.DOM */
-var React = require('react');
-var Dropzone = require('react-dropzone');
-
-var DropzoneDemo = React.createClass({
-    getInitialState: function () {
-        return {
-          files: []
-        };
-    },
-
-    onDrop: function (acceptedFiles) {
-      this.setState({
-        files: acceptedFiles
-      });
-    },
-
-    onOpenClick: function () {
-      this.dropzone.open();
-    },
-
-    render: function () {
-        return (
-            <div>
-                <Dropzone ref={(node) => { this.dropzone = node; }} onDrop={this.onDrop}>
-                    <div>Try dropping some files here, or click to select files to upload.</div>
-                </Dropzone>
-                <button type="button" onClick={this.onOpenClick}>
-                    Open Dropzone
-                </button>
-                {this.state.files.length > 0 ? <div>
-                <h2>Uploading {this.state.files.length} files...</h2>
-                <div>{this.state.files.map((file) => <img src={file.preview} /> )}</div>
-                </div> : null}
-            </div>
-        );
-    }
-});
-
-React.render(<DropzoneDemo />, document.body);
-```
-
-Uploads
-=======
+Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
 
 Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
 
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
 ```javascript
-    onDrop: function(acceptedFiles){
-        var req = request.post('/upload');
-        acceptedFiles.forEach((file)=> {
+    onDrop: acceptedFiles => {
+        const req = request.post('/upload');
+        acceptedFiles.forEach(file => {
             req.attach(file.name, file);
         });
         req.end(callback);
     }
 ```
 
-Support
-=======
+## PropTypes
+
+See https://react-dropzone.netlify.com/#proptypes
+
+### Word of caution when working with previews
+
+*Important*: `react-dropzone` doesn't manage dropped files. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
+
+## Support
+
 ### Backers
 Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/react-dropzone#backer)]
 
@@ -236,7 +132,6 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/react-dropzone/sponsor/28/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/react-dropzone/sponsor/29/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/29/avatar.svg"></a>
 
-License
-=======
+## License
 
 MIT
