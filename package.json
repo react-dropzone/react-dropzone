@@ -94,7 +94,7 @@
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.6",
     "sinon": "^1.17.4",
-    "style-loader": "^0.13.1",
+    "style-loader": "^0.17.0",
     "webpack": "^1.13.1"
   },
   "config": {
