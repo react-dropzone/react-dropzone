@@ -4,6 +4,7 @@ module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
   showCode: true,
+  showUsage: true,
   showSidebar: false,
   serverPort: 8080,
   sections: [
