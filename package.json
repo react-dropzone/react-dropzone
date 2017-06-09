@@ -74,7 +74,7 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
     "css-loader": "^0.28.1",
-    "cz-conventional-changelog": "^1.2.0",
+    "cz-conventional-changelog": "^2.0.0",
     "enzyme": "^2.6.0",
     "eslint": "^3.11.0",
     "eslint-config-okonet": "^4.0.2",
