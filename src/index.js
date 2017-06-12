@@ -32,7 +32,8 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.setRef = this.setRef.bind(this)
-    this.onFileInputElClick = this.onFileInputElClick.bind(this)
+    this.setRefs = this.setRefs.bind(this)
+    this.onInputElementClick = this.onInputElementClick.bind(this)
     this.isFileDialogActive = false
     this.state = {
       draggedFiles: [],
@@ -49,7 +50,7 @@ class Dropzone extends React.Component {
       document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
-    this.fileInputEl.addEventListener('click', this.onFileInputElClick, false)
+    this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
@@ -60,7 +61,7 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
-    this.fileInputEl.removeEventListener('click', this.onFileInputElClick, false)
+    this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
   }
@@ -199,7 +200,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onFileInputElClick(evt) {
+  onInputElementClick(evt) {
     evt.stopPropagation()
     if (this.props.inputProps && this.props.inputProps.onClick) {
       this.props.inputProps.onClick()
@@ -227,6 +228,10 @@ class Dropzone extends React.Component {
 
   setRef(ref) {
     this.node = ref
+  }
+
+  setRefs(ref) {
+    this.fileInputEl = ref
   }
 
   fileMatchSize(file) {
@@ -333,7 +338,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      ref: el => this.fileInputEl = el, // eslint-disable-line
+      ref: this.setRefs,
       onChange: this.onDrop
     }
 

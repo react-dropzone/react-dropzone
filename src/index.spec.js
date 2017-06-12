@@ -246,6 +246,14 @@ describe('Dropzone', () => {
       component.find('Dropzone').simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(1)
     })
+
+    it('should invoke inputProps onClick if provided', () => {
+      const inputPropsClickSpy = spy()
+      const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
+
+      component.find('Dropzone').simulate('click')
+      expect(inputPropsClickSpy.callCount).toEqual(1)
+    })
   })
 
   describe('drag-n-drop', () => {
@@ -831,7 +839,7 @@ describe('Dropzone', () => {
 
     const InnerDragAccepted = () => <p>Accepted</p>
     const InnerDragRejected = () => <p>Rejected</p>
-    const InnerDropzone = () => (
+    const InnerDropzone = () =>
       <Dropzone
         onDrop={innerDropSpy}
         onDropAccepted={innerDropAcceptedSpy}
@@ -844,7 +852,6 @@ describe('Dropzone', () => {
           return <p>No drag</p>
         }}
       </Dropzone>
-    )
 
     describe('dropping on the inner dropzone', () => {
       it('mounts both dropzones', () => {
