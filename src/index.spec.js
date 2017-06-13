@@ -831,7 +831,7 @@ describe('Dropzone', () => {
 
     const InnerDragAccepted = () => <p>Accepted</p>
     const InnerDragRejected = () => <p>Rejected</p>
-    const InnerDropzone = () => (
+    const InnerDropzone = () =>
       <Dropzone
         onDrop={innerDropSpy}
         onDropAccepted={innerDropAcceptedSpy}
@@ -844,7 +844,6 @@ describe('Dropzone', () => {
           return <p>No drag</p>
         }}
       </Dropzone>
-    )
 
     describe('dropping on the inner dropzone', () => {
       it('mounts both dropzones', () => {

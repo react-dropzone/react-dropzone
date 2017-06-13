@@ -2,7 +2,7 @@
 
 # react-dropzone
 
-[![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+[![Build Status](https://travis-ci.org/okonet/react-dropzone.svg?branch=master)](https://travis-ci.org/okonet/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/okonet/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/okonet/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
@@ -25,15 +25,15 @@ Import `Dropzone` in your React component:
 
 ```javascript
 import Dropzone from 'react-dropzone'
-``` 
-  
+```
+
   and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
-  
+
 ```javascript
 function onDrop(acceptedFiles, rejectedFiles) {
   // do stuff with files...
 }
-``` 
+```
 
 Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
 
@@ -47,7 +47,7 @@ Specifying the `onDrop` method, provides you with an array of [Files](https://de
     onDrop: acceptedFiles => {
         const req = request.post('/upload');
         acceptedFiles.forEach(file => {
-            req.attach(file.name, file);
+            req.attach(file.name, file.fileObject);
         });
         req.end(callback);
     }

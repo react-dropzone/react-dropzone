@@ -13,6 +13,12 @@ module.exports = {
     library: 'Dropzone'
   },
   module: {
+    preLoaders: [
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      }
+    ],
     loaders: [
       {
         include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'examples')],
