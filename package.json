@@ -82,7 +82,7 @@
     "imagemin-pngquant": "^5.0.0",
     "jest": "^20.0.1",
     "jest-enzyme": "^3.2.0",
-    "lint-staged": "^3.2.1",
+    "lint-staged": "^4.0.0",
     "markdownlint-cli": "^0.2.0",
     "npm-check": "^5.2.1",
     "pre-commit": "^1.1.3",
