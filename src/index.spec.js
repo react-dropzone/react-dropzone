@@ -246,6 +246,14 @@ describe('Dropzone', () => {
       component.find('Dropzone').simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(1)
     })
+
+    it('should invoke inputProps onClick if provided', () => {
+      const inputPropsClickSpy = spy()
+      const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
+
+      component.find('Dropzone').simulate('click')
+      expect(inputPropsClickSpy.callCount).toEqual(1)
+    })
   })
 
   describe('drag-n-drop', () => {
