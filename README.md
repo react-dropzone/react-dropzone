@@ -7,7 +7,8 @@
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
-Documentation and examples: https://react-dropzone.netlify.com
+Documentation and examples: https://react-dropzone.js.org
+Source code: https://github.com/okonet/react-dropzone/
 
 ---
 
