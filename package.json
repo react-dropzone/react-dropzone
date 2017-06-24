@@ -76,7 +76,7 @@
     "css-loader": "^0.28.1",
     "cz-conventional-changelog": "^2.0.0",
     "enzyme": "^2.6.0",
-    "eslint": "^3.11.0",
+    "eslint": "^4.1.0",
     "eslint-config-okonet": "^4.0.2",
     "imagemin-cli": "^3.0.0",
     "imagemin-pngquant": "^5.0.0",
