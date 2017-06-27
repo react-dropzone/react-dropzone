@@ -175,11 +175,14 @@ describe('Dropzone', () => {
   })
 
   describe('onClick', () => {
-    it('should call `open` method', () => {
+    it('should call `open` method', done => {
       const dropzone = mount(<Dropzone />)
       spy(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      expect(dropzone.instance().open.callCount).toEqual(1)
+      setTimeout(() => {
+        expect(dropzone.instance().open.callCount).toEqual(1)
+        done()
+      }, 0)
     })
 
     it('should not call `open` if disableClick prop is true', () => {
@@ -189,13 +192,16 @@ describe('Dropzone', () => {
       expect(dropzone.instance().open.callCount).toEqual(0)
     })
 
-    it('should call `onClick` callback if provided', () => {
+    it('should call `onClick` callback if provided', done => {
       const clickSpy = spy()
       const dropzone = mount(<Dropzone onClick={clickSpy} />)
       spy(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      expect(dropzone.instance().open.callCount).toEqual(1)
-      expect(clickSpy.callCount).toEqual(1)
+      setTimeout(() => {
+        expect(dropzone.instance().open.callCount).toEqual(1)
+        expect(clickSpy.callCount).toEqual(1)
+        done()
+      }, 0)
     })
 
     it('should reset the value of input', () => {
@@ -206,12 +212,15 @@ describe('Dropzone', () => {
       expect(dropzone.render().find('input').attr('value')).toBeUndefined()
     })
 
-    it('should trigger click even on the input', () => {
+    it('should trigger click even on the input', done => {
       const dropzone = mount(<Dropzone />)
       const clickSpy = spy(dropzone.instance().fileInputEl, 'click')
       dropzone.simulate('click')
       dropzone.simulate('click')
-      expect(clickSpy.callCount).toEqual(2)
+      setTimeout(() => {
+        expect(clickSpy.callCount).toEqual(2)
+        done()
+      }, 0)
     })
 
     it('should not invoke onClick on the wrapper', () => {
@@ -247,12 +256,15 @@ describe('Dropzone', () => {
       expect(onClickOuterSpy.callCount).toEqual(1)
     })
 
-    it('should invoke inputProps onClick if provided', () => {
+    it('should invoke inputProps onClick if provided', done => {
       const inputPropsClickSpy = spy()
       const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
 
       component.find('Dropzone').simulate('click')
-      expect(inputPropsClickSpy.callCount).toEqual(1)
+      setTimeout(() => {
+        expect(inputPropsClickSpy.callCount).toEqual(1)
+        done()
+      }, 0)
     })
   })
 
@@ -811,19 +823,22 @@ describe('Dropzone', () => {
       // Test / invoke the click event
       spy(component.instance(), 'open')
       component.simulate('click')
-      expect(component.instance().open.callCount).toEqual(1)
 
-      // Simulated DOM event - onfocus
-      document.body.addEventListener('focus', () => {})
-      const evt = document.createEvent('HTMLEvents')
-      evt.initEvent('focus', false, true)
-      document.body.dispatchEvent(evt)
-
-      // setTimeout to match the event callback from actual Component
       setTimeout(() => {
-        expect(onCancelSpy.callCount).toEqual(1)
-        done()
-      }, 300)
+        expect(component.instance().open.callCount).toEqual(1)
+
+        // Simulated DOM event - onfocus
+        document.body.addEventListener('focus', () => {})
+        const evt = document.createEvent('HTMLEvents')
+        evt.initEvent('focus', false, true)
+        document.body.dispatchEvent(evt)
+
+        // setTimeout to match the event callback from actual Component
+        setTimeout(() => {
+          expect(onCancelSpy.callCount).toEqual(1)
+          done()
+        }, 300)
+      }, 0)
     })
   })
 

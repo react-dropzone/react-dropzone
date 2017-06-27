@@ -52,7 +52,8 @@
   "contributors": [
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
     "Mike Olson <me@mwolson.org>",
-    "Param Aggarwal"
+    "Param Aggarwal",
+    "Tyler Waters <tyler.waters@gmail.com>"
   ],
   "license": "MIT",
   "peerDependencies": {
