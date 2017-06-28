@@ -193,10 +193,15 @@ class Dropzone extends React.Component {
     const { onClick, disableClick } = this.props
     if (!disableClick) {
       evt.stopPropagation()
-      this.open()
+
       if (onClick) {
         onClick.call(this, evt)
       }
+
+      // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
+      // this is so react can handle state changes in the onClick prop above above
+      // see: https://github.com/okonet/react-dropzone/issues/450
+      setTimeout(this.open.bind(this), 0)
     }
   }
 
