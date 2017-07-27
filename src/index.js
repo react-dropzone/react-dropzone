@@ -89,7 +89,10 @@ class Dropzone extends React.Component {
       this.dragTargets.push(evt.target)
     }
 
-    this.setState({ draggedFiles: getDataTransferItems(evt) })
+    this.setState({
+      isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
+      draggedFiles: getDataTransferItems(evt)
+    })
 
     if (this.props.onDragEnter) {
       this.props.onDragEnter.call(this, evt)
@@ -122,7 +125,10 @@ class Dropzone extends React.Component {
     }
 
     // Clear dragging files state
-    this.setState({ draggedFiles: [] })
+    this.setState({
+      isDragActive: false,
+      draggedFiles: []
+    })
 
     if (this.props.onDragLeave) {
       this.props.onDragLeave.call(this, evt)
@@ -183,6 +189,7 @@ class Dropzone extends React.Component {
 
     // Reset drag state
     this.setState({
+      isDragActive: false,
       draggedFiles: [],
       acceptedFiles,
       rejectedFiles
@@ -258,9 +265,9 @@ class Dropzone extends React.Component {
     this.fileInputEl.click()
   }
 
-  renderChildren = (children, isDragActive, isDragReject) => {
+  renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
     if (typeof children === 'function') {
-      return children({ ...this.state, isDragActive, isDragReject })
+      return children({ ...this.state, isDragActive, isDragAccept, isDragReject })
     }
     return children
   }
@@ -268,6 +275,7 @@ class Dropzone extends React.Component {
   render() {
     const {
       accept,
+      acceptClassName,
       activeClassName,
       inputProps,
       multiple,
@@ -278,6 +286,7 @@ class Dropzone extends React.Component {
     } = this.props
 
     let {
+      acceptStyle,
       activeStyle,
       className,
       rejectStyle,
@@ -285,22 +294,24 @@ class Dropzone extends React.Component {
       ...props // eslint-disable-line prefer-const
     } = rest
 
-    const { draggedFiles } = this.state
+    const { isDragActive, draggedFiles } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
-    const isDragActive = filesCount > 0 && this.allFilesAccepted(draggedFiles)
-    const isDragReject = filesCount > 0 && (!isDragActive || !isMultipleAllowed)
-
+    const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
+    const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
     className = className || ''
 
     if (isDragActive && activeClassName) {
       className += ' ' + activeClassName
     }
+    if (isDragAccept && acceptClassName) {
+      className += ' ' + acceptClassName
+    }
     if (isDragReject && rejectClassName) {
       className += ' ' + rejectClassName
     }
 
-    if (!className && !style && !activeStyle && !rejectStyle) {
+    if (!className && !style && !activeStyle && !acceptStyle && !rejectStyle) {
       style = {
         width: 200,
         height: 200,
@@ -314,6 +325,7 @@ class Dropzone extends React.Component {
         borderColor: '#6c6',
         backgroundColor: '#eee'
       }
+      acceptStyle = activeStyle
       rejectStyle = {
         borderStyle: 'solid',
         borderColor: '#c66',
@@ -321,20 +333,22 @@ class Dropzone extends React.Component {
       }
     }
 
-    let appliedStyle
+    let appliedStyle = { ...style }
     if (activeStyle && isDragActive) {
       appliedStyle = {
         ...style,
         ...activeStyle
       }
+    }
+    if (acceptStyle && isDragAccept) {
+      appliedStyle = {
+        ...appliedStyle,
+        ...acceptStyle
+      }
     } else if (rejectStyle && isDragReject) {
       appliedStyle = {
-        ...style,
+        ...appliedStyle,
         ...rejectStyle
-      }
-    } else {
-      appliedStyle = {
-        ...style
       }
     }
 
@@ -379,7 +393,7 @@ class Dropzone extends React.Component {
         onDrop={this.onDrop}
         ref={this.setRef}
       >
-        {this.renderChildren(children, isDragActive, isDragReject)}
+        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
           {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
@@ -450,9 +464,14 @@ Dropzone.propTypes = {
   className: PropTypes.string,
 
   /**
-   * className for accepted state
+   * className for active state
    */
   activeClassName: PropTypes.string,
+
+  /**
+   * className for accepted state
+   */
+  acceptClassName: PropTypes.string,
 
   /**
    * className for rejected state
@@ -465,9 +484,14 @@ Dropzone.propTypes = {
   style: PropTypes.object,
 
   /**
-   * CSS styles to apply when drop will be accepted
+   * CSS styles to apply when drag is active
    */
   activeStyle: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drop will be accepted
+   */
+  acceptStyle: PropTypes.object,
 
   /**
    * CSS styles to apply when drop will be rejected
