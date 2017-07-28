@@ -265,92 +265,14 @@ class Dropzone extends React.Component {
     this.fileInputEl.click()
   }
 
-  renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
-    if (typeof children === 'function') {
-      return children({ ...this.state, isDragActive, isDragAccept, isDragReject })
-    }
-    return children
-  }
-
   render() {
-    const {
-      accept,
-      acceptClassName,
-      activeClassName,
-      inputProps,
-      multiple,
-      name,
-      rejectClassName,
-      children,
-      ...rest
-    } = this.props
-
-    let {
-      acceptStyle,
-      activeStyle,
-      className,
-      rejectStyle,
-      style,
-      ...props // eslint-disable-line prefer-const
-    } = rest
+    const { accept, inputProps, multiple, name, children, ...rest } = this.props
 
     const { isDragActive, draggedFiles } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
-    className = className || ''
-
-    if (isDragActive && activeClassName) {
-      className += ' ' + activeClassName
-    }
-    if (isDragAccept && acceptClassName) {
-      className += ' ' + acceptClassName
-    }
-    if (isDragReject && rejectClassName) {
-      className += ' ' + rejectClassName
-    }
-
-    if (!className && !style && !activeStyle && !acceptStyle && !rejectStyle) {
-      style = {
-        width: 200,
-        height: 200,
-        borderWidth: 2,
-        borderColor: '#666',
-        borderStyle: 'dashed',
-        borderRadius: 5
-      }
-      activeStyle = {
-        borderStyle: 'solid',
-        borderColor: '#6c6',
-        backgroundColor: '#eee'
-      }
-      acceptStyle = activeStyle
-      rejectStyle = {
-        borderStyle: 'solid',
-        borderColor: '#c66',
-        backgroundColor: '#eee'
-      }
-    }
-
-    let appliedStyle = { ...style }
-    if (activeStyle && isDragActive) {
-      appliedStyle = {
-        ...style,
-        ...activeStyle
-      }
-    }
-    if (acceptStyle && isDragAccept) {
-      appliedStyle = {
-        ...appliedStyle,
-        ...acceptStyle
-      }
-    } else if (rejectStyle && isDragReject) {
-      appliedStyle = {
-        ...appliedStyle,
-        ...rejectStyle
-      }
-    }
 
     const inputAttributes = {
       accept,
@@ -377,27 +299,37 @@ class Dropzone extends React.Component {
       'maxSize',
       'minSize'
     ]
-    const divProps = { ...props }
+    const divProps = { ...rest }
     customProps.forEach(prop => delete divProps[prop])
 
+    const inputEl = (
+      <input
+        {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+        {...inputAttributes}
+      />
+    )
+
+    let enhancedChildren
+    if (typeof children === 'function') {
+      enhancedChildren = React.cloneElement(
+        children({ ...this.state, isDragActive, isDragAccept, isDragReject }),
+        {
+          /* expand user provided props first so event handlers are never overridden */
+          ...divProps,
+          onClick: this.onClick,
+          onDragStart: this.onDragStart,
+          onDragEnter: this.onDragEnter,
+          onDragOver: this.onDragOver,
+          onDragLeave: this.onDragLeave,
+          onDrop: this.onDrop,
+          ref: this.setRef
+        }
+      )
+    }
     return (
-      <div
-        className={className}
-        style={appliedStyle}
-        {...divProps /* expand user provided props first so event handlers are never overridden */}
-        onClick={this.onClick}
-        onDragStart={this.onDragStart}
-        onDragEnter={this.onDragEnter}
-        onDragOver={this.onDragOver}
-        onDragLeave={this.onDragLeave}
-        onDrop={this.onDrop}
-        ref={this.setRef}
-      >
-        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
-        <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
-          {...inputAttributes}
-        />
+      <div>
+        {enhancedChildren || children}
+        {inputEl}
       </div>
     )
   }
@@ -457,46 +389,6 @@ Dropzone.propTypes = {
    * Minimum file size
    */
   minSize: PropTypes.number,
-
-  /**
-   * className
-   */
-  className: PropTypes.string,
-
-  /**
-   * className for active state
-   */
-  activeClassName: PropTypes.string,
-
-  /**
-   * className for accepted state
-   */
-  acceptClassName: PropTypes.string,
-
-  /**
-   * className for rejected state
-   */
-  rejectClassName: PropTypes.string,
-
-  /**
-   * CSS styles to apply
-   */
-  style: PropTypes.object,
-
-  /**
-   * CSS styles to apply when drag is active
-   */
-  activeStyle: PropTypes.object,
-
-  /**
-   * CSS styles to apply when drop will be accepted
-   */
-  acceptStyle: PropTypes.object,
-
-  /**
-   * CSS styles to apply when drop will be rejected
-   */
-  rejectStyle: PropTypes.object,
 
   /**
    * onClick callback
