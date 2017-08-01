@@ -63,15 +63,13 @@ Also, at this moment it's not possible to read file names (and thus, file extens
 <Dropzone
   accept=".jpeg,.png"
 >
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "All files will be accepted";
-    }
-    if (isDragReject) {
-      return "Some files will be rejected";
-    }
-    return "Dropping some files here...";
-  }}
+  {({ isDragAccept, isDragReject }) => (
+    <div>
+      {isDragAccept && "All files will be accepted"}
+      {isDragReject && "Some files will be rejected"}
+      Drop some files here...
+    </div>
+  )}   
 </Dropzone>
 ```
 

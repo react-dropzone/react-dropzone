@@ -1,23 +1,41 @@
-By default, the Dropzone component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style`, `activeStyle` or `rejectStyle` which is applied when a file is dragged over the zone. You can also specify `className`,  `activeClassName` or `rejectClassName` if you would rather style using CSS.
-
-## Updating styles and contents based on user input
-
-By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
+By default, the Dropzone component doesn't render any styles. By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
 
 ```
-<Dropzone
-  accept="image/png"
->
-  {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
-    if (isDragActive) {
-      return "This file is authorized";
-    }
+const baseStyle = {
+  width: 200,
+  height: 200,
+  borderWidth: 2,
+  borderColor: '#666',
+  borderStyle: 'dashed',
+  borderRadius: 5
+};
+const activeStyle = {
+  borderStyle: 'solid',
+  borderColor: '#6c6',
+  backgroundColor: '#eee'
+};
+const rejectStyle = {
+  borderStyle: 'solid',
+  borderColor: '#c66',
+  backgroundColor: '#eee'
+};
+
+<Dropzone accept="image/*">
+  {({ isDragActive, isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
+    let styles = {...baseStyle}
+    styles = isDragActive ? {...styles, ...activeStyle} : styles
+    
     if (isDragReject) {
-      return "This file is not authorized";
-    }
-    return acceptedFiles.length || rejectedFiles.length
-      ? `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`
-      : "Try dropping some files.";
+      return <div style={{...styles, ...rejectStyle}}>
+        Unsupported file type...
+      </div>
+    } 
+          
+    return (
+      <div style={styles}>
+        {isDragAccept ? `Drop ${acceptedFiles.length}` : 'Drag'} files here...
+      </div>
+    )
   }}
 </Dropzone>
 ```

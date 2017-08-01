@@ -1,4 +1,6 @@
-Dropzone with default properties and displays list of the dropped files.
+By default, Dropzone just renders provided children without applying any styles.  
+
+This example renders a list of the dropped files.
 
 ```
 class Basic extends React.Component {
