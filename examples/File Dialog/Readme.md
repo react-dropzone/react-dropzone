@@ -1,4 +1,4 @@
-You can programmatically invoke default OS file promt. In order to do that you'll have to set the ref on your `Dropzone` instance and call the instance `open` method.
+You can programmatically invoke default OS file prompt. In order to do that you'll have to set the ref on your `Dropzone` instance and call the instance `open` method.
 
 ```
 let dropzoneRef;
