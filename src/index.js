@@ -23,18 +23,21 @@ class Dropzone extends React.Component {
 
   constructor(props, context) {
     super(props, context)
-    this.onClick = this.onClick.bind(this)
-    this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
-    this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
+    this.onClick = this.composeHandlers(this.onClick, this)
+    this.onDocumentDrop = this.composeHandlers(this.onDocumentDrop, this)
+    this.onDragEnter = this.composeHandlers(this.onDragEnter, this)
+    this.onDragLeave = this.composeHandlers(this.onDragLeave, this)
+    this.onDragOver = this.composeHandlers(this.onDragOver, this)
+    this.onDragStart = this.composeHandlers(this.onDragStart, this)
+    this.onDrop = this.composeHandlers(this.onDrop, this)
+    this.onFileDialogCancel = this.composeHandlers(this.onFileDialogCancel, this)
+    this.onInputElementClick = this.composeHandlers(this.onInputElementClick, this)
+
     this.setRef = this.setRef.bind(this)
     this.setRefs = this.setRefs.bind(this)
-    this.onInputElementClick = this.onInputElementClick.bind(this)
+
     this.isFileDialogActive = false
+
     this.state = {
       draggedFiles: [],
       acceptedFiles: [],
@@ -64,6 +67,14 @@ class Dropzone extends React.Component {
     this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
+  }
+
+  composeHandlers(handler, target) {
+    if (this.props.disableDropzone) {
+      return null
+    }
+
+    return handler.bind(target)
   }
 
   onDocumentDrop(evt) {
@@ -277,11 +288,12 @@ class Dropzone extends React.Component {
       accept,
       acceptClassName,
       activeClassName,
+      children,
+      disableDropzone,
       inputProps,
       multiple,
       name,
       rejectClassName,
-      children,
       ...rest
     } = this.props
 
@@ -359,7 +371,8 @@ class Dropzone extends React.Component {
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
-      autoComplete: 'off'
+      autoComplete: 'off',
+      disabled: disableDropzone
     }
 
     if (name && name.length) {
@@ -393,6 +406,7 @@ class Dropzone extends React.Component {
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
         ref={this.setRef}
+        aria-disabled={disableDropzone}
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
@@ -423,6 +437,11 @@ Dropzone.propTypes = {
    * Disallow clicking on the dropzone container to open file dialog
    */
   disableClick: PropTypes.bool,
+
+  /**
+ * Enable/disable the dropzone entirely
+ */
+  disableDropzone: PropTypes.bool,
 
   /**
    * Enable/disable preview generation
@@ -548,6 +567,7 @@ Dropzone.propTypes = {
 
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
+  disableDropzone: false,
   disablePreview: false,
   disableClick: false,
   multiple: true,

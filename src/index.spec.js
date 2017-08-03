@@ -941,5 +941,16 @@ describe('Dropzone', () => {
       const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [] } })
       expect(fn).not.toThrow()
     })
+
+    it('does not allow actions when disableDropzone props is true', done => {
+      const dropzone = mount(<Dropzone disableDropzone />)
+
+      spy(dropzone.instance(), 'open')
+      dropzone.simulate('click')
+      setTimeout(() => {
+        expect(dropzone.instance().open.callCount).toEqual(0)
+        done()
+      }, 0)
+    })
   })
 })
