@@ -358,7 +358,8 @@ class Dropzone extends React.Component {
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
-      onChange: this.onDrop
+      onChange: this.onDrop,
+      autoComplete: 'off'
     }
 
     if (name && name.length) {
