@@ -12,7 +12,7 @@ Source code: https://github.com/okonet/react-dropzone/
 
 ---
 
-** Looking for maintainers: https://github.com/okonet/react-dropzone/issues/479 **
+**Looking for maintainers: https://github.com/okonet/react-dropzone/issues/479**
 
 ---
 
