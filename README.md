@@ -12,6 +12,10 @@ Source code: https://github.com/okonet/react-dropzone/
 
 ---
 
+** Looking for maintainers: https://github.com/okonet/react-dropzone/issues/479 **
+
+---
+
 ## Installation
 
 Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
