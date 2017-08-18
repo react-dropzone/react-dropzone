@@ -126,7 +126,11 @@ describe('Dropzone', () => {
     }
 
     it('installs hooks to prevent stray drops from taking over the browser window', () => {
-      dropzone = mount(<Dropzone><p>Content</p></Dropzone>)
+      dropzone = mount(
+        <Dropzone>
+          <p>Content</p>
+        </Dropzone>
+      )
       expect(dropzone.html()).toMatchSnapshot()
       expect(document.addEventListener.callCount).toEqual(2)
       addEventCalls = collectEventListenerCalls(document.addEventListener.args)
@@ -320,9 +324,7 @@ describe('Dropzone', () => {
       )
 
       // And using then we'll call the onDragOver with the proxy instead of event
-      const dragOverSpy = stub(
-        component.instance(),
-        'onDragOver',
+      const dragOverSpy = stub(component.instance(), 'onDragOver').callsFake(
         component.instance().onDragOver(eventProxy)
       )
 
@@ -358,7 +360,9 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
-      dropzone.simulate('dragEnter', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('dragEnter', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', false)
       expect(child).toHaveProp('isDragReject', true)
@@ -507,7 +511,9 @@ describe('Dropzone', () => {
 
     it('should add invalid files to rejected when multiple is false', () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
-      dropzone.simulate('drop', { dataTransfer: { files: images.concat(files) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: images.concat(files) }
+      })
       const rejected = dropSpy.firstCall.args[1]
       expect(rejected.length).toEqual(2)
     })
@@ -551,7 +557,9 @@ describe('Dropzone', () => {
       dropzone.simulate('drop', { dataTransfer: { files: images } })
       expect(dropSpy.callCount).toEqual(2)
       expect(dropSpy.lastCall.args[0]).toEqual([...images], [])
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(dropSpy.callCount).toEqual(3)
       expect(dropSpy.lastCall.args[0]).toEqual([...images], [...files])
     })
@@ -570,7 +578,9 @@ describe('Dropzone', () => {
       dropzone.simulate('drop', { dataTransfer: { files: images } })
       expect(dropAcceptedSpy.callCount).toEqual(1)
       expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images])
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(dropAcceptedSpy.callCount).toEqual(2)
       expect(dropAcceptedSpy.lastCall.args[0]).toEqual([...images])
     })
@@ -589,7 +599,9 @@ describe('Dropzone', () => {
       expect(dropRejectedSpy.lastCall.args[0]).toEqual([...files])
       dropzone.simulate('drop', { dataTransfer: { files: images } })
       expect(dropRejectedSpy.callCount).toEqual(1)
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(dropRejectedSpy.callCount).toEqual(2)
       expect(dropRejectedSpy.lastCall.args[0]).toEqual([...files])
     })
@@ -665,7 +677,9 @@ describe('Dropzone', () => {
           onDropRejected={dropRejectedSpy}
         />
       )
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(dropSpy.callCount).toEqual(1)
       expect(dropSpy.firstCall.args[0]).toHaveLength(3)
       expect(dropSpy.firstCall.args[1]).toHaveLength(0)
@@ -755,7 +769,9 @@ describe('Dropzone', () => {
           onDropRejected={dropRejectedSpy}
         />
       )
-      dropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+      dropzone.simulate('drop', {
+        dataTransfer: { files: files.concat(images) }
+      })
       expect(dropSpy.callCount).toEqual(1)
       expect(dropSpy.firstCall.args[0]).toHaveLength(3)
       expect(dropSpy.firstCall.args[1]).toHaveLength(0)
@@ -860,7 +876,7 @@ describe('Dropzone', () => {
 
     const InnerDragAccepted = () => <p>Accepted</p>
     const InnerDragRejected = () => <p>Rejected</p>
-    const InnerDropzone = () => (
+    const InnerDropzone = () =>
       <Dropzone
         onDrop={innerDropSpy}
         onDropAccepted={innerDropAcceptedSpy}
@@ -873,7 +889,6 @@ describe('Dropzone', () => {
           return <p>No drag</p>
         }}
       </Dropzone>
-    )
 
     describe('dropping on the inner dropzone', () => {
       it('mounts both dropzones', () => {
@@ -897,7 +912,9 @@ describe('Dropzone', () => {
       })
 
       it('does dragEnter on both dropzones', () => {
-        innerDropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+        innerDropzone.simulate('dragEnter', {
+          dataTransfer: { files: images }
+        })
         expect(innerDropzone).toHaveProp('isDragActive', true)
         expect(innerDropzone).toHaveProp('isDragReject', false)
         expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(true)
@@ -905,7 +922,9 @@ describe('Dropzone', () => {
       })
 
       it('drops on the child dropzone', () => {
-        innerDropzone.simulate('drop', { dataTransfer: { files: files.concat(images) } })
+        innerDropzone.simulate('drop', {
+          dataTransfer: { files: files.concat(images) }
+        })
       })
 
       it('accepts the drop on the inner dropzone', () => {
