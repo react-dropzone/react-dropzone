@@ -68,7 +68,7 @@
   "devDependencies": {
     "@commitlint/cli": "^3.0.3",
     "@commitlint/config-angular": "^3.0.3",
-    "@commitlint/prompt": "^3.0.3",
+    "@commitlint/prompt": "^3.1.2",
     "@commitlint/prompt-cli": "^3.0.3",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",

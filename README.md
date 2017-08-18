@@ -23,6 +23,10 @@ Install it from npm and include it in your React build process (using [Webpack](
 ```bash
 npm install --save react-dropzone
 ```
+or:
+```bash
+yarn add react-dropzone --save
+```
 
 ## Usage
 
