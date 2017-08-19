@@ -60,7 +60,6 @@
     "attr-accept": "^1.0.3",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-1": "^6.24.1",
-    "es6bindall": "^0.0.9",
     "eslint-config-prettier": "^2.3.0",
     "eslint-plugin-prettier": "^2.2.0",
     "prop-types": "^15.5.7"

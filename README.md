@@ -25,7 +25,7 @@ npm install --save react-dropzone
 ```
 or:
 ```bash
-yarn add react-dropzone --save
+yarn add react-dropzone
 ```
 
 ## Usage
