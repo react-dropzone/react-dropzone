@@ -23,18 +23,22 @@ class Dropzone extends React.Component {
 
   constructor(props, context) {
     super(props, context)
+    this.composeHandlers = this.composeHandlers.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnter = this.onDragEnter.bind(this)
     this.onDragLeave = this.onDragLeave.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
+    this.onInputElementClick = this.onInputElementClick.bind(this)
+
     this.setRef = this.setRef.bind(this)
     this.setRefs = this.setRefs.bind(this)
-    this.onInputElementClick = this.onInputElementClick.bind(this)
+
     this.isFileDialogActive = false
+
     this.state = {
       draggedFiles: [],
       acceptedFiles: [],
@@ -64,6 +68,14 @@ class Dropzone extends React.Component {
     this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
+  }
+
+  composeHandlers(handler) {
+    if (this.props.disabled) {
+      return null
+    }
+
+    return handler
   }
 
   onDocumentDrop(evt) {
@@ -277,11 +289,13 @@ class Dropzone extends React.Component {
       accept,
       acceptClassName,
       activeClassName,
+      children,
+      disabled,
+      disabledClassName,
       inputProps,
       multiple,
       name,
       rejectClassName,
-      children,
       ...rest
     } = this.props
 
@@ -289,6 +303,7 @@ class Dropzone extends React.Component {
       acceptStyle,
       activeStyle,
       className,
+      disabledStyle,
       rejectStyle,
       style,
       ...props // eslint-disable-line prefer-const
@@ -310,8 +325,11 @@ class Dropzone extends React.Component {
     if (isDragReject && rejectClassName) {
       className += ' ' + rejectClassName
     }
+    if (disabled && disabledClassName) {
+      className += ' ' + disabledClassName
+    }
 
-    if (!className && !style && !activeStyle && !acceptStyle && !rejectStyle) {
+    if (!className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle) {
       style = {
         width: 200,
         height: 200,
@@ -330,6 +348,9 @@ class Dropzone extends React.Component {
         borderStyle: 'solid',
         borderColor: '#c66',
         backgroundColor: '#eee'
+      }
+      disabledStyle = {
+        opacity: 0.5
       }
     }
 
@@ -351,9 +372,16 @@ class Dropzone extends React.Component {
         ...rejectStyle
       }
     }
+    if (disabledStyle && disabled) {
+      appliedStyle = {
+        ...style,
+        ...disabledStyle
+      }
+    }
 
     const inputAttributes = {
       accept,
+      disabled,
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
@@ -386,13 +414,14 @@ class Dropzone extends React.Component {
         className={className}
         style={appliedStyle}
         {...divProps /* expand user provided props first so event handlers are never overridden */}
-        onClick={this.onClick}
-        onDragStart={this.onDragStart}
-        onDragEnter={this.onDragEnter}
-        onDragOver={this.onDragOver}
-        onDragLeave={this.onDragLeave}
-        onDrop={this.onDrop}
+        onClick={this.composeHandlers(this.onClick)}
+        onDragStart={this.composeHandlers(this.onDragStart)}
+        onDragEnter={this.composeHandlers(this.onDragEnter)}
+        onDragOver={this.composeHandlers(this.onDragOver)}
+        onDragLeave={this.composeHandlers(this.onDragLeave)}
+        onDrop={this.composeHandlers(this.onDrop)}
         ref={this.setRef}
+        aria-disabled={disabled}
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
@@ -423,6 +452,11 @@ Dropzone.propTypes = {
    * Disallow clicking on the dropzone container to open file dialog
    */
   disableClick: PropTypes.bool,
+
+  /**
+ * Enable/disable the dropzone entirely
+ */
+  disabled: PropTypes.bool,
 
   /**
    * Enable/disable preview generation
@@ -480,6 +514,11 @@ Dropzone.propTypes = {
   rejectClassName: PropTypes.string,
 
   /**
+   * className for disabled state
+   */
+  disabledClassName: PropTypes.string,
+
+  /**
    * CSS styles to apply
    */
   style: PropTypes.object,
@@ -498,6 +537,11 @@ Dropzone.propTypes = {
    * CSS styles to apply when drop will be rejected
    */
   rejectStyle: PropTypes.object,
+
+  /**
+   * CSS styles to apply when dropzone is disabled
+   */
+  disabledStyle: PropTypes.object,
 
   /**
    * onClick callback
@@ -548,6 +592,7 @@ Dropzone.propTypes = {
 
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
+  disabled: false,
   disablePreview: false,
   disableClick: false,
   multiple: true,

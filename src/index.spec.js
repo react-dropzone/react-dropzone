@@ -941,5 +941,29 @@ describe('Dropzone', () => {
       const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [] } })
       expect(fn).not.toThrow()
     })
+
+    it('does not allow actions when disabled props is true', done => {
+      const dropzone = mount(<Dropzone disabled />)
+
+      spy(dropzone.instance(), 'open')
+      dropzone.simulate('click')
+      setTimeout(() => {
+        expect(dropzone.instance().open.callCount).toEqual(0)
+        done()
+      }, 0)
+    })
+
+    it('when toggle disabled props, Dropzone works as expected', done => {
+      const dropzone = mount(<Dropzone disabled />)
+      spy(dropzone.instance(), 'open')
+
+      dropzone.setProps({ disabled: false })
+
+      dropzone.simulate('click')
+      setTimeout(() => {
+        expect(dropzone.instance().open.callCount).toEqual(1)
+        done()
+      }, 0)
+    })
   })
 })
