@@ -94,7 +94,7 @@
     "react-styleguidist": "^5.4.2",
     "rimraf": "^2.5.2",
     "semantic-release": "^6.3.6",
-    "sinon": "^2.3.1",
+    "sinon": "^3.0.0",
     "style-loader": "^0.17.0",
     "webpack": "^1.13.1"
   },
