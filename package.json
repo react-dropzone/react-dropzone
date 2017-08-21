@@ -93,7 +93,7 @@
     "react-dom": "^15.4.1",
     "react-styleguidist": "^5.4.2",
     "rimraf": "^2.5.2",
-    "semantic-release": "^6.3.6",
+    "semantic-release": "^7.0.1",
     "sinon": "^2.3.1",
     "style-loader": "^0.17.0",
     "webpack": "^1.13.1"
