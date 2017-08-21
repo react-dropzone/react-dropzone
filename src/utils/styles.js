@@ -1,4 +1,4 @@
-const styles = {
+export default {
   rejected: {
     borderStyle: 'solid',
     borderColor: '#c66',
@@ -21,5 +21,3 @@ const styles = {
     borderRadius: 5
   }
 }
-
-export default styles

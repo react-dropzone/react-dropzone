@@ -2,13 +2,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import getDataTransferItems from './utils/getDataTransferItems'
 import {
   supportMultiple,
   fileAccepted,
   allFilesAccepted,
   fileMatchSize,
-  onDocumentDragOver
+  onDocumentDragOver,
+  getDataTransferItems
 } from './utils'
 import styles from './utils/styles'
 
