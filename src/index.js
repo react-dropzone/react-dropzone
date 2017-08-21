@@ -2,26 +2,17 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import accepts from 'attr-accept'
-import getDataTransferItems from './getDataTransferItems'
-
-const supportMultiple =
-  typeof document !== 'undefined' && document && document.createElement
-    ? 'multiple' in document.createElement('input')
-    : true
-
-function fileAccepted(file, accept) {
-  // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
-  // that MIME type will always be accepted
-  return file.type === 'application/x-moz-file' || accepts(file, accept)
-}
+import {
+  supportMultiple,
+  fileAccepted,
+  allFilesAccepted,
+  fileMatchSize,
+  onDocumentDragOver,
+  getDataTransferItems
+} from './utils'
+import styles from './utils/styles'
 
 class Dropzone extends React.Component {
-  static onDocumentDragOver(evt) {
-    // allow the entire document to be a drag target
-    evt.preventDefault()
-  }
-
   constructor(props, context) {
     super(props, context)
     this.composeHandlers = this.composeHandlers.bind(this)
@@ -52,7 +43,7 @@ class Dropzone extends React.Component {
     this.dragTargets = []
 
     if (preventDropOnDocument) {
-      document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
+      document.addEventListener('dragover', onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
@@ -63,7 +54,7 @@ class Dropzone extends React.Component {
   componentWillUnmount() {
     const { preventDropOnDocument } = this.props
     if (preventDropOnDocument) {
-      document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
+      document.removeEventListener('dragover', onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
     this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
@@ -172,7 +163,10 @@ class Dropzone extends React.Component {
         }
       }
 
-      if (fileAccepted(file, accept) && this.fileMatchSize(file)) {
+      if (
+        fileAccepted(file, accept) &&
+        fileMatchSize(file, this.props.maxSize, this.props.minSize)
+      ) {
         acceptedFiles.push(file)
       } else {
         rejectedFiles.push(file)
@@ -258,15 +252,6 @@ class Dropzone extends React.Component {
   setRefs(ref) {
     this.fileInputEl = ref
   }
-
-  fileMatchSize(file) {
-    return file.size <= this.props.maxSize && file.size >= this.props.minSize
-  }
-
-  allFilesAccepted(files) {
-    return files.every(file => fileAccepted(file, this.props.accept))
-  }
-
   /**
    * Open system file upload dialog.
    *
@@ -280,7 +265,12 @@ class Dropzone extends React.Component {
 
   renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
     if (typeof children === 'function') {
-      return children({ ...this.state, isDragActive, isDragAccept, isDragReject })
+      return children({
+        ...this.state,
+        isDragActive,
+        isDragAccept,
+        isDragReject
+      })
     }
     return children
   }
@@ -313,9 +303,11 @@ class Dropzone extends React.Component {
     const { isDragActive, draggedFiles } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
-    const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
+    const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
     className = className || ''
+    const noStyles =
+      !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
 
     if (isDragActive && activeClassName) {
       className += ' ' + activeClassName
@@ -330,29 +322,12 @@ class Dropzone extends React.Component {
       className += ' ' + disabledClassName
     }
 
-    if (!className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle) {
-      style = {
-        width: 200,
-        height: 200,
-        borderWidth: 2,
-        borderColor: '#666',
-        borderStyle: 'dashed',
-        borderRadius: 5
-      }
-      activeStyle = {
-        borderStyle: 'solid',
-        borderColor: '#6c6',
-        backgroundColor: '#eee'
-      }
-      acceptStyle = activeStyle
-      rejectStyle = {
-        borderStyle: 'solid',
-        borderColor: '#c66',
-        backgroundColor: '#eee'
-      }
-      disabledStyle = {
-        opacity: 0.5
-      }
+    if (noStyles) {
+      style = styles.default
+      activeStyle = styles.active
+      acceptStyle = style.active
+      rejectStyle = styles.rejected
+      disabledStyle = styles.disabled
     }
 
     let appliedStyle = { ...style }
@@ -433,6 +408,8 @@ class Dropzone extends React.Component {
     )
   }
 }
+
+export default Dropzone
 
 Dropzone.propTypes = {
   /**
@@ -600,5 +577,3 @@ Dropzone.defaultProps = {
   maxSize: Infinity,
   minSize: 0
 }
-
-export default Dropzone
