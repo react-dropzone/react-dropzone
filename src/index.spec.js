@@ -1,6 +1,7 @@
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { spy, stub } from 'sinon'
+import { onDocumentDragOver } from './utils'
 
 const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index') // eslint-disable-line import/no-dynamic-require
 const DummyChildComponent = () => null
@@ -142,7 +143,7 @@ describe('Dropzone', () => {
 
     it('terminates drags and drops on elements outside our dropzone', () => {
       const event = { preventDefault: spy() }
-      Dropzone.onDocumentDragOver(event)
+      onDocumentDragOver(event)
       expect(event.preventDefault.callCount).toEqual(1)
       event.preventDefault.reset()
 

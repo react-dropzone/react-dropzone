@@ -1,4 +1,4 @@
-import getDataTransferFiles from './getDataTransferItems'
+import { getDataTransferItems } from './'
 
 const files = [
   {
@@ -18,9 +18,9 @@ const files = [
   }
 ]
 
-describe('getDataTransferFiles', () => {
+describe('getDataTransferItems', () => {
   it('should return an array', () => {
-    const res = getDataTransferFiles({})
+    const res = getDataTransferItems({})
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(0)
   })
@@ -34,7 +34,7 @@ describe('getDataTransferFiles', () => {
         files
       }
     }
-    const res = getDataTransferFiles(event)
+    const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(3)
   })
@@ -48,7 +48,7 @@ describe('getDataTransferFiles', () => {
         items: files
       }
     }
-    const res = getDataTransferFiles(event)
+    const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(3)
   })
@@ -59,7 +59,7 @@ describe('getDataTransferFiles', () => {
         files
       }
     }
-    const res = getDataTransferFiles(event)
+    const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(3)
   })
@@ -71,7 +71,7 @@ describe('getDataTransferFiles', () => {
         items: [{}, {}, {}]
       }
     }
-    const res = getDataTransferFiles(event)
+    const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(2)
   })
@@ -83,7 +83,7 @@ describe('getDataTransferFiles', () => {
       }
     }
     expect(Object.keys(files[2])).toHaveLength(3)
-    getDataTransferFiles(event, true)
+    getDataTransferItems(event, true)
     expect(Object.keys(files[2])).toHaveLength(3)
   })
 })
