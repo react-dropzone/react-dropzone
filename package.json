@@ -78,7 +78,7 @@
     "commitizen": "^2.9.6",
     "css-loader": "^0.28.1",
     "enzyme": "^2.6.0",
-    "eslint": "^3.11.0",
+    "eslint": "^4.1.0",
     "eslint-config-okonet": "^4.0.2",
     "husky": "^0.14.3",
     "imagemin-cli": "^3.0.0",
