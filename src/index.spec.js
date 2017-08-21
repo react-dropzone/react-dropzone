@@ -65,6 +65,11 @@ describe('Dropzone', () => {
       expect(component.html()).toContain('title="Dropzone"')
     })
 
+    it('renders dynamic tag', () => {
+      const dropzone = mount(<Dropzone tag="table" />)
+      expect(dropzone.find('table').length).toEqual(1)
+    })
+
     it('renders dynamic props on the input element', () => {
       const component = mount(<Dropzone inputProps={{ id: 'hiddenFileInput' }} />)
       expect(component.find('input').html()).toContain('id="hiddenFileInput"')
@@ -316,7 +321,7 @@ describe('Dropzone', () => {
           get: (target, prop) => {
             switch (prop) {
               case 'dataTransfer':
-                throw new Error('IE does not support rrror')
+                throw new Error('IE does not support error')
               default:
                 return function noop() {}
             }
@@ -343,7 +348,7 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone>
+        <Dropzone activeClassName="active" acceptClassName="accept">
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
@@ -352,11 +357,13 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', true)
       expect(child).toHaveProp('isDragReject', false)
+      expect(dropzone.find('.active').length).toEqual(1)
+      expect(dropzone.find('.accept').length).toEqual(1)
     })
 
     it('should set proper dragReject state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">
+        <Dropzone accept="image/*" rejectClassName="rejected">
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
@@ -367,6 +374,7 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', false)
       expect(child).toHaveProp('isDragReject', true)
+      expect(dropzone.find('.rejected').length).toEqual(1)
     })
 
     it('should set proper dragAccept state if multiple is false', () => {
@@ -503,7 +511,7 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragReject', false)
     })
 
-    it('should add valid files to rejected files on a multple drop when multiple false', () => {
+    it('should add valid files to rejected files on a multiple drop when multiple false', () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
       dropzone.simulate('drop', { dataTransfer: { files: images } })
       const rejected = dropSpy.firstCall.args[0]
@@ -822,7 +830,7 @@ describe('Dropzone', () => {
   describe('onClick', () => {})
 
   describe('onCancel', () => {
-    it('should not invoke onFileDialogCancel everytime window receives focus', done => {
+    it('should not invoke onFileDialogCancel every time window receives focus', done => {
       const onCancelSpy = spy()
       mount(<Dropzone id="on-cancel-example" onFileDialogCancel={onCancelSpy} />)
       // Simulated DOM event - onfocus
@@ -963,7 +971,7 @@ describe('Dropzone', () => {
     })
 
     it('does not allow actions when disabled props is true', done => {
-      const dropzone = mount(<Dropzone disabled />)
+      const dropzone = mount(<Dropzone disabled disabledClassName="disabledClass" />)
 
       spy(dropzone.instance(), 'open')
       dropzone.simulate('click')
@@ -971,6 +979,7 @@ describe('Dropzone', () => {
         expect(dropzone.instance().open.callCount).toEqual(0)
         done()
       }, 0)
+      expect(dropzone.find('.disabledClass').length).toEqual(1)
     })
 
     it('when toggle disabled props, Dropzone works as expected', done => {
