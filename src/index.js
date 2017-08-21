@@ -5,9 +5,10 @@ import PropTypes from 'prop-types'
 import accepts from 'attr-accept'
 import getDataTransferItems from './getDataTransferItems'
 
-const supportMultiple = typeof document !== 'undefined' && document && document.createElement
-  ? 'multiple' in document.createElement('input')
-  : true
+const supportMultiple =
+  typeof document !== 'undefined' && document && document.createElement
+    ? 'multiple' in document.createElement('input')
+    : true
 
 function fileAccepted(file, accept) {
   // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with

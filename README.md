@@ -23,18 +23,22 @@ Install it from npm and include it in your React build process (using [Webpack](
 ```bash
 npm install --save react-dropzone
 ```
+or:
+```bash
+yarn add react-dropzone
+```
 
 ## Usage
 
 Import `Dropzone` in your React component:
 
-```javascript
+```javascript static
 import Dropzone from 'react-dropzone'
 ``` 
   
   and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
   
-```javascript
+```javascript static
 function onDrop(acceptedFiles, rejectedFiles) {
   // do stuff with files...
 }
@@ -48,7 +52,7 @@ Using `react-dropzone` is similar to using a file form field, but instead of get
 
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
-```javascript
+```javascript static
     onDrop: acceptedFiles => {
         const req = request.post('/upload');
         acceptedFiles.forEach(file => {
@@ -61,7 +65,7 @@ Specifying the `onDrop` method, provides you with an array of [Files](https://de
 **Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
 If you want to access file content you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader).
 
-```javascript
+```javascript static
 onDrop: acceptedFiles => {
     acceptedFiles.forEach(file => {
         const reader = new FileReader();

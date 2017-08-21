@@ -1,6 +1,10 @@
 {
   "extends": [
-    "okonet"
+    "okonet",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
   ],
   "rules": {
     // React
@@ -13,9 +17,6 @@
         ]
       }
     ],
-
-    // a11y
-    "jsx-a11y/no-static-element-interactions": 0,
 
     // Import
     "import/no-extraneous-dependencies": [

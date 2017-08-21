@@ -1,7 +1,4 @@
-/* eslint prefer-template: 0 */
-/* eslint no-var: 0 */
-
-var path = require('path')
+const path = require('path')
 
 module.exports = {
   entry: './src/index.js',
@@ -23,7 +20,7 @@ module.exports = {
   },
   resolve: {
     // Can require('file') instead of require('file.js') etc.
-    extensions: ['', '.js', '.json']
+    extensions: ['.js', '.json']
   },
   externals: {
     react: 'react',
