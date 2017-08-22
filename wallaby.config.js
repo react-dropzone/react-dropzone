@@ -12,10 +12,7 @@ module.exports = wallaby => ({
 
   env: {
     type: 'node',
-    runner: 'node',
-    params: {
-      runner: '--harmony_proxies'
-    }
+    runner: 'node'
   },
 
   testFramework: 'jest',
