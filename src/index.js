@@ -214,7 +214,7 @@ class Dropzone extends React.Component {
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
       // this is so react can handle state changes in the onClick prop above above
-      // see: https://github.com/okonet/react-dropzone/issues/450
+      // see: https://github.com/react-dropzone/react-dropzone/issues/450
       setTimeout(this.open.bind(this), 0)
     }
   }
@@ -417,7 +417,7 @@ Dropzone.propTypes = {
    * Keep in mind that mime type determination is not reliable accross platforms. CSV files,
    * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
    * Windows. In some cases there might not be a mime type set at all.
-   * See: https://github.com/okonet/react-dropzone/issues/276
+   * See: https://github.com/react-dropzone/react-dropzone/issues/276
    */
   accept: PropTypes.string,
 

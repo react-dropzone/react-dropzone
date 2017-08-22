@@ -1,4 +1,4 @@
-![react-dropzone logo](https://raw.githubusercontent.com/okonet/react-dropzone/master/logo/logo.png)
+![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/react-dropzone/master/logo/logo.png)
 
 # react-dropzone
 
@@ -8,11 +8,11 @@
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 
 Documentation and examples: https://react-dropzone.js.org
-Source code: https://github.com/okonet/react-dropzone/
+Source code: https://github.com/react-dropzone/react-dropzone/
 
 ---
 
-**Looking for maintainers: https://github.com/okonet/react-dropzone/issues/479**
+**Looking for maintainers: https://github.com/react-dropzone/react-dropzone/issues/479**
 
 ---
 
