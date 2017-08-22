@@ -20,15 +20,76 @@ Install it from npm and include it in your React build process (using [Webpack](
 npm install --save react-dropzone
 ```
 
-## Usage
-
-Import `Dropzone` in your React component:
+## Usage with ES2015 classes
 
 ```javascript
+import React from 'react'
+import cx from 'classnames'
 import Dropzone from 'react-dropzone'
+
+class MyDropzone extends React.Component {
+
+  onDrop = (acceptedFiles, rejectedFiles) => {
+    // Do something with files
+    // i.e. pre-process, upload etc.
+  }
+
+  render() {
+    return (
+      <Dropzone onDrop={this.onDrop}>
+        {
+          ({ isDragActive }) => {
+            return (
+              <div className={cx('dropzone', {
+                'dropzone--isActive': isDragActive
+              })}>
+              {
+                isDragActive ?
+                  <p>Drop files here...</p> :
+                  <p>Try dropping some files here, or click to select files to upload.</p>
+              }
+              </div>
+            )
+          }
+        }
+      </Dropzone>
+    );
+  }
+}
+
 ``` 
+
+## Usage as a HOC with stateless components
+
+```javascript
+import React from 'react'
+import cx from 'classnames'
+import { makeDropzone } from 'react-dropzone'
+
+function MyDropzone({ isDragActive }) {
+  const classNames = cx('dropzone', {
+    isActive: isDragActive
+  })
+  return (
+    <div className={classNames}>
+      { isDragActive ?
+          <p>Drop files here...</p> :
+          <p>Try dropping some files here, or click to select files to upload.</p>
+      }
+    </div>
+  );
+}
+
+// Call HoC with your component and options as arguments
+export default makeDropzone(MyDropzone, {
+  onDrop: (acceptedFiles, rejectedFiles) => {
+    // Do something with files
+    // i.e. pre-process, upload etc.
+  } 
+})
+```
   
-  and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+The `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
   
 ```javascript
 function onDrop(acceptedFiles, rejectedFiles) {
@@ -45,13 +106,13 @@ Using `react-dropzone` is similar to using a file form field, but instead of get
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
 ```javascript
-    onDrop: acceptedFiles => {
-        const req = request.post('/upload');
-        acceptedFiles.forEach(file => {
-            req.attach(file.name, file);
-        });
-        req.end(callback);
-    }
+function onDrop(acceptedFiles) {
+  const req = request.post('/upload')
+  acceptedFiles.forEach(file => {
+      req.attach(file.name, file)
+  })
+  req.end(callback)
+}
 ```
 
 ## PropTypes
