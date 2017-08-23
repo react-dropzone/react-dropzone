@@ -4,8 +4,6 @@ notifications:
   email: false
 node_js:
   - '8'
-before_script:
-  - npm prune
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - npm run semantic-release
