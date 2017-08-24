@@ -3,9 +3,7 @@ cache: yarn
 notifications:
   email: false
 node_js:
-  - '7'
-before_script:
-  - npm prune
+  - '8'
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - npm run semantic-release

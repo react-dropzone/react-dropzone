@@ -39,12 +39,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/okonet/react-dropzone.git"
+    "url": "https://github.com/react-dropzone/react-dropzone.git"
   },
   "bugs": {
-    "url": "https://github.com/okonet/react-dropzone/issues"
+    "url": "https://github.com/react-dropzone/react-dropzone/issues"
   },
-  "homepage": "https://github.com/okonet/react-dropzone",
+  "homepage": "https://github.com/react-dropzone/react-dropzone",
   "author": "Param Aggarwal",
   "contributors": [
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
@@ -95,7 +95,7 @@
     "react-styleguidist": "^6.0.15",
     "react-test-renderer": "^15.6.1",
     "rimraf": "^2.5.2",
-    "semantic-release": "^7.0.1",
+    "semantic-release": "^7.0.2",
     "sinon": "^3.2.1",
     "style-loader": "^0.18.2",
     "webpack": "^3.5.5"
