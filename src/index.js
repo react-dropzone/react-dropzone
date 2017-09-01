@@ -337,12 +337,13 @@ class Dropzone extends React.Component {
         ...activeStyle
       }
     }
-    if (acceptStyle && isDragAccept && !sDragReject) {
+    if (acceptStyle && isDragAccept) {
       appliedStyle = {
         ...appliedStyle,
         ...acceptStyle
       }
-    } else if (rejectStyle && isDragReject) {
+    }
+    if (rejectStyle && isDragReject) {
       appliedStyle = {
         ...appliedStyle,
         ...rejectStyle
