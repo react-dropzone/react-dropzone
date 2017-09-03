@@ -462,7 +462,9 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state if accept prop changes mid-drag', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
+        <Dropzone accept="image/*">
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
