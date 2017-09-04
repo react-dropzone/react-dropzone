@@ -9,6 +9,19 @@ const DummyChildComponent = () => null
 let files
 let images
 
+const rejectColor = 'red'
+const acceptColor = 'green'
+
+const rejectStyle = {
+  color: rejectColor,
+  borderColor: 'black'
+}
+
+const acceptStyle = {
+  color: acceptColor,
+  borderWidth: '5px'
+}
+
 describe('Dropzone', () => {
   beforeEach(() => {
     files = [
@@ -393,6 +406,58 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', true)
       expect(child).toHaveProp('isDragReject', true)
+    })
+
+    it('should apply acceptStyle if multiple is false and single file', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          multiple={false}
+          acceptStyle={acceptStyle}
+          rejectStyle={rejectStyle}
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      dropzone.simulate('dragEnter', { dataTransfer: { files: [images[0]] } })
+      const mainDiv = dropzone.find('div').at(0)
+      expect(mainDiv).toHaveProp('style', acceptStyle)
+    })
+
+    it('should apply rejectStyle if multiple is false and single bad file type', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          multiple={false}
+          acceptStyle={acceptStyle}
+          rejectStyle={rejectStyle}
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      dropzone.simulate('dragEnter', { dataTransfer: { files: [files[0]] } })
+      const mainDiv = dropzone.find('div').at(0)
+      expect(mainDiv).toHaveProp('style', rejectStyle)
+    })
+
+    it('should apply acceptStyle + rejectStyle if multiple is false and multiple good file types', () => {
+      const dropzone = mount(
+        <Dropzone
+          accept="image/*"
+          multiple={false}
+          acceptStyle={acceptStyle}
+          rejectStyle={rejectStyle}
+        >
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      const mainDiv = dropzone.find('div').at(0)
+      const expectedStyle = {
+        ...acceptStyle,
+        ...rejectStyle
+      }
+      expect(mainDiv).toHaveProp('style', expectedStyle)
     })
 
     it('should set proper dragActive state if accept prop changes mid-drag', () => {
