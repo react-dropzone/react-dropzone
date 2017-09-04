@@ -1,5 +1,3 @@
-/* eslint prefer-template: 0 */
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
@@ -104,7 +102,6 @@ class Dropzone extends React.Component {
   }
 
   onDragOver(evt) {
-    // eslint-disable-line class-methods-use-this
     evt.preventDefault()
     evt.stopPropagation()
     try {
@@ -310,16 +307,16 @@ class Dropzone extends React.Component {
       !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
 
     if (isDragActive && activeClassName) {
-      className += ' ' + activeClassName
+      className += ` ${activeClassName}`
     }
     if (isDragAccept && acceptClassName) {
-      className += ' ' + acceptClassName
+      className += ` ${acceptClassName}`
     }
     if (isDragReject && rejectClassName) {
-      className += ' ' + rejectClassName
+      className += ` ${rejectClassName}`
     }
     if (disabled && disabledClassName) {
-      className += ' ' + disabledClassName
+      className += ` ${disabledClassName}`
     }
 
     if (noStyles) {
@@ -387,7 +384,7 @@ class Dropzone extends React.Component {
     customProps.forEach(prop => delete divProps[prop])
 
     return (
-      <div
+      <props.tag
         className={className}
         style={appliedStyle}
         {...divProps /* expand user provided props first so event handlers are never overridden */}
@@ -405,7 +402,7 @@ class Dropzone extends React.Component {
           {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
         />
-      </div>
+      </props.tag>
     )
   }
 }
@@ -415,7 +412,7 @@ export default Dropzone
 Dropzone.propTypes = {
   /**
    * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
-   * Keep in mind that mime type determination is not reliable accross platforms. CSV files,
+   * Keep in mind that mime type determination is not reliable across platforms. CSV files,
    * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
    * Windows. In some cases there might not be a mime type set at all.
    * See: https://github.com/react-dropzone/react-dropzone/issues/276
@@ -566,7 +563,12 @@ Dropzone.propTypes = {
   /**
    * Provide a callback on clicking the cancel button of the file dialog
    */
-  onFileDialogCancel: PropTypes.func
+  onFileDialogCancel: PropTypes.func,
+
+  /**
+   * Choose what tag tDropzone will be rendered into
+   */
+  tag: PropTypes.string
 }
 
 Dropzone.defaultProps = {
@@ -576,5 +578,6 @@ Dropzone.defaultProps = {
   disableClick: false,
   multiple: true,
   maxSize: Infinity,
-  minSize: 0
+  minSize: 0,
+  tag: 'div'
 }
