@@ -17,6 +17,7 @@
         ]
       }
     ],
+    "react/require-default-props": 0,
 
     // Import
     "import/no-extraneous-dependencies": [

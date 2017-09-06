@@ -99,16 +99,8 @@ describe('Dropzone', () => {
 
     it('should render children function', () => {
       const content = <p>some content</p>
-      const dropzone = mount(
-        <Dropzone>
-          {content}
-        </Dropzone>
-      )
-      const dropzoneWithFunction = mount(
-        <Dropzone>
-          {() => content}
-        </Dropzone>
-      )
+      const dropzone = mount(<Dropzone>{content}</Dropzone>)
+      const dropzoneWithFunction = mount(<Dropzone>{() => content}</Dropzone>)
       expect(dropzoneWithFunction.html()).toEqual(dropzone.html())
     })
   })
@@ -224,10 +216,25 @@ describe('Dropzone', () => {
 
     it('should reset the value of input', () => {
       const dropzone = mount(<Dropzone />)
-      expect(dropzone.render().find('input').attr('value')).toBeUndefined()
-      expect(dropzone.render().find('input').attr('value', 10)).not.toBeUndefined()
+      expect(
+        dropzone
+          .render()
+          .find('input')
+          .attr('value')
+      ).toBeUndefined()
+      expect(
+        dropzone
+          .render()
+          .find('input')
+          .attr('value', 10)
+      ).not.toBeUndefined()
       dropzone.simulate('click')
-      expect(dropzone.render().find('input').attr('value')).toBeUndefined()
+      expect(
+        dropzone
+          .render()
+          .find('input')
+          .attr('value')
+      ).toBeUndefined()
     })
 
     it('should trigger click even on the input', done => {
@@ -355,11 +362,7 @@ describe('Dropzone', () => {
     })
 
     it('should set proper dragActive state on dragEnter', () => {
-      const dropzone = mount(
-        <Dropzone>
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
+      const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
       const child = dropzone.find(DummyChildComponent)
       dropzone.simulate('dragEnter', { dataTransfer: { files } })
       expect(child).toHaveProp('isDragActive', true)
@@ -369,9 +372,7 @@ describe('Dropzone', () => {
 
     it('should set proper dragReject state on dragEnter', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
+        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
       dropzone.simulate('dragEnter', {
@@ -462,9 +463,7 @@ describe('Dropzone', () => {
 
     it('should set proper dragActive state if accept prop changes mid-drag', () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
+        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
@@ -942,7 +941,7 @@ describe('Dropzone', () => {
 
     const InnerDragAccepted = () => <p>Accepted</p>
     const InnerDragRejected = () => <p>Rejected</p>
-    const InnerDropzone = () =>
+    const InnerDropzone = () => (
       <Dropzone
         onDrop={innerDropSpy}
         onDropAccepted={innerDropAcceptedSpy}
@@ -955,6 +954,7 @@ describe('Dropzone', () => {
           return <p>No drag</p>
         }}
       </Dropzone>
+    )
 
     describe('dropping on the inner dropzone', () => {
       it('mounts both dropzones', () => {
