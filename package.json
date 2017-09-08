@@ -16,7 +16,8 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
-    "size": "size-limit"
+    "size": "size-limit",
+    "size:why": "size-limit --why"
   },
   "size-limit": [
     {
