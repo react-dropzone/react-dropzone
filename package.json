@@ -8,15 +8,23 @@
     "build": "npm run clean && webpack",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
-    "test": "npm run eslint:src && jest --coverage",
+    "test": "npm run eslint:src && jest --coverage && npm run size",
     "eslint:src": "eslint ./src ./examples ./*.js",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
     "prepublish": "NODE_ENV=production npm run build && jest",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
-    "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo"
+    "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
+    "size": "size-limit",
+    "size:why": "size-limit --why"
   },
+  "size-limit": [
+    {
+      "path": "dist/index.js",
+      "limit": "5.76 KB"
+    }
+  ],
   "lint-staged": {
     "*.js": [
       "eslint --fix",
@@ -97,6 +105,7 @@
     "rimraf": "^2.5.2",
     "semantic-release": "^7.0.2",
     "sinon": "^3.2.1",
+    "size-limit": "^0.11.0",
     "style-loader": "^0.18.2",
     "webpack": "^3.5.5"
   },
