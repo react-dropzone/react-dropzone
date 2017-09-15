@@ -2,10 +2,12 @@
   "name": "react-dropzone",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
+  "module": "dist/es/index.js",
   "scripts": {
     "ci": "git-cz",
     "clean": "rimraf ./dist",
-    "build": "npm run clean && webpack",
+    "build": "npm run clean && webpack && npm run build:es",
+    "build:es": "BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore spec.js",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
     "test": "npm run eslint:src && jest --coverage && npm run size",
