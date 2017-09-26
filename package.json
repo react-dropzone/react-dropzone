@@ -16,15 +16,6 @@
     "deps:update": "npm-check -u",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
-  "lint-staged": {
-    "*.js": [
-      "eslint:fix",
-      "git:add"
-    ]
-  },
-  "pre-commit": [
-    "lint-staged"
-  ],
   "jest": {
     "setupTestFrameworkScriptFile": "<rootDir>/testSetup.js"
   },
