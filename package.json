@@ -11,10 +11,12 @@
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
     "test": "npm run eslint:src && jest --coverage && npm run size",
+    "test:es": "JEST_TARGET=../dist/es/index jest --coverage",
+    "test:umd": "JEST_TARGET=../dist/index jest --coverage",
     "eslint:src": "eslint ./src ./examples ./*.js",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
-    "prepublish": "NODE_ENV=production npm run build && jest",
+    "prepublish": "NODE_ENV=production npm run build && npm run test:umd && npm run test:es",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
@@ -25,6 +27,10 @@
     {
       "path": "dist/index.js",
       "limit": "6 KB"
+    },
+    {
+      "path": "dist/es/index.js",
+      "limit": "3 KB"
     }
   ],
   "lint-staged": {
