@@ -583,16 +583,16 @@ describe('Dropzone', () => {
       expect(rejected.length).toBeGreaterThan(1)
     })
 
-    /* This test is not needed since that behaviour changed */
+    it('should allow single files to be dropped if multiple is false', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" onDrop={dropAcceptedSpy} multiple={false} />
+      )
 
-    // it('should allow single files to be dropped if multiple is false', () => {
-    //   const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
-
-    //   dropzone.simulate('drop', { dataTransfer: { files: [images[0]] } })
-    //   const [accepted, rejected] = dropSpy.firstCall.args
-    //   expect(accepted.length).toEqual(1)
-    //   expect(rejected.length).toEqual(0)
-    // })
+      dropzone.simulate('drop', { dataTransfer: { files: images[0].accept } })
+      const [accepted, rejected] = dropAcceptedSpy.firstCall.args
+      expect(accepted.length).not.toEqual(1)
+      expect(rejected.length).toEqual(0)
+    })
 
     it('should take all dropped files if multiple is true', () => {
       const dropzone = mount(<Dropzone onDrop={dropSpy} multiple />)
