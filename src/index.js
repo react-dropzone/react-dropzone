@@ -10,6 +10,7 @@ import {
   onDocumentDragOver,
   getDataTransferItems
 } from './utils'
+import EXIF from 'exif-js'
 import styles from './utils/styles'
 
 class Dropzone extends React.Component {
@@ -186,7 +187,29 @@ class Dropzone extends React.Component {
     this.dragTargets = []
     this.isFileDialogActive = false
 
-    fileList.forEach(file => {
+    fileList.forEach((file) => {
+      Dropzone.resetImageOrientation(file, (blob) => {
+        if (!disablePreview) {
+          file.preview = blob; // eslint-disable-line no-param-reassign
+        }
+        if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+          acceptedFiles.push(file);
+        } else {
+          rejectedFiles.push(file);
+        }
+        if (onDrop) {
+          onDrop.call(this, acceptedFiles, rejectedFiles, e);
+        }
+
+        if (rejectedFiles.length > 0 && onDropRejected) {
+          onDropRejected.call(this, rejectedFiles, e);
+        }
+
+        if (acceptedFiles.length > 0 && onDropAccepted) {
+          onDropAccepted.call(this, acceptedFiles, e);
+        }
+      });
+
       if (!disablePreview) {
         try {
           file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
