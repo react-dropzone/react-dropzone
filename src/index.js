@@ -175,7 +175,7 @@ class Dropzone extends React.Component {
   }
 
   onDrop(evt) {
-    const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
+    const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept, maxSize, minSize } = this.props
     const fileList = getDataTransferItems(evt)
     const acceptedFiles = []
     const rejectedFiles = []
@@ -198,65 +198,46 @@ class Dropzone extends React.Component {
           rejectedFiles.push(file);
         }
         if (onDrop) {
-          onDrop.call(this, acceptedFiles, rejectedFiles, e);
+          onDrop.call(this, acceptedFiles, rejectedFiles, evt);
         }
 
         if (rejectedFiles.length > 0 && onDropRejected) {
-          onDropRejected.call(this, rejectedFiles, e);
+          onDropRejected.call(this, rejectedFiles, evt);
         }
 
         if (acceptedFiles.length > 0 && onDropAccepted) {
-          onDropAccepted.call(this, acceptedFiles, e);
+          onDropAccepted.call(this, acceptedFiles, evt);
         }
       });
 
-      if (!disablePreview) {
-        try {
-          file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
-        } catch (err) {
-          if (process.env.NODE_ENV !== 'production') {
-            console.error('Failed to generate preview for file', file, err) // eslint-disable-line no-console
-          }
-        }
+      if (!multiple) {
+        // if not in multi mode add any extra accepted files to rejected.
+        // This will allow end users to easily ignore a multi file drop in "single" mode.
+        rejectedFiles.push(...acceptedFiles.splice(1))
       }
 
-      if (
-        fileAccepted(file, accept) &&
-        fileMatchSize(file, this.props.maxSize, this.props.minSize)
-      ) {
-        acceptedFiles.push(file)
-      } else {
-        rejectedFiles.push(file)
+      if (onDrop) {
+        onDrop.call(this, acceptedFiles, rejectedFiles, evt)
       }
-    })
 
-    if (!multiple) {
-      // if not in multi mode add any extra accepted files to rejected.
-      // This will allow end users to easily ignore a multi file drop in "single" mode.
-      rejectedFiles.push(...acceptedFiles.splice(1))
-    }
+      if (rejectedFiles.length > 0 && onDropRejected) {
+        onDropRejected.call(this, rejectedFiles, evt)
+      }
 
-    if (onDrop) {
-      onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-    }
+      if (acceptedFiles.length > 0 && onDropAccepted) {
+        onDropAccepted.call(this, acceptedFiles, evt)
+      }
 
-    if (rejectedFiles.length > 0 && onDropRejected) {
-      onDropRejected.call(this, rejectedFiles, evt)
-    }
+      // Clear files value
+      this.draggedFiles = null
 
-    if (acceptedFiles.length > 0 && onDropAccepted) {
-      onDropAccepted.call(this, acceptedFiles, evt)
-    }
-
-    // Clear files value
-    this.draggedFiles = null
-
-    // Reset drag state
-    this.setState({
-      isDragActive: false,
-      draggedFiles: [],
-      acceptedFiles,
-      rejectedFiles
+      // Reset drag state
+      this.setState({
+        isDragActive: false,
+        draggedFiles: [],
+        acceptedFiles,
+        rejectedFiles
+      })
     })
   }
 
