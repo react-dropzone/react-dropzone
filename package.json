@@ -62,7 +62,8 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=0.14.0"
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^15.4.1",
   },
   "dependencies": {
     "attr-accept": "^1.0.3",
@@ -98,8 +99,6 @@
     "lint-staged": "^4.1.0",
     "markdownlint-cli": "^0.3.1",
     "prettier": "^1.6.1",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
     "react-styleguidist": "^6.0.23",
     "react-test-renderer": "^15.6.1",
     "rimraf": "^2.5.2",
