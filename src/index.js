@@ -2,6 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import EXIF from 'exif-js'
 import {
   supportMultiple,
   fileAccepted,
@@ -9,8 +10,7 @@ import {
   fileMatchSize,
   onDocumentDragOver,
   getDataTransferItems
-} from './utils'
-import EXIF from 'exif-js'
+} from './utils/'
 import styles from './utils/styles'
 
 class Dropzone extends React.Component {
@@ -192,7 +192,7 @@ class Dropzone extends React.Component {
         if (!disablePreview) {
           file.preview = blob; // eslint-disable-line no-param-reassign
         }
-        if (this.fileAccepted(file) && this.fileMatchSize(file)) {
+        if (fileAccepted(file) && fileMatchSize(file)) {
           acceptedFiles.push(file);
         } else {
           rejectedFiles.push(file);
