@@ -192,7 +192,9 @@ class Dropzone extends React.Component {
         if (!disablePreview) {
           file.preview = blob; // eslint-disable-line no-param-reassign
         }
-        if (fileAccepted(file) && fileMatchSize(file)) {
+        if (
+          fileAccepted(file, accept) &&
+          fileMatchSize(file, maxSize, minSize)) {
           acceptedFiles.push(file);
         } else {
           rejectedFiles.push(file);
@@ -229,7 +231,7 @@ class Dropzone extends React.Component {
       }
 
       // Clear files value
-      this.draggedFiles = null
+      this.draggedFiles = null;
 
       // Reset drag state
       this.setState({
@@ -237,8 +239,8 @@ class Dropzone extends React.Component {
         draggedFiles: [],
         acceptedFiles,
         rejectedFiles
-      })
-    })
+      });
+    });
   }
 
   onClick(evt) {
