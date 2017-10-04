@@ -13,6 +13,40 @@ import {
 import styles from './utils/styles'
 
 class Dropzone extends React.Component {
+
+  static resetImageOrientation(image, callback) {
+    const img = new Image();
+    img.onload = () => {
+      EXIF.getData(img, function orientationReset() {
+        const width = img.width;
+        const height = img.height;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const srcOrientation = EXIF.getTag(this, 'Orientation');
+        if ([5, 6, 7, 8].indexOf(srcOrientation) > -1) {
+          canvas.width = height;
+          canvas.height = width;
+        } else {
+          canvas.width = width;
+          canvas.height = height;
+        }
+        switch (srcOrientation) {
+          case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+          case 3: ctx.transform(-1, 0, 0, -1, width, height); break;
+          case 4: ctx.transform(1, 0, 0, -1, 0, height); break;
+          case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+          case 6: ctx.transform(0, 1, -1, 0, height, 0); break;
+          case 7: ctx.transform(0, -1, -1, 0, height, width); break;
+          case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+          default: ctx.transform(1, 0, 0, 1, 0, 0);
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => callback(URL.createObjectURL(blob)));
+      });
+    };
+    img.src = URL.createObjectURL(image);
+  }
+
   constructor(props, context) {
     super(props, context)
     this.composeHandlers = this.composeHandlers.bind(this)
