@@ -6,7 +6,8 @@
   "scripts": {
     "ci": "git-cz",
     "clean": "rimraf ./dist",
-    "build": "npm run clean && webpack && npm run build:es",
+    "build": "npm run clean && npm run build:umd && npm run build:es",
+    "build:umd": "NODE_ENV=production webpack",
     "build:es": "BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore spec.js",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
@@ -16,7 +17,7 @@
     "eslint:src": "eslint ./src ./examples ./*.js",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
-    "prepublish": "NODE_ENV=production npm run build && npm run test:umd && npm run test:es",
+    "prepublish": "npm run build && npm run test:umd && npm run test:es",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
