@@ -1,19 +1,93 @@
 # Contributing to react-dropzone
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before making a change. 
+Contributions are welcome and are greatly appreciated! Every little bit helps, and credit will
+always be given.
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+When contributing to this repository, please first discuss the change you wish to make via issue,
+so that owners take notice.
 
 ## Pull Request Process
+Before you submit a pull request from your forked repo, check that it meets these guidelines:
 
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
-   build.
-2. Update the README.md with details of changes to the interface, this includes new environment 
-   variables, exposed ports, useful file locations and container parameters.
-3. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
-4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
+1. After creating a PR you will be asked to define the scope of the given issue through a predined documentation process.
+2. If the pull request fixes a bug, it should include tests that fail without the changes, and pass
+with them.
+3. If the pull request adds functionality, the docs (normally) should be updated as part of the same PR.
+4. The pull request should work for React 15, React 0.14 and React 0.13. The CI server should run the
+tests in all versions automatically when you push the PR, but if you'd like to check locally, you
+can do so (see above).
+5. Please rebase and resolve all conflicts before submitting.
+6. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
    do not have permission to do that, you may request the second reviewer to merge it for you.
+
+## Setting up your environment
+
+After forking react-dropzone to your own github account, do the following steps to get started:
+(every specific build tool command can be run with either yarn or npm)
+
+```bash
+# clone your fork to your local machine
+git clone https://github.com/[Username]/react-dropzone.git
+
+# step into local repo
+cd react-dropzone
+```
+
+### Running Tests
+
+```bash
+# run tests on whatever version of React is currently installed
+yarn test
+```
+
+```bash
+# run tests on all supported versions of React
+yarn run test:all
+```
+
+```bash
+# faster feedback for TDD
+yarn run test:watch
+```
+### Style & Linting
+
+This codebase adheres to the [Airbnb Styleguide](https://github.com/airbnb/javascript) and is
+enforced using [ESLint](http://eslint.org/).
+
+It is recommended that you install an eslint plugin for your editor of choice when working on this
+codebase, however you can always check to see if the source code is compliant by running:
+
+```bash
+yarn run lint
+```
+
+### Create a feature branch
+If you think that bigger changes are needed please create a feature branch and put your PR title
+to `[WIP] whatever problem this title defines` until you think that it can be took over by the
+react-dropzone maintainers.
+
+```bash
+git checkout -b feature/whatever-feature-branch-name
+```
+
+### Link react-dropzone to another react project
+If you would like to test specific use cases with react-dropzone it is recommended to
+link your forked react-dropzone repo to another react project for real time test case
+scenarios and proper use of react dev tools to see if changes take effect.
+
+To do so use following commands:
+
+``` bash
+# link your forked react-dropzone repo
+cd react-dropzone
+yarn link
+```
+
+``` bash
+# go to a different react project you want to test the react-dropzone component
+# and link your forked local react-dropzone repo to it.
+cd to-different-react-project
+yarn link react-dropzone
+```
 
 ## Code of Conduct
 
@@ -68,24 +142,3 @@ representing a project or community include using an official project e-mail
 address, posting via an official social media account, or acting as an appointed
 representative at an online or offline event. Representation of a project may be
 further defined and clarified by project maintainers.
-
-### Enforcement
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at [INSERT EMAIL ADDRESS]. All
-complaints will be reviewed and investigated and will result in a response that
-is deemed necessary and appropriate to the circumstances. The project team is
-obligated to maintain confidentiality with regard to the reporter of an incident.
-Further details of specific enforcement policies may be posted separately.
-
-Project maintainers who do not follow or enforce the Code of Conduct in good
-faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership.
-
-### Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
-available at [http://contributor-covenant.org/version/1/4][version]
-
-[homepage]: http://contributor-covenant.org
-[version]: http://contributor-covenant.org/version/1/4/
