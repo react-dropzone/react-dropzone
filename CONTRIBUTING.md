@@ -8,7 +8,7 @@ so that owners take notice.
 ## Pull Request Process
 Before you submit a pull request from your forked repo, check that it meets these guidelines:
 
-1. After creating a PR you will be asked to define the scope of the given issue through a predined documentation process.
+1. After creating a PR you will be asked to define the scope of the given issue through a predefined documentation process.
 2. If the pull request fixes a bug, it should include tests that fail without the changes, and pass
 with them.
 3. If the pull request adds functionality, the docs (normally) should be updated as part of the same PR.
