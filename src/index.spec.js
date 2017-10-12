@@ -853,16 +853,16 @@ describe('Dropzone', () => {
       const dropSpy = spy()
       const dropzone = mount(<Dropzone onDrop={dropSpy} />)
       dropzone.simulate('drop', { dataTransfer: { files } })
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview')
-      expect(dropSpy.firstCall.args[0][0].preview).toBeUndefined()
+      expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview')
+      expect(dropSpy.firstCall.args[0][0].preview).toContain('data://file1.pdf')
     })
 
     it('should generate previews for images', () => {
       const dropSpy = spy()
       const dropzone = mount(<Dropzone onDrop={dropSpy} />)
       dropzone.simulate('drop', { dataTransfer: { files: images } })
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview')
-      expect(dropSpy.firstCall.args[0][0].preview).toBeUndefined()
+      expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview')
+      expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif')
     })
 
     it('should not throw error when preview cannot be created', () => {
