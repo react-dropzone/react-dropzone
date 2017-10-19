@@ -71,7 +71,7 @@ class Dropzone extends React.Component {
   }
 
   onDocumentDrop(evt) {
-    if (this.node.contains(evt.target)) {
+    if (this.node && this.node.contains(evt.target)) {
       // if we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
       return
     }
