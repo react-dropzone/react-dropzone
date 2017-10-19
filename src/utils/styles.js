@@ -19,5 +19,10 @@ export default {
     borderColor: '#666',
     borderStyle: 'dashed',
     borderRadius: 5
+  },
+  focused: {
+    borderWidth: 2,
+    borderColor: '#6c6',
+    borderStyle: 'solid'
   }
 }

@@ -23,6 +23,8 @@ class Dropzone extends React.Component {
     this.onDragOver = this.onDragOver.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDrop = this.onDrop.bind(this)
+    this.onFocus = this.onFocus.bind(this)
+    this.onBlur = this.onBlur.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
 
@@ -203,6 +205,18 @@ class Dropzone extends React.Component {
     })
   }
 
+  onFocus() {
+    this.setState({
+      isFocusActive: true
+    })
+  }
+
+  onBlur() {
+    this.setState({
+      isFocusActive: false
+    })
+  }
+
   onClick(evt) {
     const { onClick, disableClick } = this.props
     if (!disableClick) {
@@ -280,6 +294,7 @@ class Dropzone extends React.Component {
       accept,
       acceptClassName,
       activeClassName,
+      focusClassName,
       children,
       disabled,
       disabledClassName,
@@ -296,18 +311,25 @@ class Dropzone extends React.Component {
       className,
       disabledStyle,
       rejectStyle,
+      focusedStyle,
       style,
       ...props // eslint-disable-line prefer-const
     } = rest
 
-    const { isDragActive, draggedFiles } = this.state
+    const { isDragActive, draggedFiles, isFocusActive } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
     className = className || ''
     const noStyles =
-      !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
+      !className &&
+      !style &&
+      !activeStyle &&
+      !acceptStyle &&
+      !rejectStyle &&
+      !disabledStyle &&
+      !focusClassName
 
     if (isDragActive && activeClassName) {
       className += ' ' + activeClassName
@@ -321,6 +343,9 @@ class Dropzone extends React.Component {
     if (disabled && disabledClassName) {
       className += ' ' + disabledClassName
     }
+    if (isFocusActive && focusClassName) {
+      className += ' ' + focusClassName
+    }
 
     if (noStyles) {
       style = styles.default
@@ -328,6 +353,7 @@ class Dropzone extends React.Component {
       acceptStyle = style.active
       rejectStyle = styles.rejected
       disabledStyle = styles.disabled
+      focusedStyle = styles.focused
     }
 
     let appliedStyle = { ...style }
@@ -355,15 +381,27 @@ class Dropzone extends React.Component {
         ...disabledStyle
       }
     }
+    if (focusedStyle && isFocusActive) {
+      appliedStyle = {
+        ...appliedStyle,
+        ...focusedStyle
+      }
+    }
 
     const inputAttributes = {
       accept,
       disabled,
       type: 'file',
-      style: { display: 'none' },
+      style: {
+        width: '0px',
+        height: '0px',
+        overflow: 'hidden'
+      },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
+      onFocus: this.composeHandlers(this.onFocus),
+      onBlur: this.composeHandlers(this.onBlur),
       autoComplete: 'off'
     }
 
@@ -500,6 +538,11 @@ Dropzone.propTypes = {
    * className for disabled state
    */
   disabledClassName: PropTypes.string,
+
+  /**
+    * className for focused state
+    */
+  focusClassName: PropTypes.string,
 
   /**
    * CSS styles to apply
