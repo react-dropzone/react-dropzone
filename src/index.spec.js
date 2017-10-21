@@ -583,13 +583,22 @@ describe('Dropzone', () => {
       expect(rejected.length).toBeGreaterThan(1)
     })
 
-    it('should reject files on multiple drop if multiple is false', () => {
+    it('should reject single file on multiple drop if multiple is false', () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
 
       dropzone.simulate('drop', { dataTransfer: { files: [images[0]] } })
       const [accepted, rejected] = dropSpy.firstCall.args
       expect(accepted.length).toEqual(0)
-      expect(rejected.length).toBeGreaterThanOrEqual(1)
+      expect(rejected.length).toEqual(1)
+    })
+
+    it('should reject all files on multiple drop if multiple is false', () => {
+      const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
+
+      dropzone.simulate('drop', { dataTransfer: { files: images } })
+      const [accepted, rejected] = dropSpy.firstCall.args
+      expect(accepted.length).toEqual(0)
+      expect(rejected.length).toBeGreaterThan(0)
     })
 
     it('should take all dropped files if multiple is true', () => {
