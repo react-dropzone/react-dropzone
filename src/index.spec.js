@@ -3,7 +3,7 @@ import { mount, render } from 'enzyme'
 import { spy, stub } from 'sinon'
 import { onDocumentDragOver } from './utils'
 
-const Dropzone = require(process.env.NODE_ENV === 'production' ? '../dist/index' : './index') // eslint-disable-line import/no-dynamic-require
+const Dropzone = require(process.env.JEST_TARGET ? process.env.JEST_TARGET : './index') // eslint-disable-line import/no-dynamic-require
 const DummyChildComponent = () => null
 
 let files

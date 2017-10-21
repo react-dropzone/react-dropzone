@@ -52,7 +52,7 @@ class FullScreen extends React.Component {
     return (
       <Dropzone
         disableClick
-        style={{}}
+        style={{position: "relative"}}
         accept={accept}
         onDrop={this.onDrop.bind(this)}
         onDragEnter={this.onDragEnter.bind(this)}
