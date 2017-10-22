@@ -16,13 +16,13 @@ class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.composeHandlers = this.composeHandlers.bind(this)
-    this.onClick = this.onClick.bind(this)
+    this.onClick = this.composeHandlers(this.onClick.bind(this))
     this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDrop = this.onDrop.bind(this)
+    this.onDragEnter = this.composeHandlers(this.onDragEnter.bind(this))
+    this.onDragLeave = this.composeHandlers(this.onDragLeave.bind(this))
+    this.onDragOver = this.composeHandlers(this.onDragOver.bind(this))
+    this.onDragStart = this.composeHandlers(this.onDragStart.bind(this))
+    this.onDrop = this.composeHandlers(this.onDrop.bind(this))
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
 
@@ -395,12 +395,12 @@ class Dropzone extends React.Component {
         className={className}
         style={appliedStyle}
         {...divProps /* expand user provided props first so event handlers are never overridden */}
-        onClick={this.composeHandlers(this.onClick)}
-        onDragStart={this.composeHandlers(this.onDragStart)}
-        onDragEnter={this.composeHandlers(this.onDragEnter)}
-        onDragOver={this.composeHandlers(this.onDragOver)}
-        onDragLeave={this.composeHandlers(this.onDragLeave)}
-        onDrop={this.composeHandlers(this.onDrop)}
+        onClick={this.onClick}
+        onDragStart={this.onDragStart}
+        onDragEnter={this.onDragEnter}
+        onDragOver={this.onDragOver}
+        onDragLeave={this.onDragLeave}
+        onDrop={this.onDrop}
         ref={this.setRef}
         aria-disabled={disabled}
       >
