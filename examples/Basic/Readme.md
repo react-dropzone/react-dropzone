@@ -17,7 +17,7 @@ class Basic extends React.Component {
     return (
       <section>
         <div className="dropzone">
-          <Dropzone onDrop={this.onDrop.bind(this)}>
+          <Dropzone onDrop={this.onDrop.bind(this)} fullScreen={true} >
             <p>Try dropping some files here, or click to select files to upload.</p>
           </Dropzone>
         </div>

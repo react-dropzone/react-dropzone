@@ -16,13 +16,15 @@ class Dropzone extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.composeHandlers = this.composeHandlers.bind(this)
-    this.onClick = this.onClick.bind(this)
+    this.composeHandlersFullscreen = this.composeHandlersFullscreen.bind(this)
+    this.onClick = this.composeHandlers(this.onClick.bind(this))
     this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDrop = this.onDrop.bind(this)
+    this.onDragEnter = this.composeHandlers(this.onDragEnter.bind(this))
+    this.onDragLeave = this.composeHandlers(this.onDragLeave.bind(this))
+    this.onDragOver = this.composeHandlers(this.onDragOver.bind(this))
+    this.onDragStart = this.composeHandlers(this.onDragStart.bind(this))
+    this.onDragEnd = this.composeHandlers(this.onDragEnd.bind(this))
+    this.onDrop = this.composeHandlers(this.onDrop.bind(this))
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
 
@@ -39,23 +41,41 @@ class Dropzone extends React.Component {
   }
 
   componentDidMount() {
-    const { preventDropOnDocument } = this.props
+    const { preventDropOnDocument, fullScreen } = this.props
     this.dragTargets = []
 
-    if (preventDropOnDocument) {
+    if (preventDropOnDocument && !fullScreen) {
       document.addEventListener('dragover', onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
+
+    if (fullScreen) {
+      document.addEventListener('dragenter', this.onDragEnter, false)
+      document.addEventListener('dragend', this.onDragEnd, false)
+      document.addEventListener('dragover', this.onDragOver, false)
+      document.addEventListener('dragStart', this.onDragStart, false)
+      document.addEventListener('drop', this.onDrop, false)
+    }
+
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
 
   componentWillUnmount() {
-    const { preventDropOnDocument } = this.props
-    if (preventDropOnDocument) {
+    const { preventDropOnDocument, fullScreen } = this.props
+
+    if (preventDropOnDocument && !fullScreen) {
       document.removeEventListener('dragover', onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
+    }
+
+    if (fullScreen) {
+      document.removeEventListener('dragenter', this.onDragEnter)
+      document.removeEventListener('dragend', this.onDragEnd)
+      document.removeEventListener('dragover', this.onDragOver)
+      document.removeEventListener('dragStart', this.onDragStart)
+      document.removeEventListener('drop', this.onDrop)
     }
     this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
@@ -64,6 +84,14 @@ class Dropzone extends React.Component {
 
   composeHandlers(handler) {
     if (this.props.disabled) {
+      return null
+    }
+
+    return handler
+  }
+
+  composeHandlersFullscreen(handler) {
+    if (this.props.fullScreen) {
       return null
     }
 
@@ -82,6 +110,19 @@ class Dropzone extends React.Component {
   onDragStart(evt) {
     if (this.props.onDragStart) {
       this.props.onDragStart.call(this, evt)
+    }
+  }
+
+  onDragEnd(evt) {
+    evt.preventDefault()
+
+    this.setState({
+      isDragActive: false,
+      draggedFiles: []
+    })
+
+    if (this.props.onDragLeave) {
+      this.props.onDragLeave.call(this, evt)
     }
   }
 
@@ -375,6 +416,7 @@ class Dropzone extends React.Component {
     const customProps = [
       'acceptedFiles',
       'preventDropOnDocument',
+      'fullScreen',
       'disablePreview',
       'disableClick',
       'activeClassName',
@@ -387,6 +429,7 @@ class Dropzone extends React.Component {
       'maxSize',
       'minSize'
     ]
+
     const divProps = { ...props }
     customProps.forEach(prop => delete divProps[prop])
 
@@ -395,12 +438,12 @@ class Dropzone extends React.Component {
         className={className}
         style={appliedStyle}
         {...divProps /* expand user provided props first so event handlers are never overridden */}
-        onClick={this.composeHandlers(this.onClick)}
-        onDragStart={this.composeHandlers(this.onDragStart)}
-        onDragEnter={this.composeHandlers(this.onDragEnter)}
-        onDragOver={this.composeHandlers(this.onDragOver)}
-        onDragLeave={this.composeHandlers(this.onDragLeave)}
-        onDrop={this.composeHandlers(this.onDrop)}
+        onClick={this.onClick}
+        onDragStart={this.composeHandlersFullscreen(this.onDragStart)}
+        onDragEnter={this.composeHandlersFullscreen(this.onDragEnter)}
+        onDragOver={this.composeHandlersFullscreen(this.onDragOver)}
+        onDragLeave={this.composeHandlersFullscreen(this.onDragLeave)}
+        onDrop={this.composeHandlersFullscreen(this.onDrop)}
         ref={this.setRef}
         aria-disabled={disabled}
       >
@@ -450,6 +493,11 @@ Dropzone.propTypes = {
    * If false, allow dropped items to take over the current browser window
    */
   preventDropOnDocument: PropTypes.bool,
+
+  /**
+   * If true, make dropzone in the document
+   */
+  fullScreen: PropTypes.bool,
 
   /**
    * Pass additional attributes to the `<input type="file"/>` tag
@@ -578,6 +626,7 @@ Dropzone.defaultProps = {
   disabled: false,
   disablePreview: false,
   disableClick: false,
+  fullScreen: false,
   multiple: true,
   maxSize: Infinity,
   minSize: 0
