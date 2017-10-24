@@ -282,6 +282,7 @@ class Dropzone extends React.Component {
       activeClassName,
       children,
       disabled,
+      required,
       disabledClassName,
       inputProps,
       multiple,
@@ -359,6 +360,7 @@ class Dropzone extends React.Component {
     const inputAttributes = {
       accept,
       disabled,
+      required,
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
@@ -477,6 +479,11 @@ Dropzone.propTypes = {
   minSize: PropTypes.number,
 
   /**
+   * Set requirement
+   */
+  required: PropTypes.bool,
+
+  /**
    * className
    */
   className: PropTypes.string,
@@ -576,6 +583,7 @@ Dropzone.propTypes = {
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disabled: false,
+  required: false,
   disablePreview: false,
   disableClick: false,
   multiple: true,
