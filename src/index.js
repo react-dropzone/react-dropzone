@@ -260,7 +260,6 @@ class Dropzone extends React.Component {
   open() {
     this.isFileDialogActive = true
     this.fileInputEl.value = null
-    this.fileInputEl.click()
   }
 
   renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
@@ -364,7 +363,18 @@ class Dropzone extends React.Component {
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
-      autoComplete: 'off'
+      autoComplete: 'off',
+      id: 'selectFile'
+    }
+
+    const labelAttributes = {
+      htmlFor: 'selectFile',
+      style: {
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        cursor: 'pointer'
+      }
     }
 
     if (name && name.length) {
@@ -404,7 +414,9 @@ class Dropzone extends React.Component {
         ref={this.setRef}
         aria-disabled={disabled}
       >
-        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
+        <label {...labelAttributes}>
+          {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
+        </label>
         <input
           {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
