@@ -252,6 +252,7 @@ class Dropzone extends React.Component {
   setRefs(ref) {
     this.fileInputEl = ref
   }
+
   /**
    * Open system file upload dialog.
    *
@@ -286,6 +287,7 @@ class Dropzone extends React.Component {
       multiple,
       name,
       rejectClassName,
+      disableClick,
       ...rest
     } = this.props
 
@@ -363,12 +365,10 @@ class Dropzone extends React.Component {
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
-      autoComplete: 'off',
-      id: 'selectFile'
+      autoComplete: 'off'
     }
 
     const labelAttributes = {
-      htmlFor: 'selectFile',
       style: {
         width: '100%',
         height: '100%',
@@ -399,6 +399,15 @@ class Dropzone extends React.Component {
     ]
     const divProps = { ...props }
     customProps.forEach(prop => delete divProps[prop])
+    const childContainer = (
+      <div>
+        <input
+          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {...inputAttributes}
+        />
+        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
+      </div>
+    )
 
     return (
       <div
@@ -414,13 +423,7 @@ class Dropzone extends React.Component {
         ref={this.setRef}
         aria-disabled={disabled}
       >
-        <label {...labelAttributes}>
-          {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
-        </label>
-        <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
-          {...inputAttributes}
-        />
+        {disableClick ? childContainer : <label {...labelAttributes}>{childContainer}</label>}
       </div>
     )
   }
@@ -449,8 +452,8 @@ Dropzone.propTypes = {
   disableClick: PropTypes.bool,
 
   /**
- * Enable/disable the dropzone entirely
- */
+   * Enable/disable the dropzone entirely
+   */
   disabled: PropTypes.bool,
 
   /**
