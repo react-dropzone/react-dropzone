@@ -266,8 +266,8 @@ class Dropzone extends React.Component {
   renderChildren = (children, isDragActive, isDragAccept, isDragReject, childrenProps) => {
     if (typeof children === 'function') {
       return children({
-        ...this.state,
         ...childrenProps,
+        ...this.state,
         isDragActive,
         isDragAccept,
         isDragReject
