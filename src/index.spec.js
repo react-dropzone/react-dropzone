@@ -103,6 +103,20 @@ describe('Dropzone', () => {
       const dropzoneWithFunction = mount(<Dropzone>{() => content}</Dropzone>)
       expect(dropzoneWithFunction.html()).toEqual(dropzone.html())
     })
+
+    it('should pass childrenProps to children function', () => {
+      const dropzone = mount(
+        <Dropzone>
+          <p>some content</p>
+        </Dropzone>
+      )
+      const dropzoneWithFunction = mount(
+        <Dropzone childrenProps={{ myProp: 'some content' }}>
+          {({ myProp }) => <p>{myProp}</p>}
+        </Dropzone>
+      )
+      expect(dropzoneWithFunction.html()).toEqual(dropzone.html())
+    })
   })
 
   describe('document drop protection', () => {
