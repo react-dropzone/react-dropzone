@@ -263,9 +263,10 @@ class Dropzone extends React.Component {
     this.fileInputEl.click()
   }
 
-  renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
+  renderChildren = (children, isDragActive, isDragAccept, isDragReject, childrenProps) => {
     if (typeof children === 'function') {
       return children({
+        ...childrenProps,
         ...this.state,
         isDragActive,
         isDragAccept,
@@ -284,6 +285,7 @@ class Dropzone extends React.Component {
       disabled,
       disabledClassName,
       inputProps,
+      childrenProps,
       multiple,
       name,
       rejectClassName,
@@ -404,7 +406,7 @@ class Dropzone extends React.Component {
         ref={this.setRef}
         aria-disabled={disabled}
       >
-        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
+        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject, childrenProps)}
         <input
           {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
           {...inputAttributes}
@@ -430,6 +432,11 @@ Dropzone.propTypes = {
    * Contents of the dropzone
    */
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+
+  /**
+   * Additional props passed to children (only if 'children' is a function)
+   */
+  childrenProps: PropTypes.object,
 
   /**
    * Disallow clicking on the dropzone container to open file dialog
