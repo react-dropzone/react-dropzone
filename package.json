@@ -7,7 +7,7 @@
     "ci": "git-cz",
     "clean": "rimraf ./dist",
     "build": "npm run clean && npm run build:umd && npm run build:es",
-    "build:umd": "NODE_ENV=production webpack",
+    "build:umd": "NODE_ENV=production webpack -p",
     "build:es": "BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore spec.js",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
