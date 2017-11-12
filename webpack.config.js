@@ -10,7 +10,7 @@ module.exports = {
     library: 'Dropzone'
   },
   module: {
-    loaders: [
+    rules: [
       {
         include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'examples')],
         test: /\.js$/,
