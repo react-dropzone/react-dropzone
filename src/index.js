@@ -256,6 +256,7 @@ class Dropzone extends React.Component {
   setRefs(ref) {
     this.fileInputEl = ref
   }
+
   /**
    * Open system file upload dialog.
    *
@@ -264,7 +265,6 @@ class Dropzone extends React.Component {
   open() {
     this.isFileDialogActive = true
     this.fileInputEl.value = null
-    this.fileInputEl.click()
   }
 
   renderChildren = (children, isDragActive, isDragAccept, isDragReject) => {
@@ -291,6 +291,7 @@ class Dropzone extends React.Component {
       multiple,
       name,
       rejectClassName,
+      disableClick,
       ...rest
     } = this.props
 
@@ -371,6 +372,15 @@ class Dropzone extends React.Component {
       autoComplete: 'off'
     }
 
+    const labelAttributes = {
+      style: {
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        cursor: 'pointer'
+      }
+    }
+
     if (name && name.length) {
       inputAttributes.name = name
     }
@@ -393,6 +403,15 @@ class Dropzone extends React.Component {
     ]
     const divProps = { ...props }
     customProps.forEach(prop => delete divProps[prop])
+    const childContainer = (
+      <div>
+        <input
+          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {...inputAttributes}
+        />
+        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
+      </div>
+    )
 
     return (
       <div
@@ -408,11 +427,7 @@ class Dropzone extends React.Component {
         ref={this.setRef}
         aria-disabled={disabled}
       >
-        {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
-        <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
-          {...inputAttributes}
-        />
+        {disableClick ? childContainer : <label {...labelAttributes}>{childContainer}</label>}
       </div>
     )
   }
@@ -441,8 +456,8 @@ Dropzone.propTypes = {
   disableClick: PropTypes.bool,
 
   /**
- * Enable/disable the dropzone entirely
- */
+   * Enable/disable the dropzone entirely
+   */
   disabled: PropTypes.bool,
 
   /**
