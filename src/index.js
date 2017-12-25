@@ -428,18 +428,12 @@ Dropzone.propTypes = {
    * Windows. In some cases there might not be a mime type set at all.
    * See: https://github.com/react-dropzone/react-dropzone/issues/276
    */
-  accept: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string)
-  ]),
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
 
   /**
    * Contents of the dropzone
    */
-  children: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.func
-  ]),
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
 
   /**
    * Disallow clicking on the dropzone container to open file dialog
