@@ -409,6 +409,60 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragReject', true)
     })
 
+    it('should set activeClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" activeClassName="👏" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragActive', true)
+      expect(dropzone.hasClass('👏')).toBe(true)
+    })
+
+    it('should set rejectClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" rejectClassName="👎" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragReject', true)
+      expect(dropzone.hasClass('👎')).toBe(true)
+    })
+
+    it('should set acceptClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" acceptClassName="👍" className="foo" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragAccept', true)
+      expect(dropzone.hasClass('👍')).toBe(true)
+    })
+
+    it('should set disabledClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone disabled disabledClassName="🤐">
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      expect(dropzone.hasClass('🤐')).toBe(true)
+    })
+
+    it('should keep dragging active when leaving from arbitrary node', () => {
+      const arbitraryOverlay = mount(<div />)
+      const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragLeave', { target: arbitraryOverlay })
+      expect(dropzone.state('isDragActive')).toBe(true)
+      expect(dropzone.state('draggedFiles').length > 0).toBe(true)
+    })
+
     it('should apply acceptStyle if multiple is false and single file', () => {
       const dropzone = mount(
         <Dropzone

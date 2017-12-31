@@ -297,7 +297,7 @@ class Dropzone extends React.Component {
     let {
       acceptStyle,
       activeStyle,
-      className,
+      className = '',
       disabledStyle,
       rejectStyle,
       style,
@@ -309,7 +309,6 @@ class Dropzone extends React.Component {
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
-    className = className || ''
     const noStyles =
       !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
 
