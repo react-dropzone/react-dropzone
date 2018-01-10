@@ -112,7 +112,10 @@ class Dropzone extends React.Component {
     evt.preventDefault()
     evt.stopPropagation()
     try {
-      evt.dataTransfer.dropEffect = 'copy' // eslint-disable-line no-param-reassign
+      // The file dialog on Chrome allows users to drag files from the dialog onto
+      // the dropzone, causing the browser the crash when the file dialog is closed.
+      // A drop effect of 'none' prevents the file from being dropped
+      evt.dataTransfer.dropEffect = this.isFileDialogActive ? 'none' : 'copy' // eslint-disable-line no-param-reassign
     } catch (err) {
       // continue regardless of error
     }
