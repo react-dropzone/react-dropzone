@@ -31,8 +31,8 @@
   },
   "size-limit": [
     {
-      "path": "dist/index.js",
-      "limit": "6 KB"
+      "limit": "5.5 KB",
+      "path": "dist/index.js"
     },
     {
       "path": "dist/es/index.js",
@@ -72,7 +72,8 @@
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
     "Mike Olson <me@mwolson.org>",
     "Param Aggarwal",
-    "Tyler Waters <tyler.waters@gmail.com>"
+    "Tyler Waters <tyler.waters@gmail.com>",
+    "Rick Markins <rmarkins@gmail.com>"
   ],
   "license": "MIT",
   "peerDependencies": {
