@@ -15,7 +15,6 @@
     "test:es": "JEST_TARGET=../dist/es/index jest --coverage",
     "test:umd": "JEST_TARGET=../dist/index jest --coverage",
     "eslint:src": "eslint ./src ./examples ./*.js",
-    "eslint:fix": "eslint ./src ./examples ./*.js --fix",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
     "prepublish": "npm run build && npm run test:umd && npm run test:es",
@@ -27,8 +26,8 @@
   },
   "size-limit": [
     {
-      "path": "dist/index.js",
-      "limit": "6 KB"
+      "limit": "5.5 KB",
+      "path": "dist/index.js"
     },
     {
       "path": "dist/es/index.js",
@@ -68,7 +67,8 @@
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
     "Mike Olson <me@mwolson.org>",
     "Param Aggarwal",
-    "Tyler Waters <tyler.waters@gmail.com>"
+    "Tyler Waters <tyler.waters@gmail.com>",
+    "Rick Markins <rmarkins@gmail.com>"
   ],
   "license": "MIT",
   "peerDependencies": {
