@@ -7,13 +7,8 @@
     "ci": "git-cz",
     "clean": "rimraf ./dist",
     "build": "npm run clean && npm run build:umd && npm run build:es",
-<<<<<<< ccbeb652004d7abba45186641cd55ded4f1a7d62
-    "build:umd": "cross-env NODE_ENV=production webpack",
+    "build:umd": "cross-env NODE_ENV=production webpack -p",
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore spec.js",
-=======
-    "build:umd": "NODE_ENV=production webpack -p",
-    "build:es": "BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore spec.js",
->>>>>>> perf(small): updated package.json
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
     "test": "npm run eslint:src && jest --coverage && npm run size",
@@ -31,8 +26,8 @@
   },
   "size-limit": [
     {
-      "path": "dist/index.js",
-      "limit": "6 KB"
+      "limit": "5.5 KB",
+      "path": "dist/index.js"
     },
     {
       "path": "dist/es/index.js",
@@ -72,7 +67,8 @@
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
     "Mike Olson <me@mwolson.org>",
     "Param Aggarwal",
-    "Tyler Waters <tyler.waters@gmail.com>"
+    "Tyler Waters <tyler.waters@gmail.com>",
+    "Rick Markins <rmarkins@gmail.com>"
   ],
   "license": "MIT",
   "peerDependencies": {
