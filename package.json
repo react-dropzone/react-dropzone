@@ -117,9 +117,7 @@
     "sinon": "^3.2.1",
     "size-limit": "^0.11.0",
     "style-loader": "^0.18.2",
-    "uglifyjs-webpack-plugin": "^1.0.1",
-    "webpack": "^3.5.5",
-    "webpack-merge": "^4.1.1"
+    "webpack": "^3.5.5"
   },
   "config": {
     "commitizen": {
