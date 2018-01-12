@@ -264,7 +264,7 @@ describe('Dropzone', () => {
       onClickOuterSpy.reset()
       onClickInnerSpy.reset()
 
-      component.find('Dropzone').simulate('click')
+      component.find(Dropzone).simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(0)
       expect(onClickInnerSpy.callCount).toEqual(1)
     })
@@ -277,7 +277,7 @@ describe('Dropzone', () => {
         </div>
       )
 
-      component.find('Dropzone').simulate('click')
+      component.find(Dropzone).simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(1)
     })
 
@@ -285,7 +285,7 @@ describe('Dropzone', () => {
       const inputPropsClickSpy = spy()
       const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
 
-      component.find('Dropzone').simulate('click')
+      component.simulate('click')
       setTimeout(() => {
         expect(inputPropsClickSpy.callCount).toEqual(1)
         done()
