@@ -5,7 +5,7 @@ export const supportMultiple =
     ? 'multiple' in document.createElement('input')
     : true
 
-export function getDataTransferItems(event) {
+export const getDataTransferItems = event => {
   let dataTransferItemsList = []
   if (event.dataTransfer) {
     const dt = event.dataTransfer
@@ -25,19 +25,15 @@ export function getDataTransferItems(event) {
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
-export function fileAccepted(file, accept) {
-  return file.type === 'application/x-moz-file' || accepts(file, accept)
-}
+export const fileAccepted = (file, accept) =>
+  file.type === 'application/x-moz-file' || accepts(file, accept)
 
-export function fileMatchSize(file, maxSize, minSize) {
-  return file.size <= maxSize && file.size >= minSize
-}
+export const fileMatchSize = (file, maxSize, minSize) =>
+  file.size <= maxSize && file.size >= minSize
 
-export function allFilesAccepted(files, accept) {
-  return files.every(file => fileAccepted(file, accept))
-}
+export const allFilesAccepted = (files, accept) => files.every(file => fileAccepted(file, accept))
 
 // allow the entire document to be a drag target
-export function onDocumentDragOver(evt) {
+export const onDocumentDragOver = evt => {
   evt.preventDefault()
 }
