@@ -38,6 +38,6 @@ export function allFilesAccepted(files, accept) {
 }
 
 // allow the entire document to be a drag target
-export const onDocumentDragOver = evt => {
+export function onDocumentDragOver(evt) {
   evt.preventDefault()
 }
