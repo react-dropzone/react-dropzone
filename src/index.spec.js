@@ -981,6 +981,26 @@ describe('Dropzone', () => {
         }, 300)
       }, 0)
     })
+
+    it('should restore isFileDialogActive to false after the FileDialog was closed', done => {
+      const component = mount(<Dropzone />)
+
+      spy(component.instance(), 'open')
+      component.simulate('click')
+
+      setTimeout(() => {
+        expect(component.instance().isFileDialogActive).toEqual(true)
+
+        const evt = document.createEvent('HTMLEvents')
+        evt.initEvent('focus', false, true)
+        document.body.dispatchEvent(evt)
+
+        setTimeout(() => {
+          expect(component.instance().isFileDialogActive).toEqual(false)
+          done()
+        }, 300)
+      }, 0)
+    })
   })
 
   describe('nested Dropzone component behavior', () => {
