@@ -239,7 +239,7 @@ class Dropzone extends React.Component {
     // execute the timeout only if the FileDialog is opened in the browser
     if (this.isFileDialogActive) {
       setTimeout(() => {
-        if (this.fileInputEl) {
+        if (this.fileInputEl != null) {
           // Returns an object as FileList
           const { files } = this.fileInputEl
 
