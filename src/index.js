@@ -239,11 +239,13 @@ class Dropzone extends React.Component {
     // execute the timeout only if the FileDialog is opened in the browser
     if (this.isFileDialogActive) {
       setTimeout(() => {
-        // Returns an object as FileList
-        const { files } = this.fileInputEl
+        if (this.fileInputEl) {
+          // Returns an object as FileList
+          const { files } = this.fileInputEl
 
-        if (!files.length) {
-          this.isFileDialogActive = false
+          if (!files.length) {
+            this.isFileDialogActive = false
+          }
         }
 
         if (typeof onFileDialogCancel === 'function') {
@@ -396,7 +398,9 @@ class Dropzone extends React.Component {
       <div
         className={className}
         style={appliedStyle}
-        {...divProps /* expand user provided props first so event handlers are never overridden */}
+        {
+          ...divProps /* expand user provided props first so event handlers are never overridden */
+        }
         onClick={this.composeHandlers(this.onClick)}
         onDragStart={this.composeHandlers(this.onDragStart)}
         onDragEnter={this.composeHandlers(this.onDragEnter)}
@@ -408,7 +412,9 @@ class Dropzone extends React.Component {
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {
+            ...inputProps /* expand user provided inputProps first so inputAttributes override them */
+          }
           {...inputAttributes}
         />
       </div>
@@ -439,8 +445,8 @@ Dropzone.propTypes = {
   disableClick: PropTypes.bool,
 
   /**
- * Enable/disable the dropzone entirely
- */
+   * Enable/disable the dropzone entirely
+   */
   disabled: PropTypes.bool,
 
   /**
