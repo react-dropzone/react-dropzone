@@ -30,6 +30,7 @@ class Dropzone extends React.Component {
     this.setRefs = this.setRefs.bind(this)
 
     this.isFileDialogActive = false
+    this.fileDialogCancelTimeout = 0
 
     this.state = {
       draggedFiles: [],
@@ -48,7 +49,6 @@ class Dropzone extends React.Component {
     }
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
-    document.body.onfocus = this.onFileDialogCancel
   }
 
   componentWillUnmount() {
@@ -60,10 +60,7 @@ class Dropzone extends React.Component {
     if (this.fileInputEl != null) {
       this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     }
-    // Can be replaced with removeEventListener, if addEventListener works
-    if (document != null) {
-      document.body.onfocus = null
-    }
+    clearTimeout(this.fileDialogCancelTimeout)
   }
 
   composeHandlers(handler) {
@@ -234,18 +231,18 @@ class Dropzone extends React.Component {
   }
 
   onFileDialogCancel() {
-    // timeout will not recognize context of this method
-    const { onFileDialogCancel } = this.props
     // execute the timeout only if the FileDialog is opened in the browser
     if (this.isFileDialogActive) {
-      setTimeout(() => {
+      document.body.onfocus = null
+      clearTimeout(this.fileDialogCancelTimeout)
+      this.fileDialogCancelTimeout = setTimeout(() => {
         // Returns an object as FileList
         const { files } = this.fileInputEl
 
         if (!files.length) {
           this.isFileDialogActive = false
         }
-
+        const { onFileDialogCancel } = this.props
         if (typeof onFileDialogCancel === 'function') {
           onFileDialogCancel()
         }
@@ -267,6 +264,7 @@ class Dropzone extends React.Component {
    */
   open() {
     this.isFileDialogActive = true
+    document.body.onfocus = this.onFileDialogCancel
     this.fileInputEl.value = null
     this.fileInputEl.click()
   }
