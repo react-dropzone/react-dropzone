@@ -239,11 +239,13 @@ class Dropzone extends React.Component {
     // execute the timeout only if the FileDialog is opened in the browser
     if (this.isFileDialogActive) {
       setTimeout(() => {
-        // Returns an object as FileList
-        const { files } = this.fileInputEl
+        if (this.fileInputEl != null) {
+          // Returns an object as FileList
+          const { files } = this.fileInputEl
 
-        if (!files.length) {
-          this.isFileDialogActive = false
+          if (!files.length) {
+            this.isFileDialogActive = false
+          }
         }
 
         if (typeof onFileDialogCancel === 'function') {
@@ -439,8 +441,8 @@ Dropzone.propTypes = {
   disableClick: PropTypes.bool,
 
   /**
- * Enable/disable the dropzone entirely
- */
+   * Enable/disable the dropzone entirely
+   */
   disabled: PropTypes.bool,
 
   /**
