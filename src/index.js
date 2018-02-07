@@ -58,7 +58,7 @@ class Dropzone extends React.Component {
       document.removeEventListener('drop', this.onDocumentDrop)
     }
     if (this.fileInputEl != null) {
-      this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
+      this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     }
     // Can be replaced with removeEventListener, if addEventListener works
     if (document != null) {
