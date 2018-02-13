@@ -471,12 +471,12 @@ Dropzone.propTypes = {
   name: PropTypes.string,
 
   /**
-   * Maximum file size
+   * Maximum file size (in bytes)
    */
   maxSize: PropTypes.number,
 
   /**
-   * Minimum file size
+   * Minimum file size (in bytes)
    */
   minSize: PropTypes.number,
 
