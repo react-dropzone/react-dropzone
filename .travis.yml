@@ -5,8 +5,9 @@ notifications:
 node_js:
   - '8'
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - npm run semantic-release
+  - 'bash <(curl -s https://codecov.io/bash)'
+  - yarn global add travis-deploy-once
+  - travis-deploy-once "yarn global add semantic-release@13 && semantic-release"
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
