@@ -26,8 +26,18 @@ module.exports = env => {
       extensions: ['.js', '.json']
     },
     externals: {
-      react: 'react',
-      'prop-types': 'prop-types'
+      react: {
+        root: 'React',
+        commonjs2: 'react',
+        commonjs: 'react',
+        amd: 'react'
+      },
+      'prop-types': {
+        root: 'PropTypes',
+        commonjs2: 'prop-types',
+        commonjs: 'prop-types',
+        amd: 'prop-types'
+      }
     }
   }
 }
