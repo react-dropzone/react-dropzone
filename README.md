@@ -2,7 +2,10 @@
 
 # react-dropzone
 
-[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+[![npm](https://img.shields.io/npm/v/react-dropzone.svg)](https://www.npmjs.com/package/react-dropzone)
+[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) 
+[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) 
+[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
