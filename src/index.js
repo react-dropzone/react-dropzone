@@ -486,22 +486,22 @@ Dropzone.propTypes = {
   className: PropTypes.string,
 
   /**
-   * className for active state
+   * className to apply when drag is active
    */
   activeClassName: PropTypes.string,
 
   /**
-   * className for accepted state
+   * className to apply when drop will be accepted
    */
   acceptClassName: PropTypes.string,
 
   /**
-   * className for rejected state
+   * className to apply when drop will be rejected
    */
   rejectClassName: PropTypes.string,
 
   /**
-   * className for disabled state
+   * className to apply when dropzone is disabled
    */
   disabledClassName: PropTypes.string,
 
