@@ -8,7 +8,8 @@ import {
   allFilesAccepted,
   fileMatchSize,
   onDocumentDragOver,
-  getDataTransferItems
+  getDataTransferItems,
+  isIeOrEdge
 } from './utils'
 import styles from './utils/styles'
 
@@ -222,7 +223,11 @@ class Dropzone extends React.Component {
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
       // this is so react can handle state changes in the onClick prop above above
       // see: https://github.com/react-dropzone/react-dropzone/issues/450
-      setTimeout(this.open.bind(this), 0)
+      if (isIeOrEdge()) {
+        setTimeout(this.open.bind(this), 0)
+      } else {
+        this.open()
+      }
     }
   }
 

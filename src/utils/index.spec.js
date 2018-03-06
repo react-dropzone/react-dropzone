@@ -1,4 +1,4 @@
-import { getDataTransferItems } from './'
+import { getDataTransferItems, isIeOrEdge } from './'
 
 const files = [
   {
@@ -85,5 +85,34 @@ describe('getDataTransferItems', () => {
     expect(Object.keys(files[2])).toHaveLength(3)
     getDataTransferItems(event, true)
     expect(Object.keys(files[2])).toHaveLength(3)
+  })
+})
+
+describe('isIeOrEdge', () => {
+  it('should return true for IE10', () => {
+    const userAgent =
+      'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0; .NET4.0E; .NET4.0C; .NET CLR 3.5.30729; .NET CLR 2.0.50727; .NET CLR 3.0.30729)'
+
+    expect(isIeOrEdge(userAgent)).toBe(true)
+  })
+
+  it('should return true for IE11', () => {
+    const userAgent =
+      'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; rv:11.0) like Gecko'
+    expect(isIeOrEdge(userAgent)).toBe(true)
+  })
+
+  it('should return true for Edge', () => {
+    const userAgent =
+      'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16258'
+
+    expect(isIeOrEdge(userAgent)).toBe(true)
+  })
+
+  it('should return false for Chrome', () => {
+    const userAgent =
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
+
+    expect(isIeOrEdge(userAgent)).toBe(false)
   })
 })
