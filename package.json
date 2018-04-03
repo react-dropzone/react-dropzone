@@ -19,7 +19,8 @@
     "logo": "cd logo && sketchtool export artboards logo.sketch",
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
     "size": "size-limit",
-    "size:why": "size-limit --why"
+    "size:why": "size-limit --why",
+    "typescript": "tsc --project ./typings/tests"
   },
   "size-limit": [
     {
@@ -35,6 +36,9 @@
     "*.js": [
       "eslint --fix",
       "git add"
+    ],
+    "*.ts": [
+      "tslint"
     ],
     "*.{svg,png}": [
       "imagemin",
@@ -81,6 +85,8 @@
     "@commitlint/config-angular": "^7.0.1",
     "@commitlint/prompt": "^7.0.0",
     "@commitlint/prompt-cli": "^7.0.0",
+    "@types/react": "^16.3.2",
+    "@types/react-dom": "^16.0.4",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "*",
@@ -123,8 +129,14 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-uglify": "^3.0.0",
     "size-limit": "^0.19.2",
-    "webpack-blocks": "^1.0.0"
+    "webpack-blocks": "^1.0.0",
+    "sinon": "^3.2.1",
+    "style-loader": "^0.18.2",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1",
+    "webpack": "^3.5.5"
   },
+  "typings": "typings/react-dropzone.d.ts",
   "config": {
     "commitizen": {
       "path": "@commitlint/prompt"
