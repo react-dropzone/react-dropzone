@@ -205,9 +205,7 @@ class Dropzone extends React.Component {
     // Reset drag state
     this.setState({
       isDragActive: false,
-      draggedFiles: [],
-      acceptedFiles,
-      rejectedFiles
+      draggedFiles: []
     })
   }
 
