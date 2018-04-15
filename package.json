@@ -75,6 +75,7 @@
   },
   "dependencies": {
     "attr-accept": "^1.0.3",
+    "html5-file-selector": "^1.0.1",
     "prop-types": "^15.5.7"
   },
   "devDependencies": {
