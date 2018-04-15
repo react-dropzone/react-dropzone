@@ -594,7 +594,7 @@ describe('Dropzone', () => {
 
     beforeAll(() => {
       getDroppedOrSelectedFilesStub = stub(html5, 'getDroppedOrSelectedFiles').callsFake(evt =>
-        Promise.resolve(evt.dataTransfer.files)
+        Promise.resolve(evt.dataTransfer.files.map(file => ({ fileObject: file })))
       )
     })
 
@@ -979,7 +979,7 @@ describe('Dropzone', () => {
 
     beforeAll(() => {
       getDroppedOrSelectedFilesStub = stub(html5, 'getDroppedOrSelectedFiles').callsFake(evt =>
-        Promise.resolve(evt.dataTransfer.files)
+        Promise.resolve(evt.dataTransfer.files.map(file => ({ fileObject: file })))
       )
     })
 

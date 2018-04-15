@@ -170,7 +170,8 @@ class Dropzone extends React.Component {
     getDroppedOrSelectedFiles(evt).then(fileList => {
       const acceptedFiles = []
       const rejectedFiles = []
-      fileList.forEach(file => {
+      fileList.forEach(fileWrap => {
+        const file = fileWrap.fileObject
         if (!disablePreview) {
           try {
             file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
