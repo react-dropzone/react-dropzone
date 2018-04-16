@@ -2,7 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { getDroppedOrSelectedFiles } from 'html5-file-selector'
+import { getDroppedOrSelectedFiles } from './utils/Html5FileSelector'
 import {
   supportMultiple,
   fileAccepted,

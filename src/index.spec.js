@@ -1,7 +1,7 @@
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { spy, stub } from 'sinon'
-import * as html5 from 'html5-file-selector'
+import * as html5 from './utils/Html5FileSelector'
 import { onDocumentDragOver } from './utils'
 
 const Dropzone = require(process.env.JEST_TARGET ? process.env.JEST_TARGET : './index') // eslint-disable-line import/no-dynamic-require
