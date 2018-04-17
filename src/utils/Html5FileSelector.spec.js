@@ -67,7 +67,7 @@ function topLevelEntry(entry) {
 
 describe('Html5FileSelector', () => {
   describe('.getDroppedOrSelectedFiles', () => {
-    it('handles files manually selected through a HTML file picker', done => {
+    it('handles files manually selected through a HTML file picker', async () => {
       const mockSelectedFiles = MOCK_MEDIA_FILES.slice(0, 2)
       const filesSelectedEvent = {
         target: {
@@ -75,15 +75,13 @@ describe('Html5FileSelector', () => {
         }
       }
 
-      Html5FileSelector.getDroppedOrSelectedFiles(filesSelectedEvent).then(selectedFiles => {
-        expect(selectedFiles.map(file => file.name).join(',')).toEqual(
-          mockSelectedFiles.map(file => file.name).join(',')
-        )
-        done()
-      })
+      const selectedFiles = await Html5FileSelector.getDroppedOrSelectedFiles(filesSelectedEvent)
+      expect(selectedFiles.map(file => file.name).join(',')).toEqual(
+        mockSelectedFiles.map(file => file.name).join(',')
+      )
     })
 
-    it('handles individual files dropped to a drop zone', done => {
+    it('handles individual files dropped to a drop zone', async () => {
       const mockDataTransferItems = [
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[0])),
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[1])),
@@ -96,23 +94,18 @@ describe('Html5FileSelector', () => {
           items: mockDataTransferItems
         }
       }
-      Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
-        .then(selectedFiles => {
-          const sortedFiles = selectedFiles.sort(fileComparator)
-          expect(sortedFiles.map(file => file.name).join(',')).toEqual(
-            MOCK_MEDIA_FILES.slice(0, 5)
-              .sort(fileComparator)
-              .map(file => file.name)
-              .join(',')
-          )
-          done()
-        })
-        .catch(error => {
-          done(error)
-        })
+      const selectedFiles = await Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
+
+      const sortedFiles = selectedFiles.sort(fileComparator)
+      expect(sortedFiles.map(file => file.name).join(',')).toEqual(
+        MOCK_MEDIA_FILES.slice(0, 5)
+          .sort(fileComparator)
+          .map(file => file.name)
+          .join(',')
+      )
     })
 
-    it('returns flattened files dropped from a mix of files and multi-nested folders dropped to a drop zone', done => {
+    it('returns flattened files dropped from a mix of files and multi-nested folders dropped to a drop zone', async () => {
       const mockDataTransferItems = [
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[0])),
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[1])),
@@ -140,22 +133,17 @@ describe('Html5FileSelector', () => {
           items: mockDataTransferItems
         }
       }
-      Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
-        .then(selectedFiles => {
-          const sortedFiles = selectedFiles.sort(fileComparator)
-          expect(sortedFiles.map(file => file.name).join(',')).toEqual(
-            MOCK_MEDIA_FILES.sort(fileComparator)
-              .map(file => file.name)
-              .join(',')
-          )
-          done()
-        })
-        .catch(error => {
-          done(error)
-        })
+      const selectedFiles = await Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
+
+      const sortedFiles = selectedFiles.sort(fileComparator)
+      expect(sortedFiles.map(file => file.name).join(',')).toEqual(
+        MOCK_MEDIA_FILES.sort(fileComparator)
+          .map(file => file.name)
+          .join(',')
+      )
     })
 
-    it('ignores OS-specific indexing files', done => {
+    it('ignores OS-specific indexing files', async () => {
       const mockDataTransferItems = [
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[0])),
         topLevelEntry(createDataTransferItemFile(MOCK_MEDIA_FILES[1])),
@@ -183,20 +171,15 @@ describe('Html5FileSelector', () => {
           items: mockDataTransferItems
         }
       }
-      Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
-        .then(selectedFiles => {
-          const sortedFiles = selectedFiles.sort(fileComparator)
-          expect(sortedFiles.map(file => file.name).join(',')).toEqual(
-            MOCK_MEDIA_FILES.slice(0, 6)
-              .sort(fileComparator)
-              .map(file => file.name)
-              .join(',')
-          )
-          done()
-        })
-        .catch(error => {
-          done(error)
-        })
+      const selectedFiles = await Html5FileSelector.getDroppedOrSelectedFiles(mockFilesDroppedEvent)
+
+      const sortedFiles = selectedFiles.sort(fileComparator)
+      expect(sortedFiles.map(file => file.name).join(',')).toEqual(
+        MOCK_MEDIA_FILES.slice(0, 6)
+          .sort(fileComparator)
+          .map(file => file.name)
+          .join(',')
+      )
     })
   })
 })
