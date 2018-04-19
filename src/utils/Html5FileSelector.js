@@ -89,10 +89,12 @@ export function getDataTransferFiles(dataTransfer) {
     if (typeof listItem.webkitGetAsEntry === 'function') {
       const entry = listItem.webkitGetAsEntry()
 
-      if (entry && entry.isDirectory) {
-        folderPromises.push(traverseDirectory(entry))
-      } else {
-        filePromises.push(getFile(entry))
+      if (entry) {
+        if (entry.isDirectory) {
+          folderPromises.push(traverseDirectory(entry))
+        } else {
+          filePromises.push(getFile(entry))
+        }
       }
     } else {
       dataTransferFiles.push(listItem)
