@@ -5,11 +5,65 @@ export const supportMultiple =
     ? 'multiple' in document.createElement('input')
     : true
 
-export function getDataTransferItems(event) {
+async function getFileFromEntry(entry) {
+  let result
+  await new Promise(resolve => {
+    entry.file(file => {
+      result = file
+      resolve()
+    })
+  })
+  return result
+}
+
+async function getFilesFromDirectory(directory) {
+  let results = []
+  const dirReader = directory.createReader()
+  await new Promise(resolve => {
+    const entriesReader = async entries => {
+      for (let i = 0; i < entries.length; i += 1) {
+        const entry = entries[i]
+        if (entry.isFile) {
+          results.push(await getFileFromEntry(entry))
+        } else if (entry.isDirectory) {
+          results = results.concat(await getFilesFromDirectory(entry))
+        }
+      }
+      resolve()
+    }
+    dirReader.readEntries(entriesReader)
+  })
+  return results
+}
+
+async function getFilesFromItems(items) {
+  let results = []
+  for (let i = 0; i < items.length; i += 1) {
+    const item = items[i]
+    if (item.webkitGetAsEntry != null && item.webkitGetAsEntry()) {
+      const entry = item.webkitGetAsEntry()
+      if (entry.isFile && item.getAsFile()) {
+        results.push(item.getAsFile())
+      } else if (entry.isDirectory) {
+        results = results.concat(await getFilesFromDirectory(entry, entry.name))
+      }
+    } else if (item.getAsFile != null) {
+      if (item.kind == null || (item.kind === 'file' && item.getAsFile())) {
+        results.push(item.getAsFile())
+      }
+    }
+  }
+  return results
+}
+
+export async function getDataTransferItems(event) {
   let dataTransferItemsList = []
   if (event.dataTransfer) {
     const dt = event.dataTransfer
-    if (dt.files && dt.files.length) {
+    if (dt.items && dt.items.length && dt.items[0].webkitGetAsEntry != null) {
+      // The browser supports dropping of folders, so handle items instead of files
+      dataTransferItemsList = await getFilesFromItems(dt.items)
+    } else if (dt.files && dt.files.length) {
       dataTransferItemsList = dt.files
     } else if (dt.items && dt.items.length) {
       // During the drag even the dataTransfer.files is null
