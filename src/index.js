@@ -90,7 +90,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDragEnter(evt) {
+  async onDragEnter(evt) {
     evt.preventDefault()
 
     // Count the dropzone and any children that are entered.
@@ -100,7 +100,7 @@ class Dropzone extends React.Component {
 
     this.setState({
       isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
-      draggedFiles: getDataTransferItems(evt)
+      draggedFiles: await getDataTransferItems(evt)
     })
 
     if (this.props.onDragEnter) {
