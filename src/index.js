@@ -374,7 +374,7 @@ class Dropzone extends React.Component {
       accept,
       disabled,
       type: 'file',
-      style: { display: 'none' },
+      style: { display: 'none', ...inputProps.style },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
