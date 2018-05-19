@@ -4055,12 +4055,11 @@ html-webpack-plugin@^2.30.0:
     pretty-error "^2.0.2"
     toposort "^1.0.0"
 
-html5-file-selector@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/html5-file-selector/-/html5-file-selector-1.0.1.tgz#ec1a7f9981f93269c602c74b0ed1e4b2ac4bb9c7"
+html5-file-selector@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/html5-file-selector/-/html5-file-selector-2.0.1.tgz#20f9a1280f0b3b34710a769daa7891e1dcf34c18"
   dependencies:
     babel-runtime "6.11.x"
-    mime-types "2.1.x"
 
 htmlparser2@^3.9.1:
   version "3.9.2"
@@ -5848,16 +5847,6 @@ miller-rabin@^4.0.0:
 "mime-db@>= 1.29.0 < 2", mime-db@~1.29.0:
   version "1.29.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.29.0.tgz#48d26d235589651704ac5916ca06001914266878"
-
-mime-db@~1.33.0:
-  version "1.33.0"
-  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.33.0.tgz#a3492050a5cb9b63450541e39d9788d2272783db"
-
-mime-types@2.1.x:
-  version "2.1.18"
-  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.18.tgz#6f323f60a83d11146f831ff11fd66e2fe5503bb8"
-  dependencies:
-    mime-db "~1.33.0"
 
 mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.15, mime-types@~2.1.7:
   version "2.1.16"
