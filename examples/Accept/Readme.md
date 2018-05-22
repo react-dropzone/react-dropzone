@@ -79,15 +79,13 @@ but this one will:
 <Dropzone
   accept="image/jpeg, image/png"
 >
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "All files will be accepted";
-    }
-    if (isDragReject) {
-      return "Some files will be rejected";
-    }
-    return "Dropping some files here...";
-  }}
+  {({ isDragAccept, isDragReject }) => (
+      <div>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        Drop some files here...
+      </div>
+    )} 
 </Dropzone>
 ```
 
