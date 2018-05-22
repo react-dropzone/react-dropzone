@@ -48,8 +48,7 @@ class Dropzone extends React.Component {
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
-    // Tried implementing addEventListener, but didn't work out
-    document.body.onfocus = this.onFileDialogCancel
+    window.addEventListener('focus', this.onFileDialogCancel, false)
   }
 
   componentWillUnmount() {
@@ -61,10 +60,7 @@ class Dropzone extends React.Component {
     if (this.fileInputEl != null) {
       this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     }
-    // Can be replaced with removeEventListener, if addEventListener works
-    if (document != null) {
-      document.body.onfocus = null
-    }
+    window.removeEventListener('focus', this.onFileDialogCancel, false)
   }
 
   composeHandlers(handler) {
