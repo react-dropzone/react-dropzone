@@ -8,6 +8,7 @@ module.exports = env => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: 'index.js',
+      libraryExport: 'default',
       libraryTarget: 'umd',
       library: 'Dropzone'
     },
