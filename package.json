@@ -58,7 +58,8 @@
   },
   "dependencies": {
     "attr-accept": "^1.0.3",
-    "prop-types": "^15.5.7"
+    "prop-types": "^15.5.7",
+    "styled-components": "^3.2.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^3.0.3",
