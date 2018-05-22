@@ -7,6 +7,10 @@ module.exports = {
   showUsage: true,
   showSidebar: false,
   serverPort: 8080,
+  compilerConfig: {
+    transforms: { dangerousTaggedTemplateString: true },
+    objectAssign: 'Object.assign'
+  },
   sections: [
     {
       content: 'README.md'
