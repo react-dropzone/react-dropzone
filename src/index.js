@@ -145,6 +145,7 @@ class Dropzone extends React.Component {
 
   onDrop(evt) {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
+
     const fileList = getDataTransferItems(evt)
     const acceptedFiles = []
     const rejectedFiles = []
@@ -193,6 +194,10 @@ class Dropzone extends React.Component {
 
     if (acceptedFiles.length > 0 && onDropAccepted) {
       onDropAccepted.call(this, acceptedFiles, evt)
+    }
+
+    if (!multiple && fileList.length > 1) {
+      acceptedFiles.length = 0
     }
 
     // Clear files value
