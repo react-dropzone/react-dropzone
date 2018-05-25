@@ -264,7 +264,7 @@ describe('Dropzone', () => {
       onClickOuterSpy.reset()
       onClickInnerSpy.reset()
 
-      component.find('Dropzone').simulate('click')
+      component.find(Dropzone).simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(0)
       expect(onClickInnerSpy.callCount).toEqual(1)
     })
@@ -277,7 +277,7 @@ describe('Dropzone', () => {
         </div>
       )
 
-      component.find('Dropzone').simulate('click')
+      component.find(Dropzone).simulate('click')
       expect(onClickOuterSpy.callCount).toEqual(1)
     })
 
@@ -285,7 +285,7 @@ describe('Dropzone', () => {
       const inputPropsClickSpy = spy()
       const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
 
-      component.find('Dropzone').simulate('click')
+      component.simulate('click')
       setTimeout(() => {
         expect(inputPropsClickSpy.callCount).toEqual(1)
         done()
@@ -407,6 +407,60 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', true)
       expect(child).toHaveProp('isDragReject', true)
+    })
+
+    it('should set activeClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" activeClassName="👏" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragActive', true)
+      expect(dropzone.hasClass('👏')).toBe(true)
+    })
+
+    it('should set rejectClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" rejectClassName="👎" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragReject', true)
+      expect(dropzone.hasClass('👎')).toBe(true)
+    })
+
+    it('should set acceptClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone accept="image/*" acceptClassName="👍" className="foo" multiple={false}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      const child = dropzone.find(DummyChildComponent)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      expect(child).toHaveProp('isDragAccept', true)
+      expect(dropzone.hasClass('👍')).toBe(true)
+    })
+
+    it('should set disabledClassName properly', () => {
+      const dropzone = mount(
+        <Dropzone disabled disabledClassName="🤐">
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      expect(dropzone.hasClass('🤐')).toBe(true)
+    })
+
+    it('should keep dragging active when leaving from arbitrary node', () => {
+      const arbitraryOverlay = mount(<div />)
+      const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragLeave', { target: arbitraryOverlay })
+      expect(dropzone.state('isDragActive')).toBe(true)
+      expect(dropzone.state('draggedFiles').length > 0).toBe(true)
     })
 
     it('should apply acceptStyle if multiple is false and single file', () => {
@@ -924,14 +978,34 @@ describe('Dropzone', () => {
         expect(component.instance().open.callCount).toEqual(1)
 
         // Simulated DOM event - onfocus
-        document.body.addEventListener('focus', () => {})
+        window.addEventListener('focus', () => {})
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('focus', false, true)
-        document.body.dispatchEvent(evt)
+        window.dispatchEvent(evt)
 
         // setTimeout to match the event callback from actual Component
         setTimeout(() => {
           expect(onCancelSpy.callCount).toEqual(1)
+          done()
+        }, 300)
+      }, 0)
+    })
+
+    it('should restore isFileDialogActive to false after the FileDialog was closed', done => {
+      const component = mount(<Dropzone />)
+
+      spy(component.instance(), 'open')
+      component.simulate('click')
+
+      setTimeout(() => {
+        expect(component.instance().isFileDialogActive).toEqual(true)
+
+        const evt = document.createEvent('HTMLEvents')
+        evt.initEvent('focus', false, true)
+        window.dispatchEvent(evt)
+
+        setTimeout(() => {
+          expect(component.instance().isFileDialogActive).toEqual(false)
           done()
         }, 300)
       }, 0)

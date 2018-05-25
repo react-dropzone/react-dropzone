@@ -8,7 +8,8 @@ import {
   allFilesAccepted,
   fileMatchSize,
   onDocumentDragOver,
-  getDataTransferItems
+  getDataTransferItems,
+  isIeOrEdge
 } from './utils'
 import styles from './utils/styles'
 
@@ -47,8 +48,7 @@ class Dropzone extends React.Component {
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
-    // Tried implementing addEventListener, but didn't work out
-    document.body.onfocus = this.onFileDialogCancel
+    window.addEventListener('focus', this.onFileDialogCancel, false)
   }
 
   componentWillUnmount() {
@@ -57,9 +57,10 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
-    this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
-    // Can be replaced with removeEventListener, if addEventListener works
-    document.body.onfocus = null
+    if (this.fileInputEl != null) {
+      this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
+    }
+    window.removeEventListener('focus', this.onFileDialogCancel, false)
   }
 
   composeHandlers(handler) {
@@ -108,7 +109,10 @@ class Dropzone extends React.Component {
     evt.preventDefault()
     evt.stopPropagation()
     try {
-      evt.dataTransfer.dropEffect = 'copy' // eslint-disable-line no-param-reassign
+      // The file dialog on Chrome allows users to drag files from the dialog onto
+      // the dropzone, causing the browser the crash when the file dialog is closed.
+      // A drop effect of 'none' prevents the file from being dropped
+      evt.dataTransfer.dropEffect = this.isFileDialogActive ? 'none' : 'copy' // eslint-disable-line no-param-reassign
     } catch (err) {
       // continue regardless of error
     }
@@ -218,7 +222,11 @@ class Dropzone extends React.Component {
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
       // this is so react can handle state changes in the onClick prop above above
       // see: https://github.com/react-dropzone/react-dropzone/issues/450
-      setTimeout(this.open.bind(this), 0)
+      if (isIeOrEdge()) {
+        setTimeout(this.open.bind(this), 0)
+      } else {
+        this.open()
+      }
     }
   }
 
@@ -232,16 +240,19 @@ class Dropzone extends React.Component {
   onFileDialogCancel() {
     // timeout will not recognize context of this method
     const { onFileDialogCancel } = this.props
-    const { fileInputEl } = this
-    let { isFileDialogActive } = this
-    // execute the timeout only if the onFileDialogCancel is defined and FileDialog
-    // is opened in the browser
-    if (onFileDialogCancel && isFileDialogActive) {
+    // execute the timeout only if the FileDialog is opened in the browser
+    if (this.isFileDialogActive) {
       setTimeout(() => {
-        // Returns an object as FileList
-        const FileList = fileInputEl.files
-        if (!FileList.length) {
-          isFileDialogActive = false
+        if (this.fileInputEl != null) {
+          // Returns an object as FileList
+          const { files } = this.fileInputEl
+
+          if (!files.length) {
+            this.isFileDialogActive = false
+          }
+        }
+
+        if (typeof onFileDialogCancel === 'function') {
           onFileDialogCancel()
         }
       }, 300)
@@ -296,7 +307,7 @@ class Dropzone extends React.Component {
     let {
       acceptStyle,
       activeStyle,
-      className,
+      className = '',
       disabledStyle,
       rejectStyle,
       style,
@@ -308,7 +319,6 @@ class Dropzone extends React.Component {
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
-    className = className || ''
     const noStyles =
       !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
 
@@ -374,24 +384,19 @@ class Dropzone extends React.Component {
       inputAttributes.name = name
     }
 
-    // Remove custom properties before passing them to the wrapper div element
-    const customProps = [
-      'acceptedFiles',
-      'preventDropOnDocument',
-      'disablePreview',
-      'disableClick',
-      'activeClassName',
-      'acceptClassName',
-      'rejectClassName',
-      'disabledClassName',
-      'onDropAccepted',
-      'onDropRejected',
-      'onFileDialogCancel',
-      'maxSize',
-      'minSize'
-    ]
-    const divProps = { ...props }
-    customProps.forEach(prop => delete divProps[prop])
+    // Destructure custom props away from props used for the div element
+    const {
+      acceptedFiles,
+      preventDropOnDocument,
+      disablePreview,
+      disableClick,
+      onDropAccepted,
+      onDropRejected,
+      onFileDialogCancel,
+      maxSize,
+      minSize,
+      ...divProps
+    } = props
 
     return (
       <div
@@ -470,12 +475,12 @@ Dropzone.propTypes = {
   name: PropTypes.string,
 
   /**
-   * Maximum file size
+   * Maximum file size (in bytes)
    */
   maxSize: PropTypes.number,
 
   /**
-   * Minimum file size
+   * Minimum file size (in bytes)
    */
   minSize: PropTypes.number,
 
@@ -485,22 +490,22 @@ Dropzone.propTypes = {
   className: PropTypes.string,
 
   /**
-   * className for active state
+   * className to apply when drag is active
    */
   activeClassName: PropTypes.string,
 
   /**
-   * className for accepted state
+   * className to apply when drop will be accepted
    */
   acceptClassName: PropTypes.string,
 
   /**
-   * className for rejected state
+   * className to apply when drop will be rejected
    */
   rejectClassName: PropTypes.string,
 
   /**
-   * className for disabled state
+   * className to apply when dropzone is disabled
    */
   disabledClassName: PropTypes.string,
 

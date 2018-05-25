@@ -2,7 +2,10 @@
 
 # react-dropzone
 
-[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) [![npm version](https://badge.fury.io/js/react-dropzone.svg)](https://badge.fury.io/js/react-dropzone) [![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) [![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+[![npm](https://img.shields.io/npm/v/react-dropzone.svg)](https://www.npmjs.com/package/react-dropzone)
+[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) 
+[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) 
+[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
@@ -53,13 +56,13 @@ Using `react-dropzone` is similar to using a file form field, but instead of get
 Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
 
 ```javascript static
-    onDrop: acceptedFiles => {
-        const req = request.post('/upload');
-        acceptedFiles.forEach(file => {
-            req.attach(file.name, file);
-        });
-        req.end(callback);
-    }
+onDrop: acceptedFiles => {
+    const req = request.post('/upload');
+    acceptedFiles.forEach(file => {
+        req.attach(file.name, file);
+    });
+    req.end(callback);
+}
 ```
 
 **Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).

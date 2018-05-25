@@ -8,6 +8,7 @@ daysUntilClose: 7
 exemptLabels:
   - BREAKING CHANGE
   - ⚠︎ Pinned
+  - in progress
 # Label to use when marking as stale
 staleLabel: stale
 # Comment to post when marking as stale. Set to `false` to disable
