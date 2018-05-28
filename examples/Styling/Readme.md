@@ -57,7 +57,7 @@ const getColor = (props) => {
         return '#c66';
     }
     return '#666';
-}
+};
 
 const Container = styled.div`
   width: 200px;
