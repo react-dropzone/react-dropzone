@@ -376,7 +376,7 @@ class Dropzone extends React.Component {
       type: 'file',
       style: {
         display: 'none',
-        ...(inputProps && inputProps.style)
+        ...inputProps.style
       },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
@@ -590,6 +590,7 @@ Dropzone.defaultProps = {
   disabled: false,
   disablePreview: false,
   disableClick: false,
+  inputProps: {},
   multiple: true,
   maxSize: Infinity,
   minSize: 0
