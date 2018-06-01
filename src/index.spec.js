@@ -969,10 +969,10 @@ describe('Dropzone', () => {
         expect(component.instance().open.callCount).toEqual(1)
 
         // Simulated DOM event - onfocus
-        document.body.addEventListener('focus', () => {})
+        window.addEventListener('focus', () => {})
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('focus', false, true)
-        document.body.dispatchEvent(evt)
+        window.dispatchEvent(evt)
 
         // setTimeout to match the event callback from actual Component
         setTimeout(() => {
@@ -993,7 +993,7 @@ describe('Dropzone', () => {
 
         const evt = document.createEvent('HTMLEvents')
         evt.initEvent('focus', false, true)
-        document.body.dispatchEvent(evt)
+        window.dispatchEvent(evt)
 
         setTimeout(() => {
           expect(component.instance().isFileDialogActive).toEqual(false)
