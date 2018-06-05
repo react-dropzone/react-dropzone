@@ -548,7 +548,7 @@ Dropzone.propTypes = {
   /**
    * getDataTransferItems handler
    * @param {Event} event
-   * @returns {Array}
+   * @returns {Array} array of File objects
    */
   getDataTransferItems: PropTypes.func,
 
