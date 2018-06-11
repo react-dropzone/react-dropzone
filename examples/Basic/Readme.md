@@ -20,7 +20,15 @@ class Basic extends React.Component {
       <section>
         <div className="dropzone">
           <Dropzone onDrop={this.onDrop.bind(this)}>
-            <p>Try dropping some files here, or click to select files to upload.</p>
+            {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+              <div
+                className={`dropzone-box ${isDragAccept ? 'accept' : ''} ${isDragReject ? 'reject' : ''}`}
+                {...getRootProps({ refKey: 'innerRef' })}
+              >
+                <input {...getInputProps()} />
+                <p>Try dropping some files here, or click to select files to upload.</p>
+              </div>
+            )}
           </Dropzone>
         </div>
         <aside>

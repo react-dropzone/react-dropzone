@@ -32,8 +32,10 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.setRef = this.setRef.bind(this)
-    this.setRefs = this.setRefs.bind(this)
+    this.setInputRef = this.setInputRef.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
+    this.getRootProps = this.getRootProps.bind(this)
+    this.getInputProps = this.getInputProps.bind(this)
     this.isFileDialogActive = false
     this.state = {
       draggedFiles: [],
@@ -50,7 +52,7 @@ class Dropzone extends React.Component {
       document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
-    this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
+    // this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
@@ -61,7 +63,7 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
-    this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
+    // this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
   }
@@ -242,7 +244,7 @@ class Dropzone extends React.Component {
     this.node = ref
   }
 
-  setRefs(ref) {
+  setInputRef(ref) {
     this.fileInputEl = ref
   }
 
@@ -252,6 +254,41 @@ class Dropzone extends React.Component {
 
   allFilesAccepted(files) {
     return files.every(file => fileAccepted(file, this.props.accept))
+  }
+
+  getRootProps({ refKey = 'ref', ...rest } = {}) {
+    return {
+      onClick: this.onClick,
+      onDragStart: this.onDragStart,
+      onDragEnter: this.onDragEnter,
+      onDragOver: this.onDragOver,
+      onDragLeave: this.onDragLeave,
+      onDrop: this.onDrop,
+      [refKey]: this.setRef,
+      ...rest
+    }
+  }
+
+  getInputProps({ refKey = 'ref', ...rest } = {}) {
+    const { accept, multiple, name } = this.props
+    const inputProps = {
+      accept,
+      type: 'file',
+      style: { display: 'none' },
+      multiple: supportMultiple && multiple,
+      onChange: this.onDrop,
+      autoComplete: 'off',
+      [refKey]: this.setInputRef
+    }
+
+    if (name && name.length) {
+      inputProps.name = name
+    }
+
+    return {
+      ...inputProps,
+      ...rest
+    }
   }
 
   /**
@@ -266,72 +303,24 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    const { accept, inputProps, multiple, name, children, ...rest } = this.props
+    const { multiple, children } = this.props
+    const { isDragActive, draggedFiles, acceptedFiles, rejectedFiles } = this.state
 
-    const { isDragActive, draggedFiles } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
-    const inputAttributes = {
-      accept,
-      type: 'file',
-      style: { display: 'none' },
-      multiple: supportMultiple && multiple,
-      ref: this.setRefs,
-      onChange: this.onDrop
-    }
-
-    if (name && name.length) {
-      inputAttributes.name = name
-    }
-
-    // Remove custom properties before passing them to the wrapper div element
-    const customProps = [
-      'acceptedFiles',
-      'preventDropOnDocument',
-      'disablePreview',
-      'disableClick',
-      'onDropAccepted',
-      'onDropRejected',
-      'onFileDialogCancel',
-      'maxSize',
-      'minSize'
-    ]
-    const divProps = { ...rest }
-    customProps.forEach(prop => delete divProps[prop])
-
-    const inputEl = (
-      <input
-        {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
-        {...inputAttributes}
-      />
-    )
-
-    let enhancedChildren
-    if (typeof children === 'function') {
-      enhancedChildren = React.cloneElement(
-        children({ ...this.state, isDragActive, isDragAccept, isDragReject }),
-        {
-          /* expand user provided props first so event handlers are never overridden */
-          ...divProps,
-          onClick: this.onClick,
-          onDragStart: this.onDragStart,
-          onDragEnter: this.onDragEnter,
-          onDragOver: this.onDragOver,
-          onDragLeave: this.onDragLeave,
-          onDrop: this.onDrop,
-          ref: this.setRef
-        }
-      )
-    }
-    return (
-      <div>
-        {enhancedChildren || children}
-        {inputEl}
-      </div>
-    )
+    return children({
+      getRootProps: this.getRootProps,
+      getInputProps: this.getInputProps,
+      isDragActive,
+      isDragAccept,
+      isDragReject,
+      draggedFiles,
+      acceptedFiles,
+      rejectedFiles
+    })
   }
 }
 
@@ -346,9 +335,17 @@ Dropzone.propTypes = {
   accept: PropTypes.string,
 
   /**
-   * Contents of the dropzone
+   * Render function that renders the actual component. It receives object with the following properties,
+   * @param {Function} getRootProps
+   * @param {Function} getInputProps
+   * @param {Boolean} isDragActive
+   * @param {Boolean} isDragAccept
+   * @param {Boolean} isDragReject
+   * @param {Array} draggedFiles
+   * @param {Array} acceptedFiles
+   * @param {Array} rejectedFiles
    */
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  children: PropTypes.func.isRequired,
 
   /**
    * Disallow clicking on the dropzone container to open file dialog
