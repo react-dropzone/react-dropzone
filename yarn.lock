@@ -4048,6 +4048,10 @@ html-webpack-plugin@^2.30.0:
     pretty-error "^2.0.2"
     toposort "^1.0.0"
 
+html5-file-selector@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/html5-file-selector/-/html5-file-selector-2.1.0.tgz#794e4a59766b1a021bd704372add4a04f2802582"
+
 htmlparser2@^3.9.1:
   version "3.9.2"
   resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-3.9.2.tgz#1bdf87acca0f3f9e53fa4fcceb0f4b4cbb00b338"
