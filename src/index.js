@@ -265,17 +265,6 @@ class Dropzone extends React.Component {
     ...rest
   })
 
-  // getRootProps = ({ refKey = 'ref', ...rest } = {}) => ({
-  //   onClick: this.onClick,
-  //   onDragStart: this.onDragStart,
-  //   onDragEnter: this.onDragEnter,
-  //   onDragOver: this.onDragOver,
-  //   onDragLeave: this.onDragLeave,
-  //   onDrop: this.onDrop,
-  //   [refKey]: this.setRef,
-  //   ...rest
-  // })
-
   getInputProps = ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
     const { accept, multiple, name } = this.props
     const inputProps = {
