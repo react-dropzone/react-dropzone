@@ -249,15 +249,32 @@ class Dropzone extends React.Component {
       ...rest
     } = {}
   ) => ({
-    onClick: composeEventHandlers(onClick, this.onClick),
-    onDragStart: composeEventHandlers(onDragStart, this.onDragStart),
-    onDragEnter: composeEventHandlers(onDragEnter, this.onDragEnter),
-    onDragOver: composeEventHandlers(onDragOver, this.onDragOver),
-    onDragLeave: composeEventHandlers(onDragLeave, this.onDragLeave),
-    onDrop: composeEventHandlers(onDrop, this.onDrop),
+    onClick: onClick ? composeEventHandlers(onClick, this.onClick) : this.onClick,
+    onDragStart: onDragStart
+      ? composeEventHandlers(onDragStart, this.onDragStart)
+      : this.onDragStart,
+    onDragEnter: onDragEnter
+      ? composeEventHandlers(onDragEnter, this.onDragEnter)
+      : this.onDragEnter,
+    onDragOver: onDragOver ? composeEventHandlers(onDragOver, this.onDragOver) : this.onDragOver,
+    onDragLeave: onDragLeave
+      ? composeEventHandlers(onDragLeave, this.onDragLeave)
+      : this.onDragLeave,
+    onDrop: onDrop ? composeEventHandlers(onDrop, this.onDrop) : this.onDrop,
     [refKey]: this.setRef,
     ...rest
   })
+
+  // getRootProps = ({ refKey = 'ref', ...rest } = {}) => ({
+  //   onClick: this.onClick,
+  //   onDragStart: this.onDragStart,
+  //   onDragEnter: this.onDragEnter,
+  //   onDragOver: this.onDragOver,
+  //   onDragLeave: this.onDragLeave,
+  //   onDrop: this.onDrop,
+  //   [refKey]: this.setRef,
+  //   ...rest
+  // })
 
   getInputProps = ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
     const { accept, multiple, name } = this.props
@@ -287,7 +304,7 @@ class Dropzone extends React.Component {
    *
    * @public
    */
-  open() {
+  open = () => {
     this.isFileDialogActive = true
     this.fileInputEl.value = null
     this.fileInputEl.click()

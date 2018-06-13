@@ -10,9 +10,7 @@
 export function composeEventHandlers(...fns) {
   return (event, ...args) =>
     fns.some(fn => {
-      if (fn) {
-        fn(event, ...args)
-      }
-      return event.defaultPrevented
+      fn && fn(event, ...args)
+      return event.preventDropzoneDefault
     })
 }
