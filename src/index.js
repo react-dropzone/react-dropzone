@@ -22,27 +22,10 @@ class Dropzone extends React.Component {
     evt.preventDefault()
   }
 
-  constructor(props, context) {
-    super(props, context)
-    this.onClick = this.onClick.bind(this)
-    this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
-    this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
-    this.setRef = this.setRef.bind(this)
-    this.setInputRef = this.setInputRef.bind(this)
-    this.onInputElementClick = this.onInputElementClick.bind(this)
-    this.getRootProps = this.getRootProps.bind(this)
-    this.getInputProps = this.getInputProps.bind(this)
-    this.isFileDialogActive = false
-    this.state = {
-      draggedFiles: [],
-      acceptedFiles: [],
-      rejectedFiles: []
-    }
+  state = {
+    draggedFiles: [],
+    acceptedFiles: [],
+    rejectedFiles: []
   }
 
   componentDidMount() {
@@ -67,7 +50,7 @@ class Dropzone extends React.Component {
     document.body.onfocus = null
   }
 
-  onDocumentDrop(evt) {
+  onDocumentDrop = evt => {
     if (this.node.contains(evt.target)) {
       // if we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
       return
@@ -76,13 +59,13 @@ class Dropzone extends React.Component {
     this.dragTargets = []
   }
 
-  onDragStart(evt) {
+  onDragStart = evt => {
     if (this.props.onDragStart) {
       this.props.onDragStart.call(this, evt)
     }
   }
 
-  onDragEnter(evt) {
+  onDragEnter = evt => {
     evt.preventDefault()
 
     // Count the dropzone and any children that are entered.
@@ -100,7 +83,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDragOver(evt) {
+  onDragOver = evt => {
     // eslint-disable-line class-methods-use-this
     evt.preventDefault()
     evt.stopPropagation()
@@ -116,7 +99,7 @@ class Dropzone extends React.Component {
     return false
   }
 
-  onDragLeave(evt) {
+  onDragLeave = evt => {
     evt.preventDefault()
 
     // Only deactivate once the dropzone and all children have been left.
@@ -136,7 +119,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDrop(evt) {
+  onDrop = evt => {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
     const fileList = getDataTransferItems(evt)
     const acceptedFiles = []
@@ -197,7 +180,7 @@ class Dropzone extends React.Component {
     })
   }
 
-  onClick(evt) {
+  onClick = evt => {
     const { onClick, disableClick } = this.props
     if (!disableClick) {
       evt.stopPropagation()
@@ -214,12 +197,12 @@ class Dropzone extends React.Component {
   }
 
   /* eslint-disable */
-  onInputElementClick(evt) {
+  onInputElementClick = evt => {
     evt.stopPropagation()
   }
   /* eslint-enable */
 
-  onFileDialogCancel() {
+  onFileDialogCancel = () => {
     // timeout will not recognize context of this method
     const { onFileDialogCancel } = this.props
     const { fileInputEl } = this
@@ -238,11 +221,11 @@ class Dropzone extends React.Component {
     }
   }
 
-  setRef(ref) {
+  setRef = ref => {
     this.node = ref
   }
 
-  setInputRef(ref) {
+  setInputRef = ref => {
     this.fileInputEl = ref
   }
 
@@ -254,20 +237,29 @@ class Dropzone extends React.Component {
     return files.every(file => fileAccepted(file, this.props.accept))
   }
 
-  getRootProps({ refKey = 'ref', ...rest } = {}) {
-    return {
-      onClick: this.onClick,
-      onDragStart: this.onDragStart,
-      onDragEnter: this.onDragEnter,
-      onDragOver: this.onDragOver,
-      onDragLeave: this.onDragLeave,
-      onDrop: this.onDrop,
-      [refKey]: this.setRef,
+  getRootProps = (
+    {
+      refKey = 'ref',
+      onClick,
+      onDragStart,
+      onDragEnter,
+      onDragOver,
+      onDragLeave,
+      onDrop,
       ...rest
-    }
-  }
+    } = {}
+  ) => ({
+    onClick: composeEventHandlers(onClick, this.onClick),
+    onDragStart: composeEventHandlers(onDragStart, this.onDragStart),
+    onDragEnter: composeEventHandlers(onDragEnter, this.onDragEnter),
+    onDragOver: composeEventHandlers(onDragOver, this.onDragOver),
+    onDragLeave: composeEventHandlers(onDragLeave, this.onDragLeave),
+    onDrop: composeEventHandlers(onDrop, this.onDrop),
+    [refKey]: this.setRef,
+    ...rest
+  })
 
-  getInputProps({ refKey = 'ref', onChange, onClick, ...rest } = {}) {
+  getInputProps = ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
     const { accept, multiple, name } = this.props
     const inputProps = {
       accept,
