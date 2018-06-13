@@ -300,7 +300,7 @@ class Dropzone extends React.Component {
   }
 
   render() {
-    const { multiple, children } = this.props
+    const { multiple, children, render } = this.props
     const { isDragActive, draggedFiles, acceptedFiles, rejectedFiles } = this.state
 
     const filesCount = draggedFiles.length
@@ -308,7 +308,8 @@ class Dropzone extends React.Component {
     const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
-    return children({
+    const renderFn = children || render
+    return renderFn({
       getRootProps: this.getRootProps,
       getInputProps: this.getInputProps,
       isDragActive,
@@ -342,7 +343,12 @@ Dropzone.propTypes = {
    * @param {Array} acceptedFiles
    * @param {Array} rejectedFiles
    */
-  children: PropTypes.func.isRequired,
+  children: PropTypes.func,
+
+  /**
+   * Alternative render function to children prop
+   */
+  render: PropTypes.func,
 
   /**
    * Disallow clicking on the dropzone container to open file dialog

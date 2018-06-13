@@ -22,15 +22,21 @@ class Accept extends React.Component {
   render() {
     return (
       <section>
-        <div className="dropzone">
-          <Dropzone
-            accept="image/jpeg, image/png"
-            onDrop={(accepted, rejected) => { this.setState({ accepted, rejected }); }}
-          >
-            <p>Try dropping some files here, or click to select files to upload.</p>
-            <p>Only *.jpeg and *.png images will be accepted</p>
-          </Dropzone>
-        </div>
+        <Dropzone
+          accept="image/jpeg, image/png"
+          onDrop={(accepted, rejected) => { this.setState({ accepted, rejected }); }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div
+              {...getRootProps()}
+              className="dropzone"
+            >
+              <input {...getInputProps()} />
+              <p>Try dropping some files here, or click to select files to upload.</p>
+              <p>Only *.jpeg and *.png images will be accepted</p>
+            </div>
+          )}
+        </Dropzone>
         <aside>
           <h2>Accepted files</h2>
           <ul>
@@ -63,13 +69,19 @@ Also, at this moment it's not possible to read file names (and thus, file extens
 <Dropzone
   accept=".jpeg,.png"
 >
-  {({ isDragAccept, isDragReject }) => (
-    <div>
-      {isDragAccept && "All files will be accepted"}
-      {isDragReject && "Some files will be rejected"}
-      Drop some files here...
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+    <div
+      {...getRootProps()}
+      className="dropzone"
+    >
+      <input {...getInputProps()} />
+      <div>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {!isDragActive && "Drop some files here..."}
+      </div>
     </div>
-  )}   
+  )}
 </Dropzone>
 ```
 
@@ -79,15 +91,19 @@ but this one will:
 <Dropzone
   accept="image/jpeg, image/png"
 >
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "All files will be accepted";
-    }
-    if (isDragReject) {
-      return "Some files will be rejected";
-    }
-    return "Dropping some files here...";
-  }}
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+    <div
+      {...getRootProps()}
+      className="dropzone"
+    >
+      <input {...getInputProps()} />
+      <div>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {!isDragActive && "Drop some files here..."}
+      </div>
+    </div>
+  )}
 </Dropzone>
 ```
 

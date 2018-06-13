@@ -21,19 +21,21 @@ const rejectStyle = {
 };
 
 <Dropzone accept="image/*">
-  {({ isDragActive, isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
     let styles = {...baseStyle}
     styles = isDragActive ? {...styles, ...activeStyle} : styles
-    
-    if (isDragReject) {
-      return <div style={{...styles, ...rejectStyle}}>
-        Unsupported file type...
-      </div>
-    } 
+    styles = isDragReject ? {...styles, ...rejectStyle} : styles
           
     return (
-      <div style={styles}>
-        {isDragAccept ? `Drop ${acceptedFiles.length}` : 'Drag'} files here...
+      <div 
+        {...getRootProps()}
+        style={styles}
+      >
+        <input {...getInputProps()} />
+        <div>
+          {isDragAccept ? `Drop ${acceptedFiles.length}` : 'Drag'} files here...
+        </div>
+        {isDragReject && <div>Unsupported file type...</div>}
       </div>
     )
   }}

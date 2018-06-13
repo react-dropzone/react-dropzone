@@ -4,11 +4,12 @@ This example renders a list of the dropped files.
 
 ```
 class Basic extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = { files: [] }
+    this.onDrop = this.onDrop.bind(this)
   }
-
+  
   onDrop(files) {
     this.setState({
       files
@@ -18,19 +19,17 @@ class Basic extends React.Component {
   render() {
     return (
       <section>
-        <div className="dropzone">
-          <Dropzone onDrop={this.onDrop.bind(this)}>
-            {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
-              <div
-                className={`dropzone-box ${isDragAccept ? 'accept' : ''} ${isDragReject ? 'reject' : ''}`}
-                {...getRootProps({ refKey: 'innerRef' })}
-              >
-                <input {...getInputProps()} />
-                <p>Try dropping some files here, or click to select files to upload.</p>
-              </div>
-            )}
-          </Dropzone>
-        </div>
+        <Dropzone onDrop={this.onDrop}>
+          {({ getRootProps, getInputProps }) => (
+            <div
+              {...getRootProps()}
+              className="dropzone"
+            >
+              <input {...getInputProps()} />
+              <p>Try dropping some files here, or click to select files to upload.</p>
+            </div>
+          )}
+        </Dropzone>
         <aside>
           <h2>Dropped files</h2>
           <ul>
