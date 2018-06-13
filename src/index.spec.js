@@ -323,13 +323,17 @@ describe('Dropzone', () => {
         <Dropzone>
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
-              <input {...getInputProps()} onClick={inputPropsClickSpy} />
+              <input
+                {...getInputProps({
+                  onClick: inputPropsClickSpy
+                })}
+              />
             </div>
           )}
         </Dropzone>
       )
 
-      component.find('Dropzone').simulate('click')
+      component.find('input').simulate('click')
       setTimeout(() => {
         expect(inputPropsClickSpy.callCount).toEqual(1)
         done()
@@ -418,7 +422,12 @@ describe('Dropzone', () => {
     it('should set proper dragActive state on dragEnter', () => {
       const dropzone = mount(
         <Dropzone>
-          {props => <DummyChildComponent {...props} />}
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
         </Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
@@ -431,10 +440,11 @@ describe('Dropzone', () => {
     it('should set proper dragReject state on dragEnter', () => {
       const dropzone = mount(
         <Dropzone accept="image/*">
-          {({ getRootProps, getInputProps, ...rest }) => (
-            <DummyChildComponent {...getRootProps()} {...rest}>
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
               <input {...getInputProps()} />
-            </DummyChildComponent>
+              <DummyChildComponent {...restProps} />
+            </div>
           )}
         </Dropzone>
       )
@@ -449,9 +459,10 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*" multiple={false}>
           {({ getRootProps, getInputProps, ...rest }) => (
-            <DummyChildComponent {...getRootProps()} {...rest}>
+            <div {...getRootProps()}>
               <input {...getInputProps()} />
-            </DummyChildComponent>
+              <DummyChildComponent {...rest} />
+            </div>
           )}
         </Dropzone>
       )
@@ -466,9 +477,10 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*" multiple={false}>
           {({ getRootProps, getInputProps, ...rest }) => (
-            <DummyChildComponent {...getRootProps()} {...rest}>
+            <div {...getRootProps()}>
               <input {...getInputProps()} />
-            </DummyChildComponent>
+              <DummyChildComponent {...rest} />
+            </div>
           )}
         </Dropzone>
       )
@@ -483,9 +495,10 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*">
           {({ getRootProps, getInputProps, ...rest }) => (
-            <DummyChildComponent {...getRootProps()} {...rest}>
+            <div {...getRootProps()}>
               <input {...getInputProps()} />
-            </DummyChildComponent>
+              <DummyChildComponent {...rest} />
+            </div>
           )}
         </Dropzone>
       )
@@ -579,7 +592,12 @@ describe('Dropzone', () => {
           onDropAccepted={dropAcceptedSpy}
           onDropRejected={dropRejectedSpy}
         >
-          {props => <DummyChildComponent {...props} />}
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
         </Dropzone>
       )
       const child = dropzone.find(DummyChildComponent)
@@ -1144,10 +1162,10 @@ describe('Dropzone', () => {
             onDropRejected={outerDropRejectedSpy}
             accept="image/*"
           >
-            {({ getRootProps, getInputProps }) => (
+            {({ getRootProps, getInputProps, ...restProps }) => (
               <div {...getRootProps()}>
                 <input {...getInputProps()} />
-                <InnerDropzone />
+                <InnerDropzone {...restProps} />
               </div>
             )}
           </Dropzone>

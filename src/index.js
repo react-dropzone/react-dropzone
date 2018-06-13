@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import accepts from 'attr-accept'
 import getDataTransferItems from './getDataTransferItems'
+import { composeEventHandlers } from './utils'
 
 const supportMultiple = typeof document !== 'undefined' && document && document.createElement
   ? 'multiple' in document.createElement('input')
@@ -52,7 +53,6 @@ class Dropzone extends React.Component {
       document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
-    // this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
@@ -63,7 +63,6 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
-    // this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
   }
@@ -214,12 +213,11 @@ class Dropzone extends React.Component {
     }
   }
 
+  /* eslint-disable */
   onInputElementClick(evt) {
     evt.stopPropagation()
-    if (this.props.inputProps && this.props.inputProps.onClick) {
-      this.props.inputProps.onClick()
-    }
   }
+  /* eslint-enable */
 
   onFileDialogCancel() {
     // timeout will not recognize context of this method
@@ -269,14 +267,15 @@ class Dropzone extends React.Component {
     }
   }
 
-  getInputProps({ refKey = 'ref', ...rest } = {}) {
+  getInputProps({ refKey = 'ref', onChange, onClick, ...rest } = {}) {
     const { accept, multiple, name } = this.props
     const inputProps = {
       accept,
       type: 'file',
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
-      onChange: this.onDrop,
+      onChange: composeEventHandlers(onChange, this.onDrop),
+      onClick: composeEventHandlers(onClick, this.onInputElementClick),
       autoComplete: 'off',
       [refKey]: this.setInputRef
     }
@@ -361,11 +360,6 @@ Dropzone.propTypes = {
    * If false, allow dropped items to take over the current browser window
    */
   preventDropOnDocument: PropTypes.bool,
-
-  /**
-   * Pass additional attributes to the `<input type="file"/>` tag
-   */
-  inputProps: PropTypes.object,
 
   /**
    * Allow dropping multiple files
