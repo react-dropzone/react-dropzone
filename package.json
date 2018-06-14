@@ -26,11 +26,11 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "5.5 KB"
+      "limit": "5.8 KB"
     },
     {
       "path": "dist/es/index.js",
-      "limit": "3 KB"
+      "limit": "3.3 KB"
     }
   ],
   "lint-staged": {
