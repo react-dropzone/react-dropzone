@@ -29,6 +29,8 @@
           "**/testSetup.js"
         ]
       }
-    ]
+    ],
+
+    "no-await-in-loop": "off"
   }
 }

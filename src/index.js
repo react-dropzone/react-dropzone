@@ -86,7 +86,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDragEnter(evt) {
+  async onDragEnter(evt) {
     evt.preventDefault()
 
     // Count the dropzone and any children that are entered.
@@ -96,7 +96,7 @@ class Dropzone extends React.Component {
 
     this.setState({
       isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
-      draggedFiles: getDataTransferItems(evt)
+      draggedFiles: await getDataTransferItems(evt)
     })
 
     if (this.props.onDragEnter) {
@@ -143,9 +143,9 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDrop(evt) {
+  async onDrop(evt) {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
-    const fileList = getDataTransferItems(evt)
+    const fileList = await getDataTransferItems(evt)
     const acceptedFiles = []
     const rejectedFiles = []
 
@@ -399,7 +399,9 @@ class Dropzone extends React.Component {
       <div
         className={className}
         style={appliedStyle}
-        {...divProps /* expand user provided props first so event handlers are never overridden */}
+        {
+          ...divProps /* expand user provided props first so event handlers are never overridden */
+        }
         onClick={this.composeHandlers(this.onClick)}
         onDragStart={this.composeHandlers(this.onDragStart)}
         onDragEnter={this.composeHandlers(this.onDragEnter)}
@@ -411,7 +413,9 @@ class Dropzone extends React.Component {
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {
+            ...inputProps /* expand user provided inputProps first so inputAttributes override them */
+          }
           {...inputAttributes}
         />
       </div>

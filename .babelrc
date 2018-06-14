@@ -2,18 +2,19 @@
   "env": {
     "development": {
       "presets": ["env", "react", "stage-1"],
-      "plugins": ["add-module-exports"]
+      "plugins": ["add-module-exports", "transform-runtime"]
     },
     "test": {
       "presets": ["env", "react", "stage-1"],
-      "plugins": ["add-module-exports"]
+      "plugins": ["add-module-exports", "transform-runtime"]
     },
     "production": {
       "presets": ["env", "react", "stage-1"],
-      "plugins": ["add-module-exports"]
+      "plugins": ["add-module-exports", "transform-runtime"]
     },
     "es": {
-      "presets": [["env",{ "modules": false }], "react", "stage-1"]
+      "presets": [["env",{ "modules": false }], "react", "stage-1"],
+      "plugins": ["transform-runtime"]
     }
   }
 }
