@@ -35,7 +35,7 @@ module.exports = {
         },
         {
           name: 'Opening File Dialog Programmatically',
-          content: 'examples/File Dialog/Readme.md'
+          content: 'examples/FileDialog/Readme.md'
         },
         {
           name: 'Full Screen Dropzone',
