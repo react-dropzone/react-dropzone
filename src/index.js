@@ -340,10 +340,10 @@ class Dropzone extends React.Component {
       disabledStyle = styles.disabled
     }
 
-    let appliedStyle = { ...style }
+    let appliedStyle = { position: 'relative', ...style }
     if (activeStyle && isDragActive) {
       appliedStyle = {
-        ...style,
+        ...appliedStyle,
         ...activeStyle
       }
     }
@@ -361,7 +361,7 @@ class Dropzone extends React.Component {
     }
     if (disabledStyle && disabled) {
       appliedStyle = {
-        ...style,
+        ...appliedStyle,
         ...disabledStyle
       }
     }
