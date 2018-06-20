@@ -74,7 +74,7 @@
     "react": ">=0.14.0"
   },
   "dependencies": {
-    "attr-accept": "^1.0.3",
+    "attr-accept": "^1.1.3",
     "prop-types": "^15.5.7"
   },
   "devDependencies": {
