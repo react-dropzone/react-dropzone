@@ -143,6 +143,12 @@ class Dropzone extends React.Component {
     }
   }
 
+  onInputChange = evt => {
+    const { inputProps: { onChange = () => {} } } = this.props
+    onChange(evt)
+    this.onDrop(evt)
+  }
+
   onDrop(evt) {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
     const fileList = getDataTransferItems(evt)
@@ -150,7 +156,6 @@ class Dropzone extends React.Component {
     const rejectedFiles = []
 
     // Stop default browser behavior
-    evt.preventDefault()
 
     // Reset the counter along with the drag on a drop.
     this.dragTargets = []
@@ -373,7 +378,7 @@ class Dropzone extends React.Component {
       style: { display: 'none' },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
-      onChange: this.onDrop,
+      onChange: this.onInputChange,
       autoComplete: 'off'
     }
 

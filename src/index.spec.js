@@ -293,6 +293,17 @@ describe('Dropzone', () => {
     })
   })
 
+  describe('onChange', () => {
+    it('should invoke inputProps onChange if provided', () => {
+      const inputPropsChangeSpy = spy()
+      const component = mount(<Dropzone inputProps={{ onChange: inputPropsChangeSpy }} />)
+
+      component.find('input').simulate('change', { target: { files: images } })
+      expect(inputPropsChangeSpy.getCall(0).args[0]).toMatchObject({ target: { files: images } })
+      expect(inputPropsChangeSpy.callCount).toEqual(1)
+    })
+  })
+
   describe('drag-n-drop', () => {
     it('should override onDrag* methods', () => {
       const dragStartSpy = spy()
