@@ -156,6 +156,7 @@ class Dropzone extends React.Component {
     const rejectedFiles = []
 
     // Stop default browser behavior
+    evt.preventDefault()
 
     // Reset the counter along with the drag on a drop.
     this.dragTargets = []
