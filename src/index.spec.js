@@ -487,7 +487,7 @@ describe('Dropzone', () => {
       )
       dropzone.simulate('dragEnter', { dataTransfer: { files: [images[0]] } })
       const mainDiv = dropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', acceptStyle)
+      expect(mainDiv).toHaveProp('style', { position: 'relative', ...acceptStyle })
     })
 
     it('should apply rejectStyle if multiple is false and single bad file type', () => {
@@ -503,7 +503,7 @@ describe('Dropzone', () => {
       )
       dropzone.simulate('dragEnter', { dataTransfer: { files: [files[0]] } })
       const mainDiv = dropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', rejectStyle)
+      expect(mainDiv).toHaveProp('style', { position: 'relative', ...rejectStyle })
     })
 
     it('should apply acceptStyle + rejectStyle if multiple is false and multiple good file types', () => {
@@ -520,6 +520,7 @@ describe('Dropzone', () => {
       dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
       const mainDiv = dropzone.find('div').at(0)
       const expectedStyle = {
+        position: 'relative',
         ...acceptStyle,
         ...rejectStyle
       }
