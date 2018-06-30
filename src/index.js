@@ -335,7 +335,7 @@ class Dropzone extends React.Component {
     if (noStyles) {
       style = styles.default
       activeStyle = styles.active
-      acceptStyle = style.active
+      acceptStyle = styles.active
       rejectStyle = styles.rejected
       disabledStyle = styles.disabled
     }
