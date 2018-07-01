@@ -48,8 +48,7 @@ class Dropzone extends React.Component {
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
     this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
-    // Tried implementing addEventListener, but didn't work out
-    document.body.onfocus = this.onFileDialogCancel
+    window.addEventListener('focus', this.onFileDialogCancel, false)
   }
 
   componentWillUnmount() {
@@ -61,10 +60,7 @@ class Dropzone extends React.Component {
     if (this.fileInputEl != null) {
       this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     }
-    // Can be replaced with removeEventListener, if addEventListener works
-    if (document != null) {
-      document.body.onfocus = null
-    }
+    window.removeEventListener('focus', this.onFileDialogCancel, false)
   }
 
   composeHandlers(handler) {
@@ -344,10 +340,10 @@ class Dropzone extends React.Component {
       disabledStyle = styles.disabled
     }
 
-    let appliedStyle = { ...style }
+    let appliedStyle = { position: 'relative', ...style }
     if (activeStyle && isDragActive) {
       appliedStyle = {
-        ...style,
+        ...appliedStyle,
         ...activeStyle
       }
     }
@@ -365,7 +361,7 @@ class Dropzone extends React.Component {
     }
     if (disabledStyle && disabled) {
       appliedStyle = {
-        ...style,
+        ...appliedStyle,
         ...disabledStyle
       }
     }
@@ -374,7 +370,16 @@ class Dropzone extends React.Component {
       accept,
       disabled,
       type: 'file',
-      style: { display: 'none' },
+      style: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        opacity: 0.00001,
+        pointerEvents: 'none',
+        ...inputProps.style
+      },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
@@ -433,7 +438,7 @@ Dropzone.propTypes = {
    * Windows. In some cases there might not be a mime type set at all.
    * See: https://github.com/react-dropzone/react-dropzone/issues/276
    */
-  accept: PropTypes.string,
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
 
   /**
    * Contents of the dropzone
@@ -587,6 +592,7 @@ Dropzone.defaultProps = {
   disabled: false,
   disablePreview: false,
   disableClick: false,
+  inputProps: {},
   multiple: true,
   maxSize: Infinity,
   minSize: 0
