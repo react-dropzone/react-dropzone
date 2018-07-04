@@ -143,6 +143,12 @@ class Dropzone extends React.Component {
     }
   }
 
+  onInputChange = evt => {
+    const { inputProps: { onChange = () => {} } } = this.props
+    onChange(evt)
+    this.onDrop(evt)
+  }
+
   onDrop(evt) {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
     const fileList = getDataTransferItems(evt)
@@ -382,7 +388,7 @@ class Dropzone extends React.Component {
       },
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
-      onChange: this.onDrop,
+      onChange: this.onInputChange,
       autoComplete: 'off'
     }
 
