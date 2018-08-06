@@ -8,9 +8,12 @@ class Basic extends React.Component {
   }
 
   onDrop(files) {
-    this.setState({
-      files
-    });
+    this.setState(
+      prevState => ({
+        ...prevState,
+        files: [...prevState.files, ...files],
+      })
+    );
   }
 
   render() {
