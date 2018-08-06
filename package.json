@@ -26,11 +26,11 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "5.5 KB"
+      "limit": "5.75 KB"
     },
     {
       "path": "dist/es/index.js",
-      "limit": "3 KB"
+      "limit": "3.2 KB"
     }
   ],
   "lint-staged": {
@@ -74,7 +74,7 @@
     "react": ">=0.14.0"
   },
   "dependencies": {
-    "attr-accept": "^1.0.3",
+    "attr-accept": "^1.1.3",
     "prop-types": "^15.5.7"
   },
   "devDependencies": {
