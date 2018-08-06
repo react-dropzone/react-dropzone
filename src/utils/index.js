@@ -9,6 +9,7 @@ export function getDataTransferItems(event) {
   let dataTransferItemsList = []
   if (event.dataTransfer) {
     const dt = event.dataTransfer
+
     if (dt.files && dt.files.length) {
       dataTransferItemsList = dt.files
     } else if (dt.items && dt.items.length) {
@@ -19,6 +20,7 @@ export function getDataTransferItems(event) {
   } else if (event.target && event.target.files) {
     dataTransferItemsList = event.target.files
   }
+
   // Convert from DataTransferItemsList to the native Array
   return Array.prototype.slice.call(dataTransferItemsList)
 }
