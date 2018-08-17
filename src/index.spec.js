@@ -622,20 +622,14 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragReject', false)
     })
 
-    it('should add valid files to rejected files on a multple drop when multiple false', async () => {
-      const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
-      const rejected = dropSpy.firstCall.args[0]
-      expect(rejected.length).toEqual(1)
-    })
-
-    it('should add invalid files to rejected when multiple is false', async () => {
+    it('should reject invalid file when multiple is false', async () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
       await dropzone.simulate('drop', {
-        dataTransfer: { files: images.concat(files) }
+        dataTransfer: { files }
       })
-      const rejected = dropSpy.firstCall.args[1]
-      expect(rejected.length).toEqual(2)
+      const [accepted, rejected] = dropSpy.firstCall.args
+      expect(rejected.length).toEqual(1)
+      expect(accepted.length).toEqual(0)
     })
 
     it('should allow single files to be dropped if multiple is false', async () => {
@@ -645,6 +639,15 @@ describe('Dropzone', () => {
       const [accepted, rejected] = dropSpy.firstCall.args
       expect(accepted.length).toEqual(1)
       expect(rejected.length).toEqual(0)
+    })
+
+    it('should reject multiple files to be dropped if multiple is false', async () => {
+      const dropzone = mount(<Dropzone accept="image/*" onDrop={dropSpy} multiple={false} />)
+
+      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      const [accepted, rejected] = dropSpy.firstCall.args
+      expect(accepted.length).toEqual(0)
+      expect(rejected.length).toEqual(2)
     })
 
     it('should take all dropped files if multiple is true', async () => {
