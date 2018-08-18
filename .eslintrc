@@ -4,6 +4,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "node/no-unpublished-require": 0,
     // Import
     "import/no-extraneous-dependencies": [
       2,
