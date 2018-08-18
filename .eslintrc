@@ -1,9 +1,7 @@
 {
   "extends": ["okonet/node"],
-  "parserOptions": {
-    "sourceType": "module"
-  },
   "rules": {
+    "strict": 0,
     "node/no-unpublished-require": 0,
     // Import
     "import/no-extraneous-dependencies": [
