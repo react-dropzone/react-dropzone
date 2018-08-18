@@ -20,7 +20,7 @@ const rejectStyle = {
   backgroundColor: '#eee'
 };
 
-<Dropzone accept="image/*">
+<Dropzone>
   {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
     let styles = {...baseStyle}
     styles = isDragActive ? {...styles, ...activeStyle} : styles
