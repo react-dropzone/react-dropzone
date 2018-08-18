@@ -86,7 +86,6 @@
     "babel-core": "^6.9.1",
     "babel-eslint": "^7.1.1",
     "babel-jest": "^21.0.0",
-    "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.0",
@@ -95,7 +94,6 @@
     "babel-register": "^6.9.0",
     "commitizen": "^2.9.6",
     "cross-env": "^5.1.3",
-    "css-loader": "^0.28.7",
     "enzyme": "^2.6.0",
     "eslint": "^4.6.1",
     "eslint-config-okonet": "^5.0.1",
@@ -111,7 +109,7 @@
     "prettier": "^1.6.1",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
-    "react-styleguidist": "^6.0.23",
+    "react-styleguidist": "^7.2.3",
     "react-test-renderer": "^15.6.1",
     "rimraf": "^2.5.2",
     "rollup": "^0.58.2",
@@ -121,8 +119,7 @@
     "rollup-plugin-uglify": "^3.0.0",
     "sinon": "^3.2.1",
     "size-limit": "^0.11.0",
-    "style-loader": "^0.18.2",
-    "webpack": "^3.5.5"
+    "webpack-blocks": "^1.0.0"
   },
   "config": {
     "commitizen": {

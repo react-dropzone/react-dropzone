@@ -1,10 +1,13 @@
+/* eslint import/no-extraneous-dependencies: 0 */
 const path = require('path')
+const { createConfig, babel } = require('webpack-blocks')
 
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
-  showCode: true,
-  showUsage: true,
+  webpackConfig: createConfig([babel()]),
+  exampleMode: 'expand',
+  usageMode: 'expand',
   showSidebar: false,
   serverPort: 8080,
   sections: [
