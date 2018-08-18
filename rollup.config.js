@@ -1,4 +1,4 @@
-/* eslint import/no-extraneous-dependencies: 0 */
+/* eslint node/no-unsupported-features: 0 */
 
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'

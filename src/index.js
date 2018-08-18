@@ -1,3 +1,4 @@
+/* global process */
 /* eslint prefer-template: 0 */
 
 import React from 'react'
@@ -402,6 +403,7 @@ class Dropzone extends React.Component {
     }
 
     // Destructure custom props away from props used for the div element
+    /* eslint-disable no-unused-vars */
     const {
       acceptedFiles,
       preventDropOnDocument,
@@ -415,12 +417,17 @@ class Dropzone extends React.Component {
       getDataTransferItems,
       ...divProps
     } = props
+    /* eslint-enable no-unused-vars */
 
+    /* eslint-disable jsx-a11y/no-static-element-interactions */
+    /* eslint-disable jsx-a11y/click-events-have-key-events */
     return (
       <div
         className={className}
         style={appliedStyle}
-        {...divProps /* expand user provided props first so event handlers are never overridden */}
+        {
+          ...divProps /* expand user provided props first so event handlers are never overridden */
+        }
         onClick={this.composeHandlers(this.onClick)}
         onDragStart={this.composeHandlers(this.onDragStart)}
         onDragEnter={this.composeHandlers(this.onDragEnter)}
@@ -432,7 +439,9 @@ class Dropzone extends React.Component {
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
-          {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
+          {
+            ...inputProps /* expand user provided inputProps first so inputAttributes override them */
+          }
           {...inputAttributes}
         />
       </div>
