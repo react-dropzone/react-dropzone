@@ -391,8 +391,31 @@ Dropzone.propTypes = {
    */
   onClick: PropTypes.func,
 
-  /**
-   * onDrop callback
+  /** The `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+
+   ```javascript
+   function onDrop(acceptedFiles, rejectedFiles) {
+  // do stuff with files...
+}
+   ```
+
+   Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
+
+   Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
+
+   Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
+
+   Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+
+   ```javascript
+   function onDrop(acceptedFiles) {
+  const req = request.post('/upload')
+  acceptedFiles.forEach(file => {
+      req.attach(file.name, file)
+  })
+  req.end(callback)
+}
+   ```
    */
   onDrop: PropTypes.func,
 
