@@ -1,5 +1,9 @@
 By default, the Dropzone component doesn't render any styles. By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
 
+
+
+### Using inline styles
+
 ```
 const baseStyle = {
   width: 200,
@@ -37,6 +41,42 @@ const rejectStyle = {
         </div>
         {isDragReject && <div>Unsupported file type...</div>}
       </div>
+    )
+  }}
+</Dropzone>
+```
+
+### Using styled-components
+
+```
+const styled = require('styled-components').default;
+
+const getColor = (props) => {
+    if (props.isDragActive) {    
+        return '#6c6';
+    } 
+    if (props.isDragReject) {
+        return '#c66';
+    }
+    return '#666';
+};
+
+const Container = styled.div`
+  width: 200px;
+  height: 200px;
+  border-width: 2px;
+  border-radius: 5px;
+  border-color: ${props => getColor(props)};
+  border-style: ${props => props.isDragReject || props.isDragActive ? 'solid' : 'dashed'};
+  background-color: ${props => props.isDragReject || props.isDragActive ? '#eee' : ''};
+`;
+
+<Dropzone accept="image/*">
+  {({ isDragActive, isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
+    return (
+      <Container isDragActive={isDragActive} isDragReject={isDragReject}>
+        {isDragAccept ? `Drop ${acceptedFiles.length}` : 'Drag'} files here...
+      </Container>
     )
   }}
 </Dropzone>
