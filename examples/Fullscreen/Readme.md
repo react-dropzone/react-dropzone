@@ -41,8 +41,13 @@ class FullScreen extends React.Component {
         accept={accept}
         onDrop={this.onDrop.bind(this)}
       >
-        {({ isDragActive }) => (
-          <div style={{ position: 'relative' }}>
+        {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+          <div
+            {...getRootProps()}
+            style={{ position: 'relative' }}
+          >
+            <input {...getInputProps()} />
+            
             {isDragActive && <div style={overlayStyle}>Drop files...</div>}
             
             <h1>My awesome app</h1>
@@ -59,7 +64,6 @@ class FullScreen extends React.Component {
                 files.map(f => <li>{f.name} - {f.size} bytes</li>)
               }
             </ul>
-  
           </div>
         )}
       </Dropzone>

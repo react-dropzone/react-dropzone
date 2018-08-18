@@ -37,21 +37,23 @@ class MyDropzone extends React.Component {
   render() {
     return (
       <Dropzone onDrop={this.onDrop}>
-        {
-          ({ isDragActive }) => {
-            return (
-              <div className={cx('dropzone', {
+        {({ getRootProps, getInputProps, isDragActive }) => {
+          return (
+            <div
+              {...getRootProps()}
+              className={cx('dropzone', {
                 'dropzone--isActive': isDragActive
-              })}>
+              })}
+            >
+              <input {...getInputProps()} />
               {
                 isDragActive ?
                   <p>Drop files here...</p> :
                   <p>Try dropping some files here, or click to select files to upload.</p>
               }
-              </div>
-            )
-          }
-        }
+            </div>
+          )
+        }}
       </Dropzone>
     );
   }
@@ -59,35 +61,66 @@ class MyDropzone extends React.Component {
 
 ``` 
 
-## Usage as a HOC with stateless components
+## Render Prop Function
+
+This is where you render whatever you want to based on the state of `Dropzone`.
+You can also pass it as the children prop if you prefer to do things that way
+> `<Dropzone>{/* right here*/}</Dropzone>`
+
+The properties of this object can be split into two categories as indicated
+below:
+
+### Prop Getters
+
+These functions are used to apply props to the elements that you render. This
+gives you maximum flexibility to render what, when, and wherever you like. You
+call these on the element in question (for example: `<div {...getRootProps()}`)). It's advisable to pass all your props to that function
+rather than applying them on the element yourself to avoid your props being
+overridden (or overriding the props returned). For example:
+`getRootProps({onClick(event) {console.log(event)}})`.
+
+| property          | type           | description                                                                    |
+| ----------------- | -------------- | ------------------------------------------------------------------------------ |
+| `getRootProps`    | `function({})` | Returns the props you should apply to the root drop container you render       |
+| `getInputProps`   | `function({})` | Returns the props you should apply to hidden file input you render             |
+
+### state
+
+These are values that represent the current state of Dropzone component.
+
+| property                               | type      | description                                             |
+| -------------------------------------- | --------- | --------------------------------------------------------|
+| `isDragActive`                         | `boolean` | Flag indicating whether an active drag is in progress   |
+| `isDragAccept`                         | `boolean` | Flag indicating whether the files dragged are accepted  |
+| `isDragReject`                         | `boolean` | Flag indicating whether the files dragged are rejected  |
+| `draggedFiles`                         | `array`   | List of files in active drag                            |
+| `acceptedFiles`                        | `array`   | List of accepted files in active drag                   |
+| `rejectedFiles`                        | `array`   | List of rejected files in active drag                   |
+
+### Custom refKey
+
+Both `getRootProps` and `getInputProps` accept custom `refKey` (defaulted to `ref`) as one of the attributes passed down in the parameter.
+
+This is especially useful when incorporating custom components, e.g. styled-components, in which case you will use `innerRef` as the `refKey`.
 
 ```javascript
-import React from 'react'
-import cx from 'classnames'
-import { makeDropzone } from 'react-dropzone'
+const StyledDropArea = styled.div`
+  // Some styling here
+`
 
-function MyDropzone({ isDragActive }) {
-  const classNames = cx('dropzone', {
-    isActive: isDragActive
-  })
-  return (
-    <div className={classNames}>
-      { isDragActive ?
-          <p>Drop files here...</p> :
-          <p>Try dropping some files here, or click to select files to upload.</p>
-      }
-    </div>
-  );
-}
-
-// Call HoC with your component and options as arguments
-export default makeDropzone(MyDropzone, {
-  onDrop: (acceptedFiles, rejectedFiles) => {
-    // Do something with files
-    // i.e. pre-process, upload etc.
-  } 
-})
+const Example = () => (
+  <Dropzone>
+    {({ getRootProps, getInputProps }) => (
+      <StyledDropArea {...getRootProps({ refKey: 'innerRef' })}>
+        <input {...getInputProps()} />
+        <p>Drop some files here</p>
+      </StyledDropArea>
+    )}
+  </Dropzone>
+)
 ```
+
+## onDrop prop
   
 The `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
   

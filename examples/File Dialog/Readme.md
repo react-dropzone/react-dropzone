@@ -5,10 +5,15 @@ let dropzoneRef;
 
 <div>
   <Dropzone ref={(node) => { dropzoneRef = node; }} onDrop={(accepted, rejected) => { alert(accepted) }}>
-      <p>Drop files here.</p>
+    {({ getRootProps, getInputProps }) => (
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        <p>Drop files here.</p>
+      </div>
+    )}
   </Dropzone>
   <button type="button" onClick={() => { dropzoneRef.open() }}>
-      Open File Dialog
+    Open File Dialog
   </button>
 </div>
 ```

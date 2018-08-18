@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import accepts from 'attr-accept'
 import getDataTransferItems from './getDataTransferItems'
+import { composeEventHandlers } from './utils'
 
 const supportMultiple = typeof document !== 'undefined' && document && document.createElement
   ? 'multiple' in document.createElement('input')
@@ -21,25 +22,10 @@ class Dropzone extends React.Component {
     evt.preventDefault()
   }
 
-  constructor(props, context) {
-    super(props, context)
-    this.onClick = this.onClick.bind(this)
-    this.onDocumentDrop = this.onDocumentDrop.bind(this)
-    this.onDragStart = this.onDragStart.bind(this)
-    this.onDragEnter = this.onDragEnter.bind(this)
-    this.onDragLeave = this.onDragLeave.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
-    this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
-    this.setRef = this.setRef.bind(this)
-    this.setRefs = this.setRefs.bind(this)
-    this.onInputElementClick = this.onInputElementClick.bind(this)
-    this.isFileDialogActive = false
-    this.state = {
-      draggedFiles: [],
-      acceptedFiles: [],
-      rejectedFiles: []
-    }
+  state = {
+    draggedFiles: [],
+    acceptedFiles: [],
+    rejectedFiles: []
   }
 
   componentDidMount() {
@@ -50,7 +36,6 @@ class Dropzone extends React.Component {
       document.addEventListener('dragover', Dropzone.onDocumentDragOver, false)
       document.addEventListener('drop', this.onDocumentDrop, false)
     }
-    this.fileInputEl.addEventListener('click', this.onInputElementClick, false)
     // Tried implementing addEventListener, but didn't work out
     document.body.onfocus = this.onFileDialogCancel
   }
@@ -61,12 +46,11 @@ class Dropzone extends React.Component {
       document.removeEventListener('dragover', Dropzone.onDocumentDragOver)
       document.removeEventListener('drop', this.onDocumentDrop)
     }
-    this.fileInputEl.removeEventListener('click', this.onInputElementClick, false)
     // Can be replaced with removeEventListener, if addEventListener works
     document.body.onfocus = null
   }
 
-  onDocumentDrop(evt) {
+  onDocumentDrop = evt => {
     if (this.node.contains(evt.target)) {
       // if we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
       return
@@ -75,13 +59,13 @@ class Dropzone extends React.Component {
     this.dragTargets = []
   }
 
-  onDragStart(evt) {
+  onDragStart = evt => {
     if (this.props.onDragStart) {
       this.props.onDragStart.call(this, evt)
     }
   }
 
-  onDragEnter(evt) {
+  onDragEnter = evt => {
     evt.preventDefault()
 
     // Count the dropzone and any children that are entered.
@@ -99,7 +83,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDragOver(evt) {
+  onDragOver = evt => {
     // eslint-disable-line class-methods-use-this
     evt.preventDefault()
     evt.stopPropagation()
@@ -115,7 +99,7 @@ class Dropzone extends React.Component {
     return false
   }
 
-  onDragLeave(evt) {
+  onDragLeave = evt => {
     evt.preventDefault()
 
     // Only deactivate once the dropzone and all children have been left.
@@ -135,7 +119,7 @@ class Dropzone extends React.Component {
     }
   }
 
-  onDrop(evt) {
+  onDrop = evt => {
     const { onDrop, onDropAccepted, onDropRejected, multiple, disablePreview, accept } = this.props
     const fileList = getDataTransferItems(evt)
     const acceptedFiles = []
@@ -196,7 +180,7 @@ class Dropzone extends React.Component {
     })
   }
 
-  onClick(evt) {
+  onClick = evt => {
     const { onClick, disableClick } = this.props
     if (!disableClick) {
       evt.stopPropagation()
@@ -212,14 +196,13 @@ class Dropzone extends React.Component {
     }
   }
 
-  onInputElementClick(evt) {
+  /* eslint-disable */
+  onInputElementClick = evt => {
     evt.stopPropagation()
-    if (this.props.inputProps && this.props.inputProps.onClick) {
-      this.props.inputProps.onClick()
-    }
   }
+  /* eslint-enable */
 
-  onFileDialogCancel() {
+  onFileDialogCancel = () => {
     // timeout will not recognize context of this method
     const { onFileDialogCancel } = this.props
     const { fileInputEl } = this
@@ -238,11 +221,11 @@ class Dropzone extends React.Component {
     }
   }
 
-  setRef(ref) {
+  setRef = ref => {
     this.node = ref
   }
 
-  setRefs(ref) {
+  setInputRef = ref => {
     this.fileInputEl = ref
   }
 
@@ -254,84 +237,88 @@ class Dropzone extends React.Component {
     return files.every(file => fileAccepted(file, this.props.accept))
   }
 
+  getRootProps = (
+    {
+      refKey = 'ref',
+      onClick,
+      onDragStart,
+      onDragEnter,
+      onDragOver,
+      onDragLeave,
+      onDrop,
+      ...rest
+    } = {}
+  ) => ({
+    onClick: onClick ? composeEventHandlers(onClick, this.onClick) : this.onClick,
+    onDragStart: onDragStart
+      ? composeEventHandlers(onDragStart, this.onDragStart)
+      : this.onDragStart,
+    onDragEnter: onDragEnter
+      ? composeEventHandlers(onDragEnter, this.onDragEnter)
+      : this.onDragEnter,
+    onDragOver: onDragOver ? composeEventHandlers(onDragOver, this.onDragOver) : this.onDragOver,
+    onDragLeave: onDragLeave
+      ? composeEventHandlers(onDragLeave, this.onDragLeave)
+      : this.onDragLeave,
+    onDrop: onDrop ? composeEventHandlers(onDrop, this.onDrop) : this.onDrop,
+    [refKey]: this.setRef,
+    ...rest
+  })
+
+  getInputProps = ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
+    const { accept, multiple, name } = this.props
+    const inputProps = {
+      accept,
+      type: 'file',
+      style: { display: 'none' },
+      multiple: supportMultiple && multiple,
+      onChange: composeEventHandlers(onChange, this.onDrop),
+      onClick: composeEventHandlers(onClick, this.onInputElementClick),
+      autoComplete: 'off',
+      [refKey]: this.setInputRef
+    }
+
+    if (name && name.length) {
+      inputProps.name = name
+    }
+
+    return {
+      ...inputProps,
+      ...rest
+    }
+  }
+
   /**
    * Open system file upload dialog.
    *
    * @public
    */
-  open() {
+  open = () => {
     this.isFileDialogActive = true
     this.fileInputEl.value = null
     this.fileInputEl.click()
   }
 
   render() {
-    const { accept, inputProps, multiple, name, children, ...rest } = this.props
+    const { multiple, children, render } = this.props
+    const { isDragActive, draggedFiles, acceptedFiles, rejectedFiles } = this.state
 
-    const { isDragActive, draggedFiles } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && this.allFilesAccepted(draggedFiles)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
-    const inputAttributes = {
-      accept,
-      type: 'file',
-      style: { display: 'none' },
-      multiple: supportMultiple && multiple,
-      ref: this.setRefs,
-      onChange: this.onDrop
-    }
-
-    if (name && name.length) {
-      inputAttributes.name = name
-    }
-
-    // Remove custom properties before passing them to the wrapper div element
-    const customProps = [
-      'acceptedFiles',
-      'preventDropOnDocument',
-      'disablePreview',
-      'disableClick',
-      'onDropAccepted',
-      'onDropRejected',
-      'onFileDialogCancel',
-      'maxSize',
-      'minSize'
-    ]
-    const divProps = { ...rest }
-    customProps.forEach(prop => delete divProps[prop])
-
-    const inputEl = (
-      <input
-        {...inputProps /* expand user provided inputProps first so inputAttributes override them */}
-        {...inputAttributes}
-      />
-    )
-
-    let enhancedChildren
-    if (typeof children === 'function') {
-      enhancedChildren = React.cloneElement(
-        children({ ...this.state, isDragActive, isDragAccept, isDragReject }),
-        {
-          /* expand user provided props first so event handlers are never overridden */
-          ...divProps,
-          onClick: this.onClick,
-          onDragStart: this.onDragStart,
-          onDragEnter: this.onDragEnter,
-          onDragOver: this.onDragOver,
-          onDragLeave: this.onDragLeave,
-          onDrop: this.onDrop,
-          ref: this.setRef
-        }
-      )
-    }
-    return (
-      <div>
-        {enhancedChildren || children}
-        {inputEl}
-      </div>
-    )
+    const renderFn = children || render
+    return renderFn({
+      getRootProps: this.getRootProps,
+      getInputProps: this.getInputProps,
+      isDragActive,
+      isDragAccept,
+      isDragReject,
+      draggedFiles,
+      acceptedFiles,
+      rejectedFiles
+    })
   }
 }
 
@@ -346,9 +333,22 @@ Dropzone.propTypes = {
   accept: PropTypes.string,
 
   /**
-   * Contents of the dropzone
+   * Render function that renders the actual component. It receives object with the following properties,
+   * @param {Function} getRootProps
+   * @param {Function} getInputProps
+   * @param {Boolean} isDragActive
+   * @param {Boolean} isDragAccept
+   * @param {Boolean} isDragReject
+   * @param {Array} draggedFiles
+   * @param {Array} acceptedFiles
+   * @param {Array} rejectedFiles
    */
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+  children: PropTypes.func,
+
+  /**
+   * Alternative render function to children prop
+   */
+  render: PropTypes.func,
 
   /**
    * Disallow clicking on the dropzone container to open file dialog
@@ -364,11 +364,6 @@ Dropzone.propTypes = {
    * If false, allow dropped items to take over the current browser window
    */
   preventDropOnDocument: PropTypes.bool,
-
-  /**
-   * Pass additional attributes to the `<input type="file"/>` tag
-   */
-  inputProps: PropTypes.object,
 
   /**
    * Allow dropping multiple files
