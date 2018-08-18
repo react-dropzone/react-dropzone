@@ -28,7 +28,7 @@
     },
     {
       "path": "dist/es/index.js",
-      "limit": "4 KB"
+      "limit": "6 KB"
     }
   ],
   "lint-staged": {
