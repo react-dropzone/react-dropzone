@@ -203,33 +203,27 @@ describe('Dropzone', () => {
   })
 
   describe('onClick', () => {
-    it('should call `open` method', done => {
+    it('should call `open` method', () => {
       const dropzone = mount(<Dropzone />)
-      spy(dropzone.instance(), 'open')
+      const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      setTimeout(() => {
-        expect(dropzone.instance().open.callCount).toEqual(1)
-        done()
-      }, 0)
+      expect(open).toHaveBeenCalled()
     })
 
     it('should not call `open` if disableClick prop is true', () => {
       const dropzone = mount(<Dropzone disableClick />)
-      spy(dropzone.instance(), 'open')
+      const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      expect(dropzone.instance().open.callCount).toEqual(0)
+      expect(open).not.toHaveBeenCalled()
     })
 
-    it('should call `onClick` callback if provided', done => {
-      const clickSpy = spy()
-      const dropzone = mount(<Dropzone onClick={clickSpy} />)
-      spy(dropzone.instance(), 'open')
+    it('should call `onClick` callback if provided', () => {
+      const onClick = jest.fn()
+      const dropzone = mount(<Dropzone onClick={onClick} />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      setTimeout(() => {
-        expect(dropzone.instance().open.callCount).toEqual(1)
-        expect(clickSpy.callCount).toEqual(1)
-        done()
-      }, 0)
+      expect(open).toHaveBeenCalled()
+      expect(onClick).toHaveBeenCalled()
     })
 
     it('should reset the value of input', () => {
@@ -255,59 +249,53 @@ describe('Dropzone', () => {
       ).toBeUndefined()
     })
 
-    it('should trigger click even on the input', done => {
+    it('should trigger click even on the input', () => {
       const dropzone = mount(<Dropzone />)
-      const clickSpy = spy(dropzone.instance().fileInputEl, 'click')
+      const onFileInputClick = jest.spyOn(dropzone.instance().fileInputEl, 'click')
       dropzone.simulate('click')
       dropzone.simulate('click')
-      setTimeout(() => {
-        expect(clickSpy.callCount).toEqual(2)
-        done()
-      }, 0)
+      expect(onFileInputClick).toHaveBeenCalledTimes(2)
     })
 
     it('should not invoke onClick on the wrapper', () => {
-      const onClickOuterSpy = spy()
-      const onClickInnerSpy = spy()
+      const onClickOuter = jest.fn()
+      const onClickInner = jest.fn()
       const component = mount(
-        <div onClick={onClickOuterSpy}>
-          <Dropzone onClick={onClickInnerSpy} />
+        <div onClick={onClickOuter}>
+          <Dropzone onClick={onClickInner} />
         </div>
       )
 
       component.simulate('click')
-      expect(onClickOuterSpy.callCount).toEqual(1)
-      expect(onClickInnerSpy.callCount).toEqual(0)
+      expect(onClickOuter).toHaveBeenCalled()
+      expect(onClickInner).not.toHaveBeenCalled()
 
-      onClickOuterSpy.reset()
-      onClickInnerSpy.reset()
+      onClickOuter.mockClear()
+      onClickInner.mockClear()
 
       component.find(Dropzone).simulate('click')
-      expect(onClickOuterSpy.callCount).toEqual(0)
-      expect(onClickInnerSpy.callCount).toEqual(1)
+      expect(onClickOuter).not.toHaveBeenCalled()
+      expect(onClickInner).toHaveBeenCalled()
     })
 
     it('should invoke onClick on the wrapper if disableClick is set', () => {
-      const onClickOuterSpy = spy()
+      const onClick = jest.fn()
       const component = mount(
-        <div onClick={onClickOuterSpy}>
+        <div onClick={onClick}>
           <Dropzone disableClick />
         </div>
       )
 
       component.find(Dropzone).simulate('click')
-      expect(onClickOuterSpy.callCount).toEqual(1)
+      expect(onClick).toHaveBeenCalled()
     })
 
-    it('should invoke inputProps onClick if provided', done => {
-      const inputPropsClickSpy = spy()
-      const component = mount(<Dropzone inputProps={{ onClick: inputPropsClickSpy }} />)
+    it('should invoke inputProps onClick if provided', () => {
+      const onClick = jest.fn()
+      const component = mount(<Dropzone inputProps={{ onClick }} />)
 
       component.simulate('click')
-      setTimeout(() => {
-        expect(inputPropsClickSpy.callCount).toEqual(1)
-        done()
-      }, 0)
+      expect(onClick).toHaveBeenCalled()
     })
   })
 
