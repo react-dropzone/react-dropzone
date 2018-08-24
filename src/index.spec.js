@@ -3,7 +3,7 @@
 
 import React from 'react'
 import { mount, render } from 'enzyme'
-import { spy, stub } from 'sinon'
+import { spy } from 'sinon'
 import { onDocumentDragOver } from './utils'
 
 const flushPromises = wrapper =>
@@ -313,39 +313,30 @@ describe('Dropzone', () => {
 
   describe('drag-n-drop', () => {
     it('should override onDrag* methods', () => {
-      const dragStartSpy = spy()
-      const dragEnterSpy = spy()
-      const dragOverSpy = spy()
-      const dragLeaveSpy = spy()
-      const component = mount(
-        <Dropzone
-          onDragStart={dragStartSpy}
-          onDragEnter={dragEnterSpy}
-          onDragOver={dragOverSpy}
-          onDragLeave={dragLeaveSpy}
-        />
-      )
+      const props = {
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn()
+      }
+      const component = mount(<Dropzone {...props} />)
       component.simulate('dragStart')
+      expect(props.onDragStart).toHaveBeenCalled()
       component.simulate('dragEnter', { dataTransfer: { items: files } })
+      expect(props.onDragEnter).toHaveBeenCalled()
       component.simulate('dragOver', { dataTransfer: { items: files } })
+      expect(props.onDragOver).toHaveBeenCalled()
       component.simulate('dragLeave', { dataTransfer: { items: files } })
-      expect(dragStartSpy.callCount).toEqual(1)
-      expect(dragEnterSpy.callCount).toEqual(1)
-      expect(dragOverSpy.callCount).toEqual(1)
-      expect(dragLeaveSpy.callCount).toEqual(1)
+      expect(props.onDragLeave).toHaveBeenCalled()
     })
 
     it('should guard dropEffect in onDragOver for IE', () => {
-      const dragStartSpy = spy()
-      const dragEnterSpy = spy()
-      const dragLeaveSpy = spy()
-      const component = mount(
-        <Dropzone
-          onDragStart={dragStartSpy}
-          onDragEnter={dragEnterSpy}
-          onDragLeave={dragLeaveSpy}
-        />
-      )
+      const props = {
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragLeave: jest.fn()
+      }
+      const component = mount(<Dropzone {...props} />)
 
       // Using Proxy we'll emulate IE throwing when setting dataTransfer.dropEffect
       const eventProxy = new Proxy(
@@ -363,20 +354,20 @@ describe('Dropzone', () => {
       )
 
       // And using then we'll call the onDragOver with the proxy instead of event
-      const dragOverSpy = stub(component.instance(), 'onDragOver').callsFake(
-        component.instance().onDragOver(eventProxy)
-      )
+      const componentOnDragOver = component.instance().onDragOver
+      const onDragOver = jest
+        .spyOn(component.instance(), 'onDragOver')
+        .mockImplementation(() => componentOnDragOver(eventProxy))
 
       component.simulate('dragStart', { dataTransfer: { items: files } })
+      expect(props.onDragStart).toHaveBeenCalled()
       component.simulate('dragEnter', { dataTransfer: { items: files } })
-      component.simulate('dragOver', { dataTransfer: { items: files } })
+      expect(props.onDragEnter).toHaveBeenCalled()
       component.simulate('dragLeave', { dataTransfer: { items: files } })
-      expect(dragStartSpy.callCount).toEqual(1)
-      expect(dragEnterSpy.callCount).toEqual(1)
-      expect(dragLeaveSpy.callCount).toEqual(1)
+      expect(props.onDragLeave).toHaveBeenCalled()
       // It should not throw the error
-      expect(dragOverSpy).not.toThrow()
-      dragOverSpy.restore()
+      component.simulate('dragOver', { dataTransfer: { items: files } })
+      expect(onDragOver).not.toThrow()
     })
 
     it('should set proper dragActive state on dragEnter', async () => {
