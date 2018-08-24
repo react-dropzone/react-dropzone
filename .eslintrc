@@ -1,24 +1,8 @@
 {
-  "extends": [
-    "okonet",
-    "prettier"
-  ],
-  "plugins": [
-    "prettier"
-  ],
+  "extends": ["okonet/node"],
   "rules": {
-    // React
-    "react/forbid-prop-types": [
-      2,
-      {
-        "forbid": [
-          "any",
-          "array"
-        ]
-      }
-    ],
-    "react/require-default-props": 0,
-
+    "strict": 0,
+    "node/no-unpublished-require": 0,
     // Import
     "import/no-extraneous-dependencies": [
       2,
@@ -26,6 +10,7 @@
         "devDependencies": [
           "webpack*.js",
           "**/*.spec.js",
+          "**/*.config.js",
           "**/testSetup.js"
         ]
       }

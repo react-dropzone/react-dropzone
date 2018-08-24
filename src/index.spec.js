@@ -1,3 +1,6 @@
+/* eslint jsx-a11y/click-events-have-key-events: 0 */
+/* eslint jsx-a11y/no-static-element-interactions: 0 */
+
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { spy, stub } from 'sinon'
@@ -5,12 +8,12 @@ import { onDocumentDragOver } from './utils'
 
 const flushPromises = wrapper =>
   new Promise(resolve =>
-    setImmediate(() => {
+    global.setImmediate(() => {
       wrapper.update()
       resolve(wrapper)
     })
   )
-const Dropzone = require(process.env.JEST_TARGET ? process.env.JEST_TARGET : './index') // eslint-disable-line import/no-dynamic-require
+const Dropzone = require('./index')
 const DummyChildComponent = () => null
 
 let files

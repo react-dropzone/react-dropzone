@@ -1,16 +1,14 @@
-/* eslint import/no-extraneous-dependencies: 0 */
-
-import nodeResolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import babel from 'rollup-plugin-babel'
-import uglify from 'rollup-plugin-uglify'
+const nodeResolve = require('rollup-plugin-node-resolve')
+const commonjs = require('rollup-plugin-commonjs')
+const babel = require('rollup-plugin-babel')
+const uglify = require('rollup-plugin-uglify')
 
 const umdGlobals = {
   react: 'React',
   'prop-types': 'PropTypes'
 }
 
-export default [
+module.exports = [
   {
     input: './src/index.js',
     output: {
