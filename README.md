@@ -92,6 +92,37 @@ See https://react-dropzone.netlify.com/#proptypes
 
 *Important*: `react-dropzone` doesn't manage dropped files. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
 
+### Testing
+
+*Important*: `react-dropzone` makes its drag'n'drop callbacks asynchronous to enable promise based getDataTransfer functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
+```js
+const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+```
+
+Example with enzyme 3:
+```js
+
+it('tests drag state', async () => {
+  const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+  const DummyChildComponent = () => null
+  const dropzone = mount(
+    <Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>
+  )
+  dropzone.simulate('dragEnter', {
+    dataTransfer: { files: files.concat(images) }
+  })
+  await flushPromises(dropzone)
+  dropzone.update()
+  
+  const child = updatedDropzone.find(DummyChildComponent)
+  expect(child).toHaveProp('isDragActive', true)
+  expect(child).toHaveProp('isDragAccept', false)
+  expect(child).toHaveProp('isDragReject', true)
+})
+```
+
+Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own test suite.
+
 ## Support
 
 ### Backers
