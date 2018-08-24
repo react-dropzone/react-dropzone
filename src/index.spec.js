@@ -3,7 +3,6 @@
 
 import React from 'react'
 import { mount, render } from 'enzyme'
-import { spy } from 'sinon'
 import { onDocumentDragOver } from './utils'
 
 const flushPromises = wrapper =>
@@ -1085,28 +1084,22 @@ describe('Dropzone', () => {
       expect(fn).not.toThrow()
     })
 
-    it('does not allow actions when disabled props is true', done => {
+    it('does not allow actions when disabled props is true', () => {
       const dropzone = mount(<Dropzone disabled />)
 
-      spy(dropzone.instance(), 'open')
+      const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
-      setTimeout(() => {
-        expect(dropzone.instance().open.callCount).toEqual(0)
-        done()
-      }, 0)
+      expect(open).not.toHaveBeenCalled()
     })
 
-    it('when toggle disabled props, Dropzone works as expected', done => {
+    it('when toggle disabled props, Dropzone works as expected', () => {
       const dropzone = mount(<Dropzone disabled />)
-      spy(dropzone.instance(), 'open')
+      const open = jest.spyOn(dropzone.instance(), 'open')
 
       dropzone.setProps({ disabled: false })
 
       dropzone.simulate('click')
-      setTimeout(() => {
-        expect(dropzone.instance().open.callCount).toEqual(1)
-        done()
-      }, 0)
+      expect(open).toHaveBeenCalled()
     })
   })
 })
