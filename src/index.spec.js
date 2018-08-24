@@ -1047,20 +1047,22 @@ describe('Dropzone', () => {
   })
 
   describe('nested Dropzone component behavior', () => {
-    let outerDropSpy
-    let outerDropAcceptedSpy
-    let outerDropRejectedSpy
-    let innerDropSpy
-    let innerDropAcceptedSpy
-    let innerDropRejectedSpy
+    const expectedEvent = expect.anything()
+    const onOuterDrop = jest.fn()
+    const onOuterDropAccepted = jest.fn()
+    const onOuterDropRejected = jest.fn()
+
+    const onInnerDrop = jest.fn()
+    const onInnerDropAccepted = jest.fn()
+    const onInnerDropRejected = jest.fn()
 
     const InnerDragAccepted = () => <p>Accepted</p>
     const InnerDragRejected = () => <p>Rejected</p>
     const InnerDropzone = () => (
       <Dropzone
-        onDrop={innerDropSpy}
-        onDropAccepted={innerDropAcceptedSpy}
-        onDropRejected={innerDropRejectedSpy}
+        onDrop={onInnerDrop}
+        onDropAccepted={onInnerDropAccepted}
+        onDropRejected={onInnerDropRejected}
         accept="image/*"
       >
         {({ isDragActive, isDragReject }) => {
@@ -1089,17 +1091,11 @@ describe('Dropzone', () => {
       })
 
       it('accepts the drop on the inner dropzone', async () => {
-        outerDropSpy = spy()
-        outerDropAcceptedSpy = spy()
-        outerDropRejectedSpy = spy()
-        innerDropSpy = spy()
-        innerDropAcceptedSpy = spy()
-        innerDropRejectedSpy = spy()
         const outerDropzone = mount(
           <Dropzone
-            onDrop={outerDropSpy}
-            onDropAccepted={outerDropAcceptedSpy}
-            onDropRejected={outerDropRejectedSpy}
+            onDrop={onOuterDrop}
+            onDropAccepted={onOuterDropAccepted}
+            onDropRejected={onOuterDropRejected}
             accept="image/*"
           >
             {props => <InnerDropzone {...props} />}
@@ -1112,49 +1108,42 @@ describe('Dropzone', () => {
         const updatedOuterDropzone = await flushPromises(outerDropzone)
         const innerDropzone = updatedOuterDropzone.find(InnerDropzone)
 
-        expect(innerDropSpy.callCount).toEqual(1)
-        expect(innerDropSpy.firstCall.args[0]).toHaveLength(2)
-        expect(innerDropSpy.firstCall.args[1]).toHaveLength(1)
-        expect(innerDropAcceptedSpy.callCount).toEqual(1)
-        expect(innerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2)
-        expect(innerDropRejectedSpy.callCount).toEqual(1)
-        expect(innerDropRejectedSpy.firstCall.args[0]).toHaveLength(1)
-        expect(innerDropzone.find(InnerDragAccepted).exists()).toEqual(false)
-        expect(innerDropzone.find(InnerDragRejected).exists()).toEqual(false)
+        expect(onInnerDrop).toHaveBeenCalledTimes(1)
+        expect(onInnerDrop).toHaveBeenCalledWith(images, files, expectedEvent)
+        expect(onInnerDropAccepted).toHaveBeenCalledTimes(1)
+        expect(onInnerDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
+        expect(onInnerDropRejected).toHaveBeenCalledTimes(1)
+        expect(onInnerDropRejected).toHaveBeenCalledWith(files, expectedEvent)
+
+        expect(innerDropzone.find(InnerDragAccepted)).not.toExist()
+        expect(innerDropzone.find(InnerDragRejected)).not.toExist()
       })
 
       it('also accepts the drop on the outer dropzone', async () => {
-        outerDropSpy = spy()
-        outerDropAcceptedSpy = spy()
-        outerDropRejectedSpy = spy()
-        innerDropSpy = spy()
-        innerDropAcceptedSpy = spy()
-        innerDropRejectedSpy = spy()
         const outerDropzone = mount(
           <Dropzone
-            onDrop={outerDropSpy}
-            onDropAccepted={outerDropAcceptedSpy}
-            onDropRejected={outerDropRejectedSpy}
+            onDrop={onOuterDrop}
+            onDropAccepted={onOuterDropAccepted}
+            onDropRejected={onOuterDropRejected}
             accept="image/*"
           >
             {props => <InnerDropzone {...props} />}
           </Dropzone>
         )
 
-        outerDropzone.find(InnerDropzone).simulate('drop', {
+        outerDropzone.simulate('drop', {
           dataTransfer: { files: files.concat(images) }
         })
         const updatedOuterDropzone = await flushPromises(outerDropzone)
 
         const innerDropzone = updatedOuterDropzone.find(InnerDropzone)
 
-        expect(outerDropSpy.callCount).toEqual(1)
-        expect(outerDropSpy.firstCall.args[0]).toHaveLength(2)
-        expect(outerDropSpy.firstCall.args[1]).toHaveLength(1)
-        expect(outerDropAcceptedSpy.callCount).toEqual(1)
-        expect(outerDropAcceptedSpy.firstCall.args[0]).toHaveLength(2)
-        expect(outerDropRejectedSpy.callCount).toEqual(1)
-        expect(outerDropRejectedSpy.firstCall.args[0]).toHaveLength(1)
+        expect(onOuterDrop).toHaveBeenCalledTimes(1)
+        expect(onOuterDrop).toHaveBeenCalledWith(images, files, expectedEvent)
+        expect(onOuterDropAccepted).toHaveBeenCalledTimes(1)
+        expect(onOuterDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
+        expect(onOuterDropRejected).toHaveBeenCalledTimes(1)
+        expect(onOuterDropRejected).toHaveBeenCalledWith(files, expectedEvent)
         expect(innerDropzone).toHaveProp('isDragActive', false)
         expect(innerDropzone).toHaveProp('isDragReject', false)
       })
