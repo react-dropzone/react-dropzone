@@ -117,40 +117,30 @@ describe('Dropzone', () => {
   })
 
   describe('document drop protection', () => {
-    let dropzone
-    let addEventCalls
-    let savedAddEventListener
-    let savedRemoveEventListener
-
-    beforeEach(() => {
-      savedAddEventListener = document.addEventListener
-      savedRemoveEventListener = document.removeEventListener
-      document.addEventListener = spy()
-      document.removeEventListener = spy()
-    })
-
-    afterEach(() => {
-      document.addEventListener = savedAddEventListener
-      document.removeEventListener = savedRemoveEventListener
-    })
+    const event = { preventDefault: jest.fn() }
+    const onAddEventListener = jest.spyOn(document, 'addEventListener')
+    const onRemoveEventListener = jest.spyOn(document, 'removeEventListener')
 
     // Collect the list of addEventListener/removeEventListener spy calls into an object keyed by event name.
     function collectEventListenerCalls(calls) {
-      return calls.reduce((acc, [eventName, ...rest]) => {
-        acc[eventName] = rest // eslint-disable-line no-param-reassign
-        return acc
-      }, {})
+      return calls.reduce(
+        (acc, [eventName, ...rest]) => ({
+          ...acc,
+          [eventName]: rest
+        }),
+        {}
+      )
     }
 
     it('installs hooks to prevent stray drops from taking over the browser window', () => {
-      dropzone = mount(
+      const dropzone = mount(
         <Dropzone>
           <p>Content</p>
         </Dropzone>
       )
       expect(dropzone.html()).toMatchSnapshot()
-      expect(document.addEventListener.callCount).toEqual(2)
-      addEventCalls = collectEventListenerCalls(document.addEventListener.args)
+      expect(onAddEventListener).toHaveBeenCalledTimes(2)
+      const addEventCalls = collectEventListenerCalls(onAddEventListener.mock.calls)
       Object.keys(addEventCalls).forEach(eventName => {
         expect(addEventCalls[eventName][0]).toBeDefined()
         expect(addEventCalls[eventName][1]).toBe(false)
@@ -158,40 +148,57 @@ describe('Dropzone', () => {
     })
 
     it('terminates drags and drops on elements outside our dropzone', () => {
-      const event = { preventDefault: spy() }
+      const dropzone = mount(
+        <Dropzone>
+          <p>Content</p>
+        </Dropzone>
+      )
+
       onDocumentDragOver(event)
-      expect(event.preventDefault.callCount).toEqual(1)
-      event.preventDefault.reset()
+      expect(event.preventDefault).toHaveBeenCalledTimes(1)
+      event.preventDefault.mockClear()
 
       dropzone.instance().onDocumentDrop(event)
-      expect(event.preventDefault.callCount).toEqual(1)
+      expect(event.preventDefault).toHaveBeenCalledTimes(1)
     })
 
     it('permits drags and drops on elements inside our dropzone', () => {
+      const dropzone = mount(
+        <Dropzone>
+          <p>Content</p>
+        </Dropzone>
+      )
+
       const instanceEvent = {
-        preventDefault: spy(),
+        preventDefault: jest.fn(),
         target: dropzone.getDOMNode()
       }
       dropzone.instance().onDocumentDrop(instanceEvent)
-      expect(instanceEvent.preventDefault.callCount).toEqual(0)
+      expect(instanceEvent.preventDefault).not.toHaveBeenCalled()
     })
 
     it('removes document hooks when unmounted', () => {
+      const dropzone = mount(
+        <Dropzone>
+          <p>Content</p>
+        </Dropzone>
+      )
       dropzone.unmount()
-      expect(document.removeEventListener.callCount).toEqual(2)
-      const removeEventCalls = collectEventListenerCalls(document.removeEventListener.args)
+      expect(onRemoveEventListener).toHaveBeenCalledTimes(2)
+      const addEventCalls = collectEventListenerCalls(onAddEventListener.mock.calls)
+      const removeEventCalls = collectEventListenerCalls(onRemoveEventListener.mock.calls)
       Object.keys(addEventCalls).forEach(eventName => {
         expect(removeEventCalls[eventName][0]).toEqual(addEventCalls[eventName][0])
       })
     })
 
     it('does not prevent stray drops when preventDropOnDocument is false', () => {
-      dropzone = mount(<Dropzone preventDropOnDocument={false} />)
+      const dropzone = mount(<Dropzone preventDropOnDocument={false} />)
       expect(dropzone.html()).toMatchSnapshot()
-      expect(document.addEventListener.callCount).toEqual(0)
+      expect(onAddEventListener).not.toHaveBeenCalled()
 
       dropzone.unmount()
-      expect(document.removeEventListener.callCount).toEqual(0)
+      expect(onRemoveEventListener).not.toHaveBeenCalled()
     })
   })
 
