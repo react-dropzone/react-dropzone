@@ -852,39 +852,63 @@ describe('Dropzone', () => {
   })
 
   describe('preview', () => {
+    const expectedEvent = expect.anything()
+
     it('should generate previews for non-images', async () => {
-      const dropSpy = spy()
-      const dropzone = mount(<Dropzone onDrop={dropSpy} />)
+      const onDrop = jest.fn()
+      const dropzone = mount(<Dropzone onDrop={onDrop} />)
       await dropzone.simulate('drop', { dataTransfer: { files } })
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview')
-      expect(dropSpy.firstCall.args[0][0].preview).toContain('data://file1.pdf')
+      expect(onDrop).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ preview: 'data://file1.pdf' })]),
+        [],
+        expectedEvent
+      )
     })
 
     it('should generate previews for images', async () => {
-      const dropSpy = spy()
-      const dropzone = mount(<Dropzone onDrop={dropSpy} />)
+      const onDrop = jest.fn()
+      const dropzone = mount(<Dropzone onDrop={onDrop} />)
       await dropzone.simulate('drop', { dataTransfer: { files: images } })
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).toContain('preview')
-      expect(dropSpy.firstCall.args[0][0].preview).toContain('data://cats.gif')
+      expect(onDrop).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ preview: 'data://cats.gif' })]),
+        [],
+        expectedEvent
+      )
     })
 
     it('should not throw error when preview cannot be created', async () => {
-      const dropSpy = spy()
-      const dropzone = mount(<Dropzone onDrop={dropSpy} />)
+      const onDrop = jest.fn()
+      const onConsoleError = jest.fn()
+      jest.spyOn(console, 'error').mockImplementationOnce(onConsoleError)
 
+      const dropzone = mount(<Dropzone onDrop={onDrop} />)
       await dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } })
 
-      expect(Object.keys(dropSpy.firstCall.args[1][0])).not.toContain('preview')
+      expect(onConsoleError).toHaveBeenCalled()
+      expect(onDrop).not.toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
+        [],
+        expectedEvent
+      )
     })
 
     it('should not generate previews if disablePreview is true', async () => {
-      const dropSpy = spy()
-      const dropzone = mount(<Dropzone disablePreview onDrop={dropSpy} />)
+      const onDrop = jest.fn()
+      const dropzone = mount(<Dropzone disablePreview onDrop={onDrop} />)
       await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      expect(onDrop).not.toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
+        [],
+        expectedEvent
+      )
+      onDrop.mockClear()
+
       await dropzone.simulate('drop', { dataTransfer: { files } })
-      expect(dropSpy.callCount).toEqual(2)
-      expect(Object.keys(dropSpy.firstCall.args[0][0])).not.toContain('preview')
-      expect(Object.keys(dropSpy.lastCall.args[0][0])).not.toContain('preview')
+      expect(onDrop).not.toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
+        [],
+        expectedEvent
+      )
     })
   })
 
