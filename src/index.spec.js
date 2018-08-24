@@ -915,66 +915,61 @@ describe('Dropzone', () => {
   describe('onClick', () => {})
 
   describe('onCancel', () => {
-    it('should not invoke onFileDialogCancel everytime window receives focus', done => {
-      const onCancelSpy = spy()
-      mount(<Dropzone id="on-cancel-example" onFileDialogCancel={onCancelSpy} />)
+    beforeEach(() => {
+      jest.useFakeTimers(true)
+    })
+
+    afterEach(() => {
+      jest.useFakeTimers(false)
+    })
+
+    it('should not invoke onFileDialogCancel everytime window receives focus', () => {
+      const onFileDialogCancel = jest.fn()
+      mount(<Dropzone id="on-cancel-example" onFileDialogCancel={onFileDialogCancel} />)
       // Simulated DOM event - onfocus
       document.body.addEventListener('focus', () => {})
       const evt = document.createEvent('HTMLEvents')
       evt.initEvent('focus', false, true)
       document.body.dispatchEvent(evt)
-      // setTimeout to match the event callback from actual Component
-      setTimeout(() => {
-        expect(onCancelSpy.callCount).toEqual(0)
-        done()
-      }, 300)
+      jest.runAllTimers()
+      expect(onFileDialogCancel).not.toHaveBeenCalled()
     })
 
-    it('should invoke onFileDialogCancel when window receives focus via cancel button', done => {
-      const onCancelSpy = spy()
+    it('should invoke onFileDialogCancel when window receives focus via cancel button', () => {
+      const onFileDialogCancel = jest.fn()
       const component = mount(
-        <Dropzone className="dropzone-content" onFileDialogCancel={onCancelSpy} />
+        <Dropzone className="dropzone-content" onFileDialogCancel={onFileDialogCancel} />
       )
 
       // Test / invoke the click event
-      spy(component.instance(), 'open')
+      const open = jest.spyOn(component.instance(), 'open')
       component.simulate('click')
 
-      setTimeout(() => {
-        expect(component.instance().open.callCount).toEqual(1)
+      expect(open).toHaveBeenCalled()
 
-        // Simulated DOM event - onfocus
-        window.addEventListener('focus', () => {})
-        const evt = document.createEvent('HTMLEvents')
-        evt.initEvent('focus', false, true)
-        window.dispatchEvent(evt)
+      // Simulated DOM event - onfocus
+      window.addEventListener('focus', () => {})
+      const evt = document.createEvent('HTMLEvents')
+      evt.initEvent('focus', false, true)
+      window.dispatchEvent(evt)
 
-        // setTimeout to match the event callback from actual Component
-        setTimeout(() => {
-          expect(onCancelSpy.callCount).toEqual(1)
-          done()
-        }, 300)
-      }, 0)
+      jest.runAllTimers()
+      expect(onFileDialogCancel).toHaveBeenCalled()
     })
 
-    it('should restore isFileDialogActive to false after the FileDialog was closed', done => {
+    it('should restore isFileDialogActive to false after the FileDialog was closed', () => {
       const component = mount(<Dropzone />)
 
-      spy(component.instance(), 'open')
       component.simulate('click')
 
-      setTimeout(() => {
-        expect(component.instance().isFileDialogActive).toEqual(true)
+      expect(component.instance().isFileDialogActive).toEqual(true)
 
-        const evt = document.createEvent('HTMLEvents')
-        evt.initEvent('focus', false, true)
-        window.dispatchEvent(evt)
+      const evt = document.createEvent('HTMLEvents')
+      evt.initEvent('focus', false, true)
+      window.dispatchEvent(evt)
 
-        setTimeout(() => {
-          expect(component.instance().isFileDialogActive).toEqual(false)
-          done()
-        }, 300)
-      }, 0)
+      jest.runAllTimers()
+      expect(component.instance().isFileDialogActive).toEqual(false)
     })
   })
 
