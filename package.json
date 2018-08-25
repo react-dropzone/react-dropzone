@@ -42,7 +42,8 @@
     ]
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "<rootDir>/testSetup.js"
+    "setupTestFrameworkScriptFile": "<rootDir>/testSetup.js",
+    "clearMocks": true
   },
   "keywords": [
     "react-component",
@@ -121,7 +122,6 @@
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-uglify": "^3.0.0",
-    "sinon": "^3.2.1",
     "size-limit": "^0.19.2",
     "webpack-blocks": "^1.0.0"
   },
