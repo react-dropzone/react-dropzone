@@ -205,7 +205,7 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (onDrop) {
+      if (onDrop && (acceptedFiles.length > 0 || rejectedFiles.length > 0)) {
         onDrop.call(this, acceptedFiles, rejectedFiles, evt)
       }
 
