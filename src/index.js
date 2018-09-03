@@ -162,7 +162,7 @@ class Dropzone extends React.Component {
 
     // Stop default browser behavior
     evt.preventDefault()
-    
+
     // Persist event for later usage
     evt.persist()
 
