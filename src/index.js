@@ -162,6 +162,9 @@ class Dropzone extends React.Component {
 
     // Stop default browser behavior
     evt.preventDefault()
+    
+    // Persist event for later usage
+    evt.persist()
 
     // Reset the counter along with the drag on a drop.
     this.dragTargets = []
@@ -175,8 +178,6 @@ class Dropzone extends React.Component {
       isDragActive: false,
       draggedFiles: []
     })
-
-    evt.persist()
 
     Promise.resolve(getDataTransferItems(evt)).then(fileList => {
       const acceptedFiles = []
