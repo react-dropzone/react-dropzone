@@ -97,6 +97,8 @@ class Dropzone extends React.Component {
       this.dragTargets.push(evt.target)
     }
 
+    evt.persist()
+
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
       this.setState({
         isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
@@ -173,6 +175,8 @@ class Dropzone extends React.Component {
       isDragActive: false,
       draggedFiles: []
     })
+
+    evt.persist()
 
     Promise.resolve(getDataTransferItems(evt)).then(fileList => {
       const acceptedFiles = []
