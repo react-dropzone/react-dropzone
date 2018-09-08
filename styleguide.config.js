@@ -29,6 +29,10 @@ module.exports = {
           content: 'examples/Basic/Readme.md'
         },
         {
+          name: 'Dragging folders example',
+          content: 'examples/Folders/Readme.md'
+        },
+        {
           name: 'Styling Dropzone',
           content: 'examples/Styling/Readme.md'
         },
