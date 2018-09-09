@@ -97,6 +97,8 @@ class Dropzone extends React.Component {
       this.dragTargets.push(evt.target)
     }
 
+    evt.persist()
+
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
       this.setState({
         isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
@@ -160,6 +162,9 @@ class Dropzone extends React.Component {
 
     // Stop default browser behavior
     evt.preventDefault()
+
+    // Persist event for later usage
+    evt.persist()
 
     // Reset the counter along with the drag on a drop.
     this.dragTargets = []
