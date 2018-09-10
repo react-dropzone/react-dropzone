@@ -1,7 +1,7 @@
-Dropzone that accepts folders as drag-and-drop.
+Dropzone that accepts folders as drag-and-drop. Supports multiple folders and subfolders.
 
-```
-const {getDroppedOrSelectedFiles} = require('html5-file-selector')
+```jsx harmony
+const { getDroppedOrSelectedFiles } = require('html5-file-selector')
 
 class FolderDropzone extends React.Component {
   constructor() {
@@ -20,22 +20,18 @@ class FolderDropzone extends React.Component {
       <section>
         <div className="dropzone">
           <Dropzone
-            getDataTransferItems={evt =>
-              getDroppedOrSelectedFiles(evt).then(list =>
-                list.map(({ fileObject, ...rest }) => fileObject)
-              )
-            }
+            getDataTransferItems={evt => getDroppedOrSelectedFiles(evt).then(files => files)}
             onDrop={this.onDrop.bind(this)}
           >
             <p>Drop a folder with files here.</p>
           </Dropzone>
         </div>
         <aside>
-          <h2>Dropped files</h2>
+          <h2>Dropped files and folders</h2>
           <ul>
             {this.state.files.map(f => (
               <li key={f.name}>
-                {f.name} - {f.size} bytes
+                {f.fullPath} - {f.size} bytes
               </li>
             ))}
           </ul>
