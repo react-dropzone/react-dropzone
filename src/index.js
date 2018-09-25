@@ -221,6 +221,8 @@ class Dropzone extends React.Component {
       if (acceptedFiles.length > 0 && onDropAccepted) {
         onDropAccepted.call(this, acceptedFiles, evt)
       }
+
+      this.setState({ acceptedFiles, rejectedFiles })
     })
   }
 
