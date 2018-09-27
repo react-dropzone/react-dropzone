@@ -615,6 +615,21 @@ describe('Dropzone', () => {
     const onDropAccepted = jest.fn()
     const onDropRejected = jest.fn()
 
+    it('should update the acceptedFiles/rejectedFiles state', async () => {
+      let dropzone = mount(
+        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
+      )
+      dropzone.simulate('drop', { dataTransfer: { files } })
+      dropzone = await flushPromises(dropzone)
+      expect(dropzone.find(DummyChildComponent)).toHaveProp('acceptedFiles', [])
+      expect(dropzone.find(DummyChildComponent)).toHaveProp('rejectedFiles', files)
+
+      dropzone.simulate('drop', { dataTransfer: { files: images } })
+      dropzone = await flushPromises(dropzone)
+      expect(dropzone.find(DummyChildComponent)).toHaveProp('acceptedFiles', images)
+      expect(dropzone.find(DummyChildComponent)).toHaveProp('rejectedFiles', [])
+    })
+
     it('should reset the dragActive/dragReject state', async () => {
       let dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
       dropzone.simulate('dragEnter', { dataTransfer: { files } })

@@ -4,20 +4,21 @@ By default, the Dropzone component picks up some default styling to get you star
 
 By providing a function that returns the component's children you can not only style Dropzone appropriately but also render appropriate content.
 
-```
+```jsx
 <Dropzone
   accept="image/png"
 >
-  {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
-    if (isDragActive) {
+  {({ isDragAccept, isDragReject, acceptedFiles, rejectedFiles }) => {
+    if (acceptedFiles.length || rejectedFiles.length) {
+      return `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`;
+    }
+    if (isDragAccept) {
       return "This file is authorized";
     }
     if (isDragReject) {
       return "This file is not authorized";
     }
-    return acceptedFiles.length || rejectedFiles.length
-      ? `Accepted ${acceptedFiles.length}, rejected ${rejectedFiles.length} files`
-      : "Try dropping some files.";
+    return "Try dropping some files.";
   }}
 </Dropzone>
 ```
