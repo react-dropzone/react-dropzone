@@ -1,0 +1,1 @@
+Dropzone accepts `getDataTransferItems` prop that enhances the handling of dropped file system objects and allows more flexible use of them e.g. passing a function that accepts drop event of a folder and resolves it to an array of files adds plug-in functionality of folders drag-and-drop.

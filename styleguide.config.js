@@ -45,8 +45,20 @@ module.exports = {
           content: 'examples/Fullscreen/Readme.md'
         },
         {
-          name: 'Dragging folders example',
-          content: 'examples/Folders/Readme.md'
+          name: 'Extending Dropzone',
+          context: {
+            Dropzone: './src/index'
+          },
+          sections: [
+            {
+              name: 'Using third-party plugins',
+              content: 'examples/PluginArchitecture/Readme.md'
+            },
+            {
+              name: 'Dropzone for folders',
+              content: 'examples/Folders/Readme.md'
+            }
+          ]
         }
       ]
     }
