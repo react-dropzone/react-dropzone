@@ -1,5 +1,4 @@
-import * as React from "react";
-
+import React from "react";
 import Dropzone from "../../";
 
 class Test extends React.Component {
@@ -40,6 +39,7 @@ class Test extends React.Component {
           disabledClassName="disabled"
           minSize={2000}
           maxSize={Infinity}
+          preventDropOnDocument
           disablePreview
           disableClick
           disabled
