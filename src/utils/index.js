@@ -15,7 +15,11 @@ export function getDataTransferItems(event) {
     } else if (dt.items && dt.items.length) {
       // During the drag even the dataTransfer.files is null
       // but Chrome implements some drag store, which is accesible via dataTransfer.items
-      dataTransferItemsList = dt.items
+      // Map the items to File objects,
+      // and filter non-File items
+      // see https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsFile
+      const files = Array.prototype.map.call(dt.items, item => item.getAsFile())
+      dataTransferItemsList = Array.prototype.filter.call(files, file => file !== null)
     }
   } else if (event.target && event.target.files) {
     dataTransferItemsList = event.target.files
@@ -37,6 +41,16 @@ export function fileMatchSize(file, maxSize, minSize) {
 
 export function allFilesAccepted(files, accept) {
   return files.every(file => fileAccepted(file, accept))
+}
+
+export function hasFiles(files) {
+  // Allow only files and retun the items as a list of File,
+  // see https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem for details
+  return (
+    Array.isArray(files) &&
+    files.length > 0 &&
+    Array.prototype.every.call(files, file => file instanceof File)
+  )
 }
 
 // allow the entire document to be a drag target

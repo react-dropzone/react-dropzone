@@ -15,7 +15,18 @@ const flushPromises = wrapper =>
 const Dropzone = require('./index')
 const DummyChildComponent = () => null
 
+const createFile = (name, size, type) => {
+  const file = new File([], name, { type })
+  Object.defineProperty(file, 'size', {
+    get() {
+      return size
+    }
+  })
+  return file
+}
+
 let files
+let nonFileItems
 let images
 
 const rejectColor = 'red'
@@ -33,26 +44,19 @@ const acceptStyle = {
 
 describe('Dropzone', () => {
   beforeEach(() => {
-    files = [
+    files = [createFile('file1.pdf', 1111, 'application/pdf')]
+
+    nonFileItems = [
       {
-        name: 'file1.pdf',
-        size: 1111,
-        type: 'application/pdf'
+        kind: 'string',
+        type: 'text/plain',
+        getAsFile() {
+          return null
+        }
       }
     ]
 
-    images = [
-      {
-        name: 'cats.gif',
-        size: 1234,
-        type: 'image/gif'
-      },
-      {
-        name: 'dogs.jpg',
-        size: 2345,
-        type: 'image/jpeg'
-      }
-    ]
+    images = [createFile('cats.gif', 1234, 'image/gif'), createFile('dogs.gif', 2345, 'image/jpeg')]
   })
 
   describe('basics', () => {
@@ -298,8 +302,8 @@ describe('Dropzone', () => {
     })
   })
 
-  describe('drag-n-drop', () => {
-    it('should override onDrag* methods', () => {
+  describe('drag-n-drop', async () => {
+    it('should override onDrag* methods', async () => {
       const props = {
         onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
@@ -307,17 +311,25 @@ describe('Dropzone', () => {
         onDragLeave: jest.fn()
       }
       const component = mount(<Dropzone {...props} />)
-      component.simulate('dragStart')
+
+      component.simulate('dragStart', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragStart).toHaveBeenCalled()
-      component.simulate('dragEnter', { dataTransfer: { items: files } })
+
+      await component.simulate('dragEnter', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragEnter).toHaveBeenCalled()
-      component.simulate('dragOver', { dataTransfer: { items: files } })
+
+      await component.simulate('dragOver', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragOver).toHaveBeenCalled()
-      component.simulate('dragLeave', { dataTransfer: { items: files } })
+
+      await component.simulate('dragLeave', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragLeave).toHaveBeenCalled()
     })
 
-    it('should guard dropEffect in onDragOver for IE', () => {
+    it('should guard dropEffect in onDragOver for IE', async () => {
       const props = {
         onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
@@ -326,42 +338,86 @@ describe('Dropzone', () => {
       const component = mount(<Dropzone {...props} />)
 
       // Using Proxy we'll emulate IE throwing when setting dataTransfer.dropEffect
-      const eventProxy = new Proxy(
-        {},
-        {
-          get: (target, prop) => {
-            switch (prop) {
-              case 'dataTransfer':
-                throw new Error('IE does not support rrror')
-              default:
-                return function noop() {}
+      const eventProxy = {
+        preventDefault() {},
+        stopPropagation() {},
+        dataTransfer: new Proxy(
+          {},
+          {
+            set: (target, prop) => {
+              switch (prop) {
+                case 'dropEffect':
+                  throw new Error('IE does not support setting {dropEffect}')
+                default:
+                  break
+              }
             }
           }
-        }
-      )
+        )
+      }
 
       // And using then we'll call the onDragOver with the proxy instead of event
-      const componentOnDragOver = component.instance().onDragOver
+      const instance = component.instance()
+      const componentOnDragOver = instance.onDragOver
       const onDragOver = jest
-        .spyOn(component.instance(), 'onDragOver')
+        .spyOn(instance, 'onDragOver')
         .mockImplementation(() => componentOnDragOver(eventProxy))
 
-      component.simulate('dragStart', { dataTransfer: { items: files } })
+      component.simulate('dragStart', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragStart).toHaveBeenCalled()
-      component.simulate('dragEnter', { dataTransfer: { items: files } })
+
+      component.simulate('dragEnter', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragEnter).toHaveBeenCalled()
-      component.simulate('dragLeave', { dataTransfer: { items: files } })
+
+      component.simulate('dragLeave', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(props.onDragLeave).toHaveBeenCalled()
+
       // It should not throw the error
-      component.simulate('dragOver', { dataTransfer: { items: files } })
+      component.simulate('dragOver', { dataTransfer: { files } })
+      await flushPromises(component)
       expect(onDragOver).not.toThrow()
     })
 
-    it('should set proper dragActive state on dragEnter', async () => {
-      const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
-      dropzone.simulate('dragEnter', { dataTransfer: { files } })
+    it('should not call onDrag* if there are no files', async () => {
+      const props = {
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
 
-      const updatedDropzone = await flushPromises(dropzone)
+      const component = mount(<Dropzone {...props} />)
+
+      component.simulate('dragStart', { dataTransfer: { items: nonFileItems } })
+      await flushPromises(component)
+      expect(props.onDragStart).not.toHaveBeenCalled()
+
+      component.simulate('dragEnter', { dataTransfer: { items: nonFileItems } })
+      await flushPromises(component)
+      expect(props.onDragEnter).not.toHaveBeenCalled()
+
+      component.simulate('dragOver', { dataTransfer: { items: nonFileItems } })
+      await flushPromises(component)
+      expect(props.onDragOver).not.toHaveBeenCalled()
+
+      component.simulate('dragLeave', { dataTransfer: { items: nonFileItems } })
+      await flushPromises(component)
+      expect(props.onDragLeave).not.toHaveBeenCalled()
+
+      component.simulate('drop', { dataTransfer: { items: nonFileItems } })
+      await flushPromises(component)
+      expect(props.onDrop).not.toHaveBeenCalled()
+    })
+
+    it('should set proper dragActive state on dragEnter', async () => {
+      const component = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      component.simulate('dragEnter', { dataTransfer: { files } })
+
+      const updatedDropzone = await flushPromises(component)
       const child = updatedDropzone.find(DummyChildComponent)
 
       expect(child).toHaveProp('isDragActive', true)
@@ -602,7 +658,7 @@ describe('Dropzone', () => {
       expect(dragActiveChild).toHaveProp('isDragAccept', true)
       expect(dragActiveChild).toHaveProp('isDragReject', false)
 
-      dropzone.simulate('dragLeave', { dataTransfer: { files } })
+      await dropzone.simulate('dragLeave', { dataTransfer: { files } })
       expect(dropzone.find(DragActiveComponent).children()).toHaveLength(0)
       expect(dropzone.find(ChildComponent)).toHaveProp('isDragAccept', false)
       expect(dropzone.find(ChildComponent)).toHaveProp('isDragReject', false)
@@ -765,13 +821,7 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       )
-      const bogusImages = [
-        {
-          name: 'bogus.gif',
-          size: 1234,
-          type: 'application/x-moz-file'
-        }
-      ]
+      const bogusImages = [createFile('bogus.gif', 1234, 'application/x-moz-file')]
 
       await dropzone.simulate('drop', { dataTransfer: { files: bogusImages } })
       expect(onDrop).toHaveBeenCalledWith(bogusImages, [], expectedEvent)
