@@ -10,7 +10,8 @@ import {
   fileMatchSize,
   onDocumentDragOver,
   getDataTransferItems as defaultGetDataTransferItem,
-  isIeOrEdge
+  isIeOrEdge,
+  hasFiles
 } from './utils'
 import styles from './utils/styles'
 
@@ -84,9 +85,11 @@ class Dropzone extends React.Component {
   }
 
   onDragStart(evt) {
-    if (this.props.onDragStart) {
-      this.props.onDragStart.call(this, evt)
-    }
+    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
+      if (hasFiles(draggedFiles) && this.props.onDragStart) {
+        this.props.onDragStart.call(this, evt)
+      }
+    })
   }
 
   onDragEnter(evt) {
@@ -100,14 +103,17 @@ class Dropzone extends React.Component {
     evt.persist()
 
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      this.setState({
-        isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
-        draggedFiles
-      })
+      if (hasFiles(draggedFiles)) {
+        this.setState({
+          isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
+          draggedFiles
+        })
+
+        if (this.props.onDragEnter) {
+          this.props.onDragEnter.call(this, evt)
+        }
+      }
     })
-    if (this.props.onDragEnter) {
-      this.props.onDragEnter.call(this, evt)
-    }
   }
 
   onDragOver(evt) {
@@ -123,9 +129,12 @@ class Dropzone extends React.Component {
       // continue regardless of error
     }
 
-    if (this.props.onDragOver) {
-      this.props.onDragOver.call(this, evt)
-    }
+    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
+      if (hasFiles(draggedFiles) && this.props.onDragOver) {
+        this.props.onDragOver.call(this, evt)
+      }
+    })
+
     return false
   }
 
@@ -144,9 +153,11 @@ class Dropzone extends React.Component {
       draggedFiles: []
     })
 
-    if (this.props.onDragLeave) {
-      this.props.onDragLeave.call(this, evt)
-    }
+    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
+      if (hasFiles(draggedFiles) && this.props.onDragLeave) {
+        this.props.onDragLeave.call(this, evt)
+      }
+    })
   }
 
   onDrop(evt) {
@@ -210,7 +221,7 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (onDrop) {
+      if (hasFiles(fileList) && onDrop) {
         onDrop.call(this, acceptedFiles, rejectedFiles, evt)
       }
 
