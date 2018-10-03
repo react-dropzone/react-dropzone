@@ -1,4 +1,4 @@
-import { getDataTransferItems, isIeOrEdge } from './'
+import { getDataTransferItems, isIeOrEdge, hasFiles } from './'
 
 const files = [
   {
@@ -15,6 +15,33 @@ const files = [
     name: 'dogs.jpg',
     size: 2345,
     type: 'image/jpeg'
+  }
+]
+
+const nonFileItems = [
+  {
+    kind: 'string',
+    type: 'text/plain',
+    getAsFile() {
+      return null
+    }
+  }
+]
+
+const json = JSON.stringify({
+  ping: true
+})
+const file = new File([json], 'test.json', {
+  type: 'application/json'
+})
+
+const fileItems = [
+  {
+    kind: 'file',
+    type: 'application/json',
+    getAsFile() {
+      return file
+    }
   }
 ]
 
@@ -45,12 +72,26 @@ describe('getDataTransferItems', () => {
         files: [{}]
       },
       dataTransfer: {
-        items: files
+        items: fileItems
       }
     }
     const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(3)
+    expect(res).toHaveLength(1)
+  })
+
+  it('should ignore dataTransfer.items that are not of kind "file"', () => {
+    const event = {
+      target: {
+        files: [{}]
+      },
+      dataTransfer: {
+        items: nonFileItems
+      }
+    }
+    const res = getDataTransferItems(event)
+    expect(res).toBeInstanceOf(Array)
+    expect(res).toHaveLength(0)
   })
 
   it('should use event.target if dataTransfer is not defined', () => {
@@ -64,7 +105,7 @@ describe('getDataTransferItems', () => {
     expect(res).toHaveLength(3)
   })
 
-  it('should prioritize dataTransfer.files over .files', () => {
+  it('should prioritize dataTransfer.files over .items', () => {
     const event = {
       dataTransfer: {
         files: [{}, {}],
@@ -114,5 +155,14 @@ describe('isIeOrEdge', () => {
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
 
     expect(isIeOrEdge(userAgent)).toBe(false)
+  })
+})
+
+describe('hasFiles', () => {
+  it('should only return true for an Array of File objects', () => {
+    expect(hasFiles([file])).toBe(true)
+    expect(hasFiles(['domNode'])).toBe(false)
+    expect(hasFiles([])).toBe(false)
+    expect(hasFiles(null)).toBe(false)
   })
 })
