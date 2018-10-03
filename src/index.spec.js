@@ -49,10 +49,7 @@ describe('Dropzone', () => {
     nonFileItems = [
       {
         kind: 'string',
-        type: 'text/plain',
-        getAsFile() {
-          return null
-        }
+        type: 'text/plain'
       }
     ]
 

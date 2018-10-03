@@ -9,7 +9,7 @@ The value must be a comma-separated list of unique content type specifiers:
 
 For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input
 
-```
+```jsx harmony
 class Accept extends React.Component {
   constructor() {
     super()

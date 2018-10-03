@@ -11,7 +11,7 @@ import {
   onDocumentDragOver,
   getDataTransferItems as defaultGetDataTransferItem,
   isIeOrEdge,
-  hasFiles
+  isFileList
 } from './utils'
 import styles from './utils/styles'
 
@@ -86,7 +86,7 @@ class Dropzone extends React.Component {
 
   onDragStart(evt) {
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (hasFiles(draggedFiles) && this.props.onDragStart) {
+      if (isFileList(draggedFiles) && this.props.onDragStart) {
         this.props.onDragStart.call(this, evt)
       }
     })
@@ -103,7 +103,7 @@ class Dropzone extends React.Component {
     evt.persist()
 
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (hasFiles(draggedFiles)) {
+      if (isFileList(draggedFiles)) {
         this.setState({
           isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
           draggedFiles
@@ -130,7 +130,7 @@ class Dropzone extends React.Component {
     }
 
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (hasFiles(draggedFiles) && this.props.onDragOver) {
+      if (isFileList(draggedFiles) && this.props.onDragOver) {
         this.props.onDragOver.call(this, evt)
       }
     })
@@ -154,7 +154,7 @@ class Dropzone extends React.Component {
     })
 
     Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (hasFiles(draggedFiles) && this.props.onDragLeave) {
+      if (isFileList(draggedFiles) && this.props.onDragLeave) {
         this.props.onDragLeave.call(this, evt)
       }
     })
@@ -221,7 +221,7 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (hasFiles(fileList) && onDrop) {
+      if (isFileList(fileList) && onDrop) {
         onDrop.call(this, acceptedFiles, rejectedFiles, evt)
       }
 

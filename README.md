@@ -95,13 +95,12 @@ See https://react-dropzone.netlify.com/#proptypes
 ### Testing
 
 *Important*: `react-dropzone` makes its drag'n'drop callbacks asynchronous to enable promise based getDataTransfer functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
-```js
+```js static
 const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 ```
 
 Example with enzyme 3:
-```js
-
+```js static
 it('tests drag state', async () => {
   const flushPromises = () => new Promise(resolve => setImmediate(resolve));
   const DummyChildComponent = () => null

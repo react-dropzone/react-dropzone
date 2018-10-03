@@ -12,6 +12,7 @@ module.exports = {
   serverPort: 8080,
   sections: [
     {
+      name: '',
       content: 'README.md'
     },
     {

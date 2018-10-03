@@ -10,16 +10,14 @@ export function getDataTransferItems(event) {
   if (event.dataTransfer) {
     const dt = event.dataTransfer
 
+    // NOTE: Only the 'drop' event has access to DataTransfer.files,
+    // otherwise it will always be empty
     if (dt.files && dt.files.length) {
       dataTransferItemsList = dt.files
     } else if (dt.items && dt.items.length) {
       // During the drag even the dataTransfer.files is null
       // but Chrome implements some drag store, which is accesible via dataTransfer.items
-      // Map the items to File objects,
-      // and filter non-File items
-      // see https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsFile
-      const files = Array.prototype.map.call(dt.items, item => item.getAsFile())
-      dataTransferItemsList = Array.prototype.filter.call(files, file => file !== null)
+      dataTransferItemsList = dt.items
     }
   } else if (event.target && event.target.files) {
     dataTransferItemsList = event.target.files
@@ -43,14 +41,19 @@ export function allFilesAccepted(files, accept) {
   return files.every(file => fileAccepted(file, accept))
 }
 
-export function hasFiles(files) {
-  // Allow only files and retun the items as a list of File,
-  // see https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem for details
+export function isFileList(items) {
+  // Returns true only for items that are File objects or DataTransferItem of kind 'file',
+  // See https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem for details
   return (
-    Array.isArray(files) &&
-    files.length > 0 &&
-    Array.prototype.every.call(files, file => file instanceof File)
+    Array.isArray(items) &&
+    items.length > 0 &&
+    (Array.prototype.every.call(items, item => item instanceof File) ||
+      Array.prototype.every.call(items, isKindFile))
   )
+}
+
+export function isKindFile(item) {
+  return typeof item === 'object' && item.kind === 'file'
 }
 
 // allow the entire document to be a drag target
