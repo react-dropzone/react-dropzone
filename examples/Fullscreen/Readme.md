@@ -1,6 +1,6 @@
 You can wrap the whole app into the dropzone. This will make the whole app a Dropzone target.
 
-```
+```jsx harmony
 class FullScreen extends React.Component {
   constructor() {
     super()

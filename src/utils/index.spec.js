@@ -1,4 +1,4 @@
-import { getDataTransferItems, isIeOrEdge, hasFiles } from './'
+import { getDataTransferItems, isIeOrEdge, isFileList } from './'
 
 const files = [
   {
@@ -21,10 +21,7 @@ const files = [
 const nonFileItems = [
   {
     kind: 'string',
-    type: 'text/plain',
-    getAsFile() {
-      return null
-    }
+    type: 'text/plain'
   }
 ]
 
@@ -38,10 +35,7 @@ const file = new File([json], 'test.json', {
 const fileItems = [
   {
     kind: 'file',
-    type: 'application/json',
-    getAsFile() {
-      return file
-    }
+    type: 'application/json'
   }
 ]
 
@@ -78,20 +72,6 @@ describe('getDataTransferItems', () => {
     const res = getDataTransferItems(event)
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(1)
-  })
-
-  it('should ignore dataTransfer.items that are not of kind "file"', () => {
-    const event = {
-      target: {
-        files: [{}]
-      },
-      dataTransfer: {
-        items: nonFileItems
-      }
-    }
-    const res = getDataTransferItems(event)
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(0)
   })
 
   it('should use event.target if dataTransfer is not defined', () => {
@@ -158,11 +138,12 @@ describe('isIeOrEdge', () => {
   })
 })
 
-describe('hasFiles', () => {
-  it('should only return true for an Array of File objects', () => {
-    expect(hasFiles([file])).toBe(true)
-    expect(hasFiles(['domNode'])).toBe(false)
-    expect(hasFiles([])).toBe(false)
-    expect(hasFiles(null)).toBe(false)
+describe('isFileList', () => {
+  it('should only return true for an Array of File objects or DataTransferItem of kind file', () => {
+    expect(isFileList([file])).toBe(true)
+    expect(isFileList(fileItems)).toBe(true)
+    expect(isFileList(nonFileItems)).toBe(false)
+    expect(isFileList([])).toBe(false)
+    expect(isFileList(null)).toBe(false)
   })
 })

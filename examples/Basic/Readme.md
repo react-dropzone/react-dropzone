@@ -1,6 +1,6 @@
 Dropzone with default properties and displays list of the dropped files.
 
-```
+```jsx harmony
 class Basic extends React.Component {
   constructor() {
     super()
@@ -39,7 +39,7 @@ class Basic extends React.Component {
 
 Dropzone with `disabled` property:
 
-```
+```jsx harmony
 class Basic extends React.Component {
   constructor() {
     super()
