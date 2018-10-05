@@ -3,6 +3,7 @@
 
 import React from 'react'
 import { mount, render } from 'enzyme'
+import { fromEvent } from 'file-selector'
 import { onDocumentDragOver } from './utils'
 
 const flushPromises = wrapper =>
@@ -309,7 +310,7 @@ describe('Dropzone', () => {
       }
       const component = mount(<Dropzone {...props} />)
 
-      component.simulate('dragStart', { dataTransfer: { files } })
+      await component.simulate('dragStart', { dataTransfer: { files } })
       await flushPromises(component)
       expect(props.onDragStart).toHaveBeenCalled()
 
@@ -389,23 +390,23 @@ describe('Dropzone', () => {
 
       const component = mount(<Dropzone {...props} />)
 
-      component.simulate('dragStart', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragStart', { dataTransfer: { items: nonFileItems } })
       await flushPromises(component)
       expect(props.onDragStart).not.toHaveBeenCalled()
 
-      component.simulate('dragEnter', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragEnter', { dataTransfer: { items: nonFileItems } })
       await flushPromises(component)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
-      component.simulate('dragOver', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragOver', { dataTransfer: { items: nonFileItems } })
       await flushPromises(component)
       expect(props.onDragOver).not.toHaveBeenCalled()
 
-      component.simulate('dragLeave', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragLeave', { dataTransfer: { items: nonFileItems } })
       await flushPromises(component)
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
-      component.simulate('drop', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('drop', { dataTransfer: { items: nonFileItems } })
       await flushPromises(component)
       expect(props.onDrop).not.toHaveBeenCalled()
     })
@@ -1162,6 +1163,102 @@ describe('Dropzone', () => {
 
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
+    })
+  })
+
+  describe('plugin integration', () => {
+    it('uses the provided plugin fn for getting the files', async () => {
+      const props = {
+        getDataTransferItems: evt => fromEvent(evt),
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+
+      const dropzone = mount(<Dropzone {...props} />)
+
+      const data = JSON.stringify({ ping: true })
+      const file = new File([data], name, {
+        type: 'application/json'
+      })
+      const files = [file]
+
+      await dropzone.simulate('dragStart', { dataTransfer: { files } })
+      await flushPromises(dropzone)
+      expect(props.onDragStart).toHaveBeenCalled()
+
+      await dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      await flushPromises(dropzone)
+      expect(props.onDragEnter).toHaveBeenCalled()
+
+      await dropzone.simulate('dragOver', { dataTransfer: { files } })
+      await flushPromises(dropzone)
+      expect(props.onDragOver).toHaveBeenCalled()
+
+      await dropzone.simulate('dragLeave', { dataTransfer: { files } })
+      await flushPromises(dropzone)
+      expect(props.onDragLeave).toHaveBeenCalled()
+
+      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await flushPromises(dropzone)
+      expect(props.onDrop).toHaveBeenCalled()
+
+      const [call] = props.onDrop.mock.calls
+      const [fileList] = call
+
+      expect(fileList).toHaveLength(files.length)
+
+      const [item] = fileList
+
+      expect(item.name).toEqual(file.name)
+      expect(item.size).toEqual(file.size)
+      expect(item.type).toEqual(file.type)
+      expect(item.lastModified).toEqual(file.lastModified)
+    })
+
+    it('ignores the plugin result if it does not comply with the expected type signature', async () => {
+      const props = {
+        getDataTransferItems: evt => Promise.resolve(evt.dataTransfer.items),
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+
+      const dropzone = mount(<Dropzone {...props} />)
+
+      const items = [
+        {
+          kind: 'string',
+          type: 'text/plain',
+          getAsFile() {
+            return null
+          }
+        }
+      ]
+
+      await dropzone.simulate('dragStart', { dataTransfer: { items } })
+      await flushPromises(dropzone)
+      expect(props.onDragStart).not.toHaveBeenCalled()
+
+      await dropzone.simulate('dragEnter', { dataTransfer: { items } })
+      await flushPromises(dropzone)
+      expect(props.onDragEnter).not.toHaveBeenCalled()
+
+      await dropzone.simulate('dragOver', { dataTransfer: { items } })
+      await flushPromises(dropzone)
+      expect(props.onDragOver).not.toHaveBeenCalled()
+
+      await dropzone.simulate('dragLeave', { dataTransfer: { items } })
+      await flushPromises(dropzone)
+      expect(props.onDragLeave).not.toHaveBeenCalled()
+
+      await dropzone.simulate('drop', { dataTransfer: { items } })
+      await flushPromises(dropzone)
+      expect(props.onDrop).not.toHaveBeenCalled()
     })
   })
 })
