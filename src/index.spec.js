@@ -295,7 +295,7 @@ describe('Dropzone', () => {
       const component = mount(<Dropzone inputProps={{ onClick }} />)
 
       component.simulate('click')
-      expect(onClick).toHaveBeenCalled()
+      expect(onClick).toHaveBeenCalledWith(expect.any(MouseEvent))
     })
   })
 
