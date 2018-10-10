@@ -82,4 +82,4 @@ class Basic2 extends React.Component {
 }
 
 // verify that all props are optional
-const allPropsOptional = <Dropzone/>
+const allPropsOptional = <Dropzone/>;
