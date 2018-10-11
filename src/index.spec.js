@@ -4,7 +4,7 @@
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { fromEvent } from 'file-selector'
-import { onDocumentDragOver } from './utils'
+import * as utils from './utils'
 
 const flushPromises = wrapper =>
   new Promise(resolve =>
@@ -155,7 +155,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
 
-      onDocumentDragOver(event)
+      utils.onDocumentDragOver(event)
       expect(event.preventDefault).toHaveBeenCalledTimes(1)
       event.preventDefault.mockClear()
 
@@ -911,6 +911,23 @@ describe('Dropzone', () => {
       expect(onDropAccepted).toHaveBeenCalledWith(files.concat(images), expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
     })
+
+    it('should not call onDrop* callbacks in Edge for non-File items', async () => {
+      utils.isIeOrEdge = jest.fn(() => false).mockImplementationOnce(() => true)
+      const dropzone = mount(
+        <Dropzone
+          onDrop={onDrop}
+          onDropAccepted={onDropAccepted}
+          onDropRejected={onDropRejected}
+          accept="image/*"
+        />
+      )
+
+      await dropzone.simulate('drop', { dataTransfer: { files, items: nonFileItems } })
+      expect(onDrop).not.toHaveBeenCalledWith()
+      expect(onDropAccepted).not.toHaveBeenCalledWith()
+      expect(onDropRejected).not.toHaveBeenCalledWith()
+    })
   })
 
   describe('preview', () => {
@@ -938,15 +955,12 @@ describe('Dropzone', () => {
       )
     })
 
-    it('should not throw error when preview cannot be created', async () => {
+    it('should not generate previews for non-File items', async () => {
       const onDrop = jest.fn()
-      const onConsoleError = jest.fn()
-      jest.spyOn(console, 'error').mockImplementationOnce(onConsoleError)
 
       const dropzone = mount(<Dropzone onDrop={onDrop} />)
       await dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } })
 
-      expect(onConsoleError).toHaveBeenCalled()
       expect(onDrop).not.toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
         [],

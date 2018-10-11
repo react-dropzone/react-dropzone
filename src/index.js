@@ -1,4 +1,3 @@
-/* global process */
 /* eslint prefer-template: 0 */
 
 import React from 'react'
@@ -194,15 +193,16 @@ class Dropzone extends React.Component {
       const acceptedFiles = []
       const rejectedFiles = []
 
+      if (
+        !isFileList(fileList) ||
+        (isIeOrEdge() && evt.dataTransfer && !isFileList(Array.from(evt.dataTransfer.items)))
+      ) {
+        return
+      }
+
       fileList.forEach(file => {
         if (!disablePreview) {
-          try {
-            file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
-          } catch (err) {
-            if (process.env.NODE_ENV !== 'production') {
-              console.error('Failed to generate preview for file', file, err) // eslint-disable-line no-console
-            }
-          }
+          file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
         }
 
         if (
@@ -221,7 +221,7 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (isFileList(fileList) && onDrop) {
+      if (onDrop) {
         onDrop.call(this, acceptedFiles, rejectedFiles, evt)
       }
 
