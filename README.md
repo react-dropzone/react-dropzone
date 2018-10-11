@@ -3,9 +3,9 @@
 # react-dropzone
 
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg)](https://www.npmjs.com/package/react-dropzone)
-[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) 
-[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) 
-[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone)
+[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone)
+[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
@@ -18,6 +18,12 @@ Source code: https://github.com/react-dropzone/react-dropzone/
 **Looking for maintainers: https://github.com/react-dropzone/react-dropzone/issues/479**
 
 ---
+
+## Browsers support
+
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari-ios/safari-ios_48x48.png" alt="iOS Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>iOS Safari | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/samsung-internet/samsung-internet_48x48.png" alt="Samsung" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Samsung | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_48x48.png" alt="Opera" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Opera |
+| --------- | --------- | --------- | --------- | --------- | --------- | --------- |
+| IE11, Edge| last 2 versions| last 2 versions| last 2 versions| last 2 versions| last 2 versions| last 2 versions
 
 ## Installation
 
