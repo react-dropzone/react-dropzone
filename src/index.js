@@ -222,22 +222,22 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (onDrop) {
-        onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-      }
-
-      if (rejectedFiles.length > 0 && onDropRejected) {
-        onDropRejected.call(this, rejectedFiles, evt)
-      }
-
-      if (acceptedFiles.length > 0 && onDropAccepted) {
-        onDropAccepted.call(this, acceptedFiles, evt)
-      }
-
       // Update `acceptedFiles` and `rejectedFiles` state
       // This will make children render functions receive the appropriate
       // values
-      this.setState({ acceptedFiles, rejectedFiles })
+      this.setState({ acceptedFiles, rejectedFiles }, () => {
+        if (onDrop) {
+          onDrop.call(this, acceptedFiles, rejectedFiles, evt)
+        }
+
+        if (rejectedFiles.length > 0 && onDropRejected) {
+          onDropRejected.call(this, rejectedFiles, evt)
+        }
+
+        if (acceptedFiles.length > 0 && onDropAccepted) {
+          onDropAccepted.call(this, acceptedFiles, evt)
+        }
+      })
     })
   }
 
