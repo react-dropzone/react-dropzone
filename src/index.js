@@ -27,6 +27,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
+    this.open = this.open.bind(this)
 
     this.setRef = this.setRef.bind(this)
     this.setRefs = this.setRefs.bind(this)
@@ -313,7 +314,8 @@ class Dropzone extends React.Component {
         ...this.state,
         isDragActive,
         isDragAccept,
-        isDragReject
+        isDragReject,
+        open: this.open
       })
     }
     return children
