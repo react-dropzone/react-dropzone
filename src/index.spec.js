@@ -1292,4 +1292,19 @@ describe('Dropzone', () => {
       expect(props.onDrop).not.toHaveBeenCalled()
     })
   })
+
+  it('should not set state after onDrop callbacks', async () => {
+    const onDrop = () => {
+      jest.resetAllMocks()
+    }
+    let dropzone = mount(
+      <Dropzone accept="image/*" onDrop={onDrop}>
+        {props => <DummyChildComponent {...props} />}
+      </Dropzone>
+    )
+    const setState = jest.spyOn(dropzone.instance(), 'setState')
+    dropzone.simulate('drop', { dataTransfer: { files: images } })
+    dropzone = await flushPromises(dropzone)
+    expect(setState).not.toHaveBeenCalled()
+  })
 })
