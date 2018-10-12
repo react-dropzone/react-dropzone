@@ -26,6 +26,7 @@ type DropzoneRenderArgs = {
   isDragActive: boolean;
   isDragAccept: boolean;
   isDragReject: boolean;
+  open: () => void;
 };
 
 export type DropzoneRenderFunction = (x: DropzoneRenderArgs) => JSX.Element;
