@@ -663,6 +663,23 @@ describe('Dropzone', () => {
     })
   })
 
+  it('should expose open func to children', () => {
+    const subject = mount(
+      <Dropzone disableClick>
+        {({ open }) => (
+          <button type="button" onClick={open}>
+            Open
+          </button>
+        )}
+      </Dropzone>
+    )
+
+    const click = jest.spyOn(subject.instance().fileInputEl, 'click')
+    subject.find('button').simulate('click')
+
+    expect(click).toHaveBeenCalled()
+  })
+
   describe('onDrop', () => {
     const expectedEvent = expect.anything()
     const onDrop = jest.fn()
