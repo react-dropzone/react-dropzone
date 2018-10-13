@@ -1,4 +1,3 @@
-/* global process */
 /* eslint prefer-template: 0 */
 
 import React from 'react'
@@ -28,6 +27,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
+    this.open = this.open.bind(this)
 
     this.setRef = this.setRef.bind(this)
     this.setRefs = this.setRefs.bind(this)
@@ -194,15 +194,16 @@ class Dropzone extends React.Component {
       const acceptedFiles = []
       const rejectedFiles = []
 
+      if (
+        !isFileList(fileList) ||
+        (isIeOrEdge() && evt.dataTransfer && !isFileList(Array.from(evt.dataTransfer.items)))
+      ) {
+        return
+      }
+
       fileList.forEach(file => {
         if (!disablePreview) {
-          try {
-            file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
-          } catch (err) {
-            if (process.env.NODE_ENV !== 'production') {
-              console.error('Failed to generate preview for file', file, err) // eslint-disable-line no-console
-            }
-          }
+          file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
         }
 
         if (
@@ -221,22 +222,22 @@ class Dropzone extends React.Component {
         rejectedFiles.push(...acceptedFiles.splice(0))
       }
 
-      if (isFileList(fileList) && onDrop) {
-        onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-      }
-
-      if (rejectedFiles.length > 0 && onDropRejected) {
-        onDropRejected.call(this, rejectedFiles, evt)
-      }
-
-      if (acceptedFiles.length > 0 && onDropAccepted) {
-        onDropAccepted.call(this, acceptedFiles, evt)
-      }
-
       // Update `acceptedFiles` and `rejectedFiles` state
       // This will make children render functions receive the appropriate
       // values
-      this.setState({ acceptedFiles, rejectedFiles })
+      this.setState({ acceptedFiles, rejectedFiles }, () => {
+        if (onDrop) {
+          onDrop.call(this, acceptedFiles, rejectedFiles, evt)
+        }
+
+        if (rejectedFiles.length > 0 && onDropRejected) {
+          onDropRejected.call(this, rejectedFiles, evt)
+        }
+
+        if (acceptedFiles.length > 0 && onDropAccepted) {
+          onDropAccepted.call(this, acceptedFiles, evt)
+        }
+      })
     })
   }
 
@@ -313,7 +314,8 @@ class Dropzone extends React.Component {
         ...this.state,
         isDragActive,
         isDragAccept,
-        isDragReject
+        isDragReject,
+        open: this.open
       })
     }
     return children
