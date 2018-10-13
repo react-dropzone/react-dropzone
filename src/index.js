@@ -3,14 +3,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
+  isDragDataWithFiles,
   supportMultiple,
   fileAccepted,
   allFilesAccepted,
   fileMatchSize,
   onDocumentDragOver,
   getDataTransferItems as defaultGetDataTransferItem,
-  isIeOrEdge,
-  isFileList
+  isIeOrEdge
 } from './utils'
 import styles from './utils/styles'
 
@@ -85,11 +85,9 @@ class Dropzone extends React.Component {
   }
 
   onDragStart(evt) {
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragStart) {
-        this.props.onDragStart.call(this, evt)
-      }
-    })
+    if (this.props.onDragStart && isDragDataWithFiles(evt)) {
+      this.props.onDragStart.call(this, evt)
+    }
   }
 
   onDragEnter(evt) {
@@ -102,18 +100,19 @@ class Dropzone extends React.Component {
 
     evt.persist()
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles)) {
+    if (isDragDataWithFiles(evt)) {
+      Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
         this.setState({
-          isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
-          draggedFiles
+          draggedFiles,
+          // Do not rely on files for the drag state. It doesn't work in Safari.
+          isDragActive: true
         })
+      })
 
-        if (this.props.onDragEnter) {
-          this.props.onDragEnter.call(this, evt)
-        }
+      if (this.props.onDragEnter) {
+        this.props.onDragEnter.call(this, evt)
       }
-    })
+    }
   }
 
   onDragOver(evt) {
@@ -129,11 +128,9 @@ class Dropzone extends React.Component {
       // continue regardless of error
     }
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragOver) {
-        this.props.onDragOver.call(this, evt)
-      }
-    })
+    if (this.props.onDragOver && isDragDataWithFiles(evt)) {
+      this.props.onDragOver.call(this, evt)
+    }
 
     return false
   }
@@ -153,11 +150,9 @@ class Dropzone extends React.Component {
       draggedFiles: []
     })
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragLeave) {
-        this.props.onDragLeave.call(this, evt)
-      }
-    })
+    if (this.props.onDragLeave && isDragDataWithFiles(evt)) {
+      this.props.onDragLeave.call(this, evt)
+    }
   }
 
   onDrop(evt) {
@@ -190,55 +185,50 @@ class Dropzone extends React.Component {
       draggedFiles: []
     })
 
-    Promise.resolve(getDataTransferItems(evt)).then(fileList => {
-      const acceptedFiles = []
-      const rejectedFiles = []
+    if (isDragDataWithFiles(evt)) {
+      Promise.resolve(getDataTransferItems(evt)).then(fileList => {
+        const acceptedFiles = []
+        const rejectedFiles = []
 
-      if (
-        !isFileList(fileList) ||
-        (isIeOrEdge() && evt.dataTransfer && !isFileList(Array.from(evt.dataTransfer.items)))
-      ) {
-        return
-      }
+        fileList.forEach(file => {
+          if (!disablePreview) {
+            file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
+          }
 
-      fileList.forEach(file => {
-        if (!disablePreview) {
-          file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
+          if (
+            fileAccepted(file, accept) &&
+            fileMatchSize(file, this.props.maxSize, this.props.minSize)
+          ) {
+            acceptedFiles.push(file)
+          } else {
+            rejectedFiles.push(file)
+          }
+        })
+
+        if (!multiple && acceptedFiles.length > 1) {
+          // if not in multi mode add any extra accepted files to rejected.
+          // This will allow end users to easily ignore a multi file drop in "single" mode.
+          rejectedFiles.push(...acceptedFiles.splice(0))
         }
 
-        if (
-          fileAccepted(file, accept) &&
-          fileMatchSize(file, this.props.maxSize, this.props.minSize)
-        ) {
-          acceptedFiles.push(file)
-        } else {
-          rejectedFiles.push(file)
-        }
+        // Update `acceptedFiles` and `rejectedFiles` state
+        // This will make children render functions receive the appropriate
+        // values
+        this.setState({ acceptedFiles, rejectedFiles }, () => {
+          if (onDrop) {
+            onDrop.call(this, acceptedFiles, rejectedFiles, evt)
+          }
+
+          if (rejectedFiles.length > 0 && onDropRejected) {
+            onDropRejected.call(this, rejectedFiles, evt)
+          }
+
+          if (acceptedFiles.length > 0 && onDropAccepted) {
+            onDropAccepted.call(this, acceptedFiles, evt)
+          }
+        })
       })
-
-      if (!multiple && acceptedFiles.length > 1) {
-        // if not in multi mode add any extra accepted files to rejected.
-        // This will allow end users to easily ignore a multi file drop in "single" mode.
-        rejectedFiles.push(...acceptedFiles.splice(0))
-      }
-
-      // Update `acceptedFiles` and `rejectedFiles` state
-      // This will make children render functions receive the appropriate
-      // values
-      this.setState({ acceptedFiles, rejectedFiles }, () => {
-        if (onDrop) {
-          onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-        }
-
-        if (rejectedFiles.length > 0 && onDropRejected) {
-          onDropRejected.call(this, rejectedFiles, evt)
-        }
-
-        if (acceptedFiles.length > 0 && onDropAccepted) {
-          onDropAccepted.call(this, acceptedFiles, evt)
-        }
-      })
-    })
+    }
   }
 
   onClick(evt) {
@@ -370,7 +360,7 @@ class Dropzone extends React.Component {
     if (noStyles) {
       style = styles.default
       activeStyle = styles.active
-      acceptStyle = styles.active
+      acceptStyle = styles.accepted
       rejectStyle = styles.rejected
       disabledStyle = styles.disabled
     }

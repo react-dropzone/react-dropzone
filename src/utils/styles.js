@@ -1,15 +1,16 @@
 export default {
+  active: {
+    borderStyle: 'solid',
+    backgroundColor: '#eee'
+  },
+  accepted: {
+    borderStyle: 'solid',
+    borderColor: '#6c6',
+    backgroundColor: '#eee'
+  },
   rejected: {
     borderStyle: 'solid',
     borderColor: '#c66',
-    backgroundColor: '#eee'
-  },
-  disabled: {
-    opacity: 0.5
-  },
-  active: {
-    borderStyle: 'solid',
-    borderColor: '#6c6',
     backgroundColor: '#eee'
   },
   default: {
@@ -19,5 +20,8 @@ export default {
     borderColor: '#666',
     borderStyle: 'dashed',
     borderRadius: 5
+  },
+  disabled: {
+    opacity: 0.5
   }
 }

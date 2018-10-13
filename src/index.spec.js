@@ -4,7 +4,8 @@
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { fromEvent } from 'file-selector'
-import * as utils from './utils'
+import styles from './utils/styles'
+import { onDocumentDragOver } from './utils'
 
 const flushPromises = wrapper =>
   new Promise(resolve =>
@@ -26,8 +27,30 @@ const createFile = (name, size, type) => {
   return file
 }
 
+const createDtWithFiles = files => {
+  return {
+    dataTransfer: {
+      files,
+      types: ['Files']
+    }
+  }
+}
+
+const createDtWithItems = (items, types) => {
+  return {
+    dataTransfer: { items, types }
+  }
+}
+
+const createDtWithTextTypes = () => {
+  return createDtWithItems([], ['text/html', 'text/plain'])
+}
+
+const createDtWithTextItems = () => {
+  return createDtWithItems([{ kind: 'string', type: 'text/plain' }], ['text/html', 'text/plain'])
+}
+
 let files
-let nonFileItems
 let images
 
 const rejectColor = 'red'
@@ -46,14 +69,6 @@ const acceptStyle = {
 describe('Dropzone', () => {
   beforeEach(() => {
     files = [createFile('file1.pdf', 1111, 'application/pdf')]
-
-    nonFileItems = [
-      {
-        kind: 'string',
-        type: 'text/plain'
-      }
-    ]
-
     images = [createFile('cats.gif', 1234, 'image/gif'), createFile('dogs.gif', 2345, 'image/jpeg')]
   })
 
@@ -155,7 +170,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
 
-      utils.onDocumentDragOver(event)
+      onDocumentDragOver(event)
       expect(event.preventDefault).toHaveBeenCalledTimes(1)
       event.preventDefault.mockClear()
 
@@ -310,19 +325,19 @@ describe('Dropzone', () => {
       }
       const component = mount(<Dropzone {...props} />)
 
-      await component.simulate('dragStart', { dataTransfer: { files } })
+      await component.simulate('dragStart', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragStart).toHaveBeenCalled()
 
-      await component.simulate('dragEnter', { dataTransfer: { files } })
+      await component.simulate('dragEnter', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragEnter).toHaveBeenCalled()
 
-      await component.simulate('dragOver', { dataTransfer: { files } })
+      await component.simulate('dragOver', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragOver).toHaveBeenCalled()
 
-      await component.simulate('dragLeave', { dataTransfer: { files } })
+      await component.simulate('dragLeave', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragLeave).toHaveBeenCalled()
     })
@@ -361,20 +376,20 @@ describe('Dropzone', () => {
         .spyOn(instance, 'onDragOver')
         .mockImplementation(() => componentOnDragOver(eventProxy))
 
-      component.simulate('dragStart', { dataTransfer: { files } })
+      component.simulate('dragStart', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragStart).toHaveBeenCalled()
 
-      component.simulate('dragEnter', { dataTransfer: { files } })
+      component.simulate('dragEnter', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragEnter).toHaveBeenCalled()
 
-      component.simulate('dragLeave', { dataTransfer: { files } })
+      component.simulate('dragLeave', createDtWithFiles(files))
       await flushPromises(component)
       expect(props.onDragLeave).toHaveBeenCalled()
 
       // It should not throw the error
-      component.simulate('dragOver', { dataTransfer: { files } })
+      component.simulate('dragOver', createDtWithFiles(files))
       await flushPromises(component)
       expect(onDragOver).not.toThrow()
     })
@@ -385,35 +400,75 @@ describe('Dropzone', () => {
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
-        onDrop: jest.fn()
+        onDrop: jest.fn(),
+        onDropAccepted: jest.fn(),
+        onDropRejected: jest.fn()
       }
 
       const component = mount(<Dropzone {...props} />)
 
-      await component.simulate('dragStart', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragStart', createDtWithTextTypes())
       await flushPromises(component)
       expect(props.onDragStart).not.toHaveBeenCalled()
 
-      await component.simulate('dragEnter', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragEnter', createDtWithTextTypes())
       await flushPromises(component)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
-      await component.simulate('dragOver', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragOver', createDtWithTextTypes())
       await flushPromises(component)
       expect(props.onDragOver).not.toHaveBeenCalled()
 
-      await component.simulate('dragLeave', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('dragLeave', createDtWithTextTypes())
       await flushPromises(component)
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
-      await component.simulate('drop', { dataTransfer: { items: nonFileItems } })
+      await component.simulate('drop', createDtWithTextItems())
       await flushPromises(component)
       expect(props.onDrop).not.toHaveBeenCalled()
+      expect(props.onDropAccepted).not.toHaveBeenCalled()
+      expect(props.onDropRejected).not.toHaveBeenCalled()
+    })
+
+    it('should call onDrag* if the DataTransfer has files but cannot access the data', async () => {
+      const props = {
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn(),
+        onDropAccepted: jest.fn(),
+        onDropRejected: jest.fn()
+      }
+
+      const component = mount(<Dropzone {...props} />)
+
+      await component.simulate('dragStart', createDtWithFiles([]))
+      await flushPromises(component)
+      expect(props.onDragStart).toHaveBeenCalled()
+
+      await component.simulate('dragEnter', createDtWithFiles([]))
+      await flushPromises(component)
+      expect(props.onDragEnter).toHaveBeenCalled()
+
+      await component.simulate('dragOver', createDtWithFiles([]))
+      await flushPromises(component)
+      expect(props.onDragOver).toHaveBeenCalled()
+
+      await component.simulate('dragLeave', createDtWithFiles([]))
+      await flushPromises(component)
+      expect(props.onDragLeave).toHaveBeenCalled()
+
+      await component.simulate('drop', createDtWithFiles(files))
+      await flushPromises(component)
+      expect(props.onDrop).toHaveBeenCalled()
+      expect(props.onDropAccepted).toHaveBeenCalledWith(files, expect.any(Object))
+      expect(props.onDropRejected).not.toHaveBeenCalled()
     })
 
     it('should set proper dragActive state on dragEnter', async () => {
       const component = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
-      component.simulate('dragEnter', { dataTransfer: { files } })
+      component.simulate('dragEnter', createDtWithFiles(files))
 
       const updatedDropzone = await flushPromises(component)
       const child = updatedDropzone.find(DummyChildComponent)
@@ -427,9 +482,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
       )
-      dropzone.simulate('dragEnter', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      dropzone.simulate('dragEnter', createDtWithFiles(files.concat(images)))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragActive', true)
@@ -443,7 +496,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      dropzone.simulate('dragEnter', createDtWithFiles(files))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragActive', true)
@@ -457,7 +510,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragActive', true)
@@ -471,7 +524,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragActive', true)
@@ -489,7 +542,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragReject', true)
@@ -507,7 +560,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       const child = updatedDropzone.find(DummyChildComponent)
       expect(child).toHaveProp('isDragAccept', true)
@@ -531,10 +584,22 @@ describe('Dropzone', () => {
     it('should keep dragging active when leaving from arbitrary node', async () => {
       const arbitraryOverlay = mount(<div />)
       const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
-      await dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      await dropzone.simulate('dragEnter', createDtWithFiles(images))
       dropzone.simulate('dragLeave', { target: arbitraryOverlay })
       expect(dropzone.state('isDragActive')).toBe(true)
       expect(dropzone.state('draggedFiles').length > 0).toBe(true)
+    })
+
+    it('should apply default active style on drag enter if file data cannot be accessed', async () => {
+      const dropzone = mount(<Dropzone />)
+      await dropzone.simulate('dragEnter', createDtWithFiles([]))
+      await flushPromises(dropzone)
+      const mainDiv = dropzone.find('div').at(0)
+      expect(mainDiv).toHaveProp('style', {
+        position: 'relative',
+        ...styles.default,
+        ...styles.active
+      })
     })
 
     it('should apply acceptStyle if multiple is false and single file', async () => {
@@ -548,7 +613,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: [images[0]] } })
+      dropzone.simulate('dragEnter', createDtWithFiles([images[0]]))
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
       expect(mainDiv).toHaveProp('style', { position: 'relative', ...acceptStyle })
@@ -565,7 +630,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: [files[0]] } })
+      dropzone.simulate('dragEnter', createDtWithFiles([files[0]]))
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
       expect(mainDiv).toHaveProp('style', { position: 'relative', ...rejectStyle })
@@ -582,7 +647,7 @@ describe('Dropzone', () => {
           {props => <DummyChildComponent {...props} />}
         </Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
       const expectedStyle = {
@@ -597,7 +662,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
       )
-      dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
       expect(updatedDropzone.find(DummyChildComponent)).toHaveProp('isDragActive', true)
       expect(updatedDropzone.find(DummyChildComponent)).toHaveProp('isDragAccept', true)
@@ -624,9 +689,9 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       expect(dropzone.text()).toEqual('Empty')
-      await dropzone.simulate('dragEnter', { dataTransfer: { files: images } })
+      await dropzone.simulate('dragEnter', createDtWithFiles(images))
       expect(dropzone.text()).toEqual('Active and Accept')
-      await dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      await dropzone.simulate('dragEnter', createDtWithFiles(files))
       expect(dropzone.text()).toEqual('Active but Reject')
     })
 
@@ -647,16 +712,16 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       const child = dropzone.find(ChildComponent)
-      child.simulate('dragEnter', { dataTransfer: { files } })
-      await dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      child.simulate('dragEnter', createDtWithFiles(files))
+      await dropzone.simulate('dragEnter', createDtWithFiles(files))
       // make sure we handle any duplicate dragEnter events that the browser may send us
-      await dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      await dropzone.simulate('dragEnter', createDtWithFiles(files))
       const dragActiveChild = dropzone.find(DragActiveComponent)
       expect(dragActiveChild).toExist()
       expect(dragActiveChild).toHaveProp('isDragAccept', true)
       expect(dragActiveChild).toHaveProp('isDragReject', false)
 
-      await dropzone.simulate('dragLeave', { dataTransfer: { files } })
+      await dropzone.simulate('dragLeave', createDtWithFiles(files))
       expect(dropzone.find(DragActiveComponent).children()).toHaveLength(0)
       expect(dropzone.find(ChildComponent)).toHaveProp('isDragAccept', false)
       expect(dropzone.find(ChildComponent)).toHaveProp('isDragReject', false)
@@ -690,12 +755,12 @@ describe('Dropzone', () => {
       let dropzone = mount(
         <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
       )
-      dropzone.simulate('drop', { dataTransfer: { files } })
+      dropzone.simulate('drop', createDtWithFiles(files))
       dropzone = await flushPromises(dropzone)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('acceptedFiles', [])
       expect(dropzone.find(DummyChildComponent)).toHaveProp('rejectedFiles', files)
 
-      dropzone.simulate('drop', { dataTransfer: { files: images } })
+      dropzone.simulate('drop', createDtWithFiles(images))
       dropzone = await flushPromises(dropzone)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('acceptedFiles', images)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('rejectedFiles', [])
@@ -703,11 +768,11 @@ describe('Dropzone', () => {
 
     it('should reset the dragActive/dragReject state', async () => {
       let dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
-      dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      dropzone.simulate('dragEnter', createDtWithFiles(files))
       dropzone = await flushPromises(dropzone)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('isDragActive', true)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('isDragReject', false)
-      dropzone.simulate('drop', { dataTransfer: { files } })
+      dropzone.simulate('drop', createDtWithFiles(files))
       dropzone = await flushPromises(dropzone)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('isDragActive', false)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('isDragReject', false)
@@ -715,84 +780,76 @@ describe('Dropzone', () => {
 
     it('should reject invalid file when multiple is false', async () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
-      await dropzone.simulate('drop', {
-        dataTransfer: { files }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
     })
 
     it('should allow single files to be dropped if multiple is false', async () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
 
-      await dropzone.simulate('drop', { dataTransfer: { files: [images[0]] } })
+      await dropzone.simulate('drop', createDtWithFiles([images[0]]))
       expect(onDrop).toHaveBeenCalledWith([images[0]], [], expectedEvent)
     })
 
     it('should reject multiple files to be dropped if multiple is false', async () => {
       const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
 
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
     })
 
     it('should take all dropped files if multiple is true', async () => {
       const dropzone = mount(<Dropzone onDrop={onDrop} multiple />)
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
     })
 
     it('should set this.isFileDialogActive to false', async () => {
       const dropzone = mount(<Dropzone />)
       dropzone.instance().isFileDialogActive = true
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(dropzone.instance().isFileDialogActive).toEqual(false)
     })
 
     it('should always call onDrop callback with accepted and rejected arguments', async () => {
       const dropzone = mount(<Dropzone onDrop={onDrop} accept="image/*" />)
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       onDrop.mockClear()
 
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       onDrop.mockClear()
 
-      await dropzone.simulate('drop', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDrop).toHaveBeenCalledWith(images, files, expectedEvent)
     })
 
     it('should call onDropAccepted callback if some files were accepted', async () => {
       const dropzone = mount(<Dropzone onDropAccepted={onDropAccepted} accept="image/*" />)
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDropAccepted).not.toHaveBeenCalled()
       onDropAccepted.mockClear()
 
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       onDropAccepted.mockClear()
 
-      await dropzone.simulate('drop', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
     })
 
     it('should call onDropRejected callback if some files were rejected', async () => {
       const dropzone = mount(<Dropzone onDropRejected={onDropRejected} accept="image/*" />)
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDropRejected).not.toHaveBeenCalled()
       onDropRejected.mockClear()
 
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
       onDropRejected.mockClear()
 
-      await dropzone.simulate('drop', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
     })
 
@@ -805,7 +862,7 @@ describe('Dropzone', () => {
           accept="image/*"
         />
       )
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
@@ -821,7 +878,7 @@ describe('Dropzone', () => {
         />
       )
 
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -838,7 +895,7 @@ describe('Dropzone', () => {
       )
       const bogusImages = [createFile('bogus.gif', 1234, 'application/x-moz-file')]
 
-      await dropzone.simulate('drop', { dataTransfer: { files: bogusImages } })
+      await dropzone.simulate('drop', createDtWithFiles(bogusImages))
       expect(onDrop).toHaveBeenCalledWith(bogusImages, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(bogusImages, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -848,9 +905,7 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected} />
       )
-      await dropzone.simulate('drop', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files.concat(images), expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -866,7 +921,7 @@ describe('Dropzone', () => {
         />
       )
 
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith(files, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -881,7 +936,7 @@ describe('Dropzone', () => {
           maxSize={1111}
         />
       )
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(images, expectedEvent)
@@ -896,7 +951,7 @@ describe('Dropzone', () => {
           minSize={1112}
         />
       )
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
@@ -911,7 +966,7 @@ describe('Dropzone', () => {
           minSize={1112}
         />
       )
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -921,29 +976,10 @@ describe('Dropzone', () => {
       const dropzone = mount(
         <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected} />
       )
-      await dropzone.simulate('drop', {
-        dataTransfer: { files: files.concat(images) }
-      })
+      await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files.concat(images), expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
-    })
-
-    it('should not call onDrop* callbacks in Edge for non-File items', async () => {
-      utils.isIeOrEdge = jest.fn(() => false).mockImplementationOnce(() => true)
-      const dropzone = mount(
-        <Dropzone
-          onDrop={onDrop}
-          onDropAccepted={onDropAccepted}
-          onDropRejected={onDropRejected}
-          accept="image/*"
-        />
-      )
-
-      await dropzone.simulate('drop', { dataTransfer: { files, items: nonFileItems } })
-      expect(onDrop).not.toHaveBeenCalledWith()
-      expect(onDropAccepted).not.toHaveBeenCalledWith()
-      expect(onDropRejected).not.toHaveBeenCalledWith()
     })
   })
 
@@ -953,7 +989,7 @@ describe('Dropzone', () => {
     it('should generate previews for non-images', async () => {
       const onDrop = jest.fn()
       const dropzone = mount(<Dropzone onDrop={onDrop} />)
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ preview: 'data://file1.pdf' })]),
         [],
@@ -964,22 +1000,9 @@ describe('Dropzone', () => {
     it('should generate previews for images', async () => {
       const onDrop = jest.fn()
       const dropzone = mount(<Dropzone onDrop={onDrop} />)
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ preview: 'data://cats.gif' })]),
-        [],
-        expectedEvent
-      )
-    })
-
-    it('should not generate previews for non-File items', async () => {
-      const onDrop = jest.fn()
-
-      const dropzone = mount(<Dropzone onDrop={onDrop} />)
-      await dropzone.simulate('drop', { dataTransfer: { files: ['bad_val'] } })
-
-      expect(onDrop).not.toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
         [],
         expectedEvent
       )
@@ -988,7 +1011,7 @@ describe('Dropzone', () => {
     it('should not generate previews if disablePreview is true', async () => {
       const onDrop = jest.fn()
       const dropzone = mount(<Dropzone disablePreview onDrop={onDrop} />)
-      await dropzone.simulate('drop', { dataTransfer: { files: images } })
+      await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).not.toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
         [],
@@ -996,7 +1019,7 @@ describe('Dropzone', () => {
       )
       onDrop.mockClear()
 
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).not.toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
         [],
@@ -1004,8 +1027,6 @@ describe('Dropzone', () => {
       )
     })
   })
-
-  describe('onClick', () => {})
 
   describe('onCancel', () => {
     beforeEach(() => {
@@ -1098,9 +1119,7 @@ describe('Dropzone', () => {
         const outerDropzone = mount(
           <Dropzone accept="image/*">{props => <InnerDropzone {...props} />}</Dropzone>
         )
-        outerDropzone.find(InnerDropzone).simulate('dragEnter', {
-          dataTransfer: { files: images }
-        })
+        outerDropzone.find(InnerDropzone).simulate('dragEnter', createDtWithFiles(images))
         const updatedOuterDropzone = await flushPromises(outerDropzone)
         const innerDropzone = updatedOuterDropzone.find(InnerDropzone)
 
@@ -1122,9 +1141,7 @@ describe('Dropzone', () => {
           </Dropzone>
         )
 
-        outerDropzone.find(InnerDropzone).simulate('drop', {
-          dataTransfer: { files: files.concat(images) }
-        })
+        outerDropzone.find(InnerDropzone).simulate('drop', createDtWithFiles(files.concat(images)))
         const updatedOuterDropzone = await flushPromises(outerDropzone)
         const innerDropzone = updatedOuterDropzone.find(InnerDropzone)
 
@@ -1151,9 +1168,7 @@ describe('Dropzone', () => {
           </Dropzone>
         )
 
-        outerDropzone.simulate('drop', {
-          dataTransfer: { files: files.concat(images) }
-        })
+        outerDropzone.simulate('drop', createDtWithFiles(files.concat(images)))
         const updatedOuterDropzone = await flushPromises(outerDropzone)
 
         const innerDropzone = updatedOuterDropzone.find(InnerDropzone)
@@ -1174,7 +1189,7 @@ describe('Dropzone', () => {
     it('does not throw an error when html is dropped instead of files and multiple is false', () => {
       const dropzone = mount(<Dropzone multiple={false} />)
 
-      const fn = () => dropzone.simulate('drop', { dataTransfer: { files: [] } })
+      const fn = () => dropzone.simulate('drop', createDtWithFiles([]))
       expect(fn).not.toThrow()
     })
 
@@ -1194,6 +1209,22 @@ describe('Dropzone', () => {
 
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
+    })
+
+    it('should not set state after onDrop callbacks', async () => {
+      let setState
+      const onDrop = () => {
+        setState.mockClear()
+      }
+      let dropzone = mount(
+        <Dropzone accept="image/*" onDrop={onDrop}>
+          {props => <DummyChildComponent {...props} />}
+        </Dropzone>
+      )
+      setState = jest.spyOn(dropzone.instance(), 'setState')
+      await dropzone.simulate('drop', createDtWithFiles(images))
+      dropzone = await flushPromises(dropzone)
+      expect(setState).not.toHaveBeenCalled()
     })
   })
 
@@ -1216,23 +1247,23 @@ describe('Dropzone', () => {
       })
       const files = [file]
 
-      await dropzone.simulate('dragStart', { dataTransfer: { files } })
+      await dropzone.simulate('dragStart', createDtWithFiles(files))
       await flushPromises(dropzone)
       expect(props.onDragStart).toHaveBeenCalled()
 
-      await dropzone.simulate('dragEnter', { dataTransfer: { files } })
+      await dropzone.simulate('dragEnter', createDtWithFiles(files))
       await flushPromises(dropzone)
       expect(props.onDragEnter).toHaveBeenCalled()
 
-      await dropzone.simulate('dragOver', { dataTransfer: { files } })
+      await dropzone.simulate('dragOver', createDtWithFiles(files))
       await flushPromises(dropzone)
       expect(props.onDragOver).toHaveBeenCalled()
 
-      await dropzone.simulate('dragLeave', { dataTransfer: { files } })
+      await dropzone.simulate('dragLeave', createDtWithFiles(files))
       await flushPromises(dropzone)
       expect(props.onDragLeave).toHaveBeenCalled()
 
-      await dropzone.simulate('drop', { dataTransfer: { files } })
+      await dropzone.simulate('drop', createDtWithFiles(files))
       await flushPromises(dropzone)
       expect(props.onDrop).toHaveBeenCalled()
 
@@ -1270,41 +1301,27 @@ describe('Dropzone', () => {
           }
         }
       ]
+      const types = ['text/plain']
 
-      await dropzone.simulate('dragStart', { dataTransfer: { items } })
+      await dropzone.simulate('dragStart', createDtWithItems(items, types))
       await flushPromises(dropzone)
       expect(props.onDragStart).not.toHaveBeenCalled()
 
-      await dropzone.simulate('dragEnter', { dataTransfer: { items } })
+      await dropzone.simulate('dragEnter', createDtWithItems(items, types))
       await flushPromises(dropzone)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
-      await dropzone.simulate('dragOver', { dataTransfer: { items } })
+      await dropzone.simulate('dragOver', createDtWithItems(items, types))
       await flushPromises(dropzone)
       expect(props.onDragOver).not.toHaveBeenCalled()
 
-      await dropzone.simulate('dragLeave', { dataTransfer: { items } })
+      await dropzone.simulate('dragLeave', createDtWithItems(items, types))
       await flushPromises(dropzone)
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
-      await dropzone.simulate('drop', { dataTransfer: { items } })
+      await dropzone.simulate('drop', createDtWithItems(items, types))
       await flushPromises(dropzone)
       expect(props.onDrop).not.toHaveBeenCalled()
     })
-  })
-
-  it('should not set state after onDrop callbacks', async () => {
-    const onDrop = () => {
-      jest.resetAllMocks()
-    }
-    let dropzone = mount(
-      <Dropzone accept="image/*" onDrop={onDrop}>
-        {props => <DummyChildComponent {...props} />}
-      </Dropzone>
-    )
-    const setState = jest.spyOn(dropzone.instance(), 'setState')
-    dropzone.simulate('drop', { dataTransfer: { files: images } })
-    dropzone = await flushPromises(dropzone)
-    expect(setState).not.toHaveBeenCalled()
   })
 })
