@@ -264,7 +264,7 @@ class Dropzone extends React.Component {
   onInputElementClick(evt) {
     evt.stopPropagation()
     if (this.props.inputProps && this.props.inputProps.onClick) {
-      this.props.inputProps.onClick()
+      this.props.inputProps.onClick(evt)
     }
   }
 
