@@ -1,5 +1,4 @@
-import * as React from "react";
-
+import React from "react";
 import Dropzone from "../../";
 
 class Accept extends React.Component {

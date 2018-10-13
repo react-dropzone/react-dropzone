@@ -41,14 +41,12 @@ export function allFilesAccepted(files, accept) {
   return files.every(file => fileAccepted(file, accept))
 }
 
-export function isFileList(items) {
-  // Returns true only for items that are File objects or DataTransferItem of kind 'file',
-  // See https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem for details
-  return (
-    Array.isArray(items) &&
-    items.length > 0 &&
-    (Array.prototype.every.call(items, item => item instanceof File) ||
-      Array.prototype.every.call(items, isKindFile))
+export function isDragDataWithFiles(evt) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
+  return Array.prototype.every.call(
+    evt.dataTransfer.types,
+    type => type === 'Files' || type === 'application/x-moz-file'
   )
 }
 
