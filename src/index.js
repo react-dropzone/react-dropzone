@@ -233,12 +233,16 @@ class Dropzone extends React.Component {
 
   onClick(evt) {
     const { onClick, disableClick } = this.props
-    if (!disableClick) {
-      evt.stopPropagation()
 
-      if (onClick) {
-        onClick.call(this, evt)
-      }
+    // if onClick prop is given, run it first
+    if (onClick) {
+      onClick.call(this, evt)
+    }
+
+    // if disableClick is not set and the event hasn't been default prefented within
+    // the onClick listener, open the file dialog
+    if (!disableClick && !evt.isDefaultPrevented()) {
+      evt.stopPropagation()
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
       // this is so react can handle state changes in the onClick prop above above

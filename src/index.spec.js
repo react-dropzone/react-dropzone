@@ -242,6 +242,24 @@ describe('Dropzone', () => {
       expect(onClick).toHaveBeenCalled()
     })
 
+    it('should call `onClick` if provided even if `disableClick` is set', () => {
+      const onClick = jest.fn()
+      const dropzone = mount(<Dropzone disableClick onClick={onClick} />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('click')
+      expect(open).toHaveBeenCalledTimes(0)
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('should not call `open` if event was prevented in `onClick`', () => {
+      const onClick = jest.fn(event => event.preventDefault())
+      const dropzone = mount(<Dropzone onClick={onClick} />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('click')
+      expect(open).toHaveBeenCalledTimes(0)
+      expect(onClick).toHaveBeenCalled()
+    })
+
     it('should reset the value of input', () => {
       const dropzone = mount(<Dropzone />)
       expect(
