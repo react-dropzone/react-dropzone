@@ -248,7 +248,7 @@ class Dropzone extends React.Component {
       // this is so react can handle state changes in the onClick prop above above
       // see: https://github.com/react-dropzone/react-dropzone/issues/450
       if (isIeOrEdge()) {
-        setTimeout(this.open.bind(this), 0)
+        setTimeout(this.open, 0)
       } else {
         this.open()
       }

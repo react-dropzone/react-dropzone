@@ -1,4 +1,4 @@
-import { getDataTransferItems, isIeOrEdge, isDragDataWithFiles } from './'
+import { getDataTransferItems, isIeOrEdge, isKindFile, isDragDataWithFiles } from './'
 
 const files = [
   {
@@ -124,6 +124,15 @@ describe('isIeOrEdge', () => {
   })
 })
 
+describe('isKindFile()', () => {
+  it('should return true for DataTransferItem of kind "file"', () => {
+    expect(isKindFile({ kind: 'file' })).toBe(true)
+    expect(isKindFile({ kind: 'text/html' })).toBe(false)
+    expect(isKindFile({})).toBe(false)
+    expect(isKindFile(null)).toBe(false)
+  })
+})
+
 describe('isDragDataWithFiles()', () => {
   it('should return true if every dragged type is a file', () => {
     expect(isDragDataWithFiles({ dataTransfer: { types: ['Files'] } })).toBe(true)
@@ -141,5 +150,9 @@ describe('isDragDataWithFiles()', () => {
         dataTransfer: { types: ['application/x-moz-file', 'text/html'] }
       })
     ).toBe(false)
+  })
+
+  it('should return true if {dataTransfer} is not defined', () => {
+    expect(isDragDataWithFiles({})).toBe(true)
   })
 })

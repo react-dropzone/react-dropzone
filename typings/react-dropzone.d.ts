@@ -1,11 +1,4 @@
-import React, {
-  CSSProperties,
-  Component,
-  InputHTMLAttributes,
-  HTMLProps,
-  ReactNode,
-  Ref
-} from "react";
+import * as React from "react";
 
 export interface FileWithPreview extends File {
   preview?: string;
@@ -35,31 +28,31 @@ export type DropzoneRenderFunction = (x: DropzoneRenderArgs) => JSX.Element;
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
-export type DropzoneProps = Omit<HTMLProps<HTMLDivElement>, "onDrop" | "ref"> & {
+export type DropzoneProps = Omit<React.HTMLProps<HTMLDivElement>, "onDrop" | "ref"> & {
   disableClick?: boolean;
   disabled?: boolean;
   disablePreview?: boolean;
   preventDropOnDocument?: boolean;
-  inputProps?: InputHTMLAttributes<HTMLInputElement>;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   maxSize?: number;
   minSize?: number;
   activeClassName?: string;
   acceptClassName?: string;
   rejectClassName?: string;
   disabledClassName?: string;
-  activeStyle?: CSSProperties;
-  acceptStyle?: CSSProperties;
-  rejectStyle?: CSSProperties;
-  disabledStyle?: CSSProperties;
+  activeStyle?: React.CSSProperties;
+  acceptStyle?: React.CSSProperties;
+  rejectStyle?: React.CSSProperties;
+  disabledStyle?: React.CSSProperties;
   onDrop?: DropFilesEventHandler;
   onDropAccepted?: DropFileEventHandler;
   onDropRejected?: DropFileEventHandler;
   onFileDialogCancel?(): void;
   getDataTransferItems?(event: React.DragEvent<HTMLDivElement> | DragEvent): Promise<Array<File | DataTransferItem>>;
-  children?: ReactNode | DropzoneRenderFunction;
-  ref?: Ref<Dropzone>;
+  children?: React.ReactNode | DropzoneRenderFunction;
+  ref?: React.Ref<Dropzone>;
 };
 
-export default class Dropzone extends Component<DropzoneProps> {
+export default class Dropzone extends React.Component<DropzoneProps> {
   open: () => void;
 }
