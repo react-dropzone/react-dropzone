@@ -19,6 +19,9 @@ class Dropzone extends React.Component {
     super(props, context)
     this.composeHandlers = this.composeHandlers.bind(this)
     this.onClick = this.onClick.bind(this)
+    this.onFocus = this.onFocus.bind(this)
+    this.onBlur = this.onBlur.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
     this.onDocumentDrop = this.onDocumentDrop.bind(this)
     this.onDragEnter = this.onDragEnter.bind(this)
     this.onDragLeave = this.onDragLeave.bind(this)
@@ -255,6 +258,43 @@ class Dropzone extends React.Component {
     }
   }
 
+  onFocus(evt) {
+    const { onFocus } = this.props
+
+    if (onFocus) {
+      onFocus.call(this, evt)
+    }
+
+    if (!evt.isDefaultPrevented()) {
+      this.setState({ inFocus: true })
+    }
+  }
+
+  onBlur(evt) {
+    const { onBlur } = this.props
+
+    if (onBlur) {
+      onBlur.call(this, evt)
+    }
+
+    if (!evt.isDefaultPrevented()) {
+      this.setState({ inFocus: false })
+    }
+  }
+
+  onKeyDown(evt) {
+    const { onKeyDown } = this.props
+
+    if (onKeyDown) {
+      onKeyDown.call(this, evt)
+    }
+
+    if (!evt.isDefaultPrevented() && (evt.keyCode === 32 || evt.keyCode === 13)) {
+      evt.preventDefault()
+      this.open()
+    }
+  }
+
   onInputElementClick(evt) {
     evt.stopPropagation()
     if (this.props.inputProps && this.props.inputProps.onClick) {
@@ -323,6 +363,7 @@ class Dropzone extends React.Component {
       children,
       disabled,
       disabledClassName,
+      focusClassName,
       inputProps,
       multiple,
       name,
@@ -335,18 +376,26 @@ class Dropzone extends React.Component {
       activeStyle,
       className = '',
       disabledStyle,
+      focusStyle,
       rejectStyle,
       style,
       ...props // eslint-disable-line prefer-const
     } = rest
 
-    const { isDragActive, draggedFiles } = this.state
+    const { isDragActive, draggedFiles, inFocus } = this.state
     const filesCount = draggedFiles.length
     const isMultipleAllowed = multiple || filesCount <= 1
     const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
     const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
     const noStyles =
-      !className && !style && !activeStyle && !acceptStyle && !rejectStyle && !disabledStyle
+      !className &&
+      !style &&
+      !focusStyle &&
+      !activeStyle &&
+      !acceptStyle &&
+      !rejectStyle &&
+      !disabledStyle
+    const canFocus = !isDragActive && !isDragAccept && !isDragReject && inFocus && !disabled
 
     if (isDragActive && activeClassName) {
       className += ' ' + activeClassName
@@ -357,6 +406,9 @@ class Dropzone extends React.Component {
     if (isDragReject && rejectClassName) {
       className += ' ' + rejectClassName
     }
+    if (canFocus && focusClassName) {
+      className += ' ' + focusClassName
+    }
     if (disabled && disabledClassName) {
       className += ' ' + disabledClassName
     }
@@ -366,10 +418,11 @@ class Dropzone extends React.Component {
       activeStyle = styles.active
       acceptStyle = styles.accepted
       rejectStyle = styles.rejected
+      focusStyle = styles.focus
       disabledStyle = styles.disabled
     }
 
-    let appliedStyle = { position: 'relative', ...style }
+    let appliedStyle = { ...style }
     if (activeStyle && isDragActive) {
       appliedStyle = {
         ...appliedStyle,
@@ -386,6 +439,12 @@ class Dropzone extends React.Component {
       appliedStyle = {
         ...appliedStyle,
         ...rejectStyle
+      }
+    }
+    if (focusStyle && canFocus) {
+      appliedStyle = {
+        ...appliedStyle,
+        ...focusStyle
       }
     }
     if (disabledStyle && disabled) {
@@ -412,7 +471,8 @@ class Dropzone extends React.Component {
       multiple: supportMultiple && multiple,
       ref: this.setRefs,
       onChange: this.onDrop,
-      autoComplete: 'off'
+      autoComplete: 'off',
+      tabIndex: -1
     }
 
     if (name && name.length) {
@@ -446,6 +506,9 @@ class Dropzone extends React.Component {
           ...divProps /* expand user provided props first so event handlers are never overridden */
         }
         onClick={this.composeHandlers(this.onClick)}
+        onKeyDown={this.composeHandlers(this.onKeyDown)}
+        onFocus={this.composeHandlers(this.onFocus)}
+        onBlur={this.composeHandlers(this.onBlur)}
         onDragStart={this.composeHandlers(this.onDragStart)}
         onDragEnter={this.composeHandlers(this.onDragEnter)}
         onDragOver={this.composeHandlers(this.onDragOver)}
@@ -453,6 +516,7 @@ class Dropzone extends React.Component {
         onDrop={this.composeHandlers(this.onDrop)}
         ref={this.setRef}
         aria-disabled={disabled}
+        tabIndex={disabled ? -1 : 0}
       >
         {this.renderChildren(children, isDragActive, isDragAccept, isDragReject)}
         <input
@@ -534,6 +598,11 @@ Dropzone.propTypes = {
   className: PropTypes.string,
 
   /**
+   * className to apply when dropzone is in focus
+   */
+  focusClassName: PropTypes.string,
+
+  /**
    * className to apply when drag is active
    */
   activeClassName: PropTypes.string,
@@ -557,6 +626,11 @@ Dropzone.propTypes = {
    * CSS styles to apply
    */
   style: PropTypes.object,
+
+  /**
+   * CSS styles to apply when drag is active
+   */
+  focusStyle: PropTypes.object,
 
   /**
    * CSS styles to apply when drag is active
@@ -595,6 +669,21 @@ Dropzone.propTypes = {
    * onDrop callback
    */
   onDrop: PropTypes.func,
+
+  /**
+   * onFocus callback
+   */
+  onFocus: PropTypes.func,
+
+  /**
+   * onBlur callback
+   */
+  onBlur: PropTypes.func,
+
+  /**
+   * onKeyDown callback
+   */
+  onKeyDown: PropTypes.func,
 
   /**
    * onDropAccepted callback

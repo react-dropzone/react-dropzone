@@ -1,4 +1,7 @@
-By default, the Dropzone component picks up some default styling to get you started. You can customize `<Dropzone>` by specifying a `style`, `activeStyle` or `rejectStyle` which is applied when a file is dragged over the zone. You can also specify `className`,  `activeClassName` or `rejectClassName` if you would rather style using CSS.
+By default, the Dropzone component picks up some default styling to get you started.
+You can customize `<Dropzone>` by specifying a `style`, `focusStyle`, `activeStyle`, `acceptStyle`, `rejectStyle` or `disabledStyle` which is applied when a file is dragged over the zone.
+
+You can also specify `className`, `focusClassName`, `activeClassName`, `acceptClassName`, `rejectClassName` or  `disabledClassName` if you would rather style using CSS classes.
 
 ## Updating styles and contents based on user input
 
