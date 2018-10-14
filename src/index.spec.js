@@ -2,7 +2,7 @@
 /* eslint jsx-a11y/no-static-element-interactions: 0 */
 
 import React from 'react'
-import { mount, render } from 'enzyme'
+import { mount, render, shallow } from 'enzyme'
 import { fromEvent } from 'file-selector'
 import styles from './utils/styles'
 import * as utils from './utils'
@@ -347,6 +347,146 @@ describe('Dropzone', () => {
     })
   })
 
+  describe('onFocus', () => {
+    it('sets focus state', async () => {
+      const dropzone = shallow(<Dropzone />)
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      expect(dropzone.state('inFocus')).toBe(true)
+    })
+
+    it('calls user supplied onFocus', async () => {
+      const onFocus = jest.fn()
+      const dropzone = mount(<Dropzone onFocus={onFocus} />)
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+
+      expect(dropzone.state('inFocus')).toBe(true)
+      expect(onFocus).toHaveBeenCalled()
+    })
+
+    it('does not set focus state if user supplied onFocus prevented default', async () => {
+      const onFocus = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(<Dropzone onFocus={onFocus} />)
+      dropzone.simulate('focus', {})
+
+      expect(dropzone.state('inFocus')).toBeUndefined()
+      expect(onFocus).toHaveBeenCalled()
+    })
+  })
+
+  describe('onBlur', () => {
+    it('unsets focus state', async () => {
+      const dropzone = shallow(<Dropzone />)
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      expect(dropzone.state('inFocus')).toBe(true)
+      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+      expect(dropzone.state('inFocus')).toBe(false)
+    })
+
+    it('calls user supplied onBlur', async () => {
+      const onBlur = jest.fn()
+      const dropzone = mount(<Dropzone onBlur={onBlur} />)
+      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+
+      expect(dropzone.state('inFocus')).toBe(false)
+      expect(onBlur).toHaveBeenCalled()
+    })
+
+    it('does not unset focus state if user supplied onBlur prevented default', async () => {
+      const onBlur = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(<Dropzone onBlur={onBlur} />)
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('blur', {})
+
+      expect(dropzone.state('inFocus')).toBe(true)
+      expect(onBlur).toHaveBeenCalled()
+    })
+  })
+
+  describe('onKeyDown', () => {
+    it('opens the file dialog on SPACE/ENTER', async () => {
+      const dropzone = mount(<Dropzone />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+
+      dropzone.simulate('keydown', {
+        keyCode: 13,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+
+      expect(open).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not react to keydown if component is disabled', async () => {
+      const dropzone = mount(<Dropzone disabled />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+
+      expect(open).not.toHaveBeenCalled()
+    })
+
+    it('calls user supplied onKeyDown', async () => {
+      const onKeyDown = jest.fn()
+      const dropzone = mount(<Dropzone onKeyDown={onKeyDown} />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+
+      expect(onKeyDown).toHaveBeenCalled()
+      expect(open).toHaveBeenCalled()
+    })
+
+    it('does not react to keydown if user-supplied onKeyDown prevents default', async () => {
+      const onKeyDown = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(<Dropzone onKeyDown={onKeyDown} />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+
+      dropzone.simulate('keydown', { keyCode: 32 })
+
+      expect(onKeyDown).toHaveBeenCalled()
+      expect(open).not.toHaveBeenCalled()
+    })
+
+    it('does not react to other keys', async () => {
+      const dropzone = mount(<Dropzone />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+
+      dropzone.simulate('keydown', {
+        keyCode: 100,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+
+      expect(open).not.toHaveBeenCalled()
+    })
+  })
+
   describe('drag-n-drop', async () => {
     it('should override onDrag* methods', async () => {
       const props = {
@@ -622,13 +762,12 @@ describe('Dropzone', () => {
       expect(dropzone.state('draggedFiles').length > 0).toBe(true)
     })
 
-    it('should apply default active style on drag enter if file data cannot be accessed', async () => {
+    it('should apply activeStyle on drag enter if file data cannot be accessed', async () => {
       const dropzone = mount(<Dropzone />)
       await dropzone.simulate('dragEnter', createDtWithFiles([]))
       await flushPromises(dropzone)
       const mainDiv = dropzone.find('div').at(0)
       expect(mainDiv).toHaveProp('style', {
-        position: 'relative',
         ...styles.default,
         ...styles.active
       })
@@ -648,7 +787,7 @@ describe('Dropzone', () => {
       dropzone.simulate('dragEnter', createDtWithFiles([images[0]]))
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', { position: 'relative', ...acceptStyle })
+      expect(mainDiv).toHaveProp('style', acceptStyle)
     })
 
     it('should apply rejectStyle if multiple is false and single bad file type', async () => {
@@ -665,7 +804,7 @@ describe('Dropzone', () => {
       dropzone.simulate('dragEnter', createDtWithFiles([files[0]]))
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', { position: 'relative', ...rejectStyle })
+      expect(mainDiv).toHaveProp('style', rejectStyle)
     })
 
     it('should apply acceptStyle + rejectStyle if multiple is false and multiple good file types', async () => {
@@ -683,7 +822,6 @@ describe('Dropzone', () => {
       const updatedDropzone = await flushPromises(dropzone)
       const mainDiv = updatedDropzone.find('div').at(0)
       const expectedStyle = {
-        position: 'relative',
         ...acceptStyle,
         ...rejectStyle
       }
@@ -1265,6 +1403,212 @@ describe('Dropzone', () => {
 
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
+    })
+
+    it('sets {tabindex} to 0 if the component is not disabled', async () => {
+      const dropzone = mount(<Dropzone />)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .prop('tabIndex')
+      ).toBe(0)
+    })
+
+    it('sets {tabindex} to -1 if the component is disabled', async () => {
+      const dropzone = mount(<Dropzone />)
+      dropzone.setProps({ disabled: true })
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .prop('tabIndex')
+      ).toBe(-1)
+    })
+
+    it('sets focusClassName when component is in focus and not disabled', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(true)
+    })
+
+    it('does not set focusClassName when component is in focus and disabled', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} disabled />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(false)
+    })
+
+    it('does not set focusClassName when component is in focus and drag active', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles([]))
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(false)
+    })
+
+    it('does not set focusClassName when component is in focus and drag accept', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(false)
+    })
+
+    it('does not set focusClassName when component is in focus and drag reject', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} accept="image/*" />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles(files))
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(false)
+    })
+
+    it('unsets focusClassName when component is no longer in focus', async () => {
+      const className = 'in-focus'
+      const dropzone = mount(<Dropzone focusClassName={className} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(true)
+
+      dropzone.simulate('blur')
+      await flushPromises(dropzone)
+
+      expect(
+        dropzone
+          .children()
+          .first()
+          .hasClass(className)
+      ).toBe(false)
+    })
+
+    it('sets focusStyle when component is in focus and not disabled', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).toHaveProp('style', style)
+    })
+
+    it('does not set focusStyle when component is in focus and disabled', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} disabled />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).not.toHaveProp('style', style)
+    })
+
+    it('does not set focusStyle when component is in focus and drag active', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles([]))
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).not.toHaveProp('style', style)
+    })
+
+    it('does not set focusStyle when component is in focus and drag accept', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles(images))
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).not.toHaveProp('style', style)
+    })
+
+    it('does not set focusStyle when component is in focus and drag reject', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} accept="image/*" />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      dropzone.simulate('dragEnter', createDtWithFiles(files))
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).not.toHaveProp('style', style)
+    })
+
+    it('unsets focusStyle when component is no longer in focus', async () => {
+      const style = { borderColor: '#000' }
+      const dropzone = mount(<Dropzone focusStyle={style} />)
+
+      dropzone.simulate('focus')
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).toHaveProp('style', style)
+
+      dropzone.simulate('blur')
+      await flushPromises(dropzone)
+
+      expect(dropzone.find('div').at(0)).not.toHaveProp('style', style)
     })
 
     it('should not set state after onDrop callbacks', async () => {
