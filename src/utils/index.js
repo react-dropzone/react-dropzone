@@ -42,6 +42,9 @@ export function allFilesAccepted(files, accept) {
 }
 
 export function isDragDataWithFiles(evt) {
+  if (!evt.dataTransfer) {
+    return true
+  }
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
   return Array.prototype.every.call(
@@ -51,7 +54,7 @@ export function isDragDataWithFiles(evt) {
 }
 
 export function isKindFile(item) {
-  return typeof item === 'object' && item.kind === 'file'
+  return typeof item === 'object' && item !== null && item.kind === 'file'
 }
 
 // allow the entire document to be a drag target

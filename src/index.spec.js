@@ -5,7 +5,7 @@ import React from 'react'
 import { mount, render } from 'enzyme'
 import { fromEvent } from 'file-selector'
 import styles from './utils/styles'
-import { onDocumentDragOver } from './utils'
+import * as utils from './utils'
 
 const flushPromises = wrapper =>
   new Promise(resolve =>
@@ -170,7 +170,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
 
-      onDocumentDragOver(event)
+      utils.onDocumentDragOver(event)
       expect(event.preventDefault).toHaveBeenCalledTimes(1)
       event.preventDefault.mockClear()
 
@@ -330,6 +330,20 @@ describe('Dropzone', () => {
 
       component.simulate('click')
       expect(onClick).toHaveBeenCalledWith(expect.any(MouseEvent))
+    })
+
+    it('should schedule open() on next tick when Edge', () => {
+      const isIeOrEdgeSpy = jest.spyOn(utils, 'isIeOrEdge').mockReturnValueOnce(true)
+      const setTimeoutSpy = jest.spyOn(window, 'setTimeout').mockImplementationOnce(open => open())
+
+      const dropzone = mount(<Dropzone />)
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('click')
+
+      expect(setTimeoutSpy).toHaveBeenCalled()
+      expect(open).toHaveBeenCalled()
+      isIeOrEdgeSpy.mockClear()
+      setTimeoutSpy.mockClear()
     })
   })
 
@@ -761,6 +775,30 @@ describe('Dropzone', () => {
     subject.find('button').simulate('click')
 
     expect(click).toHaveBeenCalled()
+  })
+
+  it('invokes onDop cb when native file section occurs', async () => {
+    const props = {
+      onDrop: jest.fn(),
+      onDropAccepted: jest.fn(),
+      onDropRejected: jest.fn()
+    }
+
+    const component = mount(<Dropzone {...props} />)
+
+    const input = component.find('input')
+    const evt = {
+      target: { files },
+      preventDefault() {},
+      persist() {}
+    }
+    input.props().onChange(evt)
+
+    await flushPromises(component)
+
+    expect(props.onDrop).toHaveBeenCalledWith(evt.target.files, [], evt)
+    expect(props.onDropAccepted).toHaveBeenCalledWith(evt.target.files, evt)
+    expect(props.onDropRejected).not.toHaveBeenCalled()
   })
 
   describe('onDrop', () => {
