@@ -38,6 +38,10 @@ module.exports = {
           content: 'examples/Accept/Readme.md'
         },
         {
+          name: 'Nested Dropzone',
+          content: 'examples/Nesting/Readme.md'
+        },
+        {
           name: 'Opening File Dialog Programmatically',
           content: 'examples/FileDialog/Readme.md'
         },
