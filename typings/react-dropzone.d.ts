@@ -48,7 +48,7 @@ export type DropzoneProps = Omit<React.HTMLProps<HTMLDivElement>, "onDrop" | "re
   onDropAccepted?: DropFileEventHandler;
   onDropRejected?: DropFileEventHandler;
   onFileDialogCancel?(): void;
-  getDataTransferItems?(event: React.DragEvent<HTMLDivElement> | DragEvent): Promise<Array<File | DataTransferItem>>;
+  getDataTransferItems?(event: React.DragEvent<HTMLDivElement> | DragEvent | React.ChangeEvent<HTMLInputElement> | Event): Promise<Array<File | DataTransferItem>>;
   children?: React.ReactNode | DropzoneRenderFunction;
   ref?: React.Ref<Dropzone>;
 };
