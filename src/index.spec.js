@@ -27,7 +27,7 @@ const createFile = (name, size, type) => {
   return file
 }
 
-const createDtWithFiles = files => {
+const createDtWithFiles = (files = []) => {
   return {
     dataTransfer: {
       files,
@@ -384,6 +384,7 @@ describe('Dropzone', () => {
 
       // Using Proxy we'll emulate IE throwing when setting dataTransfer.dropEffect
       const eventProxy = {
+        persist() {},
         preventDefault() {},
         stopPropagation() {},
         dataTransfer: new Proxy(
@@ -790,6 +791,7 @@ describe('Dropzone', () => {
     const evt = {
       target: { files },
       preventDefault() {},
+      isPropagationStopped: () => false,
       persist() {}
     }
     input.props().onChange(evt)
@@ -1237,6 +1239,47 @@ describe('Dropzone', () => {
         expect(onOuterDropRejected).toHaveBeenCalledWith(files, expectedEvent)
         expect(innerDropzone).toHaveProp('isDragActive', false)
         expect(innerDropzone).toHaveProp('isDragReject', false)
+      })
+
+      it('does not invoke any drag event cbs on parent if child stopped event propagation', async () => {
+        const parentProps = {
+          onDragEnter: jest.fn(),
+          onDragOver: jest.fn(),
+          onDragLeave: jest.fn(),
+          onDrop: jest.fn()
+        }
+
+        const InnerDropzone = () => (
+          <Dropzone
+            onDragEnter={evt => evt.stopPropagation()}
+            onDragOver={evt => evt.stopPropagation()}
+            onDragLeave={evt => evt.stopPropagation()}
+            onDrop={(accepted, rejected, evt) => evt.stopPropagation()}
+          />
+        )
+
+        const outerDropzone = mount(
+          <Dropzone {...parentProps}>
+            <InnerDropzone />
+          </Dropzone>
+        )
+
+        outerDropzone.find(InnerDropzone).simulate('dragEnter', createDtWithFiles())
+        await flushPromises(outerDropzone)
+
+        outerDropzone.find(InnerDropzone).simulate('dragOver', createDtWithFiles())
+        await flushPromises(outerDropzone)
+
+        outerDropzone.find(InnerDropzone).simulate('dragLeave', createDtWithFiles())
+        await flushPromises(outerDropzone)
+
+        outerDropzone.find(InnerDropzone).simulate('drop', createDtWithFiles(images))
+        await flushPromises(outerDropzone)
+
+        expect(parentProps.onDragEnter).not.toHaveBeenCalled()
+        expect(parentProps.onDragOver).not.toHaveBeenCalled()
+        expect(parentProps.onDragLeave).not.toHaveBeenCalled()
+        expect(parentProps.onDrop).not.toHaveBeenCalled()
       })
     })
   })

@@ -85,6 +85,7 @@ class Dropzone extends React.Component {
   }
 
   onDragStart(evt) {
+    evt.persist()
     if (this.props.onDragStart && isDragDataWithFiles(evt)) {
       this.props.onDragStart.call(this, evt)
     }
@@ -102,6 +103,10 @@ class Dropzone extends React.Component {
 
     if (isDragDataWithFiles(evt)) {
       Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
+        if (evt.isPropagationStopped()) {
+          return
+        }
+
         this.setState({
           draggedFiles,
           // Do not rely on files for the drag state. It doesn't work in Safari.
@@ -118,7 +123,8 @@ class Dropzone extends React.Component {
   onDragOver(evt) {
     // eslint-disable-line class-methods-use-this
     evt.preventDefault()
-    evt.stopPropagation()
+    evt.persist()
+
     try {
       // The file dialog on Chrome allows users to drag files from the dialog onto
       // the dropzone, causing the browser the crash when the file dialog is closed.
@@ -137,6 +143,7 @@ class Dropzone extends React.Component {
 
   onDragLeave(evt) {
     evt.preventDefault()
+    evt.persist()
 
     // Only deactivate once the dropzone and all children have been left.
     this.dragTargets = this.dragTargets.filter(el => el !== evt.target && this.node.contains(el))
@@ -189,6 +196,10 @@ class Dropzone extends React.Component {
       Promise.resolve(getDataTransferItems(evt)).then(fileList => {
         const acceptedFiles = []
         const rejectedFiles = []
+
+        if (evt.isPropagationStopped()) {
+          return
+        }
 
         fileList.forEach(file => {
           if (!disablePreview) {
