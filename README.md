@@ -3,9 +3,9 @@
 # react-dropzone
 
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg)](https://www.npmjs.com/package/react-dropzone)
-[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone) 
-[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone) 
-[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers) 
+[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone)
+[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone)
+[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
 
 Simple HTML5-compliant drag'n'drop zone for files built with React.js.
@@ -37,15 +37,15 @@ Import `Dropzone` in your React component:
 
 ```javascript static
 import Dropzone from 'react-dropzone'
-``` 
-  
+```
+
   and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
-  
+
 ```javascript static
 function onDrop(acceptedFiles, rejectedFiles) {
   // do stuff with files...
 }
-``` 
+```
 
 Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
 
@@ -88,10 +88,6 @@ onDrop: acceptedFiles => {
 
 See https://react-dropzone.netlify.com/#proptypes
 
-### Word of caution when working with previews
-
-*Important*: `react-dropzone` doesn't manage dropped files. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
-
 ### Testing
 
 *Important*: `react-dropzone` makes its drag'n'drop callbacks asynchronous to enable promise based getDataTransfer functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
@@ -112,7 +108,7 @@ it('tests drag state', async () => {
   })
   await flushPromises(dropzone)
   dropzone.update()
-  
+
   const child = updatedDropzone.find(DummyChildComponent)
   expect(child).toHaveProp('isDragActive', true)
   expect(child).toHaveProp('isDragAccept', false)

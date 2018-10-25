@@ -47,7 +47,11 @@
   },
   "jest": {
     "setupTestFrameworkScriptFile": "<rootDir>/testSetup.js",
-    "clearMocks": true
+    "clearMocks": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/testSetup.js"
+    ]
   },
   "keywords": [
     "react-component",

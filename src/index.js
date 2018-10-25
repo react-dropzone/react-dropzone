@@ -168,7 +168,6 @@ class Dropzone extends React.Component {
       onDropAccepted,
       onDropRejected,
       multiple,
-      disablePreview,
       accept,
       getDataTransferItems
     } = this.props
@@ -202,10 +201,6 @@ class Dropzone extends React.Component {
         }
 
         fileList.forEach(file => {
-          if (!disablePreview) {
-            file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
-          }
-
           if (
             fileAccepted(file, accept) &&
             fileMatchSize(file, this.props.maxSize, this.props.minSize)
@@ -435,7 +430,6 @@ class Dropzone extends React.Component {
     const {
       acceptedFiles,
       preventDropOnDocument,
-      disablePreview,
       disableClick,
       onDropAccepted,
       onDropRejected,
@@ -503,11 +497,6 @@ Dropzone.propTypes = {
    * Enable/disable the dropzone entirely
    */
   disabled: PropTypes.bool,
-
-  /**
-   * Enable/disable preview generation
-   */
-  disablePreview: PropTypes.bool,
 
   /**
    * If false, allow dropped items to take over the current browser window
@@ -646,7 +635,6 @@ Dropzone.propTypes = {
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disabled: false,
-  disablePreview: false,
   disableClick: false,
   inputProps: {},
   multiple: true,
