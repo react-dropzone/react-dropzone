@@ -280,11 +280,11 @@ class Dropzone extends React.Component {
 
           if (!files.length) {
             this.isFileDialogActive = false
-          }
-        }
 
-        if (typeof onFileDialogCancel === 'function') {
-          onFileDialogCancel()
+            if (typeof onFileDialogCancel === 'function') {
+              onFileDialogCancel()
+            }
+          }
         }
       }, 300)
     }

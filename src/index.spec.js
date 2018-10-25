@@ -1062,7 +1062,23 @@ describe('Dropzone', () => {
       expect(onFileDialogCancel).not.toHaveBeenCalled()
     })
 
-    it('should invoke onFileDialogCancel when window receives focus via cancel button', () => {
+    it('should not invoke onFileDialogCancel if input does not exist', () => {
+      const onFileDialogCancel = jest.fn()
+      const component = mount(
+        <Dropzone id="on-cancel-example" onFileDialogCancel={onFileDialogCancel} />
+      )
+
+      component.instance().setRefs(null)
+
+      document.body.addEventListener('focus', () => {})
+      const evt = document.createEvent('HTMLEvents')
+      evt.initEvent('focus', false, true)
+      document.body.dispatchEvent(evt)
+      jest.runAllTimers()
+      expect(onFileDialogCancel).not.toHaveBeenCalled()
+    })
+
+    it('should invoke onFileDialogCancel when window receives focus via cancel button and there were no files selected', () => {
       const onFileDialogCancel = jest.fn()
       const component = mount(
         <Dropzone className="dropzone-content" onFileDialogCancel={onFileDialogCancel} />
@@ -1082,6 +1098,34 @@ describe('Dropzone', () => {
 
       jest.runAllTimers()
       expect(onFileDialogCancel).toHaveBeenCalled()
+    })
+
+    it('should not invoke onFileDialogCancel when window receives focus via cancel button and there were files selected', () => {
+      const onFileDialogCancel = jest.fn()
+      const component = mount(
+        <Dropzone className="dropzone-content" onFileDialogCancel={onFileDialogCancel} />
+      )
+
+      // Test / invoke the click event
+      const open = jest.spyOn(component.instance(), 'open')
+      component.simulate('click')
+
+      expect(open).toHaveBeenCalled()
+
+      const input = component.find('input').getDOMNode()
+
+      Object.defineProperty(input, 'files', {
+        value: images
+      })
+
+      // Simulated DOM event - onfocus
+      window.addEventListener('focus', () => {})
+      const evt = document.createEvent('HTMLEvents')
+      evt.initEvent('focus', false, true)
+      window.dispatchEvent(evt)
+
+      jest.runAllTimers()
+      expect(onFileDialogCancel).not.toHaveBeenCalled()
     })
 
     it('should restore isFileDialogActive to false after the FileDialog was closed', () => {
