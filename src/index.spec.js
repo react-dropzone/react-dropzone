@@ -1041,51 +1041,6 @@ describe('Dropzone', () => {
     })
   })
 
-  describe('preview', () => {
-    const expectedEvent = expect.anything()
-
-    it('should generate previews for non-images', async () => {
-      const onDrop = jest.fn()
-      const dropzone = mount(<Dropzone onDrop={onDrop} />)
-      await dropzone.simulate('drop', createDtWithFiles(files))
-      expect(onDrop).toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ preview: 'data://file1.pdf' })]),
-        [],
-        expectedEvent
-      )
-    })
-
-    it('should generate previews for images', async () => {
-      const onDrop = jest.fn()
-      const dropzone = mount(<Dropzone onDrop={onDrop} />)
-      await dropzone.simulate('drop', createDtWithFiles(images))
-      expect(onDrop).toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ preview: 'data://cats.gif' })]),
-        [],
-        expectedEvent
-      )
-    })
-
-    it('should not generate previews if disablePreview is true', async () => {
-      const onDrop = jest.fn()
-      const dropzone = mount(<Dropzone disablePreview onDrop={onDrop} />)
-      await dropzone.simulate('drop', createDtWithFiles(images))
-      expect(onDrop).not.toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
-        [],
-        expectedEvent
-      )
-      onDrop.mockClear()
-
-      await dropzone.simulate('drop', createDtWithFiles(files))
-      expect(onDrop).not.toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ preview: expect.anything() })]),
-        [],
-        expectedEvent
-      )
-    })
-  })
-
   describe('onCancel', () => {
     beforeEach(() => {
       jest.useFakeTimers(true)

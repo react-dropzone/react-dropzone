@@ -38,6 +38,10 @@ module.exports = {
           content: 'examples/Accept/Readme.md'
         },
         {
+          name: 'Previews',
+          content: 'examples/Previews/Readme.md'
+        },
+        {
           name: 'Nested Dropzone',
           content: 'examples/Nesting/Readme.md'
         },
