@@ -109,14 +109,14 @@ it('tests drag state', async () => {
   await flushPromises(dropzone)
   dropzone.update()
 
-  const child = updatedDropzone.find(DummyChildComponent)
+  const child = dropzone.find(DummyChildComponent)
   expect(child).toHaveProp('isDragActive', true)
   expect(child).toHaveProp('isDragAccept', false)
   expect(child).toHaveProp('isDragReject', true)
 })
 ```
 
-Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own test suite.
+Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own [test suite](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
 
 ## Support
 
