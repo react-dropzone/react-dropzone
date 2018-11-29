@@ -27,18 +27,23 @@ class Accept extends React.Component {
             accept="image/jpeg, image/png"
             onDrop={(accepted, rejected) => { this.setState({ accepted, rejected }); }}
           >
-            <p>Try dropping some files here, or click to select files to upload.</p>
-            <p>Only *.jpeg and *.png images will be accepted</p>
+            {({ getRootProps, getInputProps }) => (
+              <div {...getRootProps()}  className="dropzone">
+                <input {...getInputProps()} />
+                <p>Try dropping some files here, or click to select files to upload.</p>
+                <p>Only *.jpeg and *.png images will be accepted</p>
+              </div>
+            )}
           </Dropzone>
         </div>
         <aside>
-          <h2>Accepted files</h2>
+          <h4>Accepted files</h4>
           <ul>
             {
               this.state.accepted.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
             }
           </ul>
-          <h2>Rejected files</h2>
+          <h4>Rejected files</h4>
           <ul>
             {
               this.state.rejected.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
@@ -59,37 +64,35 @@ Because of HTML5 File API differences across different browsers during the drag,
 
 Also, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
 
-```
-<Dropzone
-  accept=".jpeg,.png"
->
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "All files will be accepted";
-    }
-    if (isDragReject) {
-      return "Some files will be rejected";
-    }
-    return "Dropping some files here...";
-  }}
+```jsx harmony
+<Dropzone accept=".jpeg,.png">
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+    <div {...getRootProps()} className="dropzone">
+      <input {...getInputProps()} />
+      <div>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {!isDragActive && "Drop some files here..."}
+      </div>
+    </div>
+  )}
 </Dropzone>
 ```
 
 but this one will:
 
-```
-<Dropzone
-  accept="image/jpeg, image/png"
->
-  {({ isDragActive, isDragReject }) => {
-    if (isDragActive) {
-      return "All files will be accepted";
-    }
-    if (isDragReject) {
-      return "Some files will be rejected";
-    }
-    return "Dropping some files here...";
-  }}
+```jsx harmony
+<Dropzone accept="image/jpeg, image/png">
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+    <div {...getRootProps()} className="dropzone">
+      <input {...getInputProps()} />
+      <div>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {!isDragActive && "Drop some files here..."}
+      </div>
+    </div>
+  )}
 </Dropzone>
 ```
 

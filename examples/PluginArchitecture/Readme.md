@@ -18,10 +18,12 @@ async function myCustomFileGetter(evt) {
   return files;
 }
 
-class PulginExample extends React.Component {
+class Plugin extends React.Component {
   constructor() {
     super()
-    this.state = { files: [] }
+    this.state = {
+      files: []
+    }
   }
 
   onDrop(files) {
@@ -31,30 +33,34 @@ class PulginExample extends React.Component {
   }
 
   render() {
+    const files = this.state.files.map(f => (
+      <li key={f.name}>
+        {f.name} has <strong>myProps</strong>: {f.myProp === true ? 'YES' : ''}
+      </li>
+    ))
     return (
       <section>
-        <div className="dropzone">
+        <div>
           <Dropzone
             getDataTransferItems={evt => myCustomFileGetter(evt)}
             onDrop={this.onDrop.bind(this)}
           >
-            <p>Drop some files here ...</p>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                  <p>Drop files here</p>
+              </div>
+            )}
           </Dropzone>
         </div>
         <aside>
-          <h2>Dropped files</h2>
-          <ul>
-            {this.state.files.map(f => (
-              <li key={f.name}>
-                {f.name} has <strong>myProps</strong>: {f.myProp === true ? 'YES' : ''}
-              </li>
-            ))}
-          </ul>
+          <h4>Files</h4>
+          <ul>{files}</ul>
         </aside>
       </section>
     )
   }
 }
 
-<PulginExample />
+<Plugin />
 ```

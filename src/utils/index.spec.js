@@ -1,4 +1,10 @@
-import { getDataTransferItems, isIeOrEdge, isKindFile, isDragDataWithFiles } from './'
+import {
+  getDataTransferItems,
+  isIeOrEdge,
+  isKindFile,
+  isDragDataWithFiles,
+  composeEventHandlers
+} from './'
 
 const files = [
   {
@@ -154,5 +160,36 @@ describe('isDragDataWithFiles()', () => {
 
   it('should return true if {dataTransfer} is not defined', () => {
     expect(isDragDataWithFiles({})).toBe(true)
+  })
+})
+
+describe('composeEventHandlers', () => {
+  it('returns a fn', () => {
+    const fn = composeEventHandlers(() => {})
+    expect(typeof fn).toBe('function')
+  })
+
+  it('runs every passed fn in order', () => {
+    const fn1 = jest.fn()
+    const fn2 = jest.fn()
+    const fn = composeEventHandlers(fn1, fn2)
+    const evt = { type: 'click' }
+    const data = { ping: true }
+    fn(evt, data)
+    expect(fn1).toHaveBeenCalledWith(evt, data)
+    expect(fn2).toHaveBeenCalledWith(evt, data)
+  })
+
+  it('stops after first fn that calls preventDefault()', () => {
+    const fn1 = jest.fn().mockImplementation(evt => {
+      Object.defineProperty(evt, 'defaultPrevented', { value: true })
+      return evt
+    })
+    const fn2 = jest.fn()
+    const fn = composeEventHandlers(fn1, fn2)
+    const evt = new MouseEvent('click')
+    fn(evt)
+    expect(fn1).toHaveBeenCalledWith(evt)
+    expect(fn2).not.toHaveBeenCalled()
   })
 })

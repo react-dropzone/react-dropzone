@@ -1,7 +1,7 @@
 import React from "react";
 import Dropzone from "../../";
 
-class Events extends React.Component {
+export class Events extends React.Component {
   render() {
     return (
       <section>
@@ -14,9 +14,14 @@ class Events extends React.Component {
             onDragOver={event => console.log(event)}
             onDragLeave={event => console.log(event)}
           >
-            <p>
-              Try dropping some files here, or click to select files to upload.
-            </p>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>
+                  Try dropping some files here, or click to select files to upload.
+                </p>
+              </div>
+            )}
           </Dropzone>
         </div>
       </section>

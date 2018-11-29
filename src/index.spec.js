@@ -4,7 +4,6 @@
 import React from 'react'
 import { mount, render } from 'enzyme'
 import { fromEvent } from 'file-selector'
-import styles from './utils/styles'
 import * as utils from './utils'
 
 const flushPromises = wrapper =>
@@ -53,19 +52,6 @@ const createDtWithTextItems = () => {
 let files
 let images
 
-const rejectColor = 'red'
-const acceptColor = 'green'
-
-const rejectStyle = {
-  color: rejectColor,
-  borderColor: 'black'
-}
-
-const acceptStyle = {
-  color: acceptColor,
-  borderWidth: '5px'
-}
-
 describe('Dropzone', () => {
   beforeEach(() => {
     files = [createFile('file1.pdf', 1111, 'application/pdf')]
@@ -76,41 +62,42 @@ describe('Dropzone', () => {
     it('should render children', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>some content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
         </Dropzone>
       )
       expect(dropzone.html()).toMatchSnapshot()
     })
 
-    it('should render an input HTML element', () => {
+    it('sets refs properly', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>some content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
         </Dropzone>
       )
-      expect(dropzone.find('input').length).toEqual(1)
-    })
-
-    it('sets ref properly', () => {
-      const dropzone = mount(<Dropzone />)
-      expect(dropzone.instance().fileInputEl).not.toBeUndefined()
-      expect(dropzone.instance().fileInputEl.tagName).toEqual('INPUT')
-    })
-
-    it('renders dynamic props on the root element', () => {
-      const component = mount(<Dropzone hidden aria-hidden title="Dropzone" />)
-      expect(component.html()).toContain('aria-hidden="true"')
-      expect(component.html()).toContain('hidden=""')
-      expect(component.html()).toContain('title="Dropzone"')
-    })
-
-    it('renders dynamic props on the input element', () => {
-      const component = mount(<Dropzone inputProps={{ id: 'hiddenFileInput' }} />)
-      expect(component.find('input').html()).toContain('id="hiddenFileInput"')
+      expect(dropzone.instance().node).not.toBeUndefined()
+      expect(dropzone.instance().node.tagName).toEqual('DIV')
+      expect(dropzone.instance().input).not.toBeUndefined()
+      expect(dropzone.instance().input.tagName).toEqual('INPUT')
     })
 
     it('applies the accept prop to the child input', () => {
-      const component = render(<Dropzone className="my-dropzone" accept="image/jpeg" />)
+      const component = render(
+        <Dropzone accept="image/jpeg">
+          {({ getRootProps, getInputProps }) => (
+            <div className="my-dropzone" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       expect(component.attr()).not.toContain('accept')
       expect(Object.keys(component.find('input').attr())).toContain('accept')
@@ -118,17 +105,75 @@ describe('Dropzone', () => {
     })
 
     it('applies the name prop to the child input', () => {
-      const component = render(<Dropzone className="my-dropzone" name="test-file-input" />)
+      const component = render(
+        <Dropzone name="test-file-input">
+          {({ getRootProps, getInputProps }) => (
+            <div className="my-dropzone" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       expect(component.attr()).not.toContain('name')
       expect(Object.keys(component.find('input').attr())).toContain('name')
       expect(component.find('input').attr('name')).toEqual('test-file-input')
     })
 
-    it('should render children function', () => {
-      const content = <p>some content</p>
-      const dropzone = mount(<Dropzone>{content}</Dropzone>)
-      const dropzoneWithFunction = mount(<Dropzone>{() => content}</Dropzone>)
-      expect(dropzoneWithFunction.html()).toEqual(dropzone.html())
+    it('runs custom root handlers', async () => {
+      const evt = createDtWithFiles(files)
+      const rootProps = {
+        onClick: jest.fn(),
+        onKeyDown: jest.fn(),
+        onFocus: jest.fn(),
+        onBlur: jest.fn(),
+        onDragStart: jest.fn(),
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps(rootProps)}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      await dropzone.simulate('click')
+      await flushPromises(dropzone)
+      expect(rootProps.onClick).toHaveBeenCalled()
+
+      dropzone.simulate('focus')
+      expect(rootProps.onFocus).toHaveBeenCalled()
+
+      dropzone.simulate('blur')
+      expect(rootProps.onBlur).toHaveBeenCalled()
+
+      dropzone.simulate('keydown')
+      expect(rootProps.onKeyDown).toHaveBeenCalled()
+
+      await dropzone.simulate('dragStart', evt)
+      await flushPromises(dropzone)
+      expect(rootProps.onDragStart).toHaveBeenCalled()
+
+      await dropzone.simulate('dragEnter', evt)
+      await flushPromises(dropzone)
+      expect(rootProps.onDragEnter).toHaveBeenCalled()
+
+      await dropzone.simulate('dragOver', evt)
+      await flushPromises(dropzone)
+      expect(rootProps.onDragOver).toHaveBeenCalled()
+
+      await dropzone.simulate('dragLeave', evt)
+      await flushPromises(dropzone)
+      expect(rootProps.onDragLeave).toHaveBeenCalled()
+
+      await dropzone.simulate('drop', evt)
+      await flushPromises(dropzone)
+      expect(rootProps.onDrop).toHaveBeenCalled()
     })
   })
 
@@ -151,7 +196,12 @@ describe('Dropzone', () => {
     it('installs hooks to prevent stray drops from taking over the browser window', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>Content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Content</p>
+            </div>
+          )}
         </Dropzone>
       )
       expect(dropzone.html()).toMatchSnapshot()
@@ -166,7 +216,12 @@ describe('Dropzone', () => {
     it('terminates drags and drops on elements outside our dropzone', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>Content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Content</p>
+            </div>
+          )}
         </Dropzone>
       )
 
@@ -181,7 +236,12 @@ describe('Dropzone', () => {
     it('permits drags and drops on elements inside our dropzone', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>Content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Content</p>
+            </div>
+          )}
         </Dropzone>
       )
 
@@ -196,7 +256,12 @@ describe('Dropzone', () => {
     it('removes document hooks when unmounted', () => {
       const dropzone = mount(
         <Dropzone>
-          <p>Content</p>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Content</p>
+            </div>
+          )}
         </Dropzone>
       )
       dropzone.unmount()
@@ -209,7 +274,15 @@ describe('Dropzone', () => {
     })
 
     it('does not prevent stray drops when preventDropOnDocument is false', () => {
-      const dropzone = mount(<Dropzone preventDropOnDocument={false} />)
+      const dropzone = mount(
+        <Dropzone preventDropOnDocument={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       expect(dropzone.html()).toMatchSnapshot()
       expect(onAddEventListener).not.toHaveBeenCalled()
 
@@ -220,14 +293,30 @@ describe('Dropzone', () => {
 
   describe('onClick', () => {
     it('should call `open` method', () => {
-      const dropzone = mount(<Dropzone />)
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
     })
 
     it('should not call `open` if disableClick prop is true', () => {
-      const dropzone = mount(<Dropzone disableClick />)
+      const dropzone = mount(
+        <Dropzone disableClick>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).not.toHaveBeenCalled()
@@ -235,7 +324,15 @@ describe('Dropzone', () => {
 
     it('should call `onClick` callback if provided', () => {
       const onClick = jest.fn()
-      const dropzone = mount(<Dropzone onClick={onClick} />)
+      const dropzone = mount(
+        <Dropzone onClick={onClick}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
@@ -244,7 +341,15 @@ describe('Dropzone', () => {
 
     it('should call `onClick` if provided even if `disableClick` is set', () => {
       const onClick = jest.fn()
-      const dropzone = mount(<Dropzone disableClick onClick={onClick} />)
+      const dropzone = mount(
+        <Dropzone onClick={onClick} disableClick>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).toHaveBeenCalledTimes(0)
@@ -253,7 +358,15 @@ describe('Dropzone', () => {
 
     it('should not call `open` if event was prevented in `onClick`', () => {
       const onClick = jest.fn(event => event.preventDefault())
-      const dropzone = mount(<Dropzone onClick={onClick} />)
+      const dropzone = mount(
+        <Dropzone onClick={onClick}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).toHaveBeenCalledTimes(0)
@@ -261,7 +374,15 @@ describe('Dropzone', () => {
     })
 
     it('should reset the value of input', () => {
-      const dropzone = mount(<Dropzone />)
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       expect(
         dropzone
           .render()
@@ -284,8 +405,16 @@ describe('Dropzone', () => {
     })
 
     it('should trigger click even on the input', () => {
-      const dropzone = mount(<Dropzone />)
-      const onFileInputClick = jest.spyOn(dropzone.instance().fileInputEl, 'click')
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const onFileInputClick = jest.spyOn(dropzone.instance().input, 'click')
       dropzone.simulate('click')
       dropzone.simulate('click')
       expect(onFileInputClick).toHaveBeenCalledTimes(2)
@@ -296,7 +425,13 @@ describe('Dropzone', () => {
       const onClickInner = jest.fn()
       const component = mount(
         <div onClick={onClickOuter}>
-          <Dropzone onClick={onClickInner} />
+          <Dropzone onClick={onClickInner}>
+            {({ getRootProps, getInputProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
         </div>
       )
 
@@ -316,7 +451,13 @@ describe('Dropzone', () => {
       const onClick = jest.fn()
       const component = mount(
         <div onClick={onClick}>
-          <Dropzone disableClick />
+          <Dropzone disableClick>
+            {({ getRootProps, getInputProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
         </div>
       )
 
@@ -326,17 +467,33 @@ describe('Dropzone', () => {
 
     it('should invoke inputProps onClick if provided', () => {
       const onClick = jest.fn()
-      const component = mount(<Dropzone inputProps={{ onClick }} />)
+      const component = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps({ onClick })} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
-      component.simulate('click')
-      expect(onClick).toHaveBeenCalledWith(expect.any(MouseEvent))
+      component.find('input').simulate('click')
+      expect(onClick).toHaveBeenCalled()
     })
 
     it('should schedule open() on next tick when Edge', () => {
       const isIeOrEdgeSpy = jest.spyOn(utils, 'isIeOrEdge').mockReturnValueOnce(true)
       const setTimeoutSpy = jest.spyOn(window, 'setTimeout').mockImplementationOnce(open => open())
 
-      const dropzone = mount(<Dropzone />)
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
 
@@ -344,6 +501,218 @@ describe('Dropzone', () => {
       expect(open).toHaveBeenCalled()
       isIeOrEdgeSpy.mockClear()
       setTimeoutSpy.mockClear()
+    })
+  })
+
+  describe('onFocus', () => {
+    it('sets focus state', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <span className="dropzone-focused" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      expect(dropzone.find('.dropzone-focused')).toHaveLength(1)
+    })
+
+    it('calls user supplied onFocus', async () => {
+      const onFocus = jest.fn()
+      const dropzone = mount(
+        <Dropzone onFocus={onFocus}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      expect(dropzone.state('isFocused')).toBe(true)
+      expect(onFocus).toHaveBeenCalled()
+    })
+
+    it('does not set focus state if user supplied onFocus prevented default', async () => {
+      const onFocus = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(
+        <Dropzone onFocus={onFocus}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('focus', {})
+      expect(onFocus).toHaveBeenCalled()
+    })
+  })
+
+  describe('onBlur', () => {
+    it('unsets focus state', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <span className="dropzone-focused" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      expect(dropzone.find('.dropzone-focused')).toHaveLength(1)
+      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+      expect(dropzone.find('.dropzone-focused')).toHaveLength(0)
+    })
+
+    it('calls user supplied onBlur', async () => {
+      const onBlur = jest.fn()
+      const dropzone = mount(
+        <Dropzone onBlur={onBlur}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+      expect(onBlur).toHaveBeenCalled()
+    })
+
+    it('does not unset focus state if user supplied onBlur prevented default', async () => {
+      const onBlur = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(
+        <Dropzone onBlur={onBlur}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('blur', {})
+      expect(onBlur).toHaveBeenCalled()
+    })
+  })
+
+  describe('onKeyDown', () => {
+    it('opens the file dialog on SPACE/ENTER', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      dropzone.simulate('keydown', {
+        keyCode: 13,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(open).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not react to keydown if component is disabled', async () => {
+      const dropzone = mount(
+        <Dropzone disabled>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(open).not.toHaveBeenCalled()
+    })
+
+    it('calls user supplied onKeyDown', async () => {
+      const onKeyDown = jest.fn()
+      const dropzone = mount(
+        <Dropzone onKeyDown={onKeyDown}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(onKeyDown).toHaveBeenCalled()
+      expect(open).toHaveBeenCalled()
+    })
+
+    it('does not react to keydown if user-supplied onKeyDown prevents default', async () => {
+      const onKeyDown = jest.fn().mockImplementationOnce(evt => {
+        Object.assign(evt, {
+          isDefaultPrevented: () => true
+        })
+      })
+      const dropzone = mount(
+        <Dropzone onKeyDown={onKeyDown}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', { keyCode: 32 })
+      expect(onKeyDown).toHaveBeenCalled()
+      expect(open).not.toHaveBeenCalled()
+    })
+
+    it('does not react to other keys', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', {
+        keyCode: 100,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(open).not.toHaveBeenCalled()
     })
   })
 
@@ -355,7 +724,15 @@ describe('Dropzone', () => {
         onDragOver: jest.fn(),
         onDragLeave: jest.fn()
       }
-      const component = mount(<Dropzone {...props} />)
+      const component = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       await component.simulate('dragStart', createDtWithFiles(files))
       await flushPromises(component)
@@ -380,7 +757,15 @@ describe('Dropzone', () => {
         onDragEnter: jest.fn(),
         onDragLeave: jest.fn()
       }
-      const component = mount(<Dropzone {...props} />)
+      const component = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       // Using Proxy we'll emulate IE throwing when setting dataTransfer.dropEffect
       const eventProxy = {
@@ -438,7 +823,15 @@ describe('Dropzone', () => {
         onDropRejected: jest.fn()
       }
 
-      const component = mount(<Dropzone {...props} />)
+      const component = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       await component.simulate('dragStart', createDtWithTextTypes())
       await flushPromises(component)
@@ -474,7 +867,15 @@ describe('Dropzone', () => {
         onDropRejected: jest.fn()
       }
 
-      const component = mount(<Dropzone {...props} />)
+      const component = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       await component.simulate('dragStart', createDtWithFiles([]))
       await flushPromises(component)
@@ -500,7 +901,16 @@ describe('Dropzone', () => {
     })
 
     it('should set proper dragActive state on dragEnter', async () => {
-      const component = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      const component = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
+        </Dropzone>
+      )
       component.simulate('dragEnter', createDtWithFiles(files))
 
       const updatedDropzone = await flushPromises(component)
@@ -513,7 +923,14 @@ describe('Dropzone', () => {
 
     it('should set proper dragReject state on dragEnter', async () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
+        <Dropzone accept="image/*">
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
+        </Dropzone>
       )
       dropzone.simulate('dragEnter', createDtWithFiles(files.concat(images)))
       const updatedDropzone = await flushPromises(dropzone)
@@ -523,10 +940,15 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragReject', true)
     })
 
-    it('should set proper dragAccept state if multiple is false', async () => {
+    it('should set proper dragActive state if multiple is false', async () => {
       const dropzone = mount(
         <Dropzone accept="image/*" multiple={false}>
-          {props => <DummyChildComponent {...props} />}
+          {({ getRootProps, getInputProps, ...rest }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...rest} />
+            </div>
+          )}
         </Dropzone>
       )
       dropzone.simulate('dragEnter', createDtWithFiles(files))
@@ -540,7 +962,12 @@ describe('Dropzone', () => {
     it('should set proper dragAccept state if multiple is false', async () => {
       const dropzone = mount(
         <Dropzone accept="image/*" multiple={false}>
-          {props => <DummyChildComponent {...props} />}
+          {({ getRootProps, getInputProps, ...rest }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...rest} />
+            </div>
+          )}
         </Dropzone>
       )
       dropzone.simulate('dragEnter', createDtWithFiles(images))
@@ -549,151 +976,36 @@ describe('Dropzone', () => {
       expect(child).toHaveProp('isDragActive', true)
       expect(child).toHaveProp('isDragAccept', true)
       expect(child).toHaveProp('isDragReject', true)
-    })
-
-    it('should set activeClassName properly', async () => {
-      const dropzone = mount(
-        <Dropzone accept="image/*" activeClassName="👏" multiple={false}>
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles(images))
-      const updatedDropzone = await flushPromises(dropzone)
-      const child = updatedDropzone.find(DummyChildComponent)
-      expect(child).toHaveProp('isDragActive', true)
-      expect(
-        dropzone
-          .children()
-          .first()
-          .hasClass('👏')
-      ).toBe(true)
-    })
-
-    it('should set rejectClassName properly', async () => {
-      const dropzone = mount(
-        <Dropzone accept="image/*" rejectClassName="👎" multiple={false}>
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles(images))
-      const updatedDropzone = await flushPromises(dropzone)
-      const child = updatedDropzone.find(DummyChildComponent)
-      expect(child).toHaveProp('isDragReject', true)
-      expect(
-        dropzone
-          .children()
-          .first()
-          .hasClass('👎')
-      ).toBe(true)
-    })
-
-    it('should set acceptClassName properly', async () => {
-      const dropzone = mount(
-        <Dropzone accept="image/*" acceptClassName="👍" className="foo" multiple={false}>
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles(images))
-      const updatedDropzone = await flushPromises(dropzone)
-      const child = updatedDropzone.find(DummyChildComponent)
-      expect(child).toHaveProp('isDragAccept', true)
-      expect(
-        updatedDropzone
-          .children()
-          .first()
-          .hasClass('👍')
-      ).toBe(true)
-    })
-
-    it('should set disabledClassName properly', () => {
-      const dropzone = render(
-        <Dropzone disabled disabledClassName="🤐">
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      expect(dropzone.hasClass('🤐')).toBe(true)
     })
 
     it('should keep dragging active when leaving from arbitrary node', async () => {
       const arbitraryOverlay = mount(<div />)
-      const dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps, ...rest }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...rest} />
+            </div>
+          )}
+        </Dropzone>
+      )
       await dropzone.simulate('dragEnter', createDtWithFiles(images))
       dropzone.simulate('dragLeave', { target: arbitraryOverlay })
       expect(dropzone.state('isDragActive')).toBe(true)
       expect(dropzone.state('draggedFiles').length > 0).toBe(true)
     })
 
-    it('should apply default active style on drag enter if file data cannot be accessed', async () => {
-      const dropzone = mount(<Dropzone />)
-      await dropzone.simulate('dragEnter', createDtWithFiles([]))
-      await flushPromises(dropzone)
-      const mainDiv = dropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', {
-        position: 'relative',
-        ...styles.default,
-        ...styles.active
-      })
-    })
-
-    it('should apply acceptStyle if multiple is false and single file', async () => {
-      const dropzone = mount(
-        <Dropzone
-          accept="image/*"
-          multiple={false}
-          acceptStyle={acceptStyle}
-          rejectStyle={rejectStyle}
-        >
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles([images[0]]))
-      const updatedDropzone = await flushPromises(dropzone)
-      const mainDiv = updatedDropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', { position: 'relative', ...acceptStyle })
-    })
-
-    it('should apply rejectStyle if multiple is false and single bad file type', async () => {
-      const dropzone = mount(
-        <Dropzone
-          accept="image/*"
-          multiple={false}
-          acceptStyle={acceptStyle}
-          rejectStyle={rejectStyle}
-        >
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles([files[0]]))
-      const updatedDropzone = await flushPromises(dropzone)
-      const mainDiv = updatedDropzone.find('div').at(0)
-      expect(mainDiv).toHaveProp('style', { position: 'relative', ...rejectStyle })
-    })
-
-    it('should apply acceptStyle + rejectStyle if multiple is false and multiple good file types', async () => {
-      const dropzone = mount(
-        <Dropzone
-          accept="image/*"
-          multiple={false}
-          acceptStyle={acceptStyle}
-          rejectStyle={rejectStyle}
-        >
-          {props => <DummyChildComponent {...props} />}
-        </Dropzone>
-      )
-      dropzone.simulate('dragEnter', createDtWithFiles(images))
-      const updatedDropzone = await flushPromises(dropzone)
-      const mainDiv = updatedDropzone.find('div').at(0)
-      const expectedStyle = {
-        position: 'relative',
-        ...acceptStyle,
-        ...rejectStyle
-      }
-      expect(mainDiv).toHaveProp('style', expectedStyle)
-    })
-
     it('should set proper dragActive state if accept prop changes mid-drag', async () => {
       const dropzone = mount(
-        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
+        <Dropzone accept="image/*">
+          {({ getRootProps, getInputProps, ...rest }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...rest} />
+            </div>
+          )}
+        </Dropzone>
       )
       dropzone.simulate('dragEnter', createDtWithFiles(images))
       const updatedDropzone = await flushPromises(dropzone)
@@ -710,15 +1022,14 @@ describe('Dropzone', () => {
     it('should expose state to children', async () => {
       const dropzone = mount(
         <Dropzone accept="image/*">
-          {({ isDragActive, isDragAccept, isDragReject }) => {
-            if (isDragReject) {
-              return `${isDragActive && 'Active but'} Reject`
-            }
-            if (isDragAccept) {
-              return `${isDragActive && 'Active and'} Accept`
-            }
-            return 'Empty'
-          }}
+          {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragReject && `${isDragActive && 'Active but'} Reject`}
+              {isDragAccept && `${isDragActive && 'Active and'} Accept`}
+              {!isDragActive && 'Empty'}
+            </div>
+          )}
         </Dropzone>
       )
       expect(dropzone.text()).toEqual('Empty')
@@ -728,20 +1039,23 @@ describe('Dropzone', () => {
       expect(dropzone.text()).toEqual('Active but Reject')
     })
 
-    it('should reset the dragAccept/dragReject state when leaving after a child goes away', async () => {
+    it('should reset the dragActive/dragReject state when leaving after a child goes away', async () => {
       const DragActiveComponent = () => <p>Accept</p>
       const ChildComponent = () => <p>Child component content</p>
       const dropzone = mount(
         <Dropzone>
-          {({ isDragAccept, isDragReject }) => {
-            if (isDragReject) {
-              return 'Rejected'
-            }
-            if (isDragAccept) {
-              return <DragActiveComponent isDragAccept={isDragAccept} isDragReject={isDragReject} />
-            }
-            return <ChildComponent isDragAccept={isDragAccept} isDragReject={isDragReject} />
-          }}
+          {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragReject && 'Rejected'}
+              {isDragAccept && (
+                <DragActiveComponent isDragAccept={isDragAccept} isDragReject={isDragReject} />
+              )}
+              {!isDragActive && (
+                <ChildComponent isDragAccept={isDragAccept} isDragReject={isDragReject} />
+              )}
+            </div>
+          )}
         </Dropzone>
       )
       const child = dropzone.find(ChildComponent)
@@ -761,21 +1075,43 @@ describe('Dropzone', () => {
     })
   })
 
-  it('should expose open func to children', () => {
-    const subject = mount(
-      <Dropzone disableClick>
-        {({ open }) => (
-          <button type="button" onClick={open}>
-            Open
-          </button>
-        )}
-      </Dropzone>
-    )
+  describe('open() fn', () => {
+    it('should be exposed to children', () => {
+      const subject = mount(
+        <Dropzone disableClick>
+          {({ getRootProps, getInputProps, open }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <button type="button" onClick={open}>
+                Open
+              </button>
+            </div>
+          )}
+        </Dropzone>
+      )
 
-    const click = jest.spyOn(subject.instance().fileInputEl, 'click')
-    subject.find('button').simulate('click')
+      const click = jest.spyOn(subject.instance().input, 'click')
+      subject.find('button').simulate('click')
 
-    expect(click).toHaveBeenCalled()
+      expect(click).toHaveBeenCalled()
+    })
+
+    it('should do nothing if the <input> is missing', () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, open }) => (
+            <div {...getRootProps()}>
+              <button type="button" onClick={open}>
+                Open
+              </button>
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const fn = () => dropzone.find('button').simulate('click')
+      expect(fn).not.toThrow()
+    })
   })
 
   it('invokes onDop cb when native file section occurs', async () => {
@@ -785,7 +1121,15 @@ describe('Dropzone', () => {
       onDropRejected: jest.fn()
     }
 
-    const component = mount(<Dropzone {...props} />)
+    const component = mount(
+      <Dropzone {...props}>
+        {({ getRootProps, getInputProps }) => (
+          <div {...getRootProps()}>
+            <input {...getInputProps()} />
+          </div>
+        )}
+      </Dropzone>
+    )
 
     const input = component.find('input')
     const evt = {
@@ -811,7 +1155,14 @@ describe('Dropzone', () => {
 
     it('should update the acceptedFiles/rejectedFiles state', async () => {
       let dropzone = mount(
-        <Dropzone accept="image/*">{props => <DummyChildComponent {...props} />}</Dropzone>
+        <Dropzone accept="image/*">
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
+        </Dropzone>
       )
       dropzone.simulate('drop', createDtWithFiles(files))
       dropzone = await flushPromises(dropzone)
@@ -825,7 +1176,16 @@ describe('Dropzone', () => {
     })
 
     it('should reset the dragActive/dragReject state', async () => {
-      let dropzone = mount(<Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>)
+      let dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps, ...restProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...restProps} />
+            </div>
+          )}
+        </Dropzone>
+      )
       dropzone.simulate('dragEnter', createDtWithFiles(files))
       dropzone = await flushPromises(dropzone)
       expect(dropzone.find(DummyChildComponent)).toHaveProp('isDragActive', true)
@@ -837,40 +1197,89 @@ describe('Dropzone', () => {
     })
 
     it('should reject invalid file when multiple is false', async () => {
-      const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
+      const dropzone = mount(
+        <Dropzone accept="image/*" onDrop={onDrop} multiple={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
     })
 
     it('should allow single files to be dropped if multiple is false', async () => {
-      const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
+      const dropzone = mount(
+        <Dropzone accept="image/*" onDrop={onDrop} multiple={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       await dropzone.simulate('drop', createDtWithFiles([images[0]]))
       expect(onDrop).toHaveBeenCalledWith([images[0]], [], expectedEvent)
     })
 
     it('should reject multiple files to be dropped if multiple is false', async () => {
-      const dropzone = mount(<Dropzone accept="image/*" onDrop={onDrop} multiple={false} />)
+      const dropzone = mount(
+        <Dropzone accept="image/*" onDrop={onDrop} multiple={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
     })
 
     it('should take all dropped files if multiple is true', async () => {
-      const dropzone = mount(<Dropzone onDrop={onDrop} multiple />)
+      const dropzone = mount(
+        <Dropzone onDrop={onDrop} multiple>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
     })
 
     it('should set this.isFileDialogActive to false', async () => {
-      const dropzone = mount(<Dropzone />)
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       dropzone.instance().isFileDialogActive = true
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(dropzone.instance().isFileDialogActive).toEqual(false)
     })
 
     it('should always call onDrop callback with accepted and rejected arguments', async () => {
-      const dropzone = mount(<Dropzone onDrop={onDrop} accept="image/*" />)
+      const dropzone = mount(
+        <Dropzone onDrop={onDrop} accept="image/*">
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       onDrop.mockClear()
@@ -884,7 +1293,16 @@ describe('Dropzone', () => {
     })
 
     it('should call onDropAccepted callback if some files were accepted', async () => {
-      const dropzone = mount(<Dropzone onDropAccepted={onDropAccepted} accept="image/*" />)
+      const dropzone = mount(
+        <Dropzone onDropAccepted={onDropAccepted} accept="image/*">
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDropAccepted).not.toHaveBeenCalled()
       onDropAccepted.mockClear()
@@ -898,7 +1316,16 @@ describe('Dropzone', () => {
     })
 
     it('should call onDropRejected callback if some files were rejected', async () => {
-      const dropzone = mount(<Dropzone onDropRejected={onDropRejected} accept="image/*" />)
+      const dropzone = mount(
+        <Dropzone onDropRejected={onDropRejected} accept="image/*">
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
       await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDropRejected).not.toHaveBeenCalled()
       onDropRejected.mockClear()
@@ -918,7 +1345,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           accept="image/*"
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
@@ -933,7 +1366,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           accept="image/*"
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
 
       await dropzone.simulate('drop', createDtWithFiles(images))
@@ -949,7 +1388,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           accept="image/*"
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       const bogusImages = [createFile('bogus.gif', 1234, 'application/x-moz-file')]
 
@@ -961,7 +1406,13 @@ describe('Dropzone', () => {
 
     it('accepts all dropped files and images when no accept prop is specified', async () => {
       const dropzone = mount(
-        <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected} />
+        <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
@@ -976,7 +1427,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           maxSize={1111}
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
 
       await dropzone.simulate('drop', createDtWithFiles(files))
@@ -992,7 +1449,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           maxSize={1111}
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
@@ -1007,7 +1470,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           minSize={1112}
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files))
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
@@ -1022,7 +1491,13 @@ describe('Dropzone', () => {
           onDropAccepted={onDropAccepted}
           onDropRejected={onDropRejected}
           minSize={1112}
-        />
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(images))
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
@@ -1032,7 +1507,13 @@ describe('Dropzone', () => {
 
     it('accepts all dropped files and images when no size prop is specified', async () => {
       const dropzone = mount(
-        <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected} />
+        <Dropzone onDrop={onDrop} onDropAccepted={onDropAccepted} onDropRejected={onDropRejected}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
@@ -1052,7 +1533,15 @@ describe('Dropzone', () => {
 
     it('should not invoke onFileDialogCancel everytime window receives focus', () => {
       const onFileDialogCancel = jest.fn()
-      mount(<Dropzone id="on-cancel-example" onFileDialogCancel={onFileDialogCancel} />)
+      mount(
+        <Dropzone onFileDialogCancel={onFileDialogCancel}>
+          {({ getRootProps, getInputProps }) => (
+            <div id="on-cancel-example" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       // Simulated DOM event - onfocus
       document.body.addEventListener('focus', () => {})
       const evt = document.createEvent('HTMLEvents')
@@ -1064,11 +1553,11 @@ describe('Dropzone', () => {
 
     it('should not invoke onFileDialogCancel if input does not exist', () => {
       const onFileDialogCancel = jest.fn()
-      const component = mount(
-        <Dropzone id="on-cancel-example" onFileDialogCancel={onFileDialogCancel} />
+      mount(
+        <Dropzone onFileDialogCancel={onFileDialogCancel}>
+          {({ getRootProps }) => <div id="on-cancel-example" {...getRootProps()} />}
+        </Dropzone>
       )
-
-      component.instance().setRefs(null)
 
       document.body.addEventListener('focus', () => {})
       const evt = document.createEvent('HTMLEvents')
@@ -1081,7 +1570,13 @@ describe('Dropzone', () => {
     it('should invoke onFileDialogCancel when window receives focus via cancel button and there were no files selected', () => {
       const onFileDialogCancel = jest.fn()
       const component = mount(
-        <Dropzone className="dropzone-content" onFileDialogCancel={onFileDialogCancel} />
+        <Dropzone onFileDialogCancel={onFileDialogCancel}>
+          {({ getRootProps, getInputProps }) => (
+            <div className="dropzone-content" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
 
       // Test / invoke the click event
@@ -1103,7 +1598,13 @@ describe('Dropzone', () => {
     it('should not invoke onFileDialogCancel when window receives focus via cancel button and there were files selected', () => {
       const onFileDialogCancel = jest.fn()
       const component = mount(
-        <Dropzone className="dropzone-content" onFileDialogCancel={onFileDialogCancel} />
+        <Dropzone onFileDialogCancel={onFileDialogCancel}>
+          {({ getRootProps, getInputProps }) => (
+            <div className="dropzone-content" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
       )
 
       // Test / invoke the click event
@@ -1129,7 +1630,15 @@ describe('Dropzone', () => {
     })
 
     it('should restore isFileDialogActive to false after the FileDialog was closed', () => {
-      const component = mount(<Dropzone />)
+      const component = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       component.simulate('click')
 
@@ -1163,18 +1672,28 @@ describe('Dropzone', () => {
         onDropRejected={onInnerDropRejected}
         accept="image/*"
       >
-        {({ isDragActive, isDragReject }) => {
-          if (isDragReject) return <InnerDragRejected />
-          if (isDragActive) return <InnerDragAccepted />
-          return <p>No drag</p>
-        }}
+        {({ getRootProps, getInputProps, isDragAccept, isDragReject, isDragActive }) => (
+          <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            {isDragReject && <InnerDragRejected />}
+            {isDragAccept && <InnerDragAccepted />}
+            {!isDragActive && <p>No drag</p>}
+          </div>
+        )}
       </Dropzone>
     )
 
     describe('dropping on the inner dropzone', () => {
       it('does dragEnter on both dropzones', async () => {
         const outerDropzone = mount(
-          <Dropzone accept="image/*">{props => <InnerDropzone {...props} />}</Dropzone>
+          <Dropzone accept="image/*">
+            {({ getRootProps, getInputProps, ...restProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <InnerDropzone {...restProps} />
+              </div>
+            )}
+          </Dropzone>
         )
         outerDropzone.find(InnerDropzone).simulate('dragEnter', createDtWithFiles(images))
         const updatedOuterDropzone = await flushPromises(outerDropzone)
@@ -1194,7 +1713,12 @@ describe('Dropzone', () => {
             onDropRejected={onOuterDropRejected}
             accept="image/*"
           >
-            {props => <InnerDropzone {...props} />}
+            {({ getRootProps, getInputProps, ...restProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <InnerDropzone {...restProps} />
+              </div>
+            )}
           </Dropzone>
         )
 
@@ -1221,7 +1745,12 @@ describe('Dropzone', () => {
             onDropRejected={onOuterDropRejected}
             accept="image/*"
           >
-            {props => <InnerDropzone {...props} />}
+            {({ getRootProps, getInputProps, ...restProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <InnerDropzone {...restProps} />
+              </div>
+            )}
           </Dropzone>
         )
 
@@ -1254,12 +1783,23 @@ describe('Dropzone', () => {
             onDragOver={evt => evt.stopPropagation()}
             onDragLeave={evt => evt.stopPropagation()}
             onDrop={(accepted, rejected, evt) => evt.stopPropagation()}
-          />
+          >
+            {({ getRootProps, getInputProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
         )
 
         const outerDropzone = mount(
           <Dropzone {...parentProps}>
-            <InnerDropzone />
+            {({ getRootProps, getInputProps, ...restProps }) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <InnerDropzone {...restProps} />
+              </div>
+            )}
           </Dropzone>
         )
 
@@ -1285,14 +1825,30 @@ describe('Dropzone', () => {
 
   describe('behavior', () => {
     it('does not throw an error when html is dropped instead of files and multiple is false', () => {
-      const dropzone = mount(<Dropzone multiple={false} />)
+      const dropzone = mount(
+        <Dropzone multiple={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       const fn = () => dropzone.simulate('drop', createDtWithFiles([]))
       expect(fn).not.toThrow()
     })
 
     it('does not allow actions when disabled props is true', () => {
-      const dropzone = mount(<Dropzone disabled />)
+      const dropzone = mount(
+        <Dropzone disabled>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
@@ -1300,7 +1856,15 @@ describe('Dropzone', () => {
     })
 
     it('when toggle disabled props, Dropzone works as expected', () => {
-      const dropzone = mount(<Dropzone disabled />)
+      const dropzone = mount(
+        <Dropzone disabled>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
       const open = jest.spyOn(dropzone.instance(), 'open')
 
       dropzone.setProps({ disabled: false })
@@ -1316,13 +1880,55 @@ describe('Dropzone', () => {
       }
       let dropzone = mount(
         <Dropzone accept="image/*" onDrop={onDrop}>
-          {props => <DummyChildComponent {...props} />}
+          {({ getRootProps, getInputProps, ...rest }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <DummyChildComponent {...rest} />
+            </div>
+          )}
         </Dropzone>
       )
       setState = jest.spyOn(dropzone.instance(), 'setState')
       await dropzone.simulate('drop', createDtWithFiles(images))
       dropzone = await flushPromises(dropzone)
       expect(setState).not.toHaveBeenCalled()
+    })
+
+    it('sets {tabindex} to 0 if the component is not disabled', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      expect(
+        dropzone
+          .children()
+          .first()
+          .prop('tabIndex')
+      ).toBe(0)
+    })
+
+    it('sets {tabindex} to -1 if the component is disabled', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.setProps({ disabled: true })
+      expect(
+        dropzone
+          .children()
+          .first()
+          .prop('tabIndex')
+      ).toBe(-1)
     })
   })
 
@@ -1337,7 +1943,15 @@ describe('Dropzone', () => {
         onDrop: jest.fn()
       }
 
-      const dropzone = mount(<Dropzone {...props} />)
+      const dropzone = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       const data = JSON.stringify({ ping: true })
       const file = new File([data], name, {
@@ -1388,7 +2002,15 @@ describe('Dropzone', () => {
         onDrop: jest.fn()
       }
 
-      const dropzone = mount(<Dropzone {...props} />)
+      const dropzone = mount(
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
 
       const items = [
         {

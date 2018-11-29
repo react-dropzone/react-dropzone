@@ -11,7 +11,9 @@ export class TestReactDragEvt extends Component {
     return (
       <div>
         <Dropzone getDataTransferItems={this.getFiles}>
-          Hi
+          {({getRootProps}) => (
+            <div {...getRootProps()} />
+          )}
         </Dropzone>
       </div>
     );
@@ -28,7 +30,9 @@ export class TestDataTransferItems extends Component {
     return (
       <div>
         <Dropzone getDataTransferItems={this.getFiles}>
-          Hi
+          {({getRootProps}) => (
+            <div {...getRootProps()} />
+          )}
         </Dropzone>
       </div>
     );
@@ -45,7 +49,9 @@ export class TestNativeDragEventEvt extends Component {
     return (
       <div>
         <Dropzone getDataTransferItems={this.getFiles}>
-          Hi
+          {({getRootProps}) => (
+            <div {...getRootProps()} />
+          )}
         </Dropzone>
       </div>
     );
@@ -62,7 +68,9 @@ export class TestChangeEvt extends Component {
     return (
       <div>
         <Dropzone getDataTransferItems={this.getFiles}>
-          Hi
+          {({getRootProps}) => (
+            <div {...getRootProps()} />
+          )}
         </Dropzone>
       </div>
     );
@@ -80,7 +88,9 @@ export class TestNativeEvt extends Component {
     return (
       <div>
         <Dropzone getDataTransferItems={this.getFiles}>
-          Hi
+          {({getRootProps}) => (
+            <div {...getRootProps()} />
+          )}
         </Dropzone>
       </div>
     );
