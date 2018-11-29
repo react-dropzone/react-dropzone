@@ -1,7 +1,7 @@
 import React from "react";
 import Dropzone from "../../";
 
-class Accept extends React.Component {
+export default class Accept extends React.Component {
   state = {
     accepted: [],
     rejected: []
@@ -17,10 +17,14 @@ class Accept extends React.Component {
               this.setState({ accepted, rejected });
             }}
           >
-            <p>
-              Try dropping some files here, or click to select files to upload.
-            </p>
-            <p>Only *.jpeg and *.png images will be accepted</p>
+            {({getRootProps}) => (
+              <div {...getRootProps()}>
+                <p>
+                  Try dropping some files here, or click to select files to upload.
+                </p>
+                <p>Only *.jpeg and *.png images will be accepted</p>
+              </div>
+            )}
           </Dropzone>
         </div>
         <aside>
@@ -46,30 +50,26 @@ class Accept extends React.Component {
   }
 }
 
-const a = (
+export const acceptExt = (
   <Dropzone accept=".jpeg,.png">
-    {({ isDragActive, isDragReject }) => {
-      if (isDragActive) {
-        return "All files will be accepted";
-      }
-      if (isDragReject) {
-        return "Some files will be rejected";
-      }
-      return "Dropping some files here...";
-    }}
+    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+      <div {...getRootProps()}>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {isDragActive && "Drop some files here ..."}
+      </div>
+    )}
   </Dropzone>
 );
 
-const b = (
+export const acceptMime = (
   <Dropzone accept="image/jpeg, image/png">
-    {({ isDragActive, isDragReject }) => {
-      if (isDragActive) {
-        return "All files will be accepted";
-      }
-      if (isDragReject) {
-        return "Some files will be rejected";
-      }
-      return "Dropping some files here...";
-    }}
+    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+      <div {...getRootProps()}>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {isDragActive && "Drop some files here ..."}
+      </div>
+    )}
   </Dropzone>
 );

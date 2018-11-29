@@ -10,6 +10,10 @@ module.exports = {
   usageMode: 'expand',
   showSidebar: false,
   serverPort: 8080,
+  compilerConfig: {
+    transforms: { dangerousTaggedTemplateString: true },
+    objectAssign: 'Object.assign'
+  },
   sections: [
     {
       name: '',

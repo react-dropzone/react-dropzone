@@ -44,20 +44,22 @@ class DropzoneWithPreview extends React.Component {
 
   onDrop(files) {
     this.setState({
-      files: files.map(file => Object.assign(file, {preview: URL.createObjectURL(file)}))
+      files: files.map(file => Object.assign(file, {
+        preview: URL.createObjectURL(file)
+      }))
     });
   }
 
   componentWillUnmount() {
     // Make sure to revoke the data uris to avoid memory leaks
-    this.state.files.forEach(f => URL.revokeObjectURL(f.preview))
+    this.state.files.forEach(file => URL.revokeObjectURL(file.preview))
   }
 
   render() {
     const {files} = this.state;
 
     const thumbs = files.map(file => (
-      <div style={thumb}>
+      <div style={thumb} key={file.name}>
         <div style={thumbInner}>
           <img
             src={file.preview}
@@ -69,12 +71,17 @@ class DropzoneWithPreview extends React.Component {
 
     return (
       <section>
-        <div className="dropzone">
-          <Dropzone
-            accept="image/*"
-            onDrop={this.onDrop.bind(this)}
-          />
-        </div>
+        <Dropzone
+          accept="image/*"
+          onDrop={this.onDrop.bind(this)}
+        >
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Drop files here</p>
+            </div>
+          )}
+        </Dropzone>
         <aside style={thumbsContainer}>
           {thumbs}
         </aside>

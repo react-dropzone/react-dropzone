@@ -33,36 +33,87 @@ yarn add react-dropzone
 
 ## Usage
 
-Import `Dropzone` in your React component:
-
 ```javascript static
+import React from 'react'
+import classNames from 'classnames'
 import Dropzone from 'react-dropzone'
-```
 
-  and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
+class MyDropzone extends React.Component {
+   onDrop = (acceptedFiles, rejectedFiles) => {
+     // Do something with files
+   }
 
-```javascript static
-function onDrop(acceptedFiles, rejectedFiles) {
-  // do stuff with files...
+   render() {
+    return (
+      <Dropzone onDrop={this.onDrop}>
+        {({getRootProps, getInputProps, isDragActive}) => {
+          return (
+            <div
+              {...getRootProps()}
+              className={classNames('dropzone', {'dropzone--isActive': isDragActive})}
+            >
+              <input {...getInputProps()} />
+              {
+                isDragActive ?
+                  <p>Drop files here...</p> :
+                  <p>Try dropping some files here, or click to select files to upload.</p>
+              }
+            </div>
+          )
+        }}
+      </Dropzone>
+    );
+  }
 }
 ```
 
-Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
+## Render Prop Function
 
-Please note that `onDrop` method will always be called regardless if dropped file was accepted or rejected. The `onDropAccepted` method will be called if all dropped files were accepted and the `onDropRejected` method will be called if any of the dropped files was rejected.
+The render property function is what you use to render whatever you want to based on the state of `Dropzone`:
+```jsx static
+<Dropzone>
+  {({getRootProps}) => <div {...getRootProps()} />}
+</Dropzone>
+```
 
-Using `react-dropzone` is similar to using a file form field, but instead of getting the `files` property from the field, you listen to the `onDrop` callback to handle the files. Simple explanation here: http://abandon.ie/notebook/simple-file-uploads-using-jquery-ajax
+### Prop Getters
+See https://react-dropzone.netlify.com/#proptypes `{children}` for more info.
 
-Specifying the `onDrop` method, provides you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then send to a server. For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+These functions are used to apply props to the elements that you render.
+
+This gives you maximum flexibility to render what, when, and wherever you like. You call these on the element in question (for example: `<div {...getRootProps()} />`).
+
+You should pass all your props to that function rather than applying them on the element yourself to avoid your props being overridden (or overriding the props returned).
+E.g.
+```jsx static
+<div
+  {...getRootProps({
+    onClick: evt => console.log(event)
+  })}
+/>
+```
+
+### State
+See https://react-dropzone.netlify.com/#proptypes `{children}` for more info.
+
+### Custom refKey
+
+Both `getRootProps` and `getInputProps` accept custom `refKey` (defaulted to `ref`) as one of the attributes passed down in the parameter.
 
 ```javascript static
-onDrop: acceptedFiles => {
-    const req = request.post('/upload');
-    acceptedFiles.forEach(file => {
-        req.attach(file.name, file);
-    });
-    req.end(callback);
-}
+const StyledDropArea = styled.div`
+// Some styling here
+`
+const Example = () => (
+  <Dropzone>
+   {({ getRootProps, getInputProps }) => (
+      <StyledDropArea {...getRootProps({ refKey: 'innerRef' })}>
+        <input {...getInputProps()} />
+        <p>Drop some files here</p>
+      </StyledDropArea>
+    )}
+  </Dropzone>
+);
 ```
 
 **Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).

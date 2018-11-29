@@ -1,16 +1,17 @@
-Dropzone with default properties and displays list of the dropped files.
+By default, Dropzone just renders provided children without applying any styles.  
+
 
 ```jsx harmony
 class Basic extends React.Component {
   constructor() {
     super()
-    this.state = { files: [] }
+    this.state = {
+      files: []
+    }
   }
 
   onDrop(files) {
-    this.setState({
-      files
-    });
+    this.setState({files});
   }
 
   onCancel() {
@@ -20,23 +21,28 @@ class Basic extends React.Component {
   }
 
   render() {
+    const files = this.state.files.map(file => (
+      <li key={file.name}>
+        {file.name} - {file.size} bytes
+      </li>
+    ))
+
     return (
       <section>
-        <div className="dropzone">
-          <Dropzone
-            onDrop={this.onDrop.bind(this)}
-            onFileDialogCancel={this.onCancel.bind(this)}
-          >
-            <p>Try dropping some files here, or click to select files to upload.</p>
-          </Dropzone>
-        </div>
+        <Dropzone
+          onDrop={this.onDrop.bind(this)}
+          onFileDialogCancel={this.onCancel.bind(this)}
+        >
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+                <p>Drop files here, or click to select files</p>
+            </div>
+          )}
+        </Dropzone>
         <aside>
-          <h2>Dropped files</h2>
-          <ul>
-            {
-              this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
-            }
-          </ul>
+          <h4>Files</h4>
+          <ul>{files}</ul>
         </aside>
       </section>
     );
@@ -52,33 +58,55 @@ Dropzone with `disabled` property:
 class Basic extends React.Component {
   constructor() {
     super()
-    this.state = { disabled: true, files: [] }
+    this.state = {
+      disabled: true,
+      files: []
+    }
   }
 
   onDrop(files) {
+    this.setState({files});
+  }
+
+  toggleDisabled() {
     this.setState({
-      files
-    });
+      disabled: !this.state.disabled
+    })
   }
 
   render() {
+    const files = this.state.files.map(file => (
+      <li key={file.name}>
+        {file.name} - {file.size} bytes
+      </li>
+    ))
+
     return (
       <section>
         <aside>
-          <button type="button" onClick={() => this.setState({ disabled: !this.state.disabled })}>Toggle disabled</button>
+          <button
+            type="button"
+            onClick={this.toggleDisabled.bind(this)}
+          >
+            Toggle disabled
+          </button>
         </aside>
         <div className="dropzone">
-          <Dropzone onDrop={this.onDrop.bind(this)} disabled={this.state.disabled}>
-            <p>Try dropping some files here, or click to select files to upload.</p>
+          <Dropzone
+            onDrop={this.onDrop.bind(this)}
+            disabled={this.state.disabled}
+          >
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                 <p>Drop files here, or click to select files</p>
+              </div>
+            )}
           </Dropzone>
         </div>
         <aside>
-          <h2>Dropped files</h2>
-          <ul>
-            {
-              this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
-            }
-          </ul>
+          <h4>Files</h4>
+          <ul>{files}</ul>
         </aside>
       </section>
     );

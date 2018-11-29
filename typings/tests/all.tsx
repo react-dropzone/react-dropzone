@@ -1,7 +1,7 @@
 import React from "react";
 import Dropzone from "../../";
 
-class Test extends React.Component {
+export default class Test extends React.Component {
   dz: Dropzone;
 
   open() {
@@ -14,10 +14,6 @@ class Test extends React.Component {
     return (
       <div>
         <Dropzone
-          ref={node => {
-            this.dz = node;
-          }}
-          onClick={event => console.log(event)}
           onDrop={(acceptedFiles, rejectedFiles, event) =>
             console.log(acceptedFiles, rejectedFiles, event)}
           onDragStart={event => console.log(event)}
@@ -27,16 +23,6 @@ class Test extends React.Component {
           onDropAccepted={event => console.log(event)}
           onDropRejected={event => console.log(event)}
           onFileDialogCancel={() => console.log("abc")}
-          style={{ borderStyle: "dashed" }}
-          activeStyle={{ borderStyle: "dotted" }}
-          acceptStyle={{ borderStyle: "dotted" }}
-          rejectStyle={{ borderStyle: "dotted" }}
-          disabledStyle={{ borderStyle: "dotted" }}
-          className="regular"
-          activeClassName="active"
-          acceptClassName="accept"
-          rejectClassName="reject"
-          disabledClassName="disabled"
           minSize={2000}
           maxSize={Infinity}
           preventDropOnDocument
@@ -45,13 +31,14 @@ class Test extends React.Component {
           multiple={false}
           accept="*.png"
           name="dropzone"
-          inputProps={{ id: "dropzone" }}
         >
-          Hi
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
         </Dropzone>
       </div>
     );
   }
 }
-
-export default Test;

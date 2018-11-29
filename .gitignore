@@ -14,5 +14,7 @@ styleguide
 
 .DS_Store
 
+.envrc
+
 coverage
 Changelog.md
