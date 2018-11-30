@@ -44,20 +44,13 @@ class DropzoneWithPreview extends React.Component {
 
   onDrop(files) {
     this.setState({
-      files: files.map(file => ({
-        ...file,
-        preview: URL.createObjectURL(file)
-      }))
+      files: files.map(file => Object.assign(file, {preview: URL.createObjectURL(file)}))
     });
   }
 
   componentWillUnmount() {
     // Make sure to revoke the data uris to avoid memory leaks
-    const {files} = this.state;
-    for (let i = files.length; i >= 0; i--) {
-      const file = files[0];
-      URL.revokeObjectURL(file.preview);
-    }
+    this.state.files.forEach(f => URL.revokeObjectURL(f.preview))
   }
 
   render() {
