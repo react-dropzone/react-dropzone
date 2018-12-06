@@ -1,4 +1,4 @@
-import { getDataTransferItems, isIeOrEdge, isFileList } from './'
+import { getDataTransferItems, isIeOrEdge, isKindFile, isDragDataWithFiles } from './'
 
 const files = [
   {
@@ -17,20 +17,6 @@ const files = [
     type: 'image/jpeg'
   }
 ]
-
-const nonFileItems = [
-  {
-    kind: 'string',
-    type: 'text/plain'
-  }
-]
-
-const json = JSON.stringify({
-  ping: true
-})
-const file = new File([json], 'test.json', {
-  type: 'application/json'
-})
 
 const fileItems = [
   {
@@ -138,12 +124,35 @@ describe('isIeOrEdge', () => {
   })
 })
 
-describe('isFileList', () => {
-  it('should only return true for an Array of File objects or DataTransferItem of kind file', () => {
-    expect(isFileList([file])).toBe(true)
-    expect(isFileList(fileItems)).toBe(true)
-    expect(isFileList(nonFileItems)).toBe(false)
-    expect(isFileList([])).toBe(false)
-    expect(isFileList(null)).toBe(false)
+describe('isKindFile()', () => {
+  it('should return true for DataTransferItem of kind "file"', () => {
+    expect(isKindFile({ kind: 'file' })).toBe(true)
+    expect(isKindFile({ kind: 'text/html' })).toBe(false)
+    expect(isKindFile({})).toBe(false)
+    expect(isKindFile(null)).toBe(false)
+  })
+})
+
+describe('isDragDataWithFiles()', () => {
+  it('should return true if every dragged type is a file', () => {
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['Files'] } })).toBe(true)
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['application/x-moz-file'] } })).toBe(true)
+    expect(
+      isDragDataWithFiles({
+        dataTransfer: { types: ['Files', 'application/x-moz-file'] }
+      })
+    ).toBe(true)
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['text/plain'] } })).toBe(false)
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['text/html'] } })).toBe(false)
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['Files', 'text/html'] } })).toBe(false)
+    expect(
+      isDragDataWithFiles({
+        dataTransfer: { types: ['application/x-moz-file', 'text/html'] }
+      })
+    ).toBe(false)
+  })
+
+  it('should return true if {dataTransfer} is not defined', () => {
+    expect(isDragDataWithFiles({})).toBe(true)
   })
 })

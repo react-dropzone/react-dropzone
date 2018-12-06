@@ -1,17 +1,16 @@
-/* global process */
 /* eslint prefer-template: 0 */
 
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
+  isDragDataWithFiles,
   supportMultiple,
   fileAccepted,
   allFilesAccepted,
   fileMatchSize,
   onDocumentDragOver,
   getDataTransferItems as defaultGetDataTransferItem,
-  isIeOrEdge,
-  isFileList
+  isIeOrEdge
 } from './utils'
 import styles from './utils/styles'
 
@@ -28,6 +27,7 @@ class Dropzone extends React.Component {
     this.onDrop = this.onDrop.bind(this)
     this.onFileDialogCancel = this.onFileDialogCancel.bind(this)
     this.onInputElementClick = this.onInputElementClick.bind(this)
+    this.open = this.open.bind(this)
 
     this.setRef = this.setRef.bind(this)
     this.setRefs = this.setRefs.bind(this)
@@ -85,11 +85,10 @@ class Dropzone extends React.Component {
   }
 
   onDragStart(evt) {
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragStart) {
-        this.props.onDragStart.call(this, evt)
-      }
-    })
+    evt.persist()
+    if (this.props.onDragStart && isDragDataWithFiles(evt)) {
+      this.props.onDragStart.call(this, evt)
+    }
   }
 
   onDragEnter(evt) {
@@ -102,24 +101,30 @@ class Dropzone extends React.Component {
 
     evt.persist()
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles)) {
-        this.setState({
-          isDragActive: true, // Do not rely on files for the drag state. It doesn't work in Safari.
-          draggedFiles
-        })
-
-        if (this.props.onDragEnter) {
-          this.props.onDragEnter.call(this, evt)
+    if (isDragDataWithFiles(evt)) {
+      Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
+        if (evt.isPropagationStopped()) {
+          return
         }
+
+        this.setState({
+          draggedFiles,
+          // Do not rely on files for the drag state. It doesn't work in Safari.
+          isDragActive: true
+        })
+      })
+
+      if (this.props.onDragEnter) {
+        this.props.onDragEnter.call(this, evt)
       }
-    })
+    }
   }
 
   onDragOver(evt) {
     // eslint-disable-line class-methods-use-this
     evt.preventDefault()
-    evt.stopPropagation()
+    evt.persist()
+
     try {
       // The file dialog on Chrome allows users to drag files from the dialog onto
       // the dropzone, causing the browser the crash when the file dialog is closed.
@@ -129,17 +134,16 @@ class Dropzone extends React.Component {
       // continue regardless of error
     }
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragOver) {
-        this.props.onDragOver.call(this, evt)
-      }
-    })
+    if (this.props.onDragOver && isDragDataWithFiles(evt)) {
+      this.props.onDragOver.call(this, evt)
+    }
 
     return false
   }
 
   onDragLeave(evt) {
     evt.preventDefault()
+    evt.persist()
 
     // Only deactivate once the dropzone and all children have been left.
     this.dragTargets = this.dragTargets.filter(el => el !== evt.target && this.node.contains(el))
@@ -153,11 +157,9 @@ class Dropzone extends React.Component {
       draggedFiles: []
     })
 
-    Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-      if (isFileList(draggedFiles) && this.props.onDragLeave) {
-        this.props.onDragLeave.call(this, evt)
-      }
-    })
+    if (this.props.onDragLeave && isDragDataWithFiles(evt)) {
+      this.props.onDragLeave.call(this, evt)
+    }
   }
 
   onDrop(evt) {
@@ -166,7 +168,6 @@ class Dropzone extends React.Component {
       onDropAccepted,
       onDropRejected,
       multiple,
-      disablePreview,
       accept,
       getDataTransferItems
     } = this.props
@@ -190,70 +191,70 @@ class Dropzone extends React.Component {
       draggedFiles: []
     })
 
-    Promise.resolve(getDataTransferItems(evt)).then(fileList => {
-      const acceptedFiles = []
-      const rejectedFiles = []
+    if (isDragDataWithFiles(evt)) {
+      Promise.resolve(getDataTransferItems(evt)).then(fileList => {
+        const acceptedFiles = []
+        const rejectedFiles = []
 
-      fileList.forEach(file => {
-        if (!disablePreview) {
-          try {
-            file.preview = window.URL.createObjectURL(file) // eslint-disable-line no-param-reassign
-          } catch (err) {
-            if (process.env.NODE_ENV !== 'production') {
-              console.error('Failed to generate preview for file', file, err) // eslint-disable-line no-console
-            }
+        if (evt.isPropagationStopped()) {
+          return
+        }
+
+        fileList.forEach(file => {
+          if (
+            fileAccepted(file, accept) &&
+            fileMatchSize(file, this.props.maxSize, this.props.minSize)
+          ) {
+            acceptedFiles.push(file)
+          } else {
+            rejectedFiles.push(file)
           }
+        })
+
+        if (!multiple && acceptedFiles.length > 1) {
+          // if not in multi mode add any extra accepted files to rejected.
+          // This will allow end users to easily ignore a multi file drop in "single" mode.
+          rejectedFiles.push(...acceptedFiles.splice(0))
         }
 
-        if (
-          fileAccepted(file, accept) &&
-          fileMatchSize(file, this.props.maxSize, this.props.minSize)
-        ) {
-          acceptedFiles.push(file)
-        } else {
-          rejectedFiles.push(file)
-        }
+        // Update `acceptedFiles` and `rejectedFiles` state
+        // This will make children render functions receive the appropriate
+        // values
+        this.setState({ acceptedFiles, rejectedFiles }, () => {
+          if (onDrop) {
+            onDrop.call(this, acceptedFiles, rejectedFiles, evt)
+          }
+
+          if (rejectedFiles.length > 0 && onDropRejected) {
+            onDropRejected.call(this, rejectedFiles, evt)
+          }
+
+          if (acceptedFiles.length > 0 && onDropAccepted) {
+            onDropAccepted.call(this, acceptedFiles, evt)
+          }
+        })
       })
-
-      if (!multiple && acceptedFiles.length > 1) {
-        // if not in multi mode add any extra accepted files to rejected.
-        // This will allow end users to easily ignore a multi file drop in "single" mode.
-        rejectedFiles.push(...acceptedFiles.splice(0))
-      }
-
-      if (isFileList(fileList) && onDrop) {
-        onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-      }
-
-      if (rejectedFiles.length > 0 && onDropRejected) {
-        onDropRejected.call(this, rejectedFiles, evt)
-      }
-
-      if (acceptedFiles.length > 0 && onDropAccepted) {
-        onDropAccepted.call(this, acceptedFiles, evt)
-      }
-
-      // Update `acceptedFiles` and `rejectedFiles` state
-      // This will make children render functions receive the appropriate
-      // values
-      this.setState({ acceptedFiles, rejectedFiles })
-    })
+    }
   }
 
   onClick(evt) {
     const { onClick, disableClick } = this.props
-    if (!disableClick) {
-      evt.stopPropagation()
 
-      if (onClick) {
-        onClick.call(this, evt)
-      }
+    // if onClick prop is given, run it first
+    if (onClick) {
+      onClick.call(this, evt)
+    }
+
+    // if disableClick is not set and the event hasn't been default prefented within
+    // the onClick listener, open the file dialog
+    if (!disableClick && !evt.isDefaultPrevented()) {
+      evt.stopPropagation()
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
       // this is so react can handle state changes in the onClick prop above above
       // see: https://github.com/react-dropzone/react-dropzone/issues/450
       if (isIeOrEdge()) {
-        setTimeout(this.open.bind(this), 0)
+        setTimeout(this.open, 0)
       } else {
         this.open()
       }
@@ -263,7 +264,7 @@ class Dropzone extends React.Component {
   onInputElementClick(evt) {
     evt.stopPropagation()
     if (this.props.inputProps && this.props.inputProps.onClick) {
-      this.props.inputProps.onClick()
+      this.props.inputProps.onClick(evt)
     }
   }
 
@@ -279,11 +280,11 @@ class Dropzone extends React.Component {
 
           if (!files.length) {
             this.isFileDialogActive = false
-          }
-        }
 
-        if (typeof onFileDialogCancel === 'function') {
-          onFileDialogCancel()
+            if (typeof onFileDialogCancel === 'function') {
+              onFileDialogCancel()
+            }
+          }
         }
       }, 300)
     }
@@ -313,7 +314,8 @@ class Dropzone extends React.Component {
         ...this.state,
         isDragActive,
         isDragAccept,
-        isDragReject
+        isDragReject,
+        open: this.open
       })
     }
     return children
@@ -368,7 +370,7 @@ class Dropzone extends React.Component {
     if (noStyles) {
       style = styles.default
       activeStyle = styles.active
-      acceptStyle = styles.active
+      acceptStyle = styles.accepted
       rejectStyle = styles.rejected
       disabledStyle = styles.disabled
     }
@@ -428,7 +430,6 @@ class Dropzone extends React.Component {
     const {
       acceptedFiles,
       preventDropOnDocument,
-      disablePreview,
       disableClick,
       onDropAccepted,
       onDropRejected,
@@ -496,11 +497,6 @@ Dropzone.propTypes = {
    * Enable/disable the dropzone entirely
    */
   disabled: PropTypes.bool,
-
-  /**
-   * Enable/disable preview generation
-   */
-  disablePreview: PropTypes.bool,
 
   /**
    * If false, allow dropped items to take over the current browser window
@@ -639,7 +635,6 @@ Dropzone.propTypes = {
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disabled: false,
-  disablePreview: false,
   disableClick: false,
   inputProps: {},
   multiple: true,

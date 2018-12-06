@@ -43,15 +43,15 @@ Import `Dropzone` in your React component:
 
 ```javascript static
 import Dropzone from 'react-dropzone'
-``` 
-  
+```
+
   and specify the `onDrop` method that accepts two arguments. The first argument represents the accepted files and the second argument the rejected files.
-  
+
 ```javascript static
 function onDrop(acceptedFiles, rejectedFiles) {
   // do stuff with files...
 }
-``` 
+```
 
 Files accepted or rejected based on `accept` prop. This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file).
 
@@ -94,10 +94,6 @@ onDrop: acceptedFiles => {
 
 See https://react-dropzone.netlify.com/#proptypes
 
-### Word of caution when working with previews
-
-*Important*: `react-dropzone` doesn't manage dropped files. You need to destroy the object URL yourself whenever you don't need the `preview` by calling `window.URL.revokeObjectURL(file.preview);` to avoid memory leaks.
-
 ### Testing
 
 *Important*: `react-dropzone` makes its drag'n'drop callbacks asynchronous to enable promise based getDataTransfer functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
@@ -118,15 +114,15 @@ it('tests drag state', async () => {
   })
   await flushPromises(dropzone)
   dropzone.update()
-  
-  const child = updatedDropzone.find(DummyChildComponent)
+
+  const child = dropzone.find(DummyChildComponent)
   expect(child).toHaveProp('isDragActive', true)
   expect(child).toHaveProp('isDragAccept', false)
   expect(child).toHaveProp('isDragReject', true)
 })
 ```
 
-Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own test suite.
+Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own [test suite](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
 
 ## Support
 

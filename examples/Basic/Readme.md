@@ -13,11 +13,20 @@ class Basic extends React.Component {
     });
   }
 
+  onCancel() {
+    this.setState({
+      files: []
+    });
+  }
+
   render() {
     return (
       <section>
         <div className="dropzone">
-          <Dropzone onDrop={this.onDrop.bind(this)}>
+          <Dropzone
+            onDrop={this.onDrop.bind(this)}
+            onFileDialogCancel={this.onCancel.bind(this)}
+          >
             <p>Try dropping some files here, or click to select files to upload.</p>
           </Dropzone>
         </div>
@@ -67,7 +76,7 @@ class Basic extends React.Component {
           <h2>Dropped files</h2>
           <ul>
             {
-              this.state.files.map(f => <li>{f.name} - {f.size} bytes</li>)
+              this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
             }
           </ul>
         </aside>
