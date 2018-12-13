@@ -751,67 +751,6 @@ describe('Dropzone', () => {
       expect(props.onDragLeave).toHaveBeenCalled()
     })
 
-    it('should guard dropEffect in onDragOver for IE', async () => {
-      const props = {
-        onDragStart: jest.fn(),
-        onDragEnter: jest.fn(),
-        onDragLeave: jest.fn()
-      }
-      const component = mount(
-        <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-            </div>
-          )}
-        </Dropzone>
-      )
-
-      // Using Proxy we'll emulate IE throwing when setting dataTransfer.dropEffect
-      const eventProxy = {
-        persist() {},
-        preventDefault() {},
-        stopPropagation() {},
-        dataTransfer: new Proxy(
-          {},
-          {
-            set: (target, prop) => {
-              switch (prop) {
-                case 'dropEffect':
-                  throw new Error('IE does not support setting {dropEffect}')
-                default:
-                  break
-              }
-            }
-          }
-        )
-      }
-
-      // And using then we'll call the onDragOver with the proxy instead of event
-      const instance = component.instance()
-      const componentOnDragOver = instance.onDragOver
-      const onDragOver = jest
-        .spyOn(instance, 'onDragOver')
-        .mockImplementation(() => componentOnDragOver(eventProxy))
-
-      component.simulate('dragStart', createDtWithFiles(files))
-      await flushPromises(component)
-      expect(props.onDragStart).toHaveBeenCalled()
-
-      component.simulate('dragEnter', createDtWithFiles(files))
-      await flushPromises(component)
-      expect(props.onDragEnter).toHaveBeenCalled()
-
-      component.simulate('dragLeave', createDtWithFiles(files))
-      await flushPromises(component)
-      expect(props.onDragLeave).toHaveBeenCalled()
-
-      // It should not throw the error
-      component.simulate('dragOver', createDtWithFiles(files))
-      await flushPromises(component)
-      expect(onDragOver).not.toThrow()
-    })
-
     it('should not call onDrag* if there are no files', async () => {
       const props = {
         onDragStart: jest.fn(),
