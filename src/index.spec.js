@@ -611,7 +611,7 @@ describe('Dropzone', () => {
   })
 
   describe('onKeyDown', () => {
-    it('opens the file dialog on SPACE/ENTER', async () => {
+    it('opens the file dialog on SPACE/ENTER if component is in focus', async () => {
       const dropzone = mount(
         <Dropzone>
           {({ getRootProps, getInputProps }) => (
@@ -622,16 +622,19 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       const open = jest.spyOn(dropzone.instance(), 'open')
+
       dropzone.simulate('keydown', {
         keyCode: 32,
         isDefaultPrevented: () => false,
         preventDefault() {}
       })
+
       dropzone.simulate('keydown', {
         keyCode: 13,
         isDefaultPrevented: () => false,
         preventDefault() {}
       })
+
       expect(open).toHaveBeenCalledTimes(2)
     })
 
@@ -654,6 +657,40 @@ describe('Dropzone', () => {
       expect(open).not.toHaveBeenCalled()
     })
 
+    it('does not react to keydown if component is not in focus', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.find('input').simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(open).not.toHaveBeenCalled()
+    })
+
+    it('does not react to keydown from child components', async () => {
+      const dropzone = mount(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.find('input').simulate('keydown', { keyCode: 13 })
+      expect(open).not.toHaveBeenCalled()
+    })
+
     it('calls user supplied onKeyDown', async () => {
       const onKeyDown = jest.fn()
       const dropzone = mount(
@@ -673,6 +710,25 @@ describe('Dropzone', () => {
       })
       expect(onKeyDown).toHaveBeenCalled()
       expect(open).toHaveBeenCalled()
+    })
+
+    it('does not call user supplied onKeyDown if component is not in focus', async () => {
+      const onKeyDown = jest.fn()
+      const dropzone = mount(
+        <Dropzone onKeyDown={onKeyDown}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      dropzone.find('input').simulate('keydown', {
+        keyCode: 32,
+        isDefaultPrevented: () => false,
+        preventDefault() {}
+      })
+      expect(onKeyDown).not.toHaveBeenCalled()
     })
 
     it('does not react to keydown if user-supplied onKeyDown prevents default', async () => {

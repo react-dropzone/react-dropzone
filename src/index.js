@@ -270,9 +270,14 @@ class Dropzone extends React.Component {
 
   onKeyDown = evt => {
     const { onKeyDown } = this.props
+    if (!this.node.isEqualNode(evt.target)) {
+      return
+    }
+
     if (onKeyDown) {
       onKeyDown.call(this, evt)
     }
+
     if (!evt.isDefaultPrevented() && (evt.keyCode === 32 || evt.keyCode === 13)) {
       evt.preventDefault()
       this.open()
