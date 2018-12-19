@@ -150,12 +150,14 @@ describe('isDragDataWithFiles()', () => {
     ).toBe(true)
     expect(isDragDataWithFiles({ dataTransfer: { types: ['text/plain'] } })).toBe(false)
     expect(isDragDataWithFiles({ dataTransfer: { types: ['text/html'] } })).toBe(false)
-    expect(isDragDataWithFiles({ dataTransfer: { types: ['Files', 'text/html'] } })).toBe(false)
+    expect(isDragDataWithFiles({ dataTransfer: { types: ['Files', 'application/test'] } })).toBe(
+      true
+    )
     expect(
       isDragDataWithFiles({
-        dataTransfer: { types: ['application/x-moz-file', 'text/html'] }
+        dataTransfer: { types: ['application/x-moz-file', 'application/test'] }
       })
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('should return true if {dataTransfer} is not defined', () => {
