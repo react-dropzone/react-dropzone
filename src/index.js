@@ -208,7 +208,7 @@ class Dropzone extends React.Component {
 
     // if disableClick is not set and the event hasn't been default prefented within
     // the onClick listener, open the file dialog
-    if (!disableClick && !evt.isDefaultPrevented()) {
+    if (!disableClick && !evt.defaultPrevented) {
       evt.stopPropagation()
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
@@ -253,7 +253,7 @@ class Dropzone extends React.Component {
     if (onFocus) {
       onFocus.call(this, evt)
     }
-    if (!evt.isDefaultPrevented()) {
+    if (!evt.defaultPrevented) {
       this.setState({ isFocused: true })
     }
   }
@@ -263,7 +263,7 @@ class Dropzone extends React.Component {
     if (onBlur) {
       onBlur.call(this, evt)
     }
-    if (!evt.isDefaultPrevented()) {
+    if (!evt.defaultPrevented) {
       this.setState({ isFocused: false })
     }
   }
@@ -278,7 +278,7 @@ class Dropzone extends React.Component {
       onKeyDown.call(this, evt)
     }
 
-    if (!evt.isDefaultPrevented() && (evt.keyCode === 32 || evt.keyCode === 13)) {
+    if (!evt.defaultPrevented && (evt.keyCode === 32 || evt.keyCode === 13)) {
       evt.preventDefault()
       this.open()
     }

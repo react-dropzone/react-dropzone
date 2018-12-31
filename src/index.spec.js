@@ -516,7 +516,7 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('focus', { defaultPrevented: false })
       expect(dropzone.find('.dropzone-focused')).toHaveLength(1)
     })
 
@@ -531,7 +531,7 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('focus', { defaultPrevented: false })
       expect(dropzone.state('isFocused')).toBe(true)
       expect(onFocus).toHaveBeenCalled()
     })
@@ -539,7 +539,7 @@ describe('Dropzone', () => {
     it('does not set focus state if user supplied onFocus prevented default', async () => {
       const onFocus = jest.fn().mockImplementationOnce(evt => {
         Object.assign(evt, {
-          isDefaultPrevented: () => true
+          defaultPrevented: true
         })
       })
       const dropzone = mount(
@@ -568,9 +568,9 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('focus', { defaultPrevented: false })
       expect(dropzone.find('.dropzone-focused')).toHaveLength(1)
-      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+      dropzone.simulate('blur', { defaultPrevented: false })
       expect(dropzone.find('.dropzone-focused')).toHaveLength(0)
     })
 
@@ -585,14 +585,14 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-      dropzone.simulate('blur', { isDefaultPrevented: () => false })
+      dropzone.simulate('blur', { defaultPrevented: false })
       expect(onBlur).toHaveBeenCalled()
     })
 
     it('does not unset focus state if user supplied onBlur prevented default', async () => {
       const onBlur = jest.fn().mockImplementationOnce(evt => {
         Object.assign(evt, {
-          isDefaultPrevented: () => true
+          defaultPrevented: true
         })
       })
       const dropzone = mount(
@@ -604,7 +604,7 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-      dropzone.simulate('focus', { isDefaultPrevented: () => false })
+      dropzone.simulate('focus', { defaultPrevented: false })
       dropzone.simulate('blur', {})
       expect(onBlur).toHaveBeenCalled()
     })
@@ -625,13 +625,13 @@ describe('Dropzone', () => {
 
       dropzone.simulate('keydown', {
         keyCode: 32,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
 
       dropzone.simulate('keydown', {
         keyCode: 13,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
 
@@ -651,7 +651,7 @@ describe('Dropzone', () => {
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('keydown', {
         keyCode: 32,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
       expect(open).not.toHaveBeenCalled()
@@ -670,7 +670,7 @@ describe('Dropzone', () => {
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.find('input').simulate('keydown', {
         keyCode: 32,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
       expect(open).not.toHaveBeenCalled()
@@ -705,7 +705,7 @@ describe('Dropzone', () => {
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('keydown', {
         keyCode: 32,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
       expect(onKeyDown).toHaveBeenCalled()
@@ -725,7 +725,7 @@ describe('Dropzone', () => {
       )
       dropzone.find('input').simulate('keydown', {
         keyCode: 32,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
       expect(onKeyDown).not.toHaveBeenCalled()
@@ -734,7 +734,7 @@ describe('Dropzone', () => {
     it('does not react to keydown if user-supplied onKeyDown prevents default', async () => {
       const onKeyDown = jest.fn().mockImplementationOnce(evt => {
         Object.assign(evt, {
-          isDefaultPrevented: () => true
+          defaultPrevented: true
         })
       })
       const dropzone = mount(
@@ -765,7 +765,7 @@ describe('Dropzone', () => {
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('keydown', {
         keyCode: 100,
-        isDefaultPrevented: () => false,
+        defaultPrevented: false,
         preventDefault() {}
       })
       expect(open).not.toHaveBeenCalled()
