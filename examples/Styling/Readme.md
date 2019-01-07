@@ -30,9 +30,9 @@ const rejectStyle = {
     let styles = {...baseStyle}
     styles = isDragActive ? {...styles, ...activeStyle} : styles
     styles = isDragReject ? {...styles, ...rejectStyle} : styles
-          
+
     return (
-      <div 
+      <div
         {...getRootProps()}
         style={styles}
       >
@@ -56,9 +56,9 @@ const getColor = (props) => {
   if (props.isDragReject) {
       return '#c66';
   }
-  if (props.isDragActive) {    
+  if (props.isDragActive) {
       return '#6c6';
-  } 
+  }
   return '#666';
 };
 
@@ -73,13 +73,14 @@ const Container = styled.div`
 `;
 
 <Dropzone accept="image/*">
-  {({ getRootProps, isDragActive, isDragAccept, isDragReject, acceptedFiles }) => {
+  {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, acceptedFiles }) => {
     return (
       <Container
         isDragActive={isDragActive}
         isDragReject={isDragReject}
         {...getRootProps()}
       >
+        <input {...getInputProps()} />
         {isDragAccept ? 'Drop' : 'Drag'} files here...
       </Container>
     )
