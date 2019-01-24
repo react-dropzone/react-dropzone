@@ -13,12 +13,6 @@ Simple HTML5-compliant drag'n'drop zone for files built with React.js.
 Documentation and examples: https://react-dropzone.js.org
 Source code: https://github.com/react-dropzone/react-dropzone/
 
----
-
-**Looking for maintainers: https://github.com/react-dropzone/react-dropzone/issues/479**
-
----
-
 ## Installation
 
 Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
