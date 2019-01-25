@@ -15,7 +15,7 @@
     "eslint:src": "eslint .",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
-    "prepare": "npm run build && npm run size",
+    "prepublish": "npm run build && npm run size",
     "logo": "cd logo && sketchtool export artboards logo.sketch",
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
     "size": "size-limit",
