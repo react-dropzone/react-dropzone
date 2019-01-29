@@ -95,6 +95,10 @@ class Dropzone extends React.Component {
     evt.preventDefault()
     evt.persist()
 
+    if (evt.dataTransfer) {
+      evt.dataTransfer.dropEffect = 'copy'
+    }
+
     if (this.props.onDragOver && isDragDataWithFiles(evt)) {
       this.props.onDragOver.call(this, evt)
     }
