@@ -54,13 +54,13 @@ export function isPropagationStopped(evt) {
 }
 
 // React's synthetic events has evt.isDefaultPrevented,
-// but to remain compatibility with other libs (Preact) fall back
-// to check evt.defaultPrevented
+// but to remain compatibility with other libs (Preact) first
+// check evt.defaultPrevented
 export function isDefaultPrevented(evt) {
-  if (typeof evt.isDefaultPrevented === 'function') {
-    return evt.isDefaultPrevented()
-  } else if (typeof evt.defaultPrevented !== 'undefined') {
+  if (typeof evt.defaultPrevented !== 'undefined') {
     return evt.defaultPrevented
+  } else if (typeof evt.isDefaultPrevented === 'function') {
+    return evt.isDefaultPrevented()
   }
   return false
 }
