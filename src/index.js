@@ -11,7 +11,9 @@ import {
   onDocumentDragOver,
   getDataTransferItems as defaultGetDataTransferItem,
   isIeOrEdge,
-  composeEventHandlers
+  composeEventHandlers,
+  isPropagationStopped,
+  isDefaultPrevented
 } from './utils'
 
 class Dropzone extends React.Component {
@@ -73,7 +75,7 @@ class Dropzone extends React.Component {
 
     if (isDragDataWithFiles(evt)) {
       Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-        if (evt.isPropagationStopped()) {
+        if (isPropagationStopped(evt)) {
           return
         }
 
@@ -161,7 +163,7 @@ class Dropzone extends React.Component {
         const acceptedFiles = []
         const rejectedFiles = []
 
-        if (evt.isPropagationStopped()) {
+        if (isPropagationStopped(evt)) {
           return
         }
 
@@ -212,7 +214,7 @@ class Dropzone extends React.Component {
 
     // if disableClick is not set and the event hasn't been default prefented within
     // the onClick listener, open the file dialog
-    if (!disableClick && !evt.isDefaultPrevented()) {
+    if (!disableClick && !isDefaultPrevented(evt)) {
       evt.stopPropagation()
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
@@ -257,7 +259,7 @@ class Dropzone extends React.Component {
     if (onFocus) {
       onFocus.call(this, evt)
     }
-    if (!evt.isDefaultPrevented()) {
+    if (!isDefaultPrevented(evt)) {
       this.setState({ isFocused: true })
     }
   }
@@ -267,7 +269,7 @@ class Dropzone extends React.Component {
     if (onBlur) {
       onBlur.call(this, evt)
     }
-    if (!evt.isDefaultPrevented()) {
+    if (!isDefaultPrevented(evt)) {
       this.setState({ isFocused: false })
     }
   }
@@ -282,7 +284,7 @@ class Dropzone extends React.Component {
       onKeyDown.call(this, evt)
     }
 
-    if (!evt.isDefaultPrevented() && (evt.keyCode === 32 || evt.keyCode === 13)) {
+    if (!isDefaultPrevented(evt) && (evt.keyCode === 32 || evt.keyCode === 13)) {
       evt.preventDefault()
       this.open()
     }

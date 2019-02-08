@@ -41,6 +41,30 @@ export function allFilesAccepted(files, accept) {
   return files.every(file => fileAccepted(file, accept))
 }
 
+// React's synthetic events has evt.isPropagationStopped,
+// but to remain compatibility with other libs (Preact) fall back
+// to check evt.cancelBubble
+export function isPropagationStopped(evt) {
+  if (typeof evt.isPropagationStopped === 'function') {
+    return evt.isPropagationStopped()
+  } else if (typeof evt.cancelBubble !== 'undefined') {
+    return evt.cancelBubble
+  }
+  return false
+}
+
+// React's synthetic events has evt.isDefaultPrevented,
+// but to remain compatibility with other libs (Preact) first
+// check evt.defaultPrevented
+export function isDefaultPrevented(evt) {
+  if (typeof evt.defaultPrevented !== 'undefined') {
+    return evt.defaultPrevented
+  } else if (typeof evt.isDefaultPrevented === 'function') {
+    return evt.isDefaultPrevented()
+  }
+  return false
+}
+
 export function isDragDataWithFiles(evt) {
   if (!evt.dataTransfer) {
     return true

@@ -3,7 +3,9 @@ import {
   isIeOrEdge,
   isKindFile,
   isDragDataWithFiles,
-  composeEventHandlers
+  composeEventHandlers,
+  isPropagationStopped,
+  isDefaultPrevented
 } from './'
 
 const files = [
@@ -136,6 +138,38 @@ describe('isKindFile()', () => {
     expect(isKindFile({ kind: 'text/html' })).toBe(false)
     expect(isKindFile({})).toBe(false)
     expect(isKindFile(null)).toBe(false)
+  })
+})
+
+describe('isPropagationStopped()', () => {
+  const trueFn = jest.fn(() => true)
+
+  it('should return result of isPropagationStopped() if isPropagationStopped exists', () => {
+    expect(isPropagationStopped({ isPropagationStopped: trueFn })).toBe(true)
+  })
+
+  it('should return value of cancelBubble if isPropagationStopped doesnt exist and cancelBubble exists', () => {
+    expect(isPropagationStopped({ cancelBubble: true })).toBe(true)
+  })
+
+  it('should return false if isPropagationStopped and cancelBubble are missing', () => {
+    expect(isPropagationStopped({})).toBe(false)
+  })
+})
+
+describe('isDefaultPrevented()', () => {
+  const trueFn = jest.fn(() => true)
+
+  it('should return value of defaultPrevented if defaultPrevented exists', () => {
+    expect(isDefaultPrevented({ defaultPrevented: true })).toBe(true)
+  })
+
+  it('should return result of isDefaultPrevented() if isDefaultPrevented exists and defaultPrevented is missing', () => {
+    expect(isDefaultPrevented({ isDefaultPrevented: trueFn })).toBe(true)
+  })
+
+  it('should return false if isDefaultPrevented and defaultPrevented are missing', () => {
+    expect(isDefaultPrevented({})).toBe(false)
   })
 })
 
