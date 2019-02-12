@@ -657,6 +657,25 @@ describe('Dropzone', () => {
       expect(open).not.toHaveBeenCalled()
     })
 
+    it('does not react to keydown if component has {disableKeyDown} prop', async () => {
+      const dropzone = mount(
+        <Dropzone disableKeyDown>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const open = jest.spyOn(dropzone.instance(), 'open')
+      dropzone.simulate('keydown', {
+        keyCode: 32,
+        defaultPrevented: false,
+        preventDefault() {}
+      })
+      expect(open).not.toHaveBeenCalled()
+    })
+
     it('does not react to keydown if component is not in focus', async () => {
       const dropzone = mount(
         <Dropzone>

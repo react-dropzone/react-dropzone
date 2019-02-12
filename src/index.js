@@ -275,7 +275,8 @@ class Dropzone extends React.Component {
   }
 
   onKeyDown = evt => {
-    const { onKeyDown } = this.props
+    const { onKeyDown, disableKeyDown } = this.props
+
     if (!this.node.isEqualNode(evt.target)) {
       return
     }
@@ -284,7 +285,7 @@ class Dropzone extends React.Component {
       onKeyDown.call(this, evt)
     }
 
-    if (!isDefaultPrevented(evt) && (evt.keyCode === 32 || evt.keyCode === 13)) {
+    if (!disableKeyDown && !isDefaultPrevented(evt) && (evt.keyCode === 32 || evt.keyCode === 13)) {
       evt.preventDefault()
       this.open()
     }
@@ -438,6 +439,11 @@ Dropzone.propTypes = {
    * Disallow clicking on the dropzone container to open file dialog
    */
   disableClick: PropTypes.bool,
+
+  /**
+   * Do not open the file dialog when SPACE or ENTER is detected on the dropzone
+   */
+  disableKeyDown: PropTypes.bool,
 
   /**
    * Enable/disable the dropzone entirely
