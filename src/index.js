@@ -2,6 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import deprecated from 'prop-types-extra/lib/deprecated'
 import {
   isDragDataWithFiles,
   supportMultiple,
@@ -436,8 +437,13 @@ Dropzone.propTypes = {
 
   /**
    * Disallow clicking on the dropzone container to open file dialog
+   * @deprecated Use onClick={evt => evt.preventDefault()} to prevent the default behaviour (open the file select dialog).
+   * This prop will be removed in the next major version.
    */
-  disableClick: PropTypes.bool,
+  disableClick: deprecated(
+    PropTypes.bool,
+    'Use onClick={evt => evt.preventDefault()} instead. This prop will be removed in the next major version'
+  ),
 
   /**
    * Enable/disable the dropzone entirely
