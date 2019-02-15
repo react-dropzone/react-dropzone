@@ -57,13 +57,6 @@ class Dropzone extends React.Component {
     this.dragTargets = []
   }
 
-  onDragStart = evt => {
-    evt.persist()
-    if (this.props.onDragStart && isDragDataWithFiles(evt)) {
-      this.props.onDragStart.call(this, evt)
-    }
-  }
-
   onDragEnter = evt => {
     evt.preventDefault()
 
@@ -304,7 +297,6 @@ class Dropzone extends React.Component {
     onFocus,
     onBlur,
     onClick,
-    onDragStart,
     onDragEnter,
     onDragOver,
     onDragLeave,
@@ -320,9 +312,6 @@ class Dropzone extends React.Component {
     onBlur: this.composeHandler(onBlur ? composeEventHandlers(onBlur, this.onBlur) : this.onBlur),
     onClick: this.composeHandler(
       onClick ? composeEventHandlers(onClick, this.onClick) : this.onClick
-    ),
-    onDragStart: this.composeHandler(
-      onDragStart ? composeEventHandlers(onDragStart, this.onDragStart) : this.onDragStart
     ),
     onDragEnter: this.composeHandler(
       onDragEnter ? composeEventHandlers(onDragEnter, this.onDragEnter) : this.onDragEnter
@@ -543,11 +532,6 @@ Dropzone.propTypes = {
    * onDropRejected callback
    */
   onDropRejected: PropTypes.func,
-
-  /**
-   * onDragStart callback
-   */
-  onDragStart: PropTypes.func,
 
   /**
    * onDragEnter callback

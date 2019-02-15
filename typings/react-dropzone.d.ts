@@ -62,7 +62,6 @@ type PropTypes = "accept"
   | "onFocus"
   | "onBlur"
   | "onKeyDown"
-  | "onDragStart"
   | "onDragEnter"
   | "onDragOver"
   | "onDragLeave";

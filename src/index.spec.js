@@ -131,7 +131,6 @@ describe('Dropzone', () => {
         onKeyDown: jest.fn(),
         onFocus: jest.fn(),
         onBlur: jest.fn(),
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
@@ -159,10 +158,6 @@ describe('Dropzone', () => {
 
       dropzone.simulate('keydown')
       expect(rootProps.onKeyDown).toHaveBeenCalled()
-
-      await dropzone.simulate('dragStart', evt)
-      await flushPromises(dropzone)
-      expect(rootProps.onDragStart).toHaveBeenCalled()
 
       await dropzone.simulate('dragEnter', evt)
       await flushPromises(dropzone)
@@ -780,7 +775,6 @@ describe('Dropzone', () => {
   describe('drag-n-drop', async () => {
     it('should override onDrag* methods', async () => {
       const props = {
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn()
@@ -794,10 +788,6 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-
-      await component.simulate('dragStart', createDtWithFiles(files))
-      await flushPromises(component)
-      expect(props.onDragStart).toHaveBeenCalled()
 
       await component.simulate('dragEnter', createDtWithFiles(files))
       await flushPromises(component)
@@ -814,7 +804,6 @@ describe('Dropzone', () => {
 
     it('should not call onDrag* if there are no files', async () => {
       const props = {
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
@@ -832,10 +821,6 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-
-      await component.simulate('dragStart', createDtWithTextTypes())
-      await flushPromises(component)
-      expect(props.onDragStart).not.toHaveBeenCalled()
 
       await component.simulate('dragEnter', createDtWithTextTypes())
       await flushPromises(component)
@@ -858,7 +843,6 @@ describe('Dropzone', () => {
 
     it('should call onDrag* if the DataTransfer has files but cannot access the data', async () => {
       const props = {
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
@@ -876,10 +860,6 @@ describe('Dropzone', () => {
           )}
         </Dropzone>
       )
-
-      await component.simulate('dragStart', createDtWithFiles([]))
-      await flushPromises(component)
-      expect(props.onDragStart).toHaveBeenCalled()
 
       await component.simulate('dragEnter', createDtWithFiles([]))
       await flushPromises(component)
@@ -1959,7 +1939,6 @@ describe('Dropzone', () => {
     it('uses the provided plugin fn for getting the files', async () => {
       const props = {
         getDataTransferItems: evt => fromEvent(evt),
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
@@ -1981,10 +1960,6 @@ describe('Dropzone', () => {
         type: 'application/json'
       })
       const files = [file]
-
-      await dropzone.simulate('dragStart', createDtWithFiles(files))
-      await flushPromises(dropzone)
-      expect(props.onDragStart).toHaveBeenCalled()
 
       await dropzone.simulate('dragEnter', createDtWithFiles(files))
       await flushPromises(dropzone)
@@ -2018,7 +1993,6 @@ describe('Dropzone', () => {
     it('ignores the plugin result if it does not comply with the expected type signature', async () => {
       const props = {
         getDataTransferItems: evt => Promise.resolve(evt.dataTransfer.items),
-        onDragStart: jest.fn(),
         onDragEnter: jest.fn(),
         onDragOver: jest.fn(),
         onDragLeave: jest.fn(),
@@ -2045,10 +2019,6 @@ describe('Dropzone', () => {
         }
       ]
       const types = ['text/plain']
-
-      await dropzone.simulate('dragStart', createDtWithItems(items, types))
-      await flushPromises(dropzone)
-      expect(props.onDragStart).not.toHaveBeenCalled()
 
       await dropzone.simulate('dragEnter', createDtWithItems(items, types))
       await flushPromises(dropzone)

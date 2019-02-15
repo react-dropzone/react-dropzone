@@ -63,7 +63,6 @@ class NestedDropzone extends React.Component {
       <section>
         <div className="dropzone">
           <Dropzone
-            onDragStart={this.createDragHandler('dragstart', 'parent')}
             onDragEnter={this.createDragHandler('dragenter', 'parent')}
             onDragOver={this.createDragHandler('dragover', 'parent')}
             onDragLeave={this.createDragHandler('dragleave', 'parent')}
@@ -72,7 +71,6 @@ class NestedDropzone extends React.Component {
             {({getRootProps, getInputProps}) => (
               <div {...getRootProps()} style={parentStyle}>
                 <Dropzone
-                  onDragStart={this.createDragHandler('dragstart', 'child')}
                   onDragEnter={this.createDragHandler('dragenter', 'child')}
                   onDragOver={this.createDragHandler('dragover', 'child')}
                   onDragLeave={this.createDragHandler('dragleave', 'child')}
