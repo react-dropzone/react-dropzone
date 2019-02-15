@@ -70,10 +70,6 @@ module.exports = {
             {
               name: 'Using third-party plugins',
               content: 'examples/PluginArchitecture/Readme.md'
-            },
-            {
-              name: 'Dropzone for folders',
-              content: 'examples/Folders/Readme.md'
             }
           ]
         }

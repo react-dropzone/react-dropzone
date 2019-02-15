@@ -1,6 +1,7 @@
 /* eslint prefer-template: 0 */
 
 import React from 'react'
+import { fromEvent } from 'file-selector'
 import PropTypes from 'prop-types'
 import deprecated from 'prop-types-extra/lib/deprecated'
 import {
@@ -10,7 +11,6 @@ import {
   allFilesAccepted,
   fileMatchSize,
   onDocumentDragOver,
-  getDataTransferItems as defaultGetDataTransferItem,
   isIeOrEdge,
   composeEventHandlers,
   isPropagationStopped,
@@ -577,5 +577,5 @@ Dropzone.defaultProps = {
   multiple: true,
   maxSize: Infinity,
   minSize: 0,
-  getDataTransferItems: defaultGetDataTransferItem
+  getDataTransferItems: fromEvent
 }

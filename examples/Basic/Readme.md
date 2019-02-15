@@ -1,4 +1,6 @@
-By default, Dropzone just renders provided children without applying any styles.  
+By default, Dropzone just renders provided children without applying any styles.
+
+Furthermore, Dropzone supports folders drag 'n' drop. See [file-selector](https://github.com/react-dropzone/file-selector) for more info about supported browsers.
 
 
 ```jsx harmony

@@ -25,11 +25,11 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "6 KB"
+      "limit": "7 KB"
     },
     {
       "path": "dist/es/index.js",
-      "limit": "6 KB"
+      "limit": "7 KB"
     }
   ],
   "lint-staged": {
@@ -82,6 +82,7 @@
   },
   "dependencies": {
     "attr-accept": "^1.1.3",
+    "file-selector": "^0.1.8",
     "prop-types": "^15.6.2",
     "prop-types-extra": "^1.1.0"
   },
@@ -115,7 +116,6 @@
     "eslint-plugin-node": "5.x",
     "eslint-plugin-prettier": "2.x",
     "eslint-plugin-react": "7.x",
-    "file-selector": "^0.1.3",
     "husky": "^0.14.3",
     "imagemin-cli": "^3.0.0",
     "imagemin-pngquant": "^6.0.0",
