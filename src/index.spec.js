@@ -30,6 +30,11 @@ const createDtWithFiles = (files = []) => {
   return {
     dataTransfer: {
       files,
+      items: files.map(file => ({
+        kind: 'file',
+        type: file.type,
+        getAsFile: () => file
+      })),
       types: ['Files']
     }
   }
@@ -1127,8 +1132,9 @@ describe('Dropzone', () => {
     )
 
     const input = component.find('input')
+    Object.defineProperty(input, 'files', { value: files })
     const evt = {
-      target: { files },
+      target: input,
       preventDefault() {},
       isPropagationStopped: () => false,
       persist() {}
@@ -1202,6 +1208,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
     })
 
@@ -1217,6 +1224,7 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles([images[0]]))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([images[0]], [], expectedEvent)
     })
 
@@ -1232,6 +1240,7 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
     })
 
@@ -1246,6 +1255,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
     })
 
@@ -1276,14 +1286,17 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       onDrop.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       onDrop.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(images, files, expectedEvent)
     })
 
@@ -1299,14 +1312,17 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDropAccepted).not.toHaveBeenCalled()
       onDropAccepted.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       onDropAccepted.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
+      await flushPromises(dropzone)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
     })
 
@@ -1322,14 +1338,17 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDropRejected).not.toHaveBeenCalled()
       onDropRejected.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
       onDropRejected.mockClear()
 
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
+      await flushPromises(dropzone)
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
     })
 
@@ -1349,6 +1368,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
@@ -1371,6 +1391,7 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -1394,6 +1415,7 @@ describe('Dropzone', () => {
       const bogusImages = [createFile('bogus.gif', 1234, 'application/x-moz-file')]
 
       await dropzone.simulate('drop', createDtWithFiles(bogusImages))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(bogusImages, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(bogusImages, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -1410,6 +1432,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files.concat(images), expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -1432,6 +1455,7 @@ describe('Dropzone', () => {
       )
 
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(files, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -1453,6 +1477,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], images, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(images, expectedEvent)
@@ -1474,6 +1499,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith([], files, expectedEvent)
       expect(onDropAccepted).not.toHaveBeenCalled()
       expect(onDropRejected).toHaveBeenCalledWith(files, expectedEvent)
@@ -1495,6 +1521,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(images))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(images, [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(images, expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
@@ -1511,6 +1538,7 @@ describe('Dropzone', () => {
         </Dropzone>
       )
       await dropzone.simulate('drop', createDtWithFiles(files.concat(images)))
+      await flushPromises(dropzone)
       expect(onDrop).toHaveBeenCalledWith(files.concat(images), [], expectedEvent)
       expect(onDropAccepted).toHaveBeenCalledWith(files.concat(images), expectedEvent)
       expect(onDropRejected).not.toHaveBeenCalled()
