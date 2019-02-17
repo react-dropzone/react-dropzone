@@ -2,6 +2,7 @@
 const path = require('path')
 const { createConfig, babel } = require('webpack-blocks')
 
+// https://react-styleguidist.js.org/docs/configuration.html
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
@@ -10,68 +11,54 @@ module.exports = {
   usageMode: 'expand',
   showSidebar: false,
   serverPort: 8080,
-  compilerConfig: {
-    transforms: { dangerousTaggedTemplateString: true },
-    objectAssign: 'Object.assign'
+  moduleAliases: {
+    'react-dropzone': path.resolve(__dirname, './src')
   },
   sections: [
     {
       name: '',
       content: 'README.md'
     },
+    // TODO: Figure out how to document the hook
+    // See https://github.com/reactjs/react-docgen/issues/332
     {
-      name: 'PropTypes',
+      name: 'Components',
       components: './src/index.js'
     },
     {
       name: 'Examples',
-      context: {
-        Dropzone: './src/index'
-      },
       sections: [
         {
           name: 'Basic example',
-          content: 'examples/Basic/Readme.md'
+          content: 'examples/basic/README.md'
         },
         {
-          name: 'Events',
-          content: 'examples/Events/README.md'
+          name: 'Event Propagation',
+          content: 'examples/events/README.md'
         },
         {
           name: 'Styling Dropzone',
-          content: 'examples/Styling/Readme.md'
+          content: 'examples/styling/README.md'
         },
         {
           name: 'Accepting specific file types',
-          content: 'examples/Accept/Readme.md'
-        },
-        {
-          name: 'Previews',
-          content: 'examples/Previews/Readme.md'
-        },
-        {
-          name: 'Nested Dropzone',
-          content: 'examples/Nesting/Readme.md'
+          content: 'examples/accept/README.md'
         },
         {
           name: 'Opening File Dialog Programmatically',
-          content: 'examples/FileDialog/Readme.md'
+          content: 'examples/file-dialog/README.md'
         },
         {
-          name: 'Full Screen Dropzone',
-          content: 'examples/Fullscreen/Readme.md'
+          name: 'Previews',
+          content: 'examples/previews/README.md'
+        },
+        {
+          name: 'Class Components',
+          content: 'examples/class-component/README.md'
         },
         {
           name: 'Extending Dropzone',
-          context: {
-            Dropzone: './src/index'
-          },
-          sections: [
-            {
-              name: 'Using third-party plugins',
-              content: 'examples/PluginArchitecture/Readme.md'
-            }
-          ]
+          content: 'examples/plugins/README.md'
         }
       ]
     }

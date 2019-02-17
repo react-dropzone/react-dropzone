@@ -1,249 +1,370 @@
 /* eslint prefer-template: 0 */
-
-import React from 'react'
-import { fromEvent } from 'file-selector'
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState
+} from 'react'
 import PropTypes from 'prop-types'
+import { fromEvent } from 'file-selector'
 import {
-  isDragDataWithFiles,
-  supportMultiple,
-  fileAccepted,
   allFilesAccepted,
-  fileMatchSize,
-  onDocumentDragOver,
-  isIeOrEdge,
   composeEventHandlers,
+  fileAccepted,
+  fileMatchSize,
+  isEvtWithFiles,
+  isIeOrEdge,
   isPropagationStopped,
-  isDefaultPrevented
-} from './utils'
+  onDocumentDragOver,
+  supportMultiple
+} from './utils/index'
 
-class Dropzone extends React.Component {
-  state = {
-    draggedFiles: [],
-    acceptedFiles: [],
-    rejectedFiles: []
+/**
+ * Convenience wrapper component for the `useDropzone` hook
+ *
+ * ```jsx
+ * <Dropzone>
+ *   {({getRootProps, getInputProps}) => (
+ *     <div {...getRootProps()}>
+ *       <input {...getInputProps()} />
+ *       <p>Drag 'n' drop some files here, or click to select files</p>
+ *     </div>
+ *   )}
+ * </Dropzone>
+ * ```
+ */
+function Dropzone({ children, ...params }) {
+  const { ...props } = useDropzone(params)
+  // TODO: Figure out why react-styleguidist cannot create docs if we don't return a jsx element
+  return <Fragment>{children(props)}</Fragment>
+}
+
+Dropzone.propTypes = {
+  /**
+   * Render function that exposes the dropzone state and prop getter fns
+   *
+   * @param {object} params
+   * @param {Function} params.getRootProps Returns the props you should apply to the root drop container you render
+   * @param {Function} params.getInputProps Returns the props you should apply to hidden file input you render
+   * @param {Function} params.open Open the native file selection dialog
+   * @param {boolean} params.isFocused Dropzone area is in focus
+   * @param {boolean} params.isFileDialogActive File dialog is opened
+   * @param {boolean} params.isDragActive Active drag is in progress
+   * @param {boolean} params.isDragAccept Dragged files are accepted
+   * @param {boolean} params.isDragReject Some dragged files are rejected
+   * @param {File[]} params.draggedFiles Files in active drag
+   * @param {File[]} params.acceptedFiles Accepted files
+   * @param {File[]} params.rejectedFiles Rejected files
+   */
+  children: PropTypes.func,
+
+  /**
+   * Set accepted file types.
+   * See https://github.com/okonet/attr-accept for more information.
+   * Keep in mind that mime type determination is not reliable across platforms. CSV files,
+   * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
+   * Windows. In some cases there might not be a mime type set at all.
+   * See: https://github.com/react-dropzone/react-dropzone/issues/276
+   */
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+
+  /**
+   * Allow drag 'n' drop (or selection from the file dialog) of multiple files
+   */
+  multiple: PropTypes.bool,
+
+  /**
+   * If false, allow dropped items to take over the current browser window
+   */
+  preventDropOnDocument: PropTypes.bool,
+
+  /**
+   * Minimum file size (in bytes)
+   */
+  minSize: PropTypes.number,
+
+  /**
+   * Maximum file size (in bytes)
+   */
+  maxSize: PropTypes.number,
+
+  /**
+   * Enable/disable the dropzone
+   */
+  disabled: PropTypes.bool,
+
+  /**
+   * Use this to provide a custom file aggregator
+   *
+   * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+   */
+  getFilesFromEvent: PropTypes.func,
+
+  /**
+   * Cb for when closing the file dialog with no selection
+   */
+  onFileDialogCancel: PropTypes.func,
+
+  /**
+   * Cb for when the `dragenter` event occurs.
+   *
+   * @param {DragEvent} event
+   */
+  onDragEnter: PropTypes.func,
+
+  /**
+   * Cb for when the `dragleave` event occurs
+   *
+   * @param {DragEvent} event
+   */
+  onDragLeave: PropTypes.func,
+
+  /**
+   * Cb for when the `dragover` event occurs
+   *
+   * @param {DragEvent} event
+   */
+  onDragOver: PropTypes.func,
+
+  /**
+   * Cb for when the `drop` event occurs.
+   * Note that this callback is invoked after the `getFilesFromEvent` callback is done.
+   *
+   * Files are accepted or rejected based on the `accept`, `multiple`, `minSize` and `maxSize` props.
+   * `accept` must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
+   * If `multiple` is set to false and additional files are droppped,
+   * all files besides the first will be rejected.
+   * Any file which does not have a size in the [`minSize`, `maxSize`] range, will be rejected as well.
+   *
+   * Note that the `onDrop` callback will always be invoked regardless if the dropped files were accepted or rejected.
+   * If you'd like to react to a specific scenario, use the `onDropAccepted`/`onDropRejected` props.
+   *
+   * `onDrop` will provide you with an array of [File](https://developer.mozilla.org/en-US/docs/Web/API/File) objects which you can then process and send to a server.
+   * For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+   *
+   * ```js
+   * function onDrop(acceptedFiles) {
+   *   const req = request.post('/upload')
+   *   acceptedFiles.forEach(file => {
+   *     req.attach(file.name, file)
+   *   })
+   *   req.end(callback)
+   * }
+   * ```
+   *
+   * @param {File[]} acceptedFiles
+   * @param {File[]} rejectedFiles
+   * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+   */
+  onDrop: PropTypes.func,
+
+  /**
+   * Cb for when the `drop` event occurs.
+   * Note that if no files are accepted, this callback is not invoked.
+   *
+   * @param {File[]} files
+   * @param {(DragEvent|Event)} event
+   */
+  onDropAccepted: PropTypes.func,
+
+  /**
+   * Cb for when the `drop` event occurs.
+   * Note that if no files are rejected, this callback is not invoked.
+   *
+   * @param {object[]} files
+   * @param {(DragEvent|Event)} event
+   */
+  onDropRejected: PropTypes.func
+}
+
+export default Dropzone
+
+/**
+ * A function that is invoked for the `dragenter`,
+ * `dragover` and `dragleave` events.
+ * It is not invoked if the items are not files (such as link, text, etc.).
+ *
+ * @callback dragCb
+ * @param {DragEvent} event
+ */
+
+/**
+ * A function that is invoked for the `drop` or input change event.
+ * It is not invoked if the items are not files (such as link, text, etc.).
+ *
+ * @callback dropCb
+ * @param {File[]} acceptedFiles List of accepted files
+ * @param {File[]} rejectedFiles List of rejected files
+ * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ */
+
+/**
+ * A function that is invoked for the `drop` or input change event.
+ * It is not invoked if the items are files (such as link, text, etc.).
+ *
+ * @callback dropAcceptedCb
+ * @param {File[]} files List of accepted files that meet the given criteria
+ * (`accept`, `multiple`, `minSize`, `maxSize`)
+ * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ */
+
+/**
+ * A function that is invoked for the `drop` or input change event.
+ *
+ * @callback dropRejectedCb
+ * @param {File[]} files List of rejected files that do not meet the given criteria
+ * (`accept`, `multiple`, `minSize`, `maxSize`)
+ * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ */
+
+/**
+ * A function that is used aggregate files,
+ * in a asynchronous fashion, from drag or input change events.
+ *
+ * @callback getFilesFromEvent
+ * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ * @returns {(File[]|Promise<File[]>)}
+ */
+
+/**
+ * An object with the current dropzone state and some helper functions.
+ *
+ * @typedef {object} DropzoneState
+ * @property {Function} getRootProps Returns the props you should apply to the root drop container you render
+ * @property {Function} getInputProps Returns the props you should apply to hidden file input you render
+ * @property {Function} open Open the native file selection dialog
+ * @property {boolean} isFocused Dropzone area is in focus
+ * @property {boolean} isFileDialogActive File dialog is opened
+ * @property {boolean} isDragActive Active drag is in progress
+ * @property {boolean} isDragAccept Dragged files are accepted
+ * @property {boolean} isDragReject Some dragged files are rejected
+ * @property {File[]} draggedFiles Files in active drag
+ * @property {File[]} acceptedFiles Accepted files
+ * @property {File[]} rejectedFiles Rejected files
+ */
+
+const initialState = {
+  isFocused: false,
+  isFileDialogActive: false,
+  isDragActive: false,
+  isDragAccept: false,
+  isDragReject: false,
+  draggedFiles: [],
+  acceptedFiles: [],
+  rejectedFiles: []
+}
+
+/**
+ * A React hook that creates a drag 'n' drop area.
+ *
+ * ```jsx
+ * function MyDropzone(props) {
+ *   const {getRootProps, getInputProps} = useDropzone({
+ *     onDrop: acceptedFiles => {
+ *       // do something with the File objects, e.g. upload to some server
+ *     }
+ *   });
+ *   return (
+ *     <div {...getRootProps()}>
+ *       <input {...getInputProps()} />
+ *       <p>Drag and drop some files here, or click to select files</p>
+ *     </div>
+ *   )
+ * }
+ * ```
+ *
+ * @function useDropzone
+ *
+ * @param {object} props
+ * @param {string|string[]} [props.accept] Set accepted file types.
+ * See https://github.com/okonet/attr-accept for more information.
+ * Keep in mind that mime type determination is not reliable across platforms. CSV files,
+ * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
+ * Windows. In some cases there might not be a mime type set at all.
+ * See: https://github.com/react-dropzone/react-dropzone/issues/276
+ * @param {boolean} [props.multiple=true] Allow drag 'n' drop (or selection from the file dialog) of multiple files
+ * @param {boolean} [props.preventDropOnDocument=true] If false, allow dropped items to take over the current browser window
+ * @param {number} [props.minSize=0] Minimum file size (in bytes)
+ * @param {number} [props.maxSize=Infinity] Maximum file size (in bytes)
+ * @param {boolean} [props.disabled=false] Enable/disable the dropzone
+ * @param {getFilesFromEvent} [props.getFilesFromEvent] Use this to provide a custom file aggregator
+ * @param {Function} [props.onFileDialogCancel] Cb for when closing the file dialog with no selection
+ * @param {dragCb} [props.onDragEnter] Cb for when the `dragenter` event occurs.
+ * @param {dragCb} [props.onDragLeave] Cb for when the `dragleave` event occurs
+ * @param {dragCb} [props.onDragOver] Cb for when the `dragover` event occurs
+ * @param {dropCb} [props.onDrop] Cb for when the `drop` event occurs.
+ * Note that this callback is invoked after the `getFilesFromEvent` callback is done.
+ *
+ * Files are accepted or rejected based on the `accept`, `multiple`, `minSize` and `maxSize` props.
+ * `accept` must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
+ * If `multiple` is set to false and additional files are droppped,
+ * all files besides the first will be rejected.
+ * Any file which does not have a size in the [`minSize`, `maxSize`] range, will be rejected as well.
+ *
+ * Note that the `onDrop` callback will always be invoked regardless if the dropped files were accepted or rejected.
+ * If you'd like to react to a specific scenario, use the `onDropAccepted`/`onDropRejected` props.
+ *
+ * `onDrop` will provide you with an array of [File](https://developer.mozilla.org/en-US/docs/Web/API/File) objects which you can then process and send to a server.
+ * For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
+ *
+ * ```js
+ * function onDrop(acceptedFiles) {
+ *   const req = request.post('/upload')
+ *   acceptedFiles.forEach(file => {
+ *     req.attach(file.name, file)
+ *   })
+ *   req.end(callback)
+ * }
+ * ```
+ * @param {dropAcceptedCb} [props.onDropAccepted]
+ * @param {dropRejectedCb} [props.onDropRejected]
+ *
+ * @returns {DropzoneState}
+ */
+export function useDropzone({
+  accept,
+  disabled = false,
+  getFilesFromEvent = fromEvent,
+  maxSize = Infinity,
+  minSize = 0,
+  multiple = true,
+  onDragEnter,
+  onDragLeave,
+  onDragOver,
+  onDrop,
+  onDropAccepted,
+  onDropRejected,
+  onFileDialogCancel,
+  preventDropOnDocument = true
+} = {}) {
+  const rootRef = useRef(null)
+  const inputRef = useRef(null)
+
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const { isFocused, isFileDialogActive, draggedFiles } = state
+
+  // Fn for opening the file dialog programmatically
+  const openFileDialog = () => {
+    if (inputRef.current) {
+      dispatch({ type: 'openDialog' })
+      inputRef.current.value = null
+      inputRef.current.click()
+    }
   }
 
-  componentDidMount() {
-    const { preventDropOnDocument } = this.props
-    this.dragTargets = []
-
-    if (preventDropOnDocument) {
-      document.addEventListener('dragover', onDocumentDragOver, false)
-      document.addEventListener('drop', this.onDocumentDrop, false)
-    }
-
-    window.addEventListener('focus', this.onFileDialogCancel, false)
-  }
-
-  componentWillUnmount() {
-    const { preventDropOnDocument } = this.props
-    if (preventDropOnDocument) {
-      document.removeEventListener('dragover', onDocumentDragOver)
-      document.removeEventListener('drop', this.onDocumentDrop)
-    }
-
-    window.removeEventListener('focus', this.onFileDialogCancel, false)
-  }
-
-  isFileDialogActive = false
-
-  onDocumentDrop = evt => {
-    if (this.node && this.node.contains(evt.target)) {
-      // if we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
-      return
-    }
-    evt.preventDefault()
-    this.dragTargets = []
-  }
-
-  onDragStart = evt => {
-    evt.persist()
-    if (this.props.onDragStart && isDragDataWithFiles(evt)) {
-      this.props.onDragStart.call(this, evt)
-    }
-  }
-
-  onDragEnter = evt => {
-    evt.preventDefault()
-
-    // Count the dropzone and any children that are entered.
-    if (this.dragTargets.indexOf(evt.target) === -1) {
-      this.dragTargets.push(evt.target)
-    }
-
-    evt.persist()
-
-    if (isDragDataWithFiles(evt)) {
-      Promise.resolve(this.props.getDataTransferItems(evt)).then(draggedFiles => {
-        if (isPropagationStopped(evt)) {
-          return
-        }
-
-        this.setState({
-          draggedFiles,
-          // Do not rely on files for the drag state. It doesn't work in Safari.
-          isDragActive: true
-        })
-      })
-
-      if (this.props.onDragEnter) {
-        this.props.onDragEnter.call(this, evt)
-      }
-    }
-  }
-
-  onDragOver = evt => {
-    // eslint-disable-line class-methods-use-this
-    evt.preventDefault()
-    evt.persist()
-
-    if (evt.dataTransfer) {
-      evt.dataTransfer.dropEffect = 'copy'
-    }
-
-    if (this.props.onDragOver && isDragDataWithFiles(evt)) {
-      this.props.onDragOver.call(this, evt)
-    }
-
-    return false
-  }
-
-  onDragLeave = evt => {
-    evt.preventDefault()
-    evt.persist()
-
-    // Only deactivate once the dropzone and all children have been left.
-    this.dragTargets = this.dragTargets.filter(el => el !== evt.target && this.node.contains(el))
-    if (this.dragTargets.length > 0) {
-      return
-    }
-
-    // Clear dragging files state
-    this.setState({
-      isDragActive: false,
-      draggedFiles: []
-    })
-
-    if (this.props.onDragLeave && isDragDataWithFiles(evt)) {
-      this.props.onDragLeave.call(this, evt)
-    }
-  }
-
-  onDrop = evt => {
-    const {
-      onDrop,
-      onDropAccepted,
-      onDropRejected,
-      multiple,
-      accept,
-      getDataTransferItems
-    } = this.props
-
-    // Stop default browser behavior
-    evt.preventDefault()
-
-    // Persist event for later usage
-    evt.persist()
-
-    // Reset the counter along with the drag on a drop.
-    this.dragTargets = []
-    this.isFileDialogActive = false
-
-    // Clear files value
-    this.draggedFiles = null
-
-    // Reset drag state
-    this.setState({
-      isDragActive: false,
-      draggedFiles: []
-    })
-
-    if (isDragDataWithFiles(evt)) {
-      Promise.resolve(getDataTransferItems(evt)).then(fileList => {
-        const acceptedFiles = []
-        const rejectedFiles = []
-
-        if (isPropagationStopped(evt)) {
-          return
-        }
-
-        fileList.forEach(file => {
-          if (
-            fileAccepted(file, accept) &&
-            fileMatchSize(file, this.props.maxSize, this.props.minSize)
-          ) {
-            acceptedFiles.push(file)
-          } else {
-            rejectedFiles.push(file)
-          }
-        })
-
-        if (!multiple && acceptedFiles.length > 1) {
-          // if not in multi mode add any extra accepted files to rejected.
-          // This will allow end users to easily ignore a multi file drop in "single" mode.
-          rejectedFiles.push(...acceptedFiles.splice(0))
-        }
-
-        // Update `acceptedFiles` and `rejectedFiles` state
-        // This will make children render functions receive the appropriate
-        // values
-        this.setState({ acceptedFiles, rejectedFiles }, () => {
-          if (onDrop) {
-            onDrop.call(this, acceptedFiles, rejectedFiles, evt)
-          }
-
-          if (rejectedFiles.length > 0 && onDropRejected) {
-            onDropRejected.call(this, rejectedFiles, evt)
-          }
-
-          if (acceptedFiles.length > 0 && onDropAccepted) {
-            onDropAccepted.call(this, acceptedFiles, evt)
-          }
-        })
-      })
-    }
-  }
-
-  onClick = evt => {
-    const { onClick } = this.props
-
-    // if onClick prop is given, run it first
-    if (onClick) {
-      onClick.call(this, evt)
-    }
-
-    // If the event hasn't been default prevented from within
-    // the onClick listener, open the file dialog
-    if (!isDefaultPrevented(evt)) {
-      evt.stopPropagation()
-
-      // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
-      // this is so react can handle state changes in the onClick prop above above
-      // see: https://github.com/react-dropzone/react-dropzone/issues/450
-      if (isIeOrEdge()) {
-        setTimeout(this.open, 0)
-      } else {
-        this.open()
-      }
-    }
-  }
-
-  onInputElementClick = evt => {
-    evt.stopPropagation()
-  }
-
-  onFileDialogCancel = () => {
-    // timeout will not recognize context of this method
-    const { onFileDialogCancel } = this.props
-    // execute the timeout only if the FileDialog is opened in the browser
-    if (this.isFileDialogActive) {
+  // Update file dialog active state when the window is focused on
+  const onWindowFocus = () => {
+    // Execute the timeout only if the file dialog is opened in the browser
+    if (isFileDialogActive) {
       setTimeout(() => {
-        if (this.input != null) {
-          // Returns an object as FileList
-          const { files } = this.input
+        if (inputRef.current) {
+          const { files } = inputRef.current
 
           if (!files.length) {
-            this.isFileDialogActive = false
+            dispatch({ type: 'closeDialog' })
 
             if (typeof onFileDialogCancel === 'function') {
               onFileDialogCancel()
@@ -253,317 +374,335 @@ class Dropzone extends React.Component {
       }, 300)
     }
   }
+  useEffect(() => {
+    window.addEventListener('focus', onWindowFocus, false)
+    return () => {
+      window.removeEventListener('focus', onWindowFocus, false)
+    }
+  }, [inputRef, isFileDialogActive, onFileDialogCancel])
 
-  onFocus = evt => {
-    const { onFocus } = this.props
-    if (onFocus) {
-      onFocus.call(this, evt)
-    }
-    if (!isDefaultPrevented(evt)) {
-      this.setState({ isFocused: true })
-    }
-  }
+  // Cb to open the file dialog when SPACE/ENTER occurs on the dropzone
+  const onKeyDownCb = useCallback(
+    event => {
+      // Ignore keyboard events bubbling up the DOM tree
+      if (!rootRef.current || !rootRef.current.isEqualNode(event.target)) {
+        return
+      }
 
-  onBlur = evt => {
-    const { onBlur } = this.props
-    if (onBlur) {
-      onBlur.call(this, evt)
-    }
-    if (!isDefaultPrevented(evt)) {
-      this.setState({ isFocused: false })
-    }
-  }
+      if (event.keyCode === 32 || event.keyCode === 13) {
+        event.preventDefault()
+        openFileDialog()
+      }
+    },
+    [rootRef, inputRef]
+  )
 
-  onKeyDown = evt => {
-    const { onKeyDown } = this.props
-    if (!this.node.isEqualNode(evt.target)) {
+  // Update focus state for the dropzone
+  const onFocusCb = useCallback(() => {
+    dispatch({ type: 'focus' })
+  }, [])
+  const onBlurCb = useCallback(() => {
+    dispatch({ type: 'blur' })
+  }, [])
+
+  // Cb to open the file dialog when click occurs on the dropzone
+  const onClickCb = useCallback(() => {
+    // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
+    // to ensure React can handle state changes
+    // See: https://github.com/react-dropzone/react-dropzone/issues/450
+    if (isIeOrEdge()) {
+      setTimeout(openFileDialog, 0)
+    } else {
+      openFileDialog()
+    }
+  }, [inputRef])
+
+  const [dragTargets, setDragTargets] = useState([])
+  const onDocumentDrop = event => {
+    if (rootRef.current && rootRef.current.contains(event.target)) {
+      // If we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
       return
     }
-
-    if (onKeyDown) {
-      onKeyDown.call(this, evt)
-    }
-
-    if (!isDefaultPrevented(evt) && (evt.keyCode === 32 || evt.keyCode === 13)) {
-      evt.preventDefault()
-      this.open()
-    }
+    event.preventDefault()
+    setDragTargets([])
   }
 
-  composeHandler = handler => {
-    if (this.props.disabled) {
-      return null
+  useEffect(() => {
+    if (preventDropOnDocument) {
+      document.addEventListener('dragover', onDocumentDragOver, false)
+      document.addEventListener('drop', onDocumentDrop, false)
     }
-    return handler
+
+    return () => {
+      if (preventDropOnDocument) {
+        document.removeEventListener('dragover', onDocumentDragOver)
+        document.removeEventListener('drop', onDocumentDrop)
+      }
+    }
+  }, [rootRef, preventDropOnDocument])
+
+  const onDragEnterCb = useCallback(
+    event => {
+      event.preventDefault()
+      // Persist here because we need the event later after getFilesFromEvent() is done
+      event.persist()
+
+      // Count the dropzone and any children that are entered.
+      if (dragTargets.indexOf(event.target) === -1) {
+        setDragTargets([...dragTargets, event.target])
+      }
+
+      if (isEvtWithFiles(event)) {
+        Promise.resolve(getFilesFromEvent(event)).then(draggedFiles => {
+          if (isPropagationStopped(event)) {
+            return
+          }
+
+          dispatch({
+            draggedFiles,
+            type: 'setDraggedFiles'
+          })
+
+          if (onDragEnter) {
+            onDragEnter(event)
+          }
+        })
+      }
+    },
+    [dragTargets, getFilesFromEvent, onDragEnter]
+  )
+
+  const onDragOverCb = useCallback(
+    event => {
+      event.preventDefault()
+      event.persist()
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'copy'
+      }
+
+      if (isEvtWithFiles(event) && onDragOver) {
+        onDragOver(event)
+      }
+
+      return false
+    },
+    [onDragOver]
+  )
+
+  const onDragLeaveCb = useCallback(
+    event => {
+      event.preventDefault()
+      event.persist()
+
+      // Only deactivate once the dropzone and all children have been left
+      const targets = [
+        ...dragTargets.filter(
+          target => target !== event.target && rootRef.current && rootRef.current.contains(target)
+        )
+      ]
+      setDragTargets(targets)
+      if (targets.length > 0) {
+        return
+      }
+
+      dispatch({
+        type: 'setDraggedFiles',
+        draggedFiles: []
+      })
+
+      if (isEvtWithFiles(event) && onDragLeave) {
+        onDragLeave(event)
+      }
+    },
+    [rootRef, dragTargets, onDragLeave]
+  )
+
+  const onDropCb = useCallback(
+    event => {
+      event.preventDefault()
+      // Persist here because we need the event later after getFilesFromEvent() is done
+      event.persist()
+
+      setDragTargets([])
+      dispatch({ type: 'reset' })
+
+      if (isEvtWithFiles(event)) {
+        Promise.resolve(getFilesFromEvent(event)).then(files => {
+          if (isPropagationStopped(event)) {
+            return
+          }
+
+          const acceptedFiles = []
+          const rejectedFiles = []
+
+          files.forEach(file => {
+            if (fileAccepted(file, accept) && fileMatchSize(file, maxSize, minSize)) {
+              acceptedFiles.push(file)
+            } else {
+              rejectedFiles.push(file)
+            }
+          })
+
+          if (!multiple && acceptedFiles.length > 1) {
+            rejectedFiles.push(...acceptedFiles.splice(0)) // Reject everything and empty accepted files
+          }
+
+          dispatch({
+            acceptedFiles,
+            rejectedFiles,
+            type: 'setFiles'
+          })
+
+          if (onDrop) {
+            onDrop(acceptedFiles, rejectedFiles, event)
+          }
+
+          if (rejectedFiles.length > 0 && onDropRejected) {
+            onDropRejected(rejectedFiles, event)
+          }
+
+          if (acceptedFiles.length > 0 && onDropAccepted) {
+            onDropAccepted(acceptedFiles, event)
+          }
+        })
+      }
+    },
+    [multiple, accept, minSize, maxSize, getFilesFromEvent, onDrop, onDropAccepted, onDropRejected]
+  )
+
+  const composeHandler = fn => {
+    return disabled ? null : fn
   }
 
-  getRootProps = ({
-    refKey = 'ref',
-    onKeyDown,
-    onFocus,
-    onBlur,
-    onClick,
-    onDragStart,
-    onDragEnter,
-    onDragOver,
-    onDragLeave,
-    onDrop,
-    ...rest
-  } = {}) => ({
-    onKeyDown: this.composeHandler(
-      onKeyDown ? composeEventHandlers(onKeyDown, this.onKeyDown) : this.onKeyDown
-    ),
-    onFocus: this.composeHandler(
-      onFocus ? composeEventHandlers(onFocus, this.onFocus) : this.onFocus
-    ),
-    onBlur: this.composeHandler(onBlur ? composeEventHandlers(onBlur, this.onBlur) : this.onBlur),
-    onClick: this.composeHandler(
-      onClick ? composeEventHandlers(onClick, this.onClick) : this.onClick
-    ),
-    onDragStart: this.composeHandler(
-      onDragStart ? composeEventHandlers(onDragStart, this.onDragStart) : this.onDragStart
-    ),
-    onDragEnter: this.composeHandler(
-      onDragEnter ? composeEventHandlers(onDragEnter, this.onDragEnter) : this.onDragEnter
-    ),
-    onDragOver: this.composeHandler(
-      onDragOver ? composeEventHandlers(onDragOver, this.onDragOver) : this.onDragOver
-    ),
-    onDragLeave: this.composeHandler(
-      onDragLeave ? composeEventHandlers(onDragLeave, this.onDragLeave) : this.onDragLeave
-    ),
-    onDrop: this.composeHandler(onDrop ? composeEventHandlers(onDrop, this.onDrop) : this.onDrop),
-    [refKey]: this.setNodeRef,
-    tabIndex: this.props.disabled ? -1 : 0,
-    ...rest
-  })
-
-  getInputProps = ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
-    const { accept, multiple, name } = this.props
-    const inputProps = {
-      accept,
-      type: 'file',
-      style: { display: 'none' },
-      multiple: supportMultiple && multiple,
-      onChange: composeEventHandlers(onChange, this.onDrop),
-      onClick: composeEventHandlers(onClick, this.onInputElementClick),
-      autoComplete: 'off',
-      tabIndex: -1,
-      [refKey]: this.setInputRef
-    }
-    if (name && name.length) {
-      inputProps.name = name
-    }
-    return {
-      ...inputProps,
+  const getRootProps = useMemo(
+    () => ({
+      refKey = 'ref',
+      onKeyDown,
+      onFocus,
+      onBlur,
+      onClick,
+      onDragEnter,
+      onDragOver,
+      onDragLeave,
+      onDrop,
       ...rest
-    }
-  }
+    } = {}) => ({
+      onKeyDown: composeHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
+      onFocus: composeHandler(composeEventHandlers(onFocus, onFocusCb)),
+      onBlur: composeHandler(composeEventHandlers(onBlur, onBlurCb)),
+      onClick: composeHandler(composeEventHandlers(onClick, onClickCb)),
+      onDragEnter: composeHandler(composeEventHandlers(onDragEnter, onDragEnterCb)),
+      onDragOver: composeHandler(composeEventHandlers(onDragOver, onDragOverCb)),
+      onDragLeave: composeHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
+      onDrop: composeHandler(composeEventHandlers(onDrop, onDropCb)),
+      [refKey]: rootRef,
+      tabIndex: disabled ? -1 : 0,
+      ...rest
+    }),
+    [
+      rootRef,
+      onKeyDownCb,
+      onFocusCb,
+      onBlurCb,
+      onClickCb,
+      onDragEnterCb,
+      onDragOverCb,
+      onDragLeaveCb,
+      onDropCb,
+      disabled
+    ]
+  )
 
-  setNodeRef = node => {
-    this.node = node
-  }
+  const onInputElementClick = useCallback(event => {
+    event.stopPropagation()
+  }, [])
 
-  setInputRef = input => {
-    this.input = input
-  }
+  const getInputProps = useMemo(
+    () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
+      const inputProps = {
+        accept,
+        type: 'file',
+        style: { display: 'none' },
+        multiple: supportMultiple && multiple,
+        onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
+        onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
+        autoComplete: 'off',
+        tabIndex: -1,
+        [refKey]: inputRef
+      }
 
-  /**
-   * Open system file upload dialog.
-   *
-   * @public
-   */
-  open = () => {
-    this.isFileDialogActive = true
-    if (this.input) {
-      this.input.value = null
-      this.input.click()
-    }
-  }
+      return {
+        ...inputProps,
+        ...rest
+      }
+    },
+    [inputRef, accept, multiple, onDropCb, disabled]
+  )
 
-  render() {
-    const { children, multiple, disabled } = this.props
-    const { isDragActive, isFocused, draggedFiles, acceptedFiles, rejectedFiles } = this.state
+  const fileCount = draggedFiles.length
+  const isMultipleAllowed = multiple || fileCount <= 1
+  const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept)
+  const isDragReject = fileCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
-    const filesCount = draggedFiles.length
-    const isMultipleAllowed = multiple || filesCount <= 1
-    const isDragAccept = filesCount > 0 && allFilesAccepted(draggedFiles, this.props.accept)
-    const isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed)
-
-    return children({
-      isDragActive,
-      isDragAccept,
-      isDragReject,
-      draggedFiles,
-      acceptedFiles,
-      rejectedFiles,
-      isFocused: isFocused && !disabled,
-      getRootProps: this.getRootProps,
-      getInputProps: this.getInputProps,
-      open: this.open
-    })
+  return {
+    ...state,
+    isDragAccept,
+    isDragReject,
+    isFocused: isFocused && !disabled,
+    getRootProps,
+    getInputProps,
+    rootRef,
+    inputRef,
+    open: composeHandler(openFileDialog)
   }
 }
 
-export default Dropzone
-
-Dropzone.propTypes = {
-  /**
-   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
-   * Keep in mind that mime type determination is not reliable across platforms. CSV files,
-   * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
-   * Windows. In some cases there might not be a mime type set at all.
-   * See: https://github.com/react-dropzone/react-dropzone/issues/276
-   */
-  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-
-  /**
-   * Render function that renders the actual component
-   *
-   * @param {Object} props
-   * @param {Function} props.getRootProps Returns the props you should apply to the root drop container you render
-   * @param {Function} props.getInputProps Returns the props you should apply to hidden file input you render
-   * @param {Function} props.open Open the native file selection dialog
-   * @param {Boolean} props.isFocused Dropzone area is in focus
-   * @param {Boolean} props.isDragActive Active drag is in progress
-   * @param {Boolean} props.isDragAccept Dragged files are accepted
-   * @param {Boolean} props.isDragReject Some dragged files are rejected
-   * @param {Array} props.draggedFiles Files in active drag
-   * @param {Array} props.acceptedFiles Accepted files
-   * @param {Array} props.rejectedFiles Rejected files
-   */
-  children: PropTypes.func,
-
-  /**
-   * Enable/disable the dropzone entirely
-   */
-  disabled: PropTypes.bool,
-
-  /**
-   * If false, allow dropped items to take over the current browser window
-   */
-  preventDropOnDocument: PropTypes.bool,
-
-  /**
-   * Allow dropping multiple files
-   */
-  multiple: PropTypes.bool,
-
-  /**
-   * `name` attribute for the input tag
-   */
-  name: PropTypes.string,
-
-  /**
-   * Maximum file size (in bytes)
-   */
-  maxSize: PropTypes.number,
-
-  /**
-   * Minimum file size (in bytes)
-   */
-  minSize: PropTypes.number,
-
-  /**
-   * getDataTransferItems handler
-   * @param {Event} event
-   * @returns {Array} array of File objects
-   */
-  getDataTransferItems: PropTypes.func,
-
-  /**
-   * onClick callback
-   * @param {Event} event
-   */
-  onClick: PropTypes.func,
-
-  /**
-   * onFocus callback
-   */
-  onFocus: PropTypes.func,
-
-  /**
-   * onBlur callback
-   */
-  onBlur: PropTypes.func,
-
-  /**
-   * onKeyDown callback
-   */
-  onKeyDown: PropTypes.func,
-
-  /**
-   * The `onDrop` method that accepts two arguments.
-   * The first argument represents the accepted files and the second argument the rejected files.
-   *
-   * ```javascript
-   * function onDrop(acceptedFiles, rejectedFiles) {
-   *   // do stuff with files...
-   * }
-   * ```
-   *
-   * Files are accepted or rejected based on the `accept` prop.
-   * This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
-   *
-   * Note that the `onDrop` callback will always be called regardless if the dropped files were accepted or rejected.
-   * You can use the `onDropAccepted`/`onDropRejected` props if you'd like to react to a specific event instead of the `onDrop` prop.
-   *
-   * The `onDrop` callback will provide you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then process and send to a server.
-   * For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
-   *
-   * ```javascript
-   * function onDrop(acceptedFiles) {
-   *   const req = request.post('/upload')
-   *   acceptedFiles.forEach(file => {
-   *     req.attach(file.name, file)
-   *   })
-   *   req.end(callback)
-   * }
-   * ```
-   */
-  onDrop: PropTypes.func,
-
-  /**
-   * onDropAccepted callback
-   */
-  onDropAccepted: PropTypes.func,
-
-  /**
-   * onDropRejected callback
-   */
-  onDropRejected: PropTypes.func,
-
-  /**
-   * onDragStart callback
-   */
-  onDragStart: PropTypes.func,
-
-  /**
-   * onDragEnter callback
-   */
-  onDragEnter: PropTypes.func,
-
-  /**
-   * onDragOver callback
-   */
-  onDragOver: PropTypes.func,
-
-  /**
-   * onDragLeave callback
-   */
-  onDragLeave: PropTypes.func,
-
-  /**
-   * Provide a callback on clicking the cancel button of the file dialog
-   */
-  onFileDialogCancel: PropTypes.func
-}
-
-Dropzone.defaultProps = {
-  preventDropOnDocument: true,
-  disabled: false,
-  multiple: true,
-  maxSize: Infinity,
-  minSize: 0,
-  getDataTransferItems: fromEvent
+function reducer(state, action) {
+  /* istanbul ignore next */
+  switch (action.type) {
+    case 'focus':
+      return {
+        ...state,
+        isFocused: true
+      }
+    case 'blur':
+      return {
+        ...state,
+        isFocused: false
+      }
+    case 'openDialog':
+      return {
+        ...state,
+        isFileDialogActive: true
+      }
+    case 'closeDialog':
+      return {
+        ...state,
+        isFileDialogActive: false
+      }
+    case 'setDraggedFiles':
+      /* eslint no-case-declarations: 0 */
+      const { draggedFiles } = action
+      return {
+        ...state,
+        draggedFiles,
+        isDragActive: draggedFiles.length > 0
+      }
+    case 'setFiles':
+      return {
+        ...state,
+        acceptedFiles: action.acceptedFiles,
+        rejectedFiles: action.rejectedFiles
+      }
+    case 'reset':
+      return {
+        ...state,
+        isFileDialogActive: false,
+        isDragActive: false,
+        draggedFiles: []
+      }
+    default:
+      return state
+  }
 }

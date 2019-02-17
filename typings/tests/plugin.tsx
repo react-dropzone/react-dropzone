@@ -2,15 +2,15 @@ import React, {Component} from "react";
 import Dropzone from "../../";
 
 export class TestReactDragEvt extends Component {
-  getFiles = async (evt: React.DragEvent<HTMLDivElement>) => {
-    const files = Array.from(evt.dataTransfer.files);
+  getFiles = async (event: React.DragEvent<HTMLDivElement>) => {
+    const files = Array.from(event.dataTransfer.files);
     return files;
   }
 
   render() {
     return (
       <div>
-        <Dropzone getDataTransferItems={this.getFiles}>
+        <Dropzone getFilesFromEvent={this.getFiles}>
           {({getRootProps}) => (
             <div {...getRootProps()} />
           )}
@@ -21,15 +21,15 @@ export class TestReactDragEvt extends Component {
 }
 
 export class TestDataTransferItems extends Component {
-  getFiles = async (evt: React.DragEvent<HTMLDivElement>) => {
-    const items = Array.from(evt.dataTransfer.items);
+  getFiles = async (event: React.DragEvent<HTMLDivElement>) => {
+    const items = Array.from(event.dataTransfer.items);
     return items;
   }
 
   render() {
     return (
       <div>
-        <Dropzone getDataTransferItems={this.getFiles}>
+        <Dropzone getFilesFromEvent={this.getFiles}>
           {({getRootProps}) => (
             <div {...getRootProps()} />
           )}
@@ -40,15 +40,15 @@ export class TestDataTransferItems extends Component {
 }
 
 export class TestNativeDragEventEvt extends Component {
-  getFiles = async (evt: DragEvent) => {
-    const files = Array.from(evt.dataTransfer.files);
+  getFiles = async (event: DragEvent) => {
+    const files = Array.from(event.dataTransfer.files);
     return files;
   }
 
   render() {
     return (
       <div>
-        <Dropzone getDataTransferItems={this.getFiles}>
+        <Dropzone getFilesFromEvent={this.getFiles}>
           {({getRootProps}) => (
             <div {...getRootProps()} />
           )}
@@ -59,15 +59,15 @@ export class TestNativeDragEventEvt extends Component {
 }
 
 export class TestChangeEvt extends Component {
-  getFiles = async (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(evt.target.files);
+  getFiles = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files);
     return files;
   }
 
   render() {
     return (
       <div>
-        <Dropzone getDataTransferItems={this.getFiles}>
+        <Dropzone getFilesFromEvent={this.getFiles}>
           {({getRootProps}) => (
             <div {...getRootProps()} />
           )}
@@ -79,15 +79,15 @@ export class TestChangeEvt extends Component {
 
 
 export class TestNativeEvt extends Component {
-  getFiles = async (evt: Event) => {
-    const files = Array.from((evt.target as HTMLInputElement).files);
+  getFiles = async (event: Event) => {
+    const files = Array.from((event.target as HTMLInputElement).files);
     return files;
   }
 
   render() {
     return (
       <div>
-        <Dropzone getDataTransferItems={this.getFiles}>
+        <Dropzone getFilesFromEvent={this.getFiles}>
           {({getRootProps}) => (
             <div {...getRootProps()} />
           )}
