@@ -2,16 +2,16 @@
 
 # react-dropzone
 
-[![npm](https://img.shields.io/npm/v/react-dropzone.svg)](https://www.npmjs.com/package/react-dropzone)
-[![Build Status](https://travis-ci.org/react-dropzone/react-dropzone.svg?branch=master)](https://travis-ci.org/react-dropzone/react-dropzone)
-[![codecov](https://codecov.io/gh/react-dropzone/react-dropzone/branch/master/graph/badge.svg)](https://codecov.io/gh/react-dropzone/react-dropzone)
-[![OpenCollective](https://opencollective.com/react-dropzone/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/react-dropzone/sponsors/badge.svg)](#sponsors)
+[![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
+[![Build Status](https://img.shields.io/travis/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://travis-ci.org/react-dropzone/react-dropzone)
+[![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
+[![Open Collective](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
+[![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
 
-Simple HTML5-compliant drag'n'drop zone for files built with React.js.
+Simple React hook to create a HTML5-compliant drag'n'drop zone for files.
 
-Documentation and examples: https://react-dropzone.js.org
-Source code: https://github.com/react-dropzone/react-dropzone/
+Documentation and examples at https://react-dropzone.js.org. Source code at https://github.com/react-dropzone/react-dropzone/.
+
 
 ## Installation
 
@@ -25,143 +25,236 @@ or:
 yarn add react-dropzone
 ```
 
+
 ## Usage
+You can either use the hook:
 
-```javascript static
-import React from 'react'
-import classNames from 'classnames'
-import Dropzone from 'react-dropzone'
+```jsx static
+import React, {useCallback} from 'react'
+import {useDropzone} from 'react-dropzone'
 
-class MyDropzone extends React.Component {
-   onDrop = (acceptedFiles, rejectedFiles) => {
-     // Do something with files
-   }
+function MyDropzone() {
+  const onDrop = useCallback(acceptedFiles => {
+    // Do something with the files
+  }, [])
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
-   render() {
-    return (
-      <Dropzone onDrop={this.onDrop}>
-        {({getRootProps, getInputProps, isDragActive}) => {
-          return (
-            <div
-              {...getRootProps()}
-              className={classNames('dropzone', {'dropzone--isActive': isDragActive})}
-            >
-              <input {...getInputProps()} />
-              {
-                isDragActive ?
-                  <p>Drop files here...</p> :
-                  <p>Try dropping some files here, or click to select files to upload.</p>
-              }
-            </div>
-          )
-        }}
-      </Dropzone>
-    );
-  }
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      {
+        isDragActive ?
+          <p>Drop the files here ...</p> :
+          <p>Drag 'n' drop some files here, or click to select files</p>
+      }
+    </div>
+  )
 }
 ```
 
-## Render Prop Function
-
-The render property function is what you use to render whatever you want to based on the state of `Dropzone`:
+Or the wrapper component for the hook:
 ```jsx static
-<Dropzone>
-  {({getRootProps}) => <div {...getRootProps()} />}
+import React from 'react'
+import Dropzone from 'react-dropzone'
+
+<Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
+  {({getRootProps, getInputProps}) => (
+    <section>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div>
+    </section>
+  )}
 </Dropzone>
 ```
 
-### Prop Getters
-See https://react-dropzone.netlify.com/#proptypes `{children}` for more info.
 
-These functions are used to apply props to the elements that you render.
+**Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
 
-This gives you maximum flexibility to render what, when, and wherever you like. You call these on the element in question (for example: `<div {...getRootProps()} />`).
+Furthermore, if you want to access file contents you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader):
 
-You should pass all your props to that function rather than applying them on the element yourself to avoid your props being overridden (or overriding the props returned).
-E.g.
+```jsx static
+import React, {useCallback} from 'react'
+import {useDropzone} from 'react-dropzone'
+
+function MyDropzone() {
+  const onDrop = useCallback(acceptedFiles => {
+    const reader = new FileReader()
+
+    reader.onabort = () => console.log('file reading was aborted')
+    reader.onerror = () => console.log('file reading has failed')
+    reader.onload = () => {
+      // Do whatever you want with the file contents
+      const binaryStr = reader.result
+      console.log(binaryStr)
+    }
+
+    acceptedFiles.forEach(file => reader.readAsBinaryString(file))
+  }, [])
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </div>
+  )
+}
+```
+
+
+## Dropzone Props Getters
+
+The dropzone property getters are just two functions that return objects with properties which you need to use to create the drag 'n' drop zone.
+The root properties can be applied to whatever element you want, whereas the input properties must be applied to an `<input>`:
+```jsx static
+import React from 'react'
+import {useDropzone} from 'react-dropzone'
+
+function MyDropzone() {
+  const {getRootProps, getInputProps} = useDropzone()
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </div>
+  )
+}
+```
+
+Note that whatever other props you want to add to the element where the props from `getRootProps()` are set, you should always pass them through that function rather than applying them on the element itself.
+This is in order to avoid your props being overridden (or overriding the props returned by `getRootProps()`):
 ```jsx static
 <div
   {...getRootProps({
-    onClick: evt => console.log(event)
+    onClick: event => console.log(event)
   })}
 />
 ```
 
-### State
-See https://react-dropzone.netlify.com/#proptypes `{children}` for more info.
+In the example above, the provided `{onClick}` handler will be invoked before the internal one, therefore, internal callbacks can be prevented by simply using [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation).
+See [Events](https://react-dropzone.js.org#events) for more examples.
 
-### Custom refKey
+*Important*: if you ommit rendering an `<input>` and/or binding the props from `getInputProps()`, opening a file dialog will not be possible.
 
-Both `getRootProps` and `getInputProps` accept custom `refKey` (defaulted to `ref`) as one of the attributes passed down in the parameter.
+## Refs
 
-```javascript static
-const StyledDropArea = styled.div`
-// Some styling here
+Both `getRootProps` and `getInputProps` accept a custom `refKey` (defaults to `ref`) as one of the attributes passed down in the parameter.
+
+This can be useful when the element you're trying to apply the props from either one of those fns does not expose a reference to the element, e.g.:
+
+```jsx static
+import React from 'react'
+import {useDropzone} from 'react-dropzone'
+import styled from 'styled-components'
+
+const StyledDiv = styled.div`
+  // Some styling here
 `
-const Example = () => (
-  <Dropzone>
-   {({ getRootProps, getInputProps }) => (
-      <StyledDropArea {...getRootProps({ refKey: 'innerRef' })}>
-        <input {...getInputProps()} />
-        <p>Drop some files here</p>
-      </StyledDropArea>
-    )}
-  </Dropzone>
-);
-```
-
-**Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
-If you want to access file content you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader).
-
-```javascript static
-onDrop: acceptedFiles => {
-    acceptedFiles.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const fileAsBinaryString = reader.result;
-            // do whatever you want with the file content
-        };
-        reader.onabort = () => console.log('file reading was aborted');
-        reader.onerror = () => console.log('file reading has failed');
-
-        reader.readAsBinaryString(file);
-    });
+function Example() {
+  const {getRootProps, getInputProps} = useDropzone()
+  <StyledDiv {...getRootProps({ refKey: 'innerRef' })}>
+    <input {...getInputProps()} />
+    <p>Drag 'n' drop some files here, or click to select files</p>
+  </StyledDiv>
 }
 ```
 
-## PropTypes
+*Important*: do not set the `ref` prop on the elements where `getRootProps()`/`getInputProps()` props are set, instead, get the refs from the hook itself:
 
-See https://react-dropzone.netlify.com/#proptypes
+```jsx static
+import React from 'react'
+import {useDropzone} from 'react-dropzone'
 
-### Testing
-
-*Important*: `react-dropzone` makes its drag'n'drop callbacks asynchronous to enable promise based getDataTransfer functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
-```js static
-const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+function Refs() {
+  const {
+    getRootProps,
+    getInputProps,
+    rootRef, // Ref to the `<div>`
+    inputRef // Ref to the `<input>`
+  } = useDropzone()
+  <div {...getRootProps()}>
+    <input {...getInputProps()} />
+    <p>Drag 'n' drop some files here, or click to select files</p>
+  </div>
+}
 ```
 
-Example with enzyme 3:
+
+## Testing
+
+*Important*: `react-dropzone` makes some of its drag 'n' drop callbacks asynchronous to enable promise based `getFilesFromEvent()` functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
 ```js static
-it('tests drag state', async () => {
-  const flushPromises = () => new Promise(resolve => setImmediate(resolve));
-  const DummyChildComponent = () => null
-  const dropzone = mount(
-    <Dropzone>{props => <DummyChildComponent {...props} />}</Dropzone>
+const flushPromises = () => new Promise(resolve => setImmediate(resolve))
+```
+
+Example with [react-testing-library](https://github.com/kentcdodds/react-testing-library):
+```js static
+import React from 'react'
+import Dropzone from 'react-dropzone'
+import { fireEvent, render } from 'react-testing-library'
+
+test('invoke onDragEnter when dragenter event occurs', async () => {
+  const file = new File([
+    JSON.stringify({ping: true})
+  ], 'ping.json', { type: 'application/json' })
+  const data = mockData([file])
+  const onDragEnter = jest.fn()
+
+  const ui = (
+    <Dropzone onDragEnter={onDragEnter}>
+      {({ getRootProps, getInputProps }) => (
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
+        </div>
+      )}
+    </Dropzone>
   )
-  dropzone.simulate('dragEnter', {
-    dataTransfer: { files: files.concat(images) }
-  })
-  await flushPromises(dropzone)
-  dropzone.update()
+  const { container } = render(ui)
+  const dropzone = container.querySelector('div')
 
-  const child = dropzone.find(DummyChildComponent)
-  expect(child).toHaveProp('isDragActive', true)
-  expect(child).toHaveProp('isDragAccept', false)
-  expect(child).toHaveProp('isDragReject', true)
+  dispatchEvt(dropzone, 'dragenter', data)
+  await flushPromises(ui, container)
+
+  expect(onDragEnter).toHaveBeenCalled()
 })
+
+function flushPromises(ui, container) {
+  return new Promise(resolve =>
+    setImmediate(() => {
+      render(ui, { container })
+      resolve(container)
+    })
+  )
+}
+
+function dispatchEvt(node, type, data) {
+  const event = new Event(type, { bubbles: true })
+  Object.assign(event, data)
+  fireEvent(node, event)
+}
+
+function mockData(files) {
+  return {
+    dataTransfer: {
+      files,
+      items: files.map(file => ({
+        kind: 'file',
+        type: file.type,
+        getAsFile: () => file
+      })),
+      types: ['Files']
+    }
+  }
+}
 ```
 
-Remember to update your mounted component before asserting any props. A complete example for this can be found in `react-dropzone`s own [test suite](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
+*Note*: using [Enzyme](https://airbnb.io/enzyme) for testing is not supported at the moment, see [#2011](https://github.com/airbnb/enzyme/issues/2011).
+
+More examples for this can be found in `react-dropzone`s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
+
 
 ## Support
 
@@ -233,6 +326,7 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/react-dropzone/sponsor/27/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/react-dropzone/sponsor/28/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/react-dropzone/sponsor/29/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/29/avatar.svg"></a>
+
 
 ## License
 

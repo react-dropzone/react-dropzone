@@ -1,8 +1,8 @@
-/* eslint prefer-template: 0 */
-/* eslint node/no-unpublished-require: 0 */
+// https://www.npmjs.com/package/jest-dom
+require('jest-dom/extend-expect')
 
-const Enzyme = require('enzyme')
-const Adapter = require('enzyme-adapter-react-16')
-require('jest-enzyme')
-
-Enzyme.configure({ adapter: new Adapter() })
+// TODO: Ignore warnings about act(), it refers to having async side effects updating the state;
+// This happens because our async getFilesFromEvent() fn
+// See https://github.com/kentcdodds/react-testing-library/issues/281,
+// https://github.com/facebook/react/issues/14769
+jest.spyOn(console, 'error').mockImplementation(() => jest.fn())

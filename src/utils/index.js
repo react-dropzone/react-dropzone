@@ -1,9 +1,6 @@
 import accepts from 'attr-accept'
 
-export const supportMultiple =
-  typeof document !== 'undefined' && document && document.createElement
-    ? 'multiple' in document.createElement('input')
-    : true
+export const supportMultiple = 'multiple' in document.createElement('input')
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
@@ -19,38 +16,26 @@ export function allFilesAccepted(files, accept) {
   return files.every(file => fileAccepted(file, accept))
 }
 
-// React's synthetic events has evt.isPropagationStopped,
+// React's synthetic events has event.isPropagationStopped,
 // but to remain compatibility with other libs (Preact) fall back
-// to check evt.cancelBubble
-export function isPropagationStopped(evt) {
-  if (typeof evt.isPropagationStopped === 'function') {
-    return evt.isPropagationStopped()
-  } else if (typeof evt.cancelBubble !== 'undefined') {
-    return evt.cancelBubble
+// to check event.cancelBubble
+export function isPropagationStopped(event) {
+  if (typeof event.isPropagationStopped === 'function') {
+    return event.isPropagationStopped()
+  } else if (typeof event.cancelBubble !== 'undefined') {
+    return event.cancelBubble
   }
   return false
 }
 
-// React's synthetic events has evt.isDefaultPrevented,
-// but to remain compatibility with other libs (Preact) first
-// check evt.defaultPrevented
-export function isDefaultPrevented(evt) {
-  if (typeof evt.defaultPrevented !== 'undefined') {
-    return evt.defaultPrevented
-  } else if (typeof evt.isDefaultPrevented === 'function') {
-    return evt.isDefaultPrevented()
-  }
-  return false
-}
-
-export function isDragDataWithFiles(evt) {
-  if (!evt.dataTransfer) {
-    return true
+export function isEvtWithFiles(event) {
+  if (!event.dataTransfer) {
+    return !!event.target && !!event.target.files
   }
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
   return Array.prototype.some.call(
-    evt.dataTransfer.types,
+    event.dataTransfer.types,
     type => type === 'Files' || type === 'application/x-moz-file'
   )
 }
@@ -60,8 +45,8 @@ export function isKindFile(item) {
 }
 
 // allow the entire document to be a drag target
-export function onDocumentDragOver(evt) {
-  evt.preventDefault()
+export function onDocumentDragOver(event) {
+  event.preventDefault()
 }
 
 function isIe(userAgent) {
@@ -78,15 +63,20 @@ export function isIeOrEdge(userAgent = window.navigator.userAgent) {
 
 /**
  * This is intended to be used to compose event handlers
- * They are executed in order until one of them calls `event.preventDefault()`.
- * Not sure this is the best way to do this, but it seems legit.
+ * They are executed in order until one of them calls `event.isPropagationStopped()`.
+ * Note that the check is done on the first invoke too,
+ * meaning that if propagation was stopped before invoking the fns,
+ * no handlers will be executed.
+ *
  * @param {Function} fns the event hanlder functions
  * @return {Function} the event handler to add to an element
  */
 export function composeEventHandlers(...fns) {
   return (event, ...args) =>
     fns.some(fn => {
-      fn && fn(event, ...args)
-      return event.defaultPrevented
+      if (!isPropagationStopped(event) && fn) {
+        fn(event, ...args)
+      }
+      return isPropagationStopped(event)
     })
 }

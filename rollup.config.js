@@ -1,7 +1,7 @@
 const nodeResolve = require('rollup-plugin-node-resolve')
 const commonjs = require('rollup-plugin-commonjs')
 const babel = require('rollup-plugin-babel')
-const uglify = require('rollup-plugin-uglify')
+const { uglify } = require('rollup-plugin-uglify')
 
 const umdGlobals = {
   react: 'React',
@@ -14,15 +14,16 @@ module.exports = [
     output: {
       file: 'dist/index.js',
       format: 'umd',
-      name: 'Dropzone',
+      name: 'reactDropzone',
       globals: umdGlobals,
-      sourcemap: 'inline'
+      sourcemap: 'inline',
+      exports: 'named'
     },
     external: Object.keys(umdGlobals),
     plugins: [
       nodeResolve(),
       commonjs({ include: '**/node_modules/**' }),
-      babel({ exclude: '**/node_modules/**', plugins: ['external-helpers'] }),
+      babel({ exclude: '**/node_modules/**' }),
       uglify()
     ]
   }
