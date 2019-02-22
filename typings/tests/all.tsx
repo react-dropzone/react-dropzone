@@ -26,7 +26,6 @@ export default class Test extends React.Component {
           minSize={2000}
           maxSize={Infinity}
           preventDropOnDocument
-          disableClick
           disabled
           multiple={false}
           accept="*.png"

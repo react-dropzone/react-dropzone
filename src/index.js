@@ -3,7 +3,6 @@
 import React from 'react'
 import { fromEvent } from 'file-selector'
 import PropTypes from 'prop-types'
-import deprecated from 'prop-types-extra/lib/deprecated'
 import {
   isDragDataWithFiles,
   supportMultiple,
@@ -206,16 +205,16 @@ class Dropzone extends React.Component {
   }
 
   onClick = evt => {
-    const { onClick, disableClick } = this.props
+    const { onClick } = this.props
 
     // if onClick prop is given, run it first
     if (onClick) {
       onClick.call(this, evt)
     }
 
-    // if disableClick is not set and the event hasn't been default prefented within
+    // If the event hasn't been default prevented from within
     // the onClick listener, open the file dialog
-    if (!disableClick && !isDefaultPrevented(evt)) {
+    if (!isDefaultPrevented(evt)) {
       evt.stopPropagation()
 
       // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
@@ -436,16 +435,6 @@ Dropzone.propTypes = {
   children: PropTypes.func,
 
   /**
-   * Disallow clicking on the dropzone container to open file dialog
-   * @deprecated Use onClick={evt => evt.preventDefault()} to prevent the default behaviour (open the file select dialog).
-   * This prop will be removed in the next major version.
-   */
-  disableClick: deprecated(
-    PropTypes.bool,
-    'Use onClick={evt => evt.preventDefault()} instead. This prop will be removed in the next major version'
-  ),
-
-  /**
    * Enable/disable the dropzone entirely
    */
   disabled: PropTypes.bool,
@@ -573,7 +562,6 @@ Dropzone.propTypes = {
 Dropzone.defaultProps = {
   preventDropOnDocument: true,
   disabled: false,
-  disableClick: false,
   multiple: true,
   maxSize: Infinity,
   minSize: 0,

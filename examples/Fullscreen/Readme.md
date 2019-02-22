@@ -45,12 +45,11 @@ class FullScreen extends React.Component {
       <Dropzone
         accept={accept}
         onDrop={this.onDrop.bind(this)}
-        disableClick
       >
         {({getRootProps, getInputProps, isDragActive}) => (
-            <div {...getRootProps()} style={{position: "relative"}}>
+            <div {...getRootProps({onClick: evt => evt.preventDefault()})} style={{position: "relative"}}>
               <input {...getInputProps()} />
-              { isDragActive && <div style={overlayStyle}>Drop files here</div> }    
+              { isDragActive && <div style={overlayStyle}>Drop files here</div> }
               <h4>My awesome app</h4>
               <label htmlFor="mimetypes">Enter mime types you want to accept: </label>
               <input
