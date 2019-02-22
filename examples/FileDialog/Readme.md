@@ -14,10 +14,9 @@ Due to the lack of official docs on this (at least we haven’t found any. If yo
 ```jsx harmony
 <Dropzone
   onDrop={files => alert(JSON.stringify(files.map(f => f.name)))}
-  disableClick
 >
   {({getRootProps, getInputProps, open}) => (
-    <div {...getRootProps()}>
+    <div {...getRootProps({onClick: evt => evt.preventDefault()})}>
       <input {...getInputProps()} />
         <p>Drop files here</p>
 
@@ -37,10 +36,9 @@ const dropzoneRef = React.createRef();
 <Dropzone
   ref={dropzoneRef}
   onDrop={files => { alert(JSON.stringify(files.map(f => f.name))) }}
-  disableClick
 >
   {({getRootProps, getInputProps}) => (
-    <div {...getRootProps()}>
+    <div {...getRootProps({onClick: evt => evt.preventDefault()})}>
       <input {...getInputProps()} />
         <p>Drop files here</p>
 

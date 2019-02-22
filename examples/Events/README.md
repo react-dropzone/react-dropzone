@@ -2,17 +2,11 @@ If you'd like to prevent the default behaviour for `onClick`, `onFocus`, `onBlur
 
 ```jsx harmony
 class Events extends React.Component {
-  onClick(evt) {
-    evt.preventDefault();
-  }
-
   render() {
     return (
-      <Dropzone
-        onClick={this.onClick.bind(this)}
-      >
+      <Dropzone>
         {({getRootProps, getInputProps}) => (
-          <div {...getRootProps()}>
+          <div {...getRootProps({onClick: evt => evt.preventDefault()})}>
             <input {...getInputProps()} />
             <p>Click to select files should not work!</p>
           </div>
@@ -24,6 +18,3 @@ class Events extends React.Component {
 
 <Events />
 ```
-
-**NOTE**: You can still use the `{disableClick}` prop to achieve the same behaviour,
-but it has been deprecated and will be removed with the next major version.

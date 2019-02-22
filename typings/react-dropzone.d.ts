@@ -15,7 +15,6 @@ export type DropzoneProps = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   maxSize?: number;
   minSize?: number;
   preventDropOnDocument?: boolean;
-  disableClick?: boolean;
   disabled?: boolean;
 };
 

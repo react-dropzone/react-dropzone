@@ -312,21 +312,6 @@ describe('Dropzone', () => {
       expect(open).toHaveBeenCalled()
     })
 
-    it('should not call `open` if disableClick prop is true', () => {
-      const dropzone = mount(
-        <Dropzone disableClick>
-          {({ getRootProps, getInputProps }) => (
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-            </div>
-          )}
-        </Dropzone>
-      )
-      const open = jest.spyOn(dropzone.instance(), 'open')
-      dropzone.simulate('click')
-      expect(open).not.toHaveBeenCalled()
-    })
-
     it('should call `onClick` callback if provided', () => {
       const onClick = jest.fn()
       const dropzone = mount(
@@ -341,23 +326,6 @@ describe('Dropzone', () => {
       const open = jest.spyOn(dropzone.instance(), 'open')
       dropzone.simulate('click')
       expect(open).toHaveBeenCalled()
-      expect(onClick).toHaveBeenCalled()
-    })
-
-    it('should call `onClick` if provided even if `disableClick` is set', () => {
-      const onClick = jest.fn()
-      const dropzone = mount(
-        <Dropzone onClick={onClick} disableClick>
-          {({ getRootProps, getInputProps }) => (
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-            </div>
-          )}
-        </Dropzone>
-      )
-      const open = jest.spyOn(dropzone.instance(), 'open')
-      dropzone.simulate('click')
-      expect(open).toHaveBeenCalledTimes(0)
       expect(onClick).toHaveBeenCalled()
     })
 
@@ -450,24 +418,6 @@ describe('Dropzone', () => {
       component.find(Dropzone).simulate('click')
       expect(onClickOuter).not.toHaveBeenCalled()
       expect(onClickInner).toHaveBeenCalled()
-    })
-
-    it('should invoke onClick on the wrapper if disableClick is set', () => {
-      const onClick = jest.fn()
-      const component = mount(
-        <div onClick={onClick}>
-          <Dropzone disableClick>
-            {({ getRootProps, getInputProps }) => (
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-              </div>
-            )}
-          </Dropzone>
-        </div>
-      )
-
-      component.find(Dropzone).simulate('click')
-      expect(onClick).toHaveBeenCalled()
     })
 
     it('should invoke inputProps onClick if provided', () => {
@@ -1078,7 +1028,7 @@ describe('Dropzone', () => {
   describe('open() fn', () => {
     it('should be exposed to children', () => {
       const subject = mount(
-        <Dropzone disableClick>
+        <Dropzone>
           {({ getRootProps, getInputProps, open }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
