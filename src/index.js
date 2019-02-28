@@ -1,6 +1,7 @@
 /* eslint prefer-template: 0 */
 
 import React from 'react'
+import { findDOMNode } from 'react-dom'
 import { fromEvent } from 'file-selector'
 import PropTypes from 'prop-types'
 import {
@@ -360,12 +361,14 @@ class Dropzone extends React.Component {
     }
   }
 
-  setNodeRef = node => {
-    this.node = node
+  setNodeRef = ref => {
+    // eslint-disable-next-line react/no-find-dom-node
+    this.node = ref ? findDOMNode(ref) : undefined
   }
 
-  setInputRef = input => {
-    this.input = input
+  setInputRef = ref => {
+    // eslint-disable-next-line react/no-find-dom-node
+    this.input = ref ? findDOMNode(ref) : undefined
   }
 
   /**

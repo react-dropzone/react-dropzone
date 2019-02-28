@@ -5,6 +5,7 @@ const uglify = require('rollup-plugin-uglify')
 
 const umdGlobals = {
   react: 'React',
+  'react-dom': 'ReactDOM',
   'prop-types': 'PropTypes'
 }
 

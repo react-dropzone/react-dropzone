@@ -78,7 +78,8 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=0.14.0"
+    "react": ">=0.14.0",
+    "react-dom": ">=0.14.0"
   },
   "dependencies": {
     "attr-accept": "^1.1.3",
