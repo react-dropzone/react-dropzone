@@ -428,6 +428,42 @@ describe('useDropzone() hook', () => {
 
       expect(container.querySelector('div')).toHaveAttribute('tabindex', '-1')
     })
+
+    test('refs are set when {refKey} is set to a different value', done => {
+      const data = createDtWithFiles(files)
+
+      class MyView extends React.Component {
+        render() {
+          const { children, innerRef, ...rest } = this.props
+          return (
+            <div id="dropzone" ref={innerRef} {...rest}>
+              <div>{children}</div>
+            </div>
+          )
+        }
+      }
+
+      const ui = (
+        <Dropzone>
+          {({ getRootProps }) => (
+            <MyView {...getRootProps({ refKey: 'innerRef' })}>
+              <span>Drop some files here ...</span>
+            </MyView>
+          )}
+        </Dropzone>
+      )
+
+      const { container } = render(ui)
+      const dropzone = container.querySelector('#dropzone')
+
+      const fn = async () => {
+        fireDrop(dropzone, data)
+        await flushPromises(ui, container)
+        done()
+      }
+
+      expect(fn).not.toThrow()
+    })
   })
 
   describe('document drop protection', () => {
