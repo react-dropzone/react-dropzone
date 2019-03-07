@@ -165,6 +165,4 @@ describe('supportMultiple', () => {
     const utils = await import('./index')
     expect(utils.supportMultiple).toBe(false)
   })
-
-  // TODO: Test if no doc
 })
