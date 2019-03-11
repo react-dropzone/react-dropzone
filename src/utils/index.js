@@ -1,6 +1,8 @@
 import accepts from 'attr-accept'
+import React from 'react'
 
-export const supportMultiple = 'multiple' in document.createElement('input')
+
+export const supportMultiple = 'multiple' in React.createElement('input')
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
