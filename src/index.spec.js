@@ -304,6 +304,61 @@ describe('useDropzone() hook', () => {
       expect(container.querySelector('input')).toEqual(inputRef.current)
     })
 
+    test('<Dropzone> exposes and sets the ref if using a ref object', () => {
+      const dropzoneRef = createRef()
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+
+      const { rerender } = render(
+        <Dropzone ref={dropzoneRef}>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(dropzoneRef.current).not.toBeNull()
+      expect(typeof dropzoneRef.current.open).toEqual('function')
+
+      dropzoneRef.current.open()
+
+      expect(onClickSpy).toHaveBeenCalled()
+
+      rerender(null)
+
+      expect(dropzoneRef.current).toBeNull()
+    })
+
+    test('<Dropzone> exposes and sets the ref if using a ref fn', () => {
+      let dropzoneRef
+      const setRef = ref => (dropzoneRef = ref)
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+
+      const { rerender } = render(
+        <Dropzone ref={setRef}>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(dropzoneRef).not.toBeNull()
+      expect(typeof dropzoneRef.open).toEqual('function')
+
+      dropzoneRef.open()
+
+      expect(onClickSpy).toHaveBeenCalled()
+
+      rerender(null)
+
+      expect(dropzoneRef).toBeNull()
+    })
+
     it('sets {isFocused} to false if {disabled} is true', () => {
       const { container, rerender } = render(
         <Dropzone>
