@@ -182,6 +182,26 @@ function Refs() {
 }
 ```
 
+If you're using the `<Dropzone>` component, though, you can set the `ref` prop on the component itself which will expose the `{open}` prop that can be used to open the file dialog programmatically:
+
+```jsx static
+import React, {createRef} from 'react'
+import Dropzone from 'react-dropzone'
+
+const dropzoneRef = createRef()
+
+<Dropzone ref={dropzoneRef}>
+  {({getRootProps, getInputProps}) => (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </div>
+  )}
+</Dropzone>
+
+dropzoneRef.open()
+```
+
 
 ## Testing
 

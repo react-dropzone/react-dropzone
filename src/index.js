@@ -1,5 +1,6 @@
 /* eslint prefer-template: 0 */
 import React, {
+  forwardRef,
   Fragment,
   useCallback,
   useEffect,
@@ -36,12 +37,30 @@ import {
  * </Dropzone>
  * ```
  */
-function Dropzone({ children, ...params }) {
-  const { ...props } = useDropzone(params)
-  // TODO: Figure out why react-styleguidist cannot create docs if we don't return a jsx element
-  return <Fragment>{children(props)}</Fragment>
-}
+const Dropzone = forwardRef(({ children, ...params }, ref) => {
+  const { open, ...props } = useDropzone(params)
 
+  useEffect(() => {
+    if (typeof ref === 'function') {
+      ref({ open })
+    } else if (typeof ref === 'object' && ref !== null) {
+      ref.current = { open }
+    }
+
+    return () => {
+      if (typeof ref === 'function') {
+        ref(null)
+      } else if (typeof ref === 'object' && ref !== null) {
+        ref.current = null
+      }
+    }
+  })
+
+  // TODO: Figure out why react-styleguidist cannot create docs if we don't return a jsx element
+  return <Fragment>{children({ ...props, open })}</Fragment>
+})
+
+Dropzone.displayName = 'Dropzone'
 Dropzone.propTypes = {
   /**
    * Render function that exposes the dropzone state and prop getter fns
