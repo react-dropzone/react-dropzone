@@ -73,3 +73,15 @@ export const acceptMime = (
     )}
   </Dropzone>
 );
+
+export const acceptArray = (
+  <Dropzone accept={['image/jpeg', 'image/png']}>
+    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+      <div {...getRootProps()}>
+        {isDragAccept && "All files will be accepted"}
+        {isDragReject && "Some files will be rejected"}
+        {isDragActive && "Drop some files here ..."}
+      </div>
+    )}
+  </Dropzone>
+);

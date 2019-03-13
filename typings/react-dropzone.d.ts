@@ -8,6 +8,7 @@ export interface DropzoneProps extends DropzoneOptions {
 }
 
 export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
+  accept?: string | string[];
   minSize?: number;
   maxSize?: number;
   preventDropOnDocument?: boolean;
@@ -46,8 +47,7 @@ export interface DropzoneInputProps extends React.InputHTMLAttributes<HTMLInputE
   refKey?: string;
 }
 
-type PropTypes = "accept"
-  | "multiple"
+type PropTypes = "multiple"
   | "onDragEnter"
   | "onDragOver"
   | "onDragLeave";
