@@ -6,19 +6,19 @@ Otherwise, the results will be discarded and none of the drag events callbacks w
 In case you need to extend the `File` with some additional properties, you should use [Object.defineProperty()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) so that the result will still pass through our filter:
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Plugin(props) {
   const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
     getFilesFromEvent: event => myCustomFileGetter(event)
-  })
+  });
 
   const files = acceptedFiles.map(f => (
     <li key={f.name}>
       {f.name} has <strong>myProps</strong>: {f.myProp === true ? 'YES' : ''}
     </li>
-  ))
+  ));
 
   return (
     <section>
@@ -31,19 +31,24 @@ function Plugin(props) {
         <ul>{files}</ul>
       </aside>
     </section>
-  )
+  );
 }
 
 async function myCustomFileGetter(event) {
-  const files = Array.from(event.dataTransfer ? event.dataTransfer.files : event.target.files);
+  const files = [];
+  const fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files;
 
-  files.forEach(file => {
+  for (var i = 0; i < fileList.length; i++) {
+    const file = fileList.item(i);
+    
     Object.defineProperty(file, 'myProp', {
       value: true
-    })
-  })
+    });
 
-  return files
+    files.push(file);
+  }
+
+  return files;
 }
 
 <Plugin />

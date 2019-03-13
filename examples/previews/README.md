@@ -3,15 +3,15 @@ Starting with version 7.0.0, the `{preview}` property generation on the [File](h
 If you need need the `{preview}`, it can be easily achieved in the `onDrop()` callback:
 
 ```jsx harmony
-import React, {useEffect, useState} from 'react'
-import {useDropzone} from 'react-dropzone'
+import React, {useEffect, useState} from 'react';
+import {useDropzone} from 'react-dropzone';
 
 const thumbsContainer = {
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'wrap',
   marginTop: 16
-}
+};
 
 const thumb = {
   display: 'inline-flex',
@@ -23,31 +23,31 @@ const thumb = {
   height: 100,
   padding: 4,
   boxSizing: 'border-box'
-}
+};
 
 const thumbInner = {
   display: 'flex',
   minWidth: 0,
   overflow: 'hidden'
-}
+};
 
 const img = {
   display: 'block',
   width: 'auto',
   height: '100%'
-}
+};
 
 
 function Previews(props) {
-  const [files, setFiles] = useState([])
+  const [files, setFiles] = useState([]);
   const {getRootProps, getInputProps} = useDropzone({
     accept: 'image/*',
     onDrop: acceptedFiles => {
       setFiles(acceptedFiles.map(file => Object.assign(file, {
         preview: URL.createObjectURL(file)
-      })))
+      })));
     }
-  })
+  });
   
   const thumbs = files.map(file => (
     <div style={thumb} key={file.name}>
@@ -58,12 +58,12 @@ function Previews(props) {
         />
       </div>
     </div>
-  ))
+  ));
 
   useEffect(() => () => {
     // Make sure to revoke the data uris to avoid memory leaks
-    files.forEach(file => URL.revokeObjectURL(file.preview))
-  }, [files])
+    files.forEach(file => URL.revokeObjectURL(file.preview));
+  }, [files]);
 
   return (
     <section>
@@ -75,7 +75,7 @@ function Previews(props) {
         {thumbs}
       </aside>
     </section>
-  )
+  );
 }
 
 <Previews />
