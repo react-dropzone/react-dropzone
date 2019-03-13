@@ -7,20 +7,20 @@ If you are calling `dropzoneRef.open()` asynchronously, there’s a good chance 
 Due to the lack of official docs on this (at least we haven’t found any. If you know one, feel free to open PR), there is no guarantee that **allowed delay duration** will not be changed in later browser versions. Since implementations may differ between different browsers, avoid calling open asynchronously if possible.
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Dropzone(props) {
-  const {getRootProps, getInputProps, open} = useDropzone()
+  const {getRootProps, getInputProps, open} = useDropzone();
   const rootProps = getRootProps({
     // Disable click and keydown behavior
     onClick: event => event.stopPropagation(),
     onKeyDown: event => {
       if (event.keyCode === 32 || event.keyCode === 13) {
-        event.stopPropagation()
+        event.stopPropagation();
       }
     }
-  })
+  });
 
   return (
     <div {...rootProps}>
@@ -30,7 +30,7 @@ function Dropzone(props) {
         Open File Dialog
       </button>
     </div>
-  )
+  );
 }
 
 <Dropzone />

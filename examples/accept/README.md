@@ -10,25 +10,25 @@ The value must be a comma-separated list of unique content type specifiers:
 For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Accept(props) {
   const {acceptedFiles, rejectedFiles, getRootProps, getInputProps} = useDropzone({
     accept: 'image/jpeg, image/png'
-  })
+  });
   
   const acceptedFilesItems = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
-  ))
+  ));
 
   const rejectedFilesItems = rejectedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
-  ))
+  ));
 
   return (
     <section>
@@ -48,7 +48,7 @@ function Accept(props) {
         </ul>
       </aside>
     </section>
-  )
+  );
 }
 
 <Accept />
@@ -61,8 +61,8 @@ Because of HTML5 File API differences across different browsers during the drag,
 Also, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Accept(props) {
   const {
@@ -73,7 +73,7 @@ function Accept(props) {
     isDragReject
   } = useDropzone({
     accept: '.jpeg,.png'
-  })
+  });
 
   return (
     <div {...getRootProps()}>
@@ -82,7 +82,7 @@ function Accept(props) {
       {isDragReject && "Some files will be rejected"}
       {!isDragActive && "Drop some files here..."}
     </div>
-  )
+  );
 }
 
 <Accept />
@@ -91,8 +91,8 @@ function Accept(props) {
 but this one will:
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Accept(props) {
   const {
@@ -103,7 +103,7 @@ function Accept(props) {
     isDragReject
   } = useDropzone({
     accept: 'image/jpeg, image/png'
-  })
+  });
 
   return (
     <div {...getRootProps()}>
@@ -112,7 +112,7 @@ function Accept(props) {
       {isDragReject && "Some files will be rejected"}
       {!isDragActive && "Drop some files here..."}
     </div>
-  )
+  );
 }
 
 <Accept />

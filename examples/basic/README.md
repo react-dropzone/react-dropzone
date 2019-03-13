@@ -6,17 +6,17 @@ Furthermore, the hook supports folder drag 'n' drop by default. See [file-select
 
 
 ```jsx harmony
-import React from 'react'
-import {useDropzone} from 'react-dropzone'
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Basic(props) {
-  const {acceptedFiles, getRootProps, getInputProps} = useDropzone()
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
   
   const files = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
-  ))
+  ));
 
   return (
     <section>
@@ -29,7 +29,7 @@ function Basic(props) {
         <ul>{files}</ul>
       </aside>
     </section>
-  )
+  );
 }
 
 <Basic />
@@ -38,18 +38,18 @@ function Basic(props) {
 Dropzone with `disabled` property:
 
 ```jsx harmony
-import React, {useState} from 'react'
-import {useDropzone} from 'react-dropzone'
+import React, {useState} from 'react';
+import {useDropzone} from 'react-dropzone';
 
 function Basic(props) {
-  const [disabled, setDisabled] = useState(true)
-  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({disabled})
+  const [disabled, setDisabled] = useState(true);
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({disabled});
 
   const files = acceptedFiles.map(file => (
     <li key={file.name}>
       {file.name} - {file.size} bytes
     </li>
-  ))
+  ));
 
   return (
     <section>
@@ -70,7 +70,7 @@ function Basic(props) {
         <ul>{files}</ul>
       </aside>
     </section>
-  )
+  );
 }
 
 <Basic />
