@@ -497,7 +497,9 @@ export function useDropzone({
       event.persist()
 
       if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = 'copy'
+        try {
+          event.dataTransfer.dropEffect = 'copy'
+        } catch {} /* eslint-disable-line no-empty */
       }
 
       if (isEvtWithFiles(event) && onDragOver) {
