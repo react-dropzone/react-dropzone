@@ -1,12 +1,20 @@
 language: node_js
-cache: yarn
-notifications:
-  email: false
 node_js:
   - '8'
+cache: yarn
+addons:
+  # https://docs.travis-ci.com/user/sauce-connect/
+  sauce_connect:
+    username: "rolandjitsu"
+  # Cannot use encrypted vars in PRs, so use the jwt addon
+  # https://docs.travis-ci.com/user/jwt
+  jwt:
+    secure: iq/LTGzavit3WVNCmAgkhBqgVRYnYfTCuusBw+SMlqhBFWwnKzU8UQs0+UxlH3Hw9caMw81kHUKhR5HmrEdfQ1x4ds9eZFfhUEXdxGAORJqsuUbXVNPQM+7akjldDsbllTkkhgOybQC53j/WfZhVhvMyfBKCjkMp+Fp4oep89ag=
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
   - npx semantic-release
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
+notifications:
+  email: false

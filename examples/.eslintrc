@@ -1,5 +1,23 @@
 {
-  "globals": {
-    "useDropzone": true
+  "root": true,
+  "extends": [
+    "okonet/react",
+    "plugin:react/recommended"
+  ],
+  "plugins": [
+    "react",
+    "react-hooks"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
   }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "nextjs-integration",
+  "description": "Dropzone next.js integration example",
+  "scripts": {
+    "build": "next build",
+    "start": "next start -p 3000"
+  },
+  "dependencies": {
+    "react": "^16.8.2",
+    "next": "^8.0.3",
+    "react-dom": "^16.8.2"
+  }
+}

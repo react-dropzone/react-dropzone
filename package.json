@@ -11,8 +11,12 @@
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore '**/*.spec.js'",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
-    "test": "cross-env NODE_ENV=test npm run eslint:src && jest --coverage && npm run typescript",
+    "test": "cross-env NODE_ENV=test npm run eslint:src && jest --coverage && npm run typescript && npm run test:e2e",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:e2e": "start-server-and-test next:start http://localhost:3000 wdio:run",
+    "wdio:run": "wdio wdio.conf.js",
+    "prenext:start": "npm run build && next build examples/next.js",
+    "next:start": "next start examples/next.js -p 3000",
     "eslint:src": "eslint .",
     "commitmsg": "commitlint -e",
     "precommit": "lint-staged",
@@ -48,15 +52,18 @@
   },
   "jest": {
     "clearMocks": true,
-    "setupFilesAfterEnv": ["<rootDir>/testSetup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/testSetup.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/dist/",
       "/node_modules/",
       "<rootDir>/testSetup.js"
     ],
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
+      "/dist/",
+      "/e2e/",
+      "/node_modules/"
     ]
   },
   "keywords": [
@@ -96,12 +103,12 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
     "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/plugin-proposal-do-expressions": "^7.2.0",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-proposal-logical-assignment-operators": "^7.2.0",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.2.0",
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/plugin-proposal-pipeline-operator": "^7.3.2",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.2.0",
-    "@babel/plugin-proposal-do-expressions": "^7.2.0",
     "@babel/plugin-transform-runtime": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
@@ -112,6 +119,14 @@
     "@commitlint/prompt-cli": "^7.0.0",
     "@types/react": "^16.8.3",
     "@types/react-dom": "^16.8.1",
+    "@wdio/cli": "^5.7.2",
+    "@wdio/dot-reporter": "^5.7.2",
+    "@wdio/jasmine-framework": "^5.7.2",
+    "@wdio/local-runner": "^5.7.2",
+    "@wdio/sauce-service": "^5.7.2",
+    "@wdio/selenium-standalone-service": "^5.7.2",
+    "@wdio/spec-reporter": "^5.7.2",
+    "@wdio/sync": "^5.7.2",
     "babel-eslint": "*",
     "babel-jest": "^24.1.0",
     "babel-plugin-add-module-exports": "^1.0.0",
@@ -135,6 +150,7 @@
     "jest-dom": "^3.1.2",
     "lint-staged": "^7.2.2",
     "markdownlint-cli": "^0.13.0",
+    "next": "^8.0.3",
     "prettier": "*",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
@@ -148,14 +164,17 @@
     "rollup-plugin-commonjs": "^9.2.1",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-plugin-uglify": "^6.0.2",
-    "size-limit": "^0.19.2",
-    "styled-components": "^4.1.2",
-    "webpack-blocks": "^2.0.0-rc",
+    "selenium-standalone": "^6.16.0",
     "sinon": "^3.2.1",
+    "size-limit": "^0.19.2",
+    "start-server-and-test": "^1.7.11",
     "style-loader": "^0.18.2",
+    "styled-components": "^4.1.2",
     "tslint": "^5.9.1",
     "typescript": "^3.2.4",
-    "webpack": "^4.29.5"
+    "webdriverio": "^5.7.2",
+    "webpack": "^4.29.5",
+    "webpack-blocks": "^2.0.0-rc"
   },
   "typings": "typings/react-dropzone.d.ts",
   "config": {

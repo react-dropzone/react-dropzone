@@ -1,5 +1,11 @@
 {
   "extends": ["okonet/node"],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  },
   "rules": {
     "strict": 0,
     "node/no-unpublished-require": 0,

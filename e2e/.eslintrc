@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": ["okonet/node"],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "browser": true,
+    "$": true,
+    "$$": true
+  }
+}
