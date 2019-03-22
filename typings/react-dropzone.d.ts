@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default function Dropzone(props: DropzoneProps): JSX.Element;
+export default function Dropzone(props: DropzoneProps & React.RefAttributes<DropzoneRef>): JSX.Element;
 export function useDropzone(options?: DropzoneOptions): DropzoneState;
 
 export interface DropzoneProps extends DropzoneOptions {
@@ -22,7 +22,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
 
 export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
 
-export type DropzoneState = {
+export type DropzoneState = DropzoneRef & {
   isFocused: boolean;
   isDragActive: boolean;
   isDragAccept: boolean;
@@ -35,8 +35,11 @@ export type DropzoneState = {
   inputRef: React.RefObject<HTMLInputElement>;
   getRootProps(props?: DropzoneRootProps): DropzoneRootProps;
   getInputProps(props?: DropzoneInputProps): DropzoneInputProps;
-  open(): void;
 };
+
+export interface DropzoneRef {
+  open(): void;
+}
 
 export interface DropzoneRootProps extends React.HTMLAttributes<HTMLElement> {
   refKey?: string;
