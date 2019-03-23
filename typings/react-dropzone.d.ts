@@ -12,6 +12,10 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   minSize?: number;
   maxSize?: number;
   preventDropOnDocument?: boolean;
+  noClick?: boolean;
+  noKeyboard?: boolean;
+  noDrag?: boolean;
+  noDragEventsBubbling?: boolean;
   disabled?: boolean;
   onDrop?(acceptedFiles: File[], rejectedFiles: File[], event: DropEvent): void;
   onDropAccepted?(files: File[], event: DropEvent): void;

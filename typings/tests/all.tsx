@@ -17,6 +17,10 @@ export default class Test extends React.Component {
           minSize={2000}
           maxSize={Infinity}
           preventDropOnDocument
+          noClick={false}
+          noKeyboard={false}
+          noDrag={false}
+          noDragEventsBubbling={false}
           disabled
           multiple={false}
           accept="*.png"
