@@ -101,6 +101,27 @@ Dropzone.propTypes = {
   preventDropOnDocument: PropTypes.bool,
 
   /**
+   * If true, disables click to open the native file selection dialog
+   */
+  noClick: PropTypes.bool,
+
+  /**
+   * If true, disables SPACE/ENTER to open the native file selection dialog.
+   * Note that it also stops tracking the focus state.
+   */
+  noKeyboard: PropTypes.bool,
+
+  /**
+   * If true, disables drag 'n' drop
+   */
+  noDrag: PropTypes.bool,
+
+  /**
+   * If true, stops drag event propagation to parents
+   */
+  noDragEventsBubbling: PropTypes.bool,
+
+  /**
    * Minimum file size (in bytes)
    */
   minSize: PropTypes.number,
@@ -306,6 +327,11 @@ const initialState = {
  * See: https://github.com/react-dropzone/react-dropzone/issues/276
  * @param {boolean} [props.multiple=true] Allow drag 'n' drop (or selection from the file dialog) of multiple files
  * @param {boolean} [props.preventDropOnDocument=true] If false, allow dropped items to take over the current browser window
+ * @param {boolean} [props.noClick=false] If true, disables click to open the native file selection dialog
+ * @param {boolean} [props.noKeyboard=false] If true, disables SPACE/ENTER to open the native file selection dialog.
+ * Note that it also stops tracking the focus state.
+ * @param {boolean} [props.noDrag=false] If true, disables drag 'n' drop
+ * @param {boolean} [props.noDragEventsBubbling=false] If true, stops drag event propagation to parents
  * @param {number} [props.minSize=0] Minimum file size (in bytes)
  * @param {number} [props.maxSize=Infinity] Maximum file size (in bytes)
  * @param {boolean} [props.disabled=false] Enable/disable the dropzone
@@ -357,7 +383,11 @@ export function useDropzone({
   onDropAccepted,
   onDropRejected,
   onFileDialogCancel,
-  preventDropOnDocument = true
+  preventDropOnDocument = true,
+  noClick = false,
+  noKeyboard = false,
+  noDrag = false,
+  noDragEventsBubbling = false
 } = {}) {
   const rootRef = useRef(null)
   const inputRef = useRef(null)
@@ -426,6 +456,10 @@ export function useDropzone({
 
   // Cb to open the file dialog when click occurs on the dropzone
   const onClickCb = useCallback(() => {
+    if (noClick) {
+      return
+    }
+
     // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
     // to ensure React can handle state changes
     // See: https://github.com/react-dropzone/react-dropzone/issues/450
@@ -434,7 +468,7 @@ export function useDropzone({
     } else {
       openFileDialog()
     }
-  }, [inputRef])
+  }, [inputRef, noClick])
 
   const [dragTargets, setDragTargets] = useState([])
   const onDocumentDrop = event => {
@@ -465,6 +499,7 @@ export function useDropzone({
       event.preventDefault()
       // Persist here because we need the event later after getFilesFromEvent() is done
       event.persist()
+      stopPropagation(event)
 
       // Count the dropzone and any children that are entered.
       if (dragTargets.indexOf(event.target) === -1) {
@@ -473,7 +508,7 @@ export function useDropzone({
 
       if (isEvtWithFiles(event)) {
         Promise.resolve(getFilesFromEvent(event)).then(draggedFiles => {
-          if (isPropagationStopped(event)) {
+          if (isPropagationStopped(event) && !noDragEventsBubbling) {
             return
           }
 
@@ -488,13 +523,14 @@ export function useDropzone({
         })
       }
     },
-    [dragTargets, getFilesFromEvent, onDragEnter]
+    [dragTargets, getFilesFromEvent, onDragEnter, noDragEventsBubbling]
   )
 
   const onDragOverCb = useCallback(
     event => {
       event.preventDefault()
       event.persist()
+      stopPropagation(event)
 
       if (event.dataTransfer) {
         try {
@@ -508,13 +544,14 @@ export function useDropzone({
 
       return false
     },
-    [onDragOver]
+    [onDragOver, noDragEventsBubbling]
   )
 
   const onDragLeaveCb = useCallback(
     event => {
       event.preventDefault()
       event.persist()
+      stopPropagation(event)
 
       // Only deactivate once the dropzone and all children have been left
       const targets = [
@@ -536,7 +573,7 @@ export function useDropzone({
         onDragLeave(event)
       }
     },
-    [rootRef, dragTargets, onDragLeave]
+    [rootRef, dragTargets, onDragLeave, noDragEventsBubbling]
   )
 
   const onDropCb = useCallback(
@@ -544,13 +581,14 @@ export function useDropzone({
       event.preventDefault()
       // Persist here because we need the event later after getFilesFromEvent() is done
       event.persist()
+      stopPropagation(event)
 
       setDragTargets([])
       dispatch({ type: 'reset' })
 
       if (isEvtWithFiles(event)) {
         Promise.resolve(getFilesFromEvent(event)).then(files => {
-          if (isPropagationStopped(event)) {
+          if (isPropagationStopped(event) && !noDragEventsBubbling) {
             return
           }
 
@@ -589,11 +627,35 @@ export function useDropzone({
         })
       }
     },
-    [multiple, accept, minSize, maxSize, getFilesFromEvent, onDrop, onDropAccepted, onDropRejected]
+    [
+      multiple,
+      accept,
+      minSize,
+      maxSize,
+      getFilesFromEvent,
+      onDrop,
+      onDropAccepted,
+      onDropRejected,
+      noDragEventsBubbling
+    ]
   )
 
   const composeHandler = fn => {
     return disabled ? null : fn
+  }
+
+  const composeKeyboardHandler = fn => {
+    return noKeyboard ? null : composeHandler(fn)
+  }
+
+  const composeDragHandler = fn => {
+    return noDrag ? null : composeHandler(fn)
+  }
+
+  const stopPropagation = event => {
+    if (noDragEventsBubbling) {
+      event.stopPropagation()
+    }
   }
 
   const getRootProps = useMemo(
@@ -609,16 +671,16 @@ export function useDropzone({
       onDrop,
       ...rest
     } = {}) => ({
-      onKeyDown: composeHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
-      onFocus: composeHandler(composeEventHandlers(onFocus, onFocusCb)),
-      onBlur: composeHandler(composeEventHandlers(onBlur, onBlurCb)),
+      onKeyDown: composeKeyboardHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
+      onFocus: composeKeyboardHandler(composeEventHandlers(onFocus, onFocusCb)),
+      onBlur: composeKeyboardHandler(composeEventHandlers(onBlur, onBlurCb)),
       onClick: composeHandler(composeEventHandlers(onClick, onClickCb)),
-      onDragEnter: composeHandler(composeEventHandlers(onDragEnter, onDragEnterCb)),
-      onDragOver: composeHandler(composeEventHandlers(onDragOver, onDragOverCb)),
-      onDragLeave: composeHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
-      onDrop: composeHandler(composeEventHandlers(onDrop, onDropCb)),
+      onDragEnter: composeDragHandler(composeEventHandlers(onDragEnter, onDragEnterCb)),
+      onDragOver: composeDragHandler(composeEventHandlers(onDragOver, onDragOverCb)),
+      onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
+      onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
       [refKey]: rootRef,
-      tabIndex: disabled ? -1 : 0,
+      ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
       ...rest
     }),
     [
@@ -631,6 +693,8 @@ export function useDropzone({
       onDragOverCb,
       onDragLeaveCb,
       onDropCb,
+      noKeyboard,
+      noDrag,
       disabled
     ]
   )

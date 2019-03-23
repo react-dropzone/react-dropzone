@@ -403,7 +403,7 @@ describe('useDropzone() hook', () => {
       expect(container.querySelector('div')).toHaveAttribute('tabindex', '0')
     })
 
-    test('{tabindex} is -1 if {disabled} is true', () => {
+    test('{tabindex} is not set if {disabled} is true', () => {
       const { container, rerender } = render(
         <Dropzone>
           {({ getRootProps, getInputProps }) => (
@@ -426,7 +426,33 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      expect(container.querySelector('div')).toHaveAttribute('tabindex', '-1')
+      expect(container.querySelector('div')).not.toHaveAttribute('tabindex')
+    })
+
+    test('{tabindex} is not set if {noKeyboard} is true', () => {
+      const { container, rerender } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(container.querySelector('div')).toHaveAttribute('tabindex', '0')
+
+      rerender(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(container.querySelector('div')).not.toHaveAttribute('tabindex')
     })
 
     test('refs are set when {refKey} is set to a different value', done => {
@@ -723,6 +749,70 @@ describe('useDropzone() hook', () => {
       expect(parentProps.onDrop).not.toHaveBeenCalled()
     })
 
+    test('drag events do not propagate from the inner dropzone to parent dropzone if {noDragEventsBubbling} is true', async () => {
+      const innerProps = {
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+
+      const InnerDropzone = () => (
+        <Dropzone {...innerProps} noDragEventsBubbling>
+          {({ getRootProps, getInputProps }) => (
+            <div id="inner-dropzone" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const parentProps = {
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+
+      const ui = (
+        <Dropzone {...parentProps}>
+          {({ getRootProps, getInputProps }) => (
+            <div id="outer-dropzone" {...getRootProps()}>
+              <input {...getInputProps()} />
+              <InnerDropzone />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const { container } = render(ui)
+
+      const outerDropzone = container.querySelector('#outer-dropzone')
+      const innerDropzone = container.querySelector('#inner-dropzone')
+
+      // Sets drag targets on the outer dropzone
+      fireDragEnter(outerDropzone, data)
+      await flushPromises(ui, container)
+
+      fireDragEnter(innerDropzone, data)
+      await flushPromises(ui, container)
+      expect(innerProps.onDragEnter).toHaveBeenCalled()
+      expect(parentProps.onDragEnter).toHaveBeenCalledTimes(1)
+
+      fireDragOver(innerDropzone, data)
+      expect(innerProps.onDragOver).toHaveBeenCalled()
+      expect(parentProps.onDragOver).not.toHaveBeenCalled()
+
+      fireDragLeave(innerDropzone, data)
+      expect(innerProps.onDragLeave).toHaveBeenCalled()
+      expect(parentProps.onDragLeave).not.toHaveBeenCalled()
+
+      fireDrop(innerDropzone, data)
+      await flushPromises(ui, container)
+      expect(innerProps.onDrop).toHaveBeenCalled()
+      expect(parentProps.onDrop).not.toHaveBeenCalled()
+    })
+
     test('onDragLeave is not invoked for the parent dropzone if it was invoked for an inner dropzone', async () => {
       const innerDragLeave = jest.fn()
       const InnerDropzone = () => (
@@ -842,6 +932,56 @@ describe('useDropzone() hook', () => {
       fireEvent.focus(dropzone)
       expect(dropzone.querySelector('#focus')).toBeNull()
     })
+
+    it('does not set focus state if {noKeyboard} is true', () => {
+      const { container } = render(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.focus(dropzone)
+      expect(dropzone.querySelector('#focus')).toBeNull()
+    })
+
+    it('restores focus behavior if {noKeyboard} is set back to false', () => {
+      const { container, rerender } = render(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.focus(dropzone)
+      expect(dropzone.querySelector('#focus')).toBeNull()
+
+      rerender(
+        <Dropzone noKeyboard={false}>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.focus(dropzone)
+      expect(dropzone.querySelector('#focus')).not.toBeNull()
+    })
   })
 
   describe('onBlur', () => {
@@ -884,6 +1024,84 @@ describe('useDropzone() hook', () => {
       expect(dropzone.querySelector('#focus')).not.toBeNull()
       fireEvent.blur(dropzone)
       expect(dropzone.querySelector('#focus')).not.toBeNull()
+    })
+
+    it('does not unset focus state if {noKeyboard} is true', () => {
+      const { container, rerender } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.focus(dropzone)
+      expect(dropzone.querySelector('#focus')).not.toBeNull()
+
+      rerender(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.blur(dropzone)
+      expect(dropzone.querySelector('#focus')).not.toBeNull()
+    })
+
+    it('restores blur behavior if {noKeyboard} is set back to false', () => {
+      const { container, rerender } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.focus(dropzone)
+      expect(dropzone.querySelector('#focus')).not.toBeNull()
+
+      rerender(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.blur(dropzone)
+      expect(dropzone.querySelector('#focus')).not.toBeNull()
+
+      rerender(
+        <Dropzone noKeyboard={false}>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.blur(dropzone)
+      expect(dropzone.querySelector('#focus')).toBeNull()
     })
   })
 
@@ -929,6 +1147,80 @@ describe('useDropzone() hook', () => {
 
       fireEvent.click(dropzone)
       expect(onClickSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not not proxy the click event to the input if {noClick} is true', () => {
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+      const { container } = render(
+        <Dropzone noClick>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.click(dropzone)
+      expect(onClickSpy).not.toHaveBeenCalled()
+    })
+
+    it('restores click behavior if {noClick} is set back to false', () => {
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+      const { container, rerender } = render(
+        <Dropzone noClick>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.click(dropzone)
+      expect(onClickSpy).not.toHaveBeenCalled()
+
+      rerender(
+        <Dropzone noClick={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.click(dropzone)
+      expect(onClickSpy).toHaveBeenCalled()
+    })
+
+    // https://github.com/react-dropzone/react-dropzone/issues/783
+    it('should continue event propagation if {noClick} is true', () => {
+      const btnClickSpy = jest.fn()
+      const inputClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+      const { container } = render(
+        <Dropzone noClick>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <button onClick={btnClickSpy} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+      const btn = container.querySelector('button')
+
+      fireEvent.click(dropzone)
+      expect(inputClickSpy).not.toHaveBeenCalled()
+
+      fireEvent.click(btn)
+      expect(btnClickSpy).toHaveBeenCalled()
     })
 
     it('should schedule input click on next tick in Edge', () => {
@@ -1029,6 +1321,61 @@ describe('useDropzone() hook', () => {
         keyCode: 32
       })
       expect(onClickSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not trigger the click event on the input if {noKeyboard} is true', () => {
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+      const { container } = render(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.keyDown(dropzone, {
+        keyCode: 32
+      })
+      expect(onClickSpy).not.toHaveBeenCalled()
+    })
+
+    it('restores the keydown behavior when {noKeyboard} is set back to false', () => {
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+      const { container, rerender } = render(
+        <Dropzone noKeyboard>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.keyDown(dropzone, {
+        keyCode: 32
+      })
+      expect(onClickSpy).not.toHaveBeenCalled()
+
+      rerender(
+        <Dropzone noKeyboard={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      fireEvent.keyDown(dropzone, {
+        keyCode: 32
+      })
+      expect(onClickSpy).toHaveBeenCalled()
     })
 
     it('does not trigger the click event on the input for other keys', () => {
@@ -1176,6 +1523,109 @@ describe('useDropzone() hook', () => {
       expect(props.onDrop).not.toHaveBeenCalled()
       expect(props.onDropAccepted).not.toHaveBeenCalled()
       expect(props.onDropRejected).not.toHaveBeenCalled()
+    })
+
+    it('does not invoke callbacks if {noDrag} is true', async () => {
+      const data = createDtWithFiles(files)
+
+      const props = {
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn(),
+        onDropAccepted: jest.fn(),
+        onDropRejected: jest.fn()
+      }
+
+      const ui = (
+        <Dropzone {...props} noDrag>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const dropzone = container.querySelector('div')
+
+      fireDragEnter(dropzone, data)
+      await flushPromises(ui, container)
+      expect(props.onDragEnter).not.toHaveBeenCalled()
+
+      fireDragOver(dropzone, data)
+      expect(props.onDragOver).not.toHaveBeenCalled()
+
+      fireDragLeave(dropzone, data)
+      expect(props.onDragLeave).not.toHaveBeenCalled()
+
+      fireDrop(dropzone, data)
+      await flushPromises(ui, container)
+      expect(props.onDrop).not.toHaveBeenCalled()
+      expect(props.onDropAccepted).not.toHaveBeenCalled()
+      expect(props.onDropRejected).not.toHaveBeenCalled()
+    })
+
+    it('restores drag behavior if {noDrag} is set back to false', async () => {
+      const data = createDtWithFiles(files)
+
+      const props = {
+        onDragEnter: jest.fn(),
+        onDragOver: jest.fn(),
+        onDragLeave: jest.fn(),
+        onDrop: jest.fn()
+      }
+
+      const noDragUi = (
+        <Dropzone {...props} noDrag>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container, rerender } = render(noDragUi)
+      const dropzone = container.querySelector('div')
+
+      fireDragEnter(dropzone, data)
+      await flushPromises(noDragUi, container)
+      expect(props.onDragEnter).not.toHaveBeenCalled()
+
+      fireDragOver(dropzone, data)
+      expect(props.onDragOver).not.toHaveBeenCalled()
+
+      fireDragLeave(dropzone, data)
+      expect(props.onDragLeave).not.toHaveBeenCalled()
+
+      fireDrop(dropzone, data)
+      await flushPromises(noDragUi, container)
+      expect(props.onDrop).not.toHaveBeenCalled()
+
+      const ui = (
+        <Dropzone {...props} noDrag={false}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      rerender(ui)
+
+      fireDragEnter(dropzone, data)
+      await flushPromises(ui, container)
+      expect(props.onDragEnter).toHaveBeenCalled()
+
+      fireDragOver(dropzone, data)
+      expect(props.onDragOver).toHaveBeenCalled()
+
+      fireDragLeave(dropzone, data)
+      expect(props.onDragLeave).toHaveBeenCalled()
+
+      fireDrop(dropzone, data)
+      await flushPromises(ui, container)
+      expect(props.onDrop).toHaveBeenCalled()
     })
 
     it('sets {isDragActive} and {isDragAccept} if some files are accepted on dragented', async () => {

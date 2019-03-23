@@ -11,19 +11,14 @@ import React from 'react';
 import {useDropzone} from 'react-dropzone';
 
 function Dropzone(props) {
-  const {getRootProps, getInputProps, open} = useDropzone();
-  const rootProps = getRootProps({
+  const {getRootProps, getInputProps, open} = useDropzone({
     // Disable click and keydown behavior
-    onClick: event => event.stopPropagation(),
-    onKeyDown: event => {
-      if (event.keyCode === 32 || event.keyCode === 13) {
-        event.stopPropagation();
-      }
-    }
+    noClick: true,
+    noKeyboard: true
   });
 
   return (
-    <div {...rootProps}>
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       <p>Drag 'n' drop some files here</p>
       <button type="button" onClick={open}>
@@ -43,26 +38,24 @@ import React, {createRef} from 'react';
 import Dropzone from 'react-dropzone';
 
 const dropzoneRef = createRef();
+const openDialog = () => {
+  // Note that the ref is set async,
+  // so it might be null at some point 
+  if (dropzoneRef.current) {
+    dropzoneRef.current.open()
+  }
+};
 
-<Dropzone ref={dropzoneRef}>
+// Disable click and keydown behavior on the <Dropzone>
+<Dropzone ref={dropzoneRef} noClick noKeyboard>
   {({getRootProps, getInputProps}) => {
-    const rootProps = getRootProps({
-      // Disable click and keydown behavior
-      onClick: event => event.stopPropagation(),
-      onKeyDown: event => {
-        if (event.keyCode === 32 || event.keyCode === 13) {
-          event.stopPropagation();
-        }
-      }
-    });
-
     return (
-      <div {...rootProps}>
+      <div {...getRootProps()}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here</p>
         <button
           type="button"
-          onClick={dropzoneRef.current ? dropzoneRef.current.open : null}
+          onClick={openDialog}
         >
           Open File Dialog
         </button>
