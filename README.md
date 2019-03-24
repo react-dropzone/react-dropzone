@@ -52,6 +52,8 @@ function MyDropzone() {
 }
 ```
 
+**IMPORTANT**: Under the hood, this lib makes use of [hooks](https://reactjs.org/docs/hooks-intro.html), therefore, using it requires React `>= 16.8`.
+
 Or the wrapper component for the hook:
 ```jsx static
 import React from 'react'
