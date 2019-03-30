@@ -25,8 +25,8 @@ class Basic extends Component {
     return (
       <Dropzone onDrop={this.onDrop}>
         {({getRootProps, getInputProps}) => (
-          <section>
-            <div {...getRootProps()}>
+          <section className="container">
+            <div {...getRootProps({className: 'dropzone'})}>
               <input {...getInputProps()} />
               <p>Drag 'n' drop some files here, or click to select files</p>
             </div>

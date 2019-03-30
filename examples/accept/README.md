@@ -31,11 +31,11 @@ function Accept(props) {
   ));
 
   return (
-    <section>
-      <div {...getRootProps()}>
+    <section className="container">
+      <div {...getRootProps({className: 'dropzone'})}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
-        <p>Only *.jpeg and *.png images will be accepted</p>
+        <em>(Only *.jpeg and *.png images will be accepted)</em>
       </div>
       <aside>
         <h4>Accepted files</h4>
@@ -76,11 +76,13 @@ function Accept(props) {
   });
 
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      {isDragAccept && "All files will be accepted"}
-      {isDragReject && "Some files will be rejected"}
-      {!isDragActive && "Drop some files here..."}
+    <div className="container">
+      <div {...getRootProps({className: 'dropzone'})}>
+        <input {...getInputProps()} />
+        {isDragAccept && (<p>All files will be accepted</p>)}
+        {isDragReject && (<p>Some files will be rejected</p>)}
+        {!isDragActive && (<p>Drop some files here ...</p>)}
+      </div>
     </div>
   );
 }
@@ -106,11 +108,13 @@ function Accept(props) {
   });
 
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      {isDragAccept && "All files will be accepted"}
-      {isDragReject && "Some files will be rejected"}
-      {!isDragActive && "Drop some files here..."}
+    <div className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <input {...getInputProps()} />
+        {isDragAccept && (<p>All files will be accepted</p>)}
+          {isDragReject && (<p>Some files will be rejected</p>)}
+          {!isDragActive && (<p>Drop some files here ...</p>)}
+      </div>
     </div>
   );
 }

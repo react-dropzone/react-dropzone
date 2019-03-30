@@ -7,27 +7,30 @@ import React, {useMemo} from 'react';
 import {useDropzone} from 'react-dropzone';
 
 const baseStyle = {
-  width: 200,
-  height: 200,
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '20px',
   borderWidth: 2,
-  borderColor: '#666',
+  borderRadius: 2,
+  borderColor: '#eeeeee',
   borderStyle: 'dashed',
-  borderRadius: 5
+  backgroundColor: '#fafafa',
+  color: '#bdbdbd',
+  outline: 'none',
+  transition: 'border .24s ease-in-out'
 };
 
 const activeStyle = {
-  borderStyle: 'solid',
-  borderColor: '#6c6',
-  backgroundColor: '#eee'
+  borderColor: '#2196f3'
 };
 
 const acceptStyle = {
-  borderStyle: 'solid',
   borderColor: '#00e676'
 };
 
 const rejectStyle = {
-  borderStyle: 'solid',
   borderColor: '#ff1744'
 };
 
@@ -51,9 +54,11 @@ function StyledDropzone(props) {
   ]);
 
   return (
-    <div {...getRootProps({style})}>
-      <input {...getInputProps()} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
+    <div className="container">
+      <div {...getRootProps({style})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div>
     </div>
   );
 }
@@ -76,19 +81,25 @@ const getColor = (props) => {
       return '#ff1744';
   }
   if (props.isDragActive) {
-      return '#6c6';
+      return '#2196f3';
   }
-  return '#666';
+  return '#eeeeee';
 }
 
 const Container = styled.div`
-  width: 200px;
-  height: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   border-width: 2px;
-  border-radius: 5px;
+  border-radius: 2px;
   border-color: ${props => getColor(props)};
-  border-style: ${props => props.isDragActive ? 'solid' : 'dashed'};
-  background-color: ${props => props.isDragActive ? '#eee' : ''};
+  border-style: dashed;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  outline: none;
+  transition: border .24s ease-in-out;
 `;
 
 function StyledDropzone(props) {
@@ -101,10 +112,12 @@ function StyledDropzone(props) {
   } = useDropzone({accept: 'image/*'});
   
   return (
-    <Container {...getRootProps({isDragActive, isDragAccept, isDragReject})}>
-      <input {...getInputProps()} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
-    </Container>
+    <div className="container">
+      <Container {...getRootProps({isDragActive, isDragAccept, isDragReject})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </Container>
+    </div>
   );
 }
 

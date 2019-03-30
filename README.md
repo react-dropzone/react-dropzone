@@ -150,6 +150,8 @@ This can be useful when the element you're trying to apply the props from either
 ```jsx static
 import React from 'react'
 import {useDropzone} from 'react-dropzone'
+// NOTE: After v4.0.0, styled components exposes a ref using forwardRef,
+// therefore, no need for using innerRef as refKey
 import styled from 'styled-components'
 
 const StyledDiv = styled.div`
@@ -161,6 +163,26 @@ function Example() {
     <input {...getInputProps()} />
     <p>Drag 'n' drop some files here, or click to select files</p>
   </StyledDiv>
+}
+```
+
+If you're working with [Material UI](https://material-ui.com) and would like to apply the root props on some component that does not expose a ref, use [RootRef](https://material-ui.com/api/root-ref):
+
+```jsx static
+import React from 'react'
+import {useDropzone} from 'react-dropzone'
+import RootRef from '@material-ui/core/RootRef'
+
+function PaperDropzone() {
+  const {getRootProps, getInputProps} = useDropzone()
+  const {ref, ...rootProps} = getRootProps()
+
+  <RootRef rootRef={ref}>
+    <Paper {...rootProps}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </Paper>
+  </RootRef>
 }
 ```
 

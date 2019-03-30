@@ -19,8 +19,8 @@ function Basic(props) {
   ));
 
   return (
-    <section>
-      <div {...getRootProps()}>
+    <section className="container">
+      <div {...getRootProps({className: 'dropzone'})}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
       </div>
@@ -38,12 +38,13 @@ function Basic(props) {
 Dropzone with `disabled` property:
 
 ```jsx harmony
-import React, {useState} from 'react';
+import React from 'react';
 import {useDropzone} from 'react-dropzone';
 
 function Basic(props) {
-  const [disabled, setDisabled] = useState(true);
-  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({disabled});
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
+    disabled: true
+  });
 
   const files = acceptedFiles.map(file => (
     <li key={file.name}>
@@ -52,16 +53,8 @@ function Basic(props) {
   ));
 
   return (
-    <section>
-      <aside>
-        <button
-          type="button"
-          onClick={() => setDisabled(!disabled)}
-        >
-          Toggle disabled
-        </button>
-      </aside>
-      <div {...getRootProps()}>
+    <section className="container">
+      <div {...getRootProps({className: 'dropzone disabled'})}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
       </div>
