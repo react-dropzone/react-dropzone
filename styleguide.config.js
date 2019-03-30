@@ -1,12 +1,12 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 const path = require('path')
-const { createConfig, babel } = require('webpack-blocks')
+const { createConfig, babel, css } = require('webpack-blocks')
 
 // https://react-styleguidist.js.org/docs/configuration.html
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
-  webpackConfig: createConfig([babel()]),
+  webpackConfig: createConfig([babel(), css()]),
   exampleMode: 'expand',
   usageMode: 'expand',
   showSidebar: false,
@@ -14,6 +14,7 @@ module.exports = {
   moduleAliases: {
     'react-dropzone': path.resolve(__dirname, './src')
   },
+  require: [path.join(__dirname, 'examples/theme.css')],
   sections: [
     {
       name: '',
