@@ -74,7 +74,7 @@ import Dropzone from 'react-dropzone'
 
 **Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
 
-Furthermore, if you want to access file contents you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader):
+Furthermore, if you want to access file contents you have to use the [URL.createObjectURL](https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL):
 
 ```jsx static
 import React, {useCallback} from 'react'
@@ -82,18 +82,12 @@ import {useDropzone} from 'react-dropzone'
 
 function MyDropzone() {
   const onDrop = useCallback(acceptedFiles => {
-    const reader = new FileReader()
-
-    reader.onabort = () => console.log('file reading was aborted')
-    reader.onerror = () => console.log('file reading has failed')
-    reader.onload = () => {
-      // Do whatever you want with the file contents
-      const binaryStr = reader.result
-      console.log(binaryStr)
-    }
-
-    acceptedFiles.forEach(file => reader.readAsBinaryString(file))
-  }, [])
+    acceptedFiles.forEach(file => {
+      console.log(URL.createObjectURL(file))
+      
+      /* you should */ // URL.revokeObjectURL(file)
+    })
+  }
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
   return (
