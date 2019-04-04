@@ -85,7 +85,7 @@ function MyDropzone() {
     acceptedFiles.forEach(file => {
       console.log(URL.createObjectURL(file))
       
-      /* you should */ // URL.revokeObjectURL(file)
+      /* should be after some processing */ // URL.revokeObjectURL(file)
     })
   }
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
