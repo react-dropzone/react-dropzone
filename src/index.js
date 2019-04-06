@@ -454,20 +454,27 @@ export function useDropzone({
   }, [])
 
   // Cb to open the file dialog when click occurs on the dropzone
-  const onClickCb = useCallback(() => {
-    if (noClick) {
-      return
-    }
+  const onClickCb = useCallback(
+    event => {
+      // Prevent click events from propagating to the <input> when the click event
+      // originated from a <label> that wraps the dropzone
+      event.preventDefault()
 
-    // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
-    // to ensure React can handle state changes
-    // See: https://github.com/react-dropzone/react-dropzone/issues/450
-    if (isIeOrEdge()) {
-      setTimeout(openFileDialog, 0)
-    } else {
-      openFileDialog()
-    }
-  }, [inputRef, noClick])
+      if (noClick) {
+        return
+      }
+
+      // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
+      // to ensure React can handle state changes
+      // See: https://github.com/react-dropzone/react-dropzone/issues/450
+      if (isIeOrEdge()) {
+        setTimeout(openFileDialog, 0)
+      } else {
+        openFileDialog()
+      }
+    },
+    [inputRef, noClick]
+  )
 
   const [dragTargets, setDragTargets] = useState([])
   const onDocumentDrop = event => {
