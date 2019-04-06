@@ -19,8 +19,7 @@ import {
   isEvtWithFiles,
   isIeOrEdge,
   isPropagationStopped,
-  onDocumentDragOver,
-  supportMultiple
+  onDocumentDragOver
 } from './utils/index'
 
 /**
@@ -707,9 +706,9 @@ export function useDropzone({
     () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
       const inputProps = {
         accept,
+        multiple,
         type: 'file',
         style: { display: 'none' },
-        multiple: supportMultiple && multiple,
         onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
         onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
         autoComplete: 'off',
