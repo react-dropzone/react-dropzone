@@ -152,17 +152,3 @@ describe('composeEventHandlers', () => {
     expect(fn2).not.toHaveBeenCalled()
   })
 })
-
-describe('supportMultiple', () => {
-  it('returns true if <input> supports the {multiple} attr', async () => {
-    jest.spyOn(document, 'createElement').mockReturnValueOnce({ multiple: null })
-    const utils = await import('./index')
-    expect(utils.supportMultiple).toBe(true)
-  })
-
-  it('returns false if <input> does not support the {multiple} attr', async () => {
-    jest.spyOn(document, 'createElement').mockReturnValueOnce({})
-    const utils = await import('./index')
-    expect(utils.supportMultiple).toBe(false)
-  })
-})
