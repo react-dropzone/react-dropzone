@@ -1,4 +1,4 @@
-/* eslint react/prop-types: 0 */
+/* eslint react/prop-types: 0, jsx-a11y/label-has-for: 0 */
 import React, { createRef } from 'react'
 import { cleanup, fireEvent, render } from 'react-testing-library'
 import { renderHook } from 'react-hooks-testing-library'
@@ -509,6 +509,36 @@ describe('useDropzone() hook', () => {
       }
 
       expect(fn).not.toThrow()
+    })
+
+    test('click events originating from <label> should not trigger file dialog open twice', () => {
+      const activeRef = createRef()
+      const active = <span ref={activeRef}>I am active</span>
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <label {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </label>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('label')
+
+      const event = new Event('click', { bubbles: true, cancelable: true })
+      const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
+
+      fireEvent(dropzone, event)
+
+      const ref = activeRef.current
+      expect(ref).not.toBeNull()
+      expect(dropzone).toContainElement(ref)
+      expect(preventDefaultSpy).toHaveBeenCalled()
+      expect(onClickSpy).toHaveBeenCalledTimes(1)
     })
   })
 
