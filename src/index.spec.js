@@ -359,6 +359,26 @@ describe('useDropzone() hook', () => {
       expect(dropzoneRef).toBeNull()
     })
 
+    test("<Dropzone> doesn't invoke the ref fn if it hasn't changed", () => {
+      const setRef = jest.fn()
+
+      const { rerender } = render(
+        <Dropzone ref={setRef}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      rerender(
+        <Dropzone ref={setRef}>{({ getRootProps }) => <div {...getRootProps()} />}</Dropzone>
+      )
+
+      expect(setRef).toHaveBeenCalledTimes(1)
+    })
+
     it('sets {isFocused} to false if {disabled} is true', () => {
       const { container, rerender } = render(
         <Dropzone>
