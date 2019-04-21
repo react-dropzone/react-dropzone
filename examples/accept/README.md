@@ -56,9 +56,9 @@ function Accept(props) {
 
 ### Browser limitations
 
-Because of HTML5 File API differences across different browsers during the drag, Dropzone will only display `rejected` styles in Chrome (and Chromium based browser). It isn't working in Safari nor IE.
+Because of HTML5 File API differences across different browsers during the drag, Dropzone might not be able to detect whether the files are accepted or rejected in Safari nor IE.
 
-Also, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
+Furthermore, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
 
 ```jsx harmony
 import React from 'react';
