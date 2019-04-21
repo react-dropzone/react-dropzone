@@ -520,6 +520,7 @@ export function useDropzone({
 
           dispatch({
             draggedFiles,
+            isDragActive: true,
             type: 'setDraggedFiles'
           })
 
@@ -571,6 +572,7 @@ export function useDropzone({
       }
 
       dispatch({
+        isDragActive: false,
         type: 'setDraggedFiles',
         draggedFiles: []
       })
@@ -774,11 +776,11 @@ function reducer(state, action) {
       }
     case 'setDraggedFiles':
       /* eslint no-case-declarations: 0 */
-      const { draggedFiles } = action
+      const { isDragActive, draggedFiles } = action
       return {
         ...state,
         draggedFiles,
-        isDragActive: draggedFiles.length > 0
+        isDragActive
       }
     case 'setFiles':
       return {
