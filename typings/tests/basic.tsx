@@ -1,10 +1,11 @@
 import React from "react";
 import Dropzone from "../../";
+import { FileWithPath } from "file-selector";
 
 export default class Basic extends React.Component {
   state = { files: [] };
 
-  onDrop = files => {
+  onDrop = (files: FileWithPath[]) => {
     this.setState({
       files
     });
