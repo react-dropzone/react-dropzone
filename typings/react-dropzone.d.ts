@@ -1,5 +1,6 @@
 import * as React from "react";
 
+export { FileWithPath } from "file-selector";
 export default function Dropzone(props: DropzoneProps & React.RefAttributes<DropzoneRef>): JSX.Element;
 export function useDropzone(options?: DropzoneOptions): DropzoneState;
 
@@ -17,9 +18,9 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   noDrag?: boolean;
   noDragEventsBubbling?: boolean;
   disabled?: boolean;
-  onDrop?(acceptedFiles: File[], rejectedFiles: File[], event: DropEvent): void;
-  onDropAccepted?(files: File[], event: DropEvent): void;
-  onDropRejected?(files: File[], event: DropEvent): void;
+  onDrop?<T extends File>(acceptedFiles: T[], rejectedFiles: T[], event: DropEvent): void;
+  onDropAccepted?<T extends File>(files: T[], event: DropEvent): void;
+  onDropRejected?<T extends File>(files: T[], event: DropEvent): void;
   getFilesFromEvent?(event: DropEvent): Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?(): void;
 };
