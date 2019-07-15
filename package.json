@@ -1,5 +1,5 @@
 {
-  "name": "react-dropzone",
+  "name": "react-drag-and-drop",
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "module": "dist/es/index.js",
