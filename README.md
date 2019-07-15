@@ -1,6 +1,6 @@
 ![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/react-dropzone/master/logo/logo.png)
 
-# react-dropzone
+# react-drag-and-drop
 
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
 [![Build Status](https://img.shields.io/travis/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://travis-ci.org/react-dropzone/react-dropzone)
@@ -18,11 +18,11 @@ Documentation and examples at https://react-dropzone.js.org. Source code at http
 Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
 ```bash
-npm install --save react-dropzone
+npm install --save react-drag-and-drop
 ```
 or:
 ```bash
-yarn add react-dropzone
+yarn add react-drag-and-drop
 ```
 
 
@@ -31,7 +31,7 @@ You can either use the hook:
 
 ```jsx static
 import React, {useCallback} from 'react'
-import {useDropzone} from 'react-dropzone'
+import {useDropzone} from 'react-drag-and-drop'
 
 function MyDropzone() {
   const onDrop = useCallback(acceptedFiles => {
