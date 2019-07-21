@@ -454,27 +454,20 @@ export function useDropzone({
   }, [])
 
   // Cb to open the file dialog when click occurs on the dropzone
-  const onClickCb = useCallback(
-    event => {
-      // Prevent click events from propagating to the <input> when the click event
-      // originated from a <label> that wraps the dropzone
-      event.preventDefault()
+  const onClickCb = useCallback(() => {
+    if (noClick) {
+      return
+    }
 
-      if (noClick) {
-        return
-      }
-
-      // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
-      // to ensure React can handle state changes
-      // See: https://github.com/react-dropzone/react-dropzone/issues/450
-      if (isIeOrEdge()) {
-        setTimeout(openFileDialog, 0)
-      } else {
-        openFileDialog()
-      }
-    },
-    [inputRef, noClick]
-  )
+    // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
+    // to ensure React can handle state changes
+    // See: https://github.com/react-dropzone/react-dropzone/issues/450
+    if (isIeOrEdge()) {
+      setTimeout(openFileDialog, 0)
+    } else {
+      openFileDialog()
+    }
+  }, [inputRef, noClick])
 
   const [dragTargets, setDragTargets] = useState([])
   const onDocumentDrop = event => {
@@ -686,6 +679,7 @@ export function useDropzone({
       onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
       onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
       [refKey]: rootRef,
+      ...(rootRef.current && rootRef.current.tagName === 'LABEL' ? { htmlFor: 'noop' } : {}),
       ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
       ...rest
     }),
@@ -710,7 +704,7 @@ export function useDropzone({
   }, [])
 
   const getInputProps = useMemo(
-    () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
+    () => ({ refKey = 'ref', onChange, onClick, disabled, ...rest } = {}) => {
       const inputProps = {
         accept,
         multiple,
@@ -720,6 +714,7 @@ export function useDropzone({
         onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
         autoComplete: 'off',
         tabIndex: -1,
+        disabled: disabled || noClick,
         [refKey]: inputRef
       }
 
@@ -728,7 +723,7 @@ export function useDropzone({
         ...rest
       }
     },
-    [inputRef, accept, multiple, onDropCb, disabled]
+    [inputRef, accept, multiple, onDropCb, disabled, noClick]
   )
 
   const fileCount = draggedFiles.length

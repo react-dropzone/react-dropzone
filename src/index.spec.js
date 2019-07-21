@@ -530,14 +530,12 @@ describe('useDropzone() hook', () => {
       const dropzone = container.querySelector('label')
 
       const event = new Event('click', { bubbles: true, cancelable: true })
-      const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
 
       fireEvent(dropzone, event)
 
       const ref = activeRef.current
       expect(ref).not.toBeNull()
       expect(dropzone).toContainElement(ref)
-      expect(preventDefaultSpy).toHaveBeenCalled()
       expect(onClickSpy).toHaveBeenCalledTimes(1)
     })
   })
