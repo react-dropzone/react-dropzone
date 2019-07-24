@@ -716,7 +716,7 @@ export function useDropzone({
         onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
         autoComplete: 'off',
         tabIndex: -1,
-        disabled: disabled || noClick,
+        disabled: disabled !== undefined ? disabled : noClick,
         [refKey]: inputRef
       }
 
