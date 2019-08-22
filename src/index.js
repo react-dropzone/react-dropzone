@@ -681,7 +681,6 @@ export function useDropzone({
       onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
       onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
       [refKey]: rootRef,
-      ...(rootRef.current && rootRef.current.tagName === 'LABEL' ? { htmlFor: 'noop' } : {}),
       ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
       ...rest
     }),
@@ -706,7 +705,7 @@ export function useDropzone({
   }, [])
 
   const getInputProps = useMemo(
-    () => ({ refKey = 'ref', onChange, onClick, disabled, ...rest } = {}) => {
+    () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
       const inputProps = {
         accept,
         multiple,
@@ -716,7 +715,6 @@ export function useDropzone({
         onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
         autoComplete: 'off',
         tabIndex: -1,
-        disabled: disabled !== undefined ? disabled : noClick,
         [refKey]: inputRef
       }
 
@@ -725,7 +723,7 @@ export function useDropzone({
         ...rest
       }
     },
-    [inputRef, accept, multiple, onDropCb, disabled, noClick]
+    [inputRef, accept, multiple, onDropCb, disabled]
   )
 
   const fileCount = draggedFiles.length
