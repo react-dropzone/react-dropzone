@@ -6,8 +6,7 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
-  useState
+  useRef
 } from 'react'
 import PropTypes from 'prop-types'
 import { fromEvent } from 'file-selector'
@@ -469,14 +468,14 @@ export function useDropzone({
     }
   }, [inputRef, noClick])
 
-  const [dragTargets, setDragTargets] = useState([])
+  const dragTargetsRef = useRef([])
   const onDocumentDrop = event => {
     if (rootRef.current && rootRef.current.contains(event.target)) {
       // If we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
       return
     }
     event.preventDefault()
-    setDragTargets([])
+    dragTargetsRef.current = []
   }
 
   useEffect(() => {
@@ -501,8 +500,8 @@ export function useDropzone({
       stopPropagation(event)
 
       // Count the dropzone and any children that are entered.
-      if (dragTargets.indexOf(event.target) === -1) {
-        setDragTargets([...dragTargets, event.target])
+      if (dragTargetsRef.current.indexOf(event.target) === -1) {
+        dragTargetsRef.current = [...dragTargetsRef.current, event.target]
       }
 
       if (isEvtWithFiles(event)) {
@@ -523,7 +522,7 @@ export function useDropzone({
         })
       }
     },
-    [dragTargets, getFilesFromEvent, onDragEnter, noDragEventsBubbling]
+    [getFilesFromEvent, onDragEnter, noDragEventsBubbling]
   )
 
   const onDragOverCb = useCallback(
@@ -554,12 +553,10 @@ export function useDropzone({
       stopPropagation(event)
 
       // Only deactivate once the dropzone and all children have been left
-      const targets = [
-        ...dragTargets.filter(
-          target => target !== event.target && rootRef.current && rootRef.current.contains(target)
-        )
-      ]
-      setDragTargets(targets)
+      const targets = dragTargetsRef.current.filter(
+        target => target !== event.target && rootRef.current && rootRef.current.contains(target)
+      )
+      dragTargetsRef.current = targets
       if (targets.length > 0) {
         return
       }
@@ -574,7 +571,7 @@ export function useDropzone({
         onDragLeave(event)
       }
     },
-    [rootRef, dragTargets, onDragLeave, noDragEventsBubbling]
+    [rootRef, onDragLeave, noDragEventsBubbling]
   )
 
   const onDropCb = useCallback(
@@ -584,7 +581,7 @@ export function useDropzone({
       event.persist()
       stopPropagation(event)
 
-      setDragTargets([])
+      dragTargetsRef.current = []
       dispatch({ type: 'reset' })
 
       if (isEvtWithFiles(event)) {
