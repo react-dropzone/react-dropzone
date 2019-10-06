@@ -1677,7 +1677,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDrop).toHaveBeenCalled()
     })
 
-    it('sets {isDragActive} and {isDragAccept} if some files are accepted on dragented', async () => {
+    it('sets {isDragActive} and {isDragAccept} if some files are accepted on dragenter', async () => {
       const ui = (
         <Dropzone>
           {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
@@ -1723,6 +1723,29 @@ describe('useDropzone() hook', () => {
       await flushPromises(ui, container)
 
       expect(dropzone).toHaveTextContent('dragActive')
+      expect(dropzone).not.toHaveTextContent('dragAccept')
+      expect(dropzone).toHaveTextContent('dragReject')
+    })
+
+    it('sets {isDragReject} if some files are too large', async () => {
+      const ui = (
+        <Dropzone maxSize={0}>
+          {({ getRootProps, getInputProps, isDragAccept, isDragReject }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragAccept && 'dragAccept'}
+              {isDragReject && 'dragReject'}
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const dropzone = container.querySelector('div')
+
+      const data = createDtWithFiles(files)
+      fireDragEnter(dropzone, data)
+      await flushPromises(ui, container)
+
       expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).toHaveTextContent('dragReject')
     })
@@ -2484,6 +2507,7 @@ function createDtWithFiles(files = []) {
       files,
       items: files.map(file => ({
         kind: 'file',
+        size: file.size,
         type: file.type,
         getAsFile: () => file
       })),
