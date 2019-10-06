@@ -92,7 +92,7 @@ function MyDropzone() {
       console.log(binaryStr)
     }
 
-    acceptedFiles.forEach(file => reader.readAsBinaryString(file))
+    acceptedFiles.forEach(file => reader.readAsArrayBuffer(file))
   }, [])
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
