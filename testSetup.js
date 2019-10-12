@@ -1,5 +1,5 @@
 // https://www.npmjs.com/package/jest-dom
-require('jest-dom/extend-expect')
+require('@testing-library/jest-dom/extend-expect')
 
 // TODO: Ignore warnings about act(), it refers to having async side effects updating the state;
 // This happens because our async getFilesFromEvent() fn

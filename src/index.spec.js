@@ -2,7 +2,6 @@
 import React, { createRef } from 'react'
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
-import '@testing-library/jest-dom/extend-expect'
 import { fromEvent } from 'file-selector'
 import * as utils from './utils'
 import Dropzone, { useDropzone } from './index'
