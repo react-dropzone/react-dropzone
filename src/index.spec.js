@@ -49,7 +49,7 @@ describe('useDropzone() hook', () => {
       expect(input).toHaveAttribute('accept', accept)
     })
 
-    it('updates {multiple} prop on the <input> when it changes', () => {
+    it('updates {accept} prop on the <input> when it changes', () => {
       const { container, rerender } = render(
         <Dropzone accept="image/jpeg">
           {({ getRootProps, getInputProps }) => (
@@ -105,6 +105,48 @@ describe('useDropzone() hook', () => {
 
       rerender(
         <Dropzone multiple>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(container.querySelector('input')).toHaveAttribute('multiple')
+    })
+
+    it('sets {multiple} prop to negated {single} prop on the <input>', () => {
+      const { container } = render(
+        <Dropzone single>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const input = container.querySelector('input')
+      expect(input).not.toHaveAttribute('multiple')
+      expect(input).not.toHaveAttribute('single')
+    })
+
+    it('updates {multiple} prop on the <input> when {single} prop changes', () => {
+      const { container, rerender } = render(
+        <Dropzone single>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      expect(container.querySelector('input')).not.toHaveAttribute('multiple')
+
+      rerender(
+        <Dropzone>
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />

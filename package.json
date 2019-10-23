@@ -26,7 +26,7 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "7 KB"
+      "limit": "7.03 KB"
     },
     {
       "path": "dist/es/index.js",
@@ -48,7 +48,9 @@
   },
   "jest": {
     "clearMocks": true,
-    "setupFilesAfterEnv": ["<rootDir>/testSetup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/testSetup.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/dist/",
       "/node_modules/",

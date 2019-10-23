@@ -23,6 +23,7 @@ export default class Test extends React.Component {
           noDragEventsBubbling={false}
           disabled
           multiple={false}
+          single={false}
           accept="*.png"
         >
           {({getRootProps, getInputProps}) => (

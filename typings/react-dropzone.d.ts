@@ -23,6 +23,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   onDropRejected?<T extends File>(files: T[], event: DropEvent): void;
   getFilesFromEvent?(event: DropEvent): Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?(): void;
+  single?: boolean;
 };
 
 export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;

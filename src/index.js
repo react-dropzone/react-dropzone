@@ -94,6 +94,11 @@ Dropzone.propTypes = {
   multiple: PropTypes.bool,
 
   /**
+   * Overrides `multiple` prop to only allow single file drag 'n' drop
+   */
+  single: PropTypes.bool,
+
+  /**
    * If false, allow dropped items to take over the current browser window
    */
   preventDropOnDocument: PropTypes.bool,
@@ -324,6 +329,7 @@ const initialState = {
  * Windows. In some cases there might not be a mime type set at all.
  * See: https://github.com/react-dropzone/react-dropzone/issues/276
  * @param {boolean} [props.multiple=true] Allow drag 'n' drop (or selection from the file dialog) of multiple files
+ * @param {boolean} [props.single=false] Overrides `multiple`` prop to only allow for single file drag 'n' drop
  * @param {boolean} [props.preventDropOnDocument=true] If false, allow dropped items to take over the current browser window
  * @param {boolean} [props.noClick=false] If true, disables click to open the native file selection dialog
  * @param {boolean} [props.noKeyboard=false] If true, disables SPACE/ENTER to open the native file selection dialog.
@@ -374,6 +380,7 @@ export function useDropzone({
   maxSize = Infinity,
   minSize = 0,
   multiple = true,
+  single = false,
   onDragEnter,
   onDragLeave,
   onDragOver,
@@ -392,6 +399,8 @@ export function useDropzone({
 
   const [state, dispatch] = useReducer(reducer, initialState)
   const { isFocused, isFileDialogActive, draggedFiles } = state
+
+  const derivedMultiple = !single && multiple
 
   // Fn for opening the file dialog programmatically
   const openFileDialog = () => {
@@ -601,7 +610,7 @@ export function useDropzone({
             }
           })
 
-          if (!multiple && acceptedFiles.length > 1) {
+          if (!derivedMultiple && acceptedFiles.length > 1) {
             rejectedFiles.push(...acceptedFiles.splice(0)) // Reject everything and empty accepted files
           }
 
@@ -626,7 +635,7 @@ export function useDropzone({
       }
     },
     [
-      multiple,
+      derivedMultiple,
       accept,
       minSize,
       maxSize,
@@ -705,7 +714,7 @@ export function useDropzone({
     () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
       const inputProps = {
         accept,
-        multiple,
+        multiple: derivedMultiple,
         type: 'file',
         style: { display: 'none' },
         onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
@@ -720,11 +729,11 @@ export function useDropzone({
         ...rest
       }
     },
-    [inputRef, accept, multiple, onDropCb, disabled]
+    [inputRef, accept, derivedMultiple, onDropCb, disabled]
   )
 
   const fileCount = draggedFiles.length
-  const isMultipleAllowed = multiple || fileCount <= 1
+  const isMultipleAllowed = derivedMultiple || fileCount <= 1
   const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept, maxSize, minSize)
   const isDragReject = fileCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
