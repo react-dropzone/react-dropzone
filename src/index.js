@@ -4,6 +4,7 @@ import React, {
   Fragment,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useReducer,
   useRef
@@ -38,21 +39,7 @@ import {
 const Dropzone = forwardRef(({ children, ...params }, ref) => {
   const { open, ...props } = useDropzone(params)
 
-  useEffect(() => {
-    if (typeof ref === 'function') {
-      ref({ open })
-    } else if (typeof ref === 'object' && ref !== null) {
-      ref.current = { open }
-    }
-
-    return () => {
-      if (typeof ref === 'function') {
-        ref(null)
-      } else if (typeof ref === 'object' && ref !== null) {
-        ref.current = null
-      }
-    }
-  }, [ref])
+  useImperativeHandle(ref, () => ({ open }), [open])
 
   // TODO: Figure out why react-styleguidist cannot create docs if we don't return a jsx element
   return <Fragment>{children({ ...props, open })}</Fragment>
@@ -394,13 +381,13 @@ export function useDropzone({
   const { isFocused, isFileDialogActive, draggedFiles } = state
 
   // Fn for opening the file dialog programmatically
-  const openFileDialog = () => {
+  const openFileDialog = useCallback(() => {
     if (inputRef.current) {
       dispatch({ type: 'openDialog' })
       inputRef.current.value = null
       inputRef.current.click()
     }
-  }
+  }, [dispatch])
 
   // Update file dialog active state when the window is focused on
   const onWindowFocus = () => {
