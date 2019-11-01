@@ -55,11 +55,11 @@ export interface DropzoneInputProps extends React.InputHTMLAttributes<HTMLInputE
   refKey?: string;
 }
 
-interface DropzoneFileError<T extends File> extends Error {
+export interface DropzoneFileError<T extends File> extends Error {
   message: DropzoneRejectReason;
   file: T;
 }
 
-type DropzoneRejectReason = "MIME_TYPE_NOT_MATCH" | "FILE_SIZE_EXCEED" | "SINGLE_FILE_ACCEPT";
+export type DropzoneRejectReason = "MIME_TYPE_NOT_MATCH" | "FILE_SIZE_EXCEED" | "SINGLE_FILE_ACCEPT";
 
 type PropTypes = "multiple" | "onDragEnter" | "onDragOver" | "onDragLeave";
