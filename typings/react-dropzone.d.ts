@@ -18,9 +18,9 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   noDrag?: boolean;
   noDragEventsBubbling?: boolean;
   disabled?: boolean;
-  onDrop?<T extends File>(acceptedFiles: T[], rejectedFiles: T[], event: DropEvent): void;
+  onDrop?<T extends File>(acceptedFiles: T[], rejectFilesError: DropzoneFileError<T>[], event: DropEvent): void;
   onDropAccepted?<T extends File>(files: T[], event: DropEvent): void;
-  onDropRejected?<T extends File>(files: T[], event: DropEvent): void;
+  onDropRejected?<T extends File>(rejectFilesError: DropzoneFileError<T>[], event: DropEvent): void;
   getFilesFromEvent?(event: DropEvent): Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?(): void;
 };
@@ -55,7 +55,11 @@ export interface DropzoneInputProps extends React.InputHTMLAttributes<HTMLInputE
   refKey?: string;
 }
 
-type PropTypes = "multiple"
-  | "onDragEnter"
-  | "onDragOver"
-  | "onDragLeave";
+interface DropzoneFileError<T extends File> extends Error {
+  message: DropzoneRejectReason;
+  file: T;
+}
+
+type DropzoneRejectReason = "MIME_TYPE_NOT_MATCH" | "FILE_SIZE_EXCEED" | "SINGLE_FILE_ACCEPT";
+
+type PropTypes = "multiple" | "onDragEnter" | "onDragOver" | "onDragLeave";

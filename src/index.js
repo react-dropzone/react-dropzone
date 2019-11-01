@@ -579,17 +579,30 @@ export function useDropzone({
 
           const acceptedFiles = []
           const rejectedFiles = []
+          const rejectedFileErrors = []
 
           files.forEach(file => {
-            if (fileAccepted(file, accept) && fileMatchSize(file, maxSize, minSize)) {
-              acceptedFiles.push(file)
-            } else {
+            if (!fileAccepted(file, accept)) {
               rejectedFiles.push(file)
+              rejectedFileErrors.push({ file: file, message: 'MIME_TYPE_NOT_MATCH' })
+            } else if (!fileMatchSize(file, maxSize, minSize)) {
+              rejectedFiles.push(file)
+              rejectedFileErrors.push({ file: file, message: 'FILE_SIZE_EXCEED' })
+            } else {
+              acceptedFiles.push(file)
             }
           })
 
           if (!multiple && acceptedFiles.length > 1) {
-            rejectedFiles.push(...acceptedFiles.splice(0)) // Reject everything and empty accepted files
+            let rejectedFiles = acceptedFiles.splice(0)
+            let rejectedFilesWithErrors = rejectedFiles.map(file => {
+              return {
+                file: file,
+                message: 'SINGLE_FILE_ACCEPT'
+              }
+            })
+            rejectedFiles.push(...rejectedFiles)
+            rejectedFileErrors.push(...rejectedFilesWithErrors) // Reject everything and empty accepted files
           }
 
           dispatch({
@@ -599,11 +612,11 @@ export function useDropzone({
           })
 
           if (onDrop) {
-            onDrop(acceptedFiles, rejectedFiles, event)
+            onDrop(acceptedFiles, rejectedFileErrors, event)
           }
 
           if (rejectedFiles.length > 0 && onDropRejected) {
-            onDropRejected(rejectedFiles, event)
+            onDropRejected(rejectedFileErrors, event)
           }
 
           if (acceptedFiles.length > 0 && onDropAccepted) {
