@@ -94,7 +94,7 @@ function MyDropzone() {
 
     acceptedFiles.forEach(file => reader.readAsArrayBuffer(file))
   }, [])
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+  const {getRootProps, getInputProps} = useDropzone({onDrop})
 
   return (
     <div {...getRootProps()}>
