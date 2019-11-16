@@ -1,0 +1,37 @@
+name: Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [8, 10, 12]
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js ${{ matrix.node_version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - uses: coverallsapp/github-action@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel: true
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: coverallsapp/github-action@v1.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
