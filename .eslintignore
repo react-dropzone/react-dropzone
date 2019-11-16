@@ -1,4 +1,5 @@
 dist/
 coverage/
 typings/*
+styleguide/*
 !.babelrc.js
