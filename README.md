@@ -3,7 +3,7 @@
 # react-dropzone
 
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
-[![Build Status](https://img.shields.io/travis/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://travis-ci.org/react-dropzone/react-dropzone)
+![Build Status](https://github.com/react-dropzone/react-dropzone/workflows/Test/badge.svg)
 [![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
 [![Open Collective](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
 [![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
