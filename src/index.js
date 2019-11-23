@@ -581,7 +581,7 @@ export function useDropzone({
           const rejectedFiles = []
 
           files.forEach(file => {
-            if (fileAccepted(file, accept) && fileMatchSize(file, maxSize, minSize)) {
+            if (fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)) {
               acceptedFiles.push(file)
             } else {
               rejectedFiles.push(file)
@@ -712,7 +712,7 @@ export function useDropzone({
 
   const fileCount = draggedFiles.length
   const isMultipleAllowed = multiple || fileCount <= 1
-  const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept, maxSize, minSize)
+  const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept, minSize, maxSize)
   const isDragReject = fileCount > 0 && (!isDragAccept || !isMultipleAllowed)
 
   return {
