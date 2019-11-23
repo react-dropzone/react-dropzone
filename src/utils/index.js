@@ -6,13 +6,25 @@ export function fileAccepted(file, accept) {
   return file.type === 'application/x-moz-file' || accepts(file, accept)
 }
 
-export function fileMatchSize(file, maxSize, minSize) {
-  return file.size <= maxSize && file.size >= minSize
+export function fileMatchSize(file, minSize, maxSize) {
+  if (isDefined(file.size)) {
+    if (isDefined(minSize) && isDefined(maxSize))
+      return file.size >= minSize && file.size <= maxSize
+    else if (isDefined(minSize))
+      return file.size >= minSize
+    else if (isDefined(maxSize))
+      return file.size <= maxSize
+  }
+  return true
 }
 
-export function allFilesAccepted(files, accept, maxSize, minSize) {
+function isDefined(value) {
+  return value !== undefined && value !== null
+}
+
+export function allFilesAccepted(files, accept, minSize, maxSize) {
   return files.every(file => {
-    return fileAccepted(file, accept) && fileMatchSize(file, maxSize, minSize)
+    return fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)
   })
 }
 
