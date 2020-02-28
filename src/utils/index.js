@@ -1,21 +1,49 @@
 import accepts from 'attr-accept'
 
+export const REJECT_REASONS = {
+  INVALID_TYPE: accept => {
+    const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
+    return {
+      code: 'file-invalid-type',
+      message: `File type must be ${messageSuffix}`
+    }
+  },
+  TOO_LARGE: maxSize => {
+    return {
+      code: 'file-too-large',
+      message: `File is larger than ${maxSize} bytes`
+    }
+  },
+  TOO_SMALL: minSize => {
+    return {
+      code: 'file-too-small',
+      message: `File is smaller than ${minSize} bytes`
+    }
+  },
+  TOO_MANY: () => {
+    return {
+      code: 'file-excessive',
+      message: 'Too many files'
+    }
+  }
+}
+
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
-  return file.type === 'application/x-moz-file' || accepts(file, accept)
+  const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
+  return isAcceptable ? [isAcceptable, null] : [false, REJECT_REASONS.INVALID_TYPE(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
   if (isDefined(file.size)) {
-    if (isDefined(minSize) && isDefined(maxSize))
-      return file.size >= minSize && file.size <= maxSize
-    else if (isDefined(minSize))
-      return file.size >= minSize
-    else if (isDefined(maxSize))
-      return file.size <= maxSize
+    if (isDefined(minSize) && isDefined(maxSize)) {
+      if (file.size > maxSize) return [false, REJECT_REASONS.TOO_LARGE(maxSize)]
+      if (file.size < minSize) return [false, REJECT_REASONS.TOO_SMALL(minSize)]
+    } else if (isDefined(minSize) && file.size < minSize) return [false, REJECT_REASONS.TOO_SMALL(minSize)]
+    else if (isDefined(maxSize) && file.size > maxSize) return [false, REJECT_REASONS.TOO_LARGE(maxSize)]
   }
-  return true
+  return [true, null]
 }
 
 function isDefined(value) {
@@ -24,7 +52,9 @@ function isDefined(value) {
 
 export function allFilesAccepted(files, accept, minSize, maxSize) {
   return files.every(file => {
-    return fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)
+    const [accepted] = fileAccepted(file, accept)
+    const [sizeMatch] = fileMatchSize(file, minSize, maxSize)
+    return accepted && sizeMatch
   })
 }
 

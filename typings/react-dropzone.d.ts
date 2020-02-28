@@ -8,6 +8,11 @@ export interface DropzoneProps extends DropzoneOptions {
   children?(state: DropzoneState): JSX.Element;
 }
 
+export interface FileError extends Error {
+  message: string;
+  code: string;
+  file: File;
+}
 export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   accept?: string | string[];
   minSize?: number;
@@ -18,9 +23,9 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   noDrag?: boolean;
   noDragEventsBubbling?: boolean;
   disabled?: boolean;
-  onDrop?<T extends File>(acceptedFiles: T[], rejectedFiles: T[], event: DropEvent): void;
+  onDrop?<T extends File>(acceptedFiles: T[], rejectedFiles: T[], event: DropEvent, rejectReasons: FileError[]): void;
   onDropAccepted?<T extends File>(files: T[], event: DropEvent): void;
-  onDropRejected?<T extends File>(files: T[], event: DropEvent): void;
+  onDropRejected?<T extends File>(files: T[], event: DropEvent, rejectReasons: FileError[]): void;
   getFilesFromEvent?(event: DropEvent): Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?(): void;
 };
@@ -36,6 +41,7 @@ export type DropzoneState = DropzoneRef & {
   draggedFiles: File[];
   acceptedFiles: File[];
   rejectedFiles: File[];
+  rejectReasons: FileError[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
   getRootProps(props?: DropzoneRootProps): DropzoneRootProps;
