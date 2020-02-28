@@ -741,7 +741,7 @@ describe('useDropzone() hook', () => {
 
       Object.keys(innerProps).forEach(prop =>
         innerProps[prop].mockImplementation((...args) => {
-          const event = prop === 'onDrop' ? args.pop() : args.shift()
+          const event = prop === 'onDrop' ? args[2] : args[0]
           event.stopPropagation()
         })
       )
@@ -1911,7 +1911,7 @@ describe('useDropzone() hook', () => {
       dispatchEvt(input, 'change')
       await flushPromises(ui, container)
 
-      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything(), [])
     })
 
     it('sets {acceptedFiles, rejectedFiles}', async () => {
@@ -2005,7 +2005,7 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles(files))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything(), [{code: 'file-invalid-type', file: files[0], message: 'File type must be image/*'}])
     })
 
     it('rejects all files if {multiple} is false and {accept} criteria is met', async () => {
@@ -2024,7 +2024,7 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith([], images, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([], images, expect.anything(), [{code: 'file-excessive', file: images[0], message: 'Too many files'}, {code: 'file-excessive', file: images[1], message: 'Too many files'}])
     })
 
     it('accepts a single files if {multiple} is false and {accept} criteria is met', async () => {
@@ -2044,7 +2044,7 @@ describe('useDropzone() hook', () => {
       const [image] = images
       fireDrop(dropzone, createDtWithFiles([image]))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith([image], [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([image], [], expect.anything(), [])
     })
 
     it('accepts all files if {multiple} is true', async () => {
@@ -2063,7 +2063,7 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles(files))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything(), [])
     })
 
     it('resets {isFileDialogActive} state', async () => {
@@ -2115,17 +2115,17 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles(files))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything(), [{code: 'file-invalid-type', file: files[0], message: 'File type must be image/*'}])
       onDropSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything(), [])
       onDropSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles([...files, ...images]))
       await flushPromises(ui, container)
-      expect(onDropSpy).toHaveBeenCalledWith(images, files, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(images, files, expect.anything(), [{code: 'file-invalid-type', file: files[0], message: 'File type must be image/*'}])
     })
 
     test('onDropAccepted callback is invoked if some files are accepted', async () => {
@@ -2173,7 +2173,7 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles(files))
       await flushPromises(ui, container)
-      expect(onDropRejectedSpy).toHaveBeenCalledWith(files, expect.anything())
+      expect(onDropRejectedSpy).toHaveBeenCalledWith(files, expect.anything(), [{code: 'file-invalid-type', file: files[0], message: 'File type must be image/*'}])
       onDropRejectedSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles(images))
@@ -2183,7 +2183,7 @@ describe('useDropzone() hook', () => {
 
       fireDrop(dropzone, createDtWithFiles([...files, ...images]))
       await flushPromises(ui, container)
-      expect(onDropRejectedSpy).toHaveBeenCalledWith(files, expect.anything())
+      expect(onDropRejectedSpy).toHaveBeenCalledWith(files, expect.anything(), [{code: 'file-invalid-type', file: files[0], message: 'File type must be image/*'}])
     })
 
     it('accepts a dropped image when Firefox provides a bogus file type', async () => {
@@ -2204,7 +2204,7 @@ describe('useDropzone() hook', () => {
       fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
 
-      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything(), [])
     })
 
     it('filters files according to {maxSize}', async () => {
@@ -2224,7 +2224,7 @@ describe('useDropzone() hook', () => {
       fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
 
-      expect(onDropSpy).toHaveBeenCalledWith([], images, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([], images, expect.anything(), [{code: 'file-too-large', file: images[0], message: 'File is larger than 1111 bytes'}, {code: 'file-too-large', file: images[1], message: 'File is larger than 1111 bytes'}])
     })
 
     it('filters files according to {minSize}', async () => {
@@ -2244,7 +2244,7 @@ describe('useDropzone() hook', () => {
       fireDrop(dropzone, createDtWithFiles(files))
       await flushPromises(ui, container)
 
-      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith([], files, expect.anything(), [{code: 'file-too-small', file: files[0], message: 'File is smaller than 1112 bytes'}])
     })
   })
 

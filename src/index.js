@@ -19,7 +19,8 @@ import {
   isEvtWithFiles,
   isIeOrEdge,
   isPropagationStopped,
-  onDocumentDragOver
+  onDocumentDragOver,
+  REJECT_REASONS
 } from './utils/index'
 
 /**
@@ -62,6 +63,7 @@ Dropzone.propTypes = {
    * @param {File[]} params.draggedFiles Files in active drag
    * @param {File[]} params.acceptedFiles Accepted files
    * @param {File[]} params.rejectedFiles Rejected files
+   * @param {FileError[]} params.rejectReasons Why files are rejected
    */
   children: PropTypes.func,
 
@@ -183,6 +185,7 @@ Dropzone.propTypes = {
    * @param {File[]} acceptedFiles
    * @param {File[]} rejectedFiles
    * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+   * @param {FileError[]} rejectReasons
    */
   onDrop: PropTypes.func,
 
@@ -224,6 +227,7 @@ export default Dropzone
  * @param {File[]} acceptedFiles List of accepted files
  * @param {File[]} rejectedFiles List of rejected files
  * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ * @param {FileError[]} rejectReasons
  */
 
 /**
@@ -269,6 +273,7 @@ export default Dropzone
  * @property {File[]} draggedFiles Files in active drag
  * @property {File[]} acceptedFiles Accepted files
  * @property {File[]} rejectedFiles Rejected files
+ * @property {FileError[]} rejectReasons Why files are rejected
  */
 
 const initialState = {
@@ -279,7 +284,8 @@ const initialState = {
   isDragReject: false,
   draggedFiles: [],
   acceptedFiles: [],
-  rejectedFiles: []
+  rejectedFiles: [],
+  rejectReasons: []
 }
 
 /**
@@ -578,31 +584,40 @@ export function useDropzone({
 
           const acceptedFiles = []
           const rejectedFiles = []
+          const rejectReasons = []
 
           files.forEach(file => {
-            if (fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)) {
+            const [accepted, acceptError] = fileAccepted(file, accept)
+            const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
+            if (accepted && sizeMatch) {
               acceptedFiles.push(file)
             } else {
+              const error = acceptError || sizeError
               rejectedFiles.push(file)
+              rejectReasons.push({ file, ...error })
             }
           })
 
           if (!multiple && acceptedFiles.length > 1) {
+            acceptedFiles.forEach(file => {
+              rejectReasons.push({ file, ...REJECT_REASONS.TOO_MANY() })
+            })
             rejectedFiles.push(...acceptedFiles.splice(0)) // Reject everything and empty accepted files
           }
 
           dispatch({
             acceptedFiles,
             rejectedFiles,
+            rejectReasons,
             type: 'setFiles'
           })
 
           if (onDrop) {
-            onDrop(acceptedFiles, rejectedFiles, event)
+            onDrop(acceptedFiles, rejectedFiles, event, rejectReasons)
           }
 
           if (rejectedFiles.length > 0 && onDropRejected) {
-            onDropRejected(rejectedFiles, event)
+            onDropRejected(rejectedFiles, event, rejectReasons)
           }
 
           if (acceptedFiles.length > 0 && onDropAccepted) {
@@ -762,7 +777,8 @@ function reducer(state, action) {
       return {
         ...state,
         acceptedFiles: action.acceptedFiles,
-        rejectedFiles: action.rejectedFiles
+        rejectedFiles: action.rejectedFiles,
+        rejectReasons: action.rejectReasons
       }
     case 'reset':
       return {
