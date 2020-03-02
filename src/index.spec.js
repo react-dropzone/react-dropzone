@@ -1749,7 +1749,7 @@ describe('useDropzone() hook', () => {
       expect(dropzone).toHaveTextContent('dragReject')
     })
 
-    it('sets {isDragActive, isDragAccept, isDragReject} if all files are accepted and {multiple} is false on dragenter', async () => {
+    it('sets {isDragActive, isDragAccept, isDragReject} if any files are rejected and {multiple} is false on dragenter', async () => {
       const ui = (
         <Dropzone accept="image/*" multiple={false}>
           {({ getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject }) => (
@@ -1770,7 +1770,7 @@ describe('useDropzone() hook', () => {
       await flushPromises(ui, container)
 
       expect(dropzone).toHaveTextContent('dragActive')
-      expect(dropzone).toHaveTextContent('dragAccept')
+      expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).toHaveTextContent('dragReject')
     })
 

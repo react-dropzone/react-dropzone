@@ -569,7 +569,6 @@ export function useDropzone({
       stopPropagation(event)
 
       dragTargetsRef.current = []
-      dispatch({ type: 'reset' })
 
       if (isEvtWithFiles(event)) {
         Promise.resolve(getFilesFromEvent(event)).then(files => {
@@ -611,6 +610,7 @@ export function useDropzone({
           }
         })
       }
+      dispatch({ type: 'reset' })
     },
     [
       multiple,
@@ -711,9 +711,8 @@ export function useDropzone({
   )
 
   const fileCount = draggedFiles.length
-  const isMultipleAllowed = multiple || fileCount <= 1
-  const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept, minSize, maxSize)
-  const isDragReject = fileCount > 0 && (!isDragAccept || !isMultipleAllowed)
+  const isDragAccept = fileCount > 0 && allFilesAccepted({ files: draggedFiles, accept, minSize, maxSize, multiple })
+  const isDragReject = fileCount > 0 && !isDragAccept
 
   return {
     ...state,
@@ -770,7 +769,9 @@ function reducer(state, action) {
         ...state,
         isFileDialogActive: false,
         isDragActive: false,
-        draggedFiles: []
+        draggedFiles: [],
+        acceptedFiles: [],
+        rejectedFiles: [],
       }
     default:
       return state
