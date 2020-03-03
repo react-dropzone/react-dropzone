@@ -223,6 +223,11 @@ describe('fileAccepted', () => {
     expect(utils.fileAccepted(file, ['.gif', '.png'])).toEqual([false, { code: 'file-invalid-type', message: 'File type must be one of .gif, .png' }])
   })
 
+it('rejects file when single accept criteria as array', () => {
+  const file = createFile('hamster.pdf', 100, 'application/pdf');
+  expect(utils.fileAccepted(file, ['.gif'])).toEqual([false, { code: 'file-invalid-type', message: 'File type must be .gif' }])
+})
+
 })
 
 function createFile(name, size, type) {
