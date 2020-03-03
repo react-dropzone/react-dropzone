@@ -2,6 +2,7 @@ import accepts from 'attr-accept'
 
 export const REJECT_REASONS = {
   INVALID_TYPE: accept => {
+    accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept;
     const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
     return {
       code: 'file-invalid-type',
@@ -32,7 +33,7 @@ export const REJECT_REASONS = {
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
   const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
-  return isAcceptable ? [isAcceptable, null] : [false, REJECT_REASONS.INVALID_TYPE(accept)]
+  return isAcceptable ? [isAcceptable, null] : [isAcceptable, REJECT_REASONS.INVALID_TYPE(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
