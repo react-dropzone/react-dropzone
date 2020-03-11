@@ -202,7 +202,14 @@ Dropzone.propTypes = {
    * @param {object[]} files
    * @param {(DragEvent|Event)} event
    */
-  onDropRejected: PropTypes.func
+  onDropRejected: PropTypes.func,
+
+  /**
+   * Cb for when a user removes one or more files.
+   *
+   * @param {object[]} files
+   */
+  onRemoveFiles: PropTypes.func
 }
 
 export default Dropzone
@@ -269,6 +276,7 @@ export default Dropzone
  * @property {File[]} draggedFiles Files in active drag
  * @property {File[]} acceptedFiles Accepted files
  * @property {File[]} rejectedFiles Rejected files
+ * @property {Function} removeFiles Accepts an array of File objects to be removed
  */
 
 const initialState = {
@@ -368,6 +376,7 @@ export function useDropzone({
   onDropAccepted,
   onDropRejected,
   onFileDialogCancel,
+  onRemoveFiles,
   preventDropOnDocument = true,
   noClick = false,
   noKeyboard = false,
@@ -710,6 +719,26 @@ export function useDropzone({
     [inputRef, accept, multiple, onDropCb, disabled]
   )
 
+  const removeFiles = React.useCallback(
+    files => {
+      const acceptedFiles = state.acceptedFiles.filter(acceptedFile => {
+        return !files.find(f => f === acceptedFile);
+      });
+      const rejectedFiles = state.rejectedFiles.filter(rejectedFile => {
+        return !files.find(f => f === rejectedFile);
+      });
+
+      dispatch({
+        acceptedFiles,
+        rejectedFiles,
+        type: 'setFiles'
+      })
+
+      onRemoveFiles && onRemoveFiles(files)
+    },
+    [state, onRemoveFiles]
+  )
+
   const fileCount = draggedFiles.length
   const isMultipleAllowed = multiple || fileCount <= 1
   const isDragAccept = fileCount > 0 && allFilesAccepted(draggedFiles, accept, minSize, maxSize)
@@ -724,7 +753,8 @@ export function useDropzone({
     getInputProps,
     rootRef,
     inputRef,
-    open: composeHandler(openFileDialog)
+    open: composeHandler(openFileDialog),
+    removeFiles
   }
 }
 

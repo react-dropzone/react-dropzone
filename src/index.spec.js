@@ -1914,6 +1914,83 @@ describe('useDropzone() hook', () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
     })
 
+    test('removeFiles removes file from files arrays', async () => {
+      const FileList = (props = { files: [] }) => (
+        <ul>
+          {props.files.map(file => (
+            <li key={file.name} data-type={props.type}>
+              {file.name}
+            </li>
+          ))}
+        </ul>
+      )
+
+      const getAcceptedFiles = node => node.querySelectorAll(`[data-type="accepted"]`)
+      const getRejectedFiles = node => node.querySelectorAll(`[data-type="rejected"]`)
+
+      const ui = (
+        <Dropzone accept="image/*">
+          {({ getRootProps, getInputProps, acceptedFiles, rejectedFiles, removeFiles }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <button onClick={() => {
+                removeFiles([acceptedFiles[0], rejectedFiles[0]]);
+              }}>Remove</button>
+              <FileList files={acceptedFiles} type="accepted" />
+              <FileList files={rejectedFiles} type="rejected" />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const dropzone = container.querySelector('div')
+      const input = container.querySelector('input')
+
+      Object.defineProperty(input, 'files', { value: [...files, ...images] })
+
+      dispatchEvt(input, 'change')
+      await flushPromises(ui, container)
+
+      const button = container.querySelector('button')
+      dispatchEvt(button, 'click')
+
+      await flushPromises(ui, container)
+
+      const acceptedFileList = getAcceptedFiles(dropzone)
+      expect(acceptedFileList).toHaveLength(1)
+      const rejectedFileList = getRejectedFiles(dropzone)
+      expect(rejectedFileList).toHaveLength(0)
+    })
+
+    test('onRemoveFiles callback is invoked when removeFiles is called', async () => {
+      const onRemoveSpy = jest.fn()
+
+      const ui = (
+        <Dropzone onRemoveFiles={onRemoveSpy}>
+          {({ getRootProps, getInputProps, acceptedFiles, removeFiles }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <button onClick={() => {
+                removeFiles([acceptedFiles[0]]);
+              }}>Remove</button>
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const input = container.querySelector('input')
+
+      Object.defineProperty(input, 'files', { value: files })
+
+      dispatchEvt(input, 'change')
+      await flushPromises(ui, container)
+
+      const button = container.querySelector('button')
+      dispatchEvt(button, 'click')
+
+      expect(onRemoveSpy).toHaveBeenCalledWith(files)
+    })
+
     it('sets {acceptedFiles, rejectedFiles}', async () => {
       const FileList = (props = { files: [] }) => (
         <ul>
