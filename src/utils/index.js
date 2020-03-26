@@ -1,48 +1,56 @@
 import accepts from 'attr-accept'
 
-export const REJECT_REASONS = {
-  INVALID_TYPE: accept => {
-    accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept;
-    const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
-    return {
-      code: 'file-invalid-type',
-      message: `File type must be ${messageSuffix}`
-    }
-  },
-  TOO_LARGE: maxSize => {
-    return {
-      code: 'file-too-large',
-      message: `File is larger than ${maxSize} bytes`
-    }
-  },
-  TOO_SMALL: minSize => {
-    return {
-      code: 'file-too-small',
-      message: `File is smaller than ${minSize} bytes`
-    }
-  },
-  TOO_MANY: () => {
-    return {
-      code: 'file-excessive',
-      message: 'Too many files'
-    }
+// Error codes
+export const FILE_INVALID_TYPE = 'file-invalid-type'
+export const FILE_TOO_LARGE = 'file-too-large'
+export const FILE_TOO_SMALL = 'file-too-small'
+export const FILE_EXCESSIVE = 'file-excessive'
+
+// File Errors
+export const REJECTED_INVALID_TYPE = accept => {
+  accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
+  const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
+  return {
+    code: FILE_INVALID_TYPE,
+    message: `File type must be ${messageSuffix}`
   }
+}
+
+export const REJECTED_TOO_LARGE = maxSize => {
+  return {
+    code: FILE_TOO_LARGE,
+    message: `File is larger than ${maxSize} bytes`
+  }
+}
+
+export const REJECTED_TOO_SMALL = minSize => {
+  return {
+    code: FILE_TOO_SMALL,
+    message: `File is smaller than ${minSize} bytes`
+  }
+}
+
+export const REJECTED_EXCESSIVE = {
+  code: 'file-excessive',
+  message: 'Too many files'
 }
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
   const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
-  return isAcceptable ? [isAcceptable, null] : [isAcceptable, REJECT_REASONS.INVALID_TYPE(accept)]
+  return [isAcceptable, isAcceptable ? null : REJECTED_INVALID_TYPE(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
   if (isDefined(file.size)) {
     if (isDefined(minSize) && isDefined(maxSize)) {
-      if (file.size > maxSize) return [false, REJECT_REASONS.TOO_LARGE(maxSize)]
-      if (file.size < minSize) return [false, REJECT_REASONS.TOO_SMALL(minSize)]
-    } else if (isDefined(minSize) && file.size < minSize) return [false, REJECT_REASONS.TOO_SMALL(minSize)]
-    else if (isDefined(maxSize) && file.size > maxSize) return [false, REJECT_REASONS.TOO_LARGE(maxSize)]
+      if (file.size > maxSize) return [false, REJECTED_TOO_LARGE(maxSize)]
+      if (file.size < minSize) return [false, REJECTED_TOO_SMALL(minSize)]
+    } else if (isDefined(minSize) && file.size < minSize)
+      return [false, REJECTED_TOO_SMALL(minSize)]
+    else if (isDefined(maxSize) && file.size > maxSize)
+      return [false, REJECTED_TOO_LARGE(maxSize)]
   }
   return [true, null]
 }
