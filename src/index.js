@@ -487,10 +487,7 @@ export function useDropzone({
       event.persist()
       stopPropagation(event)
 
-      // Count the dropzone and any children that are entered.
-      if (dragTargetsRef.current.indexOf(event.target) === -1) {
-        dragTargetsRef.current = [...dragTargetsRef.current, event.target]
-      }
+      dragTargetsRef.current = [...dragTargetsRef.current, event.target]
 
       if (isEvtWithFiles(event)) {
         Promise.resolve(getFilesFromEvent(event)).then(draggedFiles => {
@@ -542,8 +539,14 @@ export function useDropzone({
 
       // Only deactivate once the dropzone and all children have been left
       const targets = dragTargetsRef.current.filter(
-        target => target !== event.target && rootRef.current && rootRef.current.contains(target)
+        target => rootRef.current && rootRef.current.contains(target)
       )
+      // Make sure to remove a target present multiple times only once
+      // (Firefox may fire dragenter/dragleave multiple times on the same element)
+      const targetIdx = targets.indexOf(event.target)
+      if (targetIdx !== -1) {
+        targets.splice(targetIdx, 1)
+      }
       dragTargetsRef.current = targets
       if (targets.length > 0) {
         return
