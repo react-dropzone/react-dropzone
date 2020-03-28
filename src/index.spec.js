@@ -1880,6 +1880,12 @@ describe('useDropzone() hook', () => {
 
       fireDragLeave(dropzone, data)
       await flushPromises(ui, container)
+      expect(dropzone).toHaveTextContent('dragActive')
+      expect(dropzone).toHaveTextContent('dragAccept')
+      expect(dropzone).not.toHaveTextContent('dragReject')
+
+      fireDragLeave(dropzone, data)
+      await flushPromises(ui, container)
       expect(dropzone).not.toHaveTextContent('dragActive')
       expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
