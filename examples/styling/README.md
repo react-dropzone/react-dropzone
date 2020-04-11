@@ -50,7 +50,8 @@ function StyledDropzone(props) {
     ...(isDragReject ? rejectStyle : {})
   }), [
     isDragActive,
-    isDragReject
+    isDragReject,
+    isDragAccept
   ]);
 
   return (
