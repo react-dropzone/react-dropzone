@@ -2039,7 +2039,7 @@ describe('useDropzone() hook', () => {
           file: images[0],
           errors: [
             {
-              code: 'file-excessive',
+              code: 'too-many-files',
               message: 'Too many files',
             }
           ]
@@ -2048,7 +2048,7 @@ describe('useDropzone() hook', () => {
           file: images[1],
           errors: [
             {
-              code: 'file-excessive',
+              code: 'too-many-files',
               message: 'Too many files',
             }
           ]

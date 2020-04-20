@@ -4,10 +4,10 @@ import accepts from 'attr-accept'
 export const FILE_INVALID_TYPE = 'file-invalid-type'
 export const FILE_TOO_LARGE = 'file-too-large'
 export const FILE_TOO_SMALL = 'file-too-small'
-export const FILE_EXCESSIVE = 'file-excessive'
+export const TOO_MANY_FILES = 'too-many-files'
 
 // File Errors
-export const REJECTED_INVALID_TYPE = accept => {
+export const getInvalidTypeRejectionMsg = accept => {
   accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
   const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
   return {
@@ -16,22 +16,22 @@ export const REJECTED_INVALID_TYPE = accept => {
   }
 }
 
-export const REJECTED_TOO_LARGE = maxSize => {
+export const getTooLargeRejectionMsg = maxSize => {
   return {
     code: FILE_TOO_LARGE,
     message: `File is larger than ${maxSize} bytes`
   }
 }
 
-export const REJECTED_TOO_SMALL = minSize => {
+export const getTooSmallRejectionMsg = minSize => {
   return {
     code: FILE_TOO_SMALL,
     message: `File is smaller than ${minSize} bytes`
   }
 }
 
-export const REJECTED_EXCESSIVE = {
-  code: 'file-excessive',
+export const TOO_MANY_FILES_REJECTION = {
+  code: TOO_MANY_FILES,
   message: 'Too many files'
 }
 
@@ -39,18 +39,18 @@ export const REJECTED_EXCESSIVE = {
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
   const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
-  return [isAcceptable, isAcceptable ? null : REJECTED_INVALID_TYPE(accept)]
+  return [isAcceptable, isAcceptable ? null : getInvalidTypeRejectionMsg(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
   if (isDefined(file.size)) {
     if (isDefined(minSize) && isDefined(maxSize)) {
-      if (file.size > maxSize) return [false, REJECTED_TOO_LARGE(maxSize)]
-      if (file.size < minSize) return [false, REJECTED_TOO_SMALL(minSize)]
+      if (file.size > maxSize) return [false, getTooLargeRejectionMsg(maxSize)]
+      if (file.size < minSize) return [false, getTooSmallRejectionMsg(minSize)]
     } else if (isDefined(minSize) && file.size < minSize)
-      return [false, REJECTED_TOO_SMALL(minSize)]
+      return [false, getTooSmallRejectionMsg(minSize)]
     else if (isDefined(maxSize) && file.size > maxSize)
-      return [false, REJECTED_TOO_LARGE(maxSize)]
+      return [false, getTooLargeRejectionMsg(maxSize)]
   }
   return [true, null]
 }

@@ -20,7 +20,7 @@ import {
   isIeOrEdge,
   isPropagationStopped,
   onDocumentDragOver,
-  REJECTED_EXCESSIVE
+  TOO_MANY_FILES_REJECTION
 } from './utils/index'
 
 /**
@@ -594,7 +594,7 @@ export function useDropzone({
           if (!multiple && acceptedFiles.length > 1) {
             // Reject everything and empty accepted files
             acceptedFiles.forEach(file => {
-              fileRejections.push({ file, errors: [REJECTED_EXCESSIVE] })
+              fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
             })
             acceptedFiles.splice(0)
           }
