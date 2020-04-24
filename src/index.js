@@ -779,7 +779,7 @@ function reducer(state, action) {
         isDragActive: false,
         draggedFiles: [],
         acceptedFiles: [],
-        rejectedFiles: [],
+        fileRejections: [],
       }
     default:
       return state
