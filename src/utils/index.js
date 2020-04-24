@@ -7,7 +7,7 @@ export const FILE_TOO_SMALL = 'file-too-small'
 export const TOO_MANY_FILES = 'too-many-files'
 
 // File Errors
-export const getInvalidTypeRejectionMsg = accept => {
+export const getInvalidTypeRejectionErr = accept => {
   accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
   const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
   return {
@@ -16,14 +16,14 @@ export const getInvalidTypeRejectionMsg = accept => {
   }
 }
 
-export const getTooLargeRejectionMsg = maxSize => {
+export const getTooLargeRejectionErr = maxSize => {
   return {
     code: FILE_TOO_LARGE,
     message: `File is larger than ${maxSize} bytes`
   }
 }
 
-export const getTooSmallRejectionMsg = minSize => {
+export const getTooSmallRejectionErr = minSize => {
   return {
     code: FILE_TOO_SMALL,
     message: `File is smaller than ${minSize} bytes`
@@ -39,18 +39,18 @@ export const TOO_MANY_FILES_REJECTION = {
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
   const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
-  return [isAcceptable, isAcceptable ? null : getInvalidTypeRejectionMsg(accept)]
+  return [isAcceptable, isAcceptable ? null : getInvalidTypeRejectionErr(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
   if (isDefined(file.size)) {
     if (isDefined(minSize) && isDefined(maxSize)) {
-      if (file.size > maxSize) return [false, getTooLargeRejectionMsg(maxSize)]
-      if (file.size < minSize) return [false, getTooSmallRejectionMsg(minSize)]
+      if (file.size > maxSize) return [false, getTooLargeRejectionErr(maxSize)]
+      if (file.size < minSize) return [false, getTooSmallRejectionErr(minSize)]
     } else if (isDefined(minSize) && file.size < minSize)
-      return [false, getTooSmallRejectionMsg(minSize)]
+      return [false, getTooSmallRejectionErr(minSize)]
     else if (isDefined(maxSize) && file.size > maxSize)
-      return [false, getTooLargeRejectionMsg(maxSize)]
+      return [false, getTooLargeRejectionErr(maxSize)]
   }
   return [true, null]
 }
