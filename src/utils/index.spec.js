@@ -11,32 +11,32 @@ describe('fileMatchSize()', () => {
   })
 
   it('should return true if the file object doesn\'t have a {size} property', () => {
-    expect(utils.fileMatchSize({})).toBe(true)
-    expect(utils.fileMatchSize({size: null})).toBe(true)
+    expect(utils.fileMatchSize({})).toEqual([true, null])
+    expect(utils.fileMatchSize({size: null})).toEqual([true, null])
   })
 
   it('should return true if the minSize and maxSize were not provided', () => {
-    expect(utils.fileMatchSize({size: 100})).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, undefined, undefined)).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, null, null)).toBe(true)
+    expect(utils.fileMatchSize({size: 100})).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, undefined, undefined)).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, null, null)).toEqual([true, null])
   })
 
   it('should return true if the file {size} is within the [minSize, maxSize] range', () => {
-    expect(utils.fileMatchSize({size: 100}, 10, 200)).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, 10, 99)).toBe(false)
-    expect(utils.fileMatchSize({size: 100}, 101, 200)).toBe(false)
+    expect(utils.fileMatchSize({size: 100}, 10, 200)).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, 10, 99)).toEqual([false, { code: 'file-too-large', message: 'File is larger than 99 bytes' }])
+    expect(utils.fileMatchSize({size: 100}, 101, 200)).toEqual([false, { code: 'file-too-small', message: 'File is smaller than 101 bytes' }])
   })
 
   it('should return true if the file {size} is more than minSize', () => {
-    expect(utils.fileMatchSize({size: 100}, 100)).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, 101)).toBe(false)
+    expect(utils.fileMatchSize({size: 100}, 100)).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, 101)).toEqual([false, { code: 'file-too-small', message: 'File is smaller than 101 bytes' }])
   })
 
   it('should return true if the file {size} is less than maxSize', () => {
-    expect(utils.fileMatchSize({size: 100}, undefined, 100)).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, null, 100)).toBe(true)
-    expect(utils.fileMatchSize({size: 100}, undefined, 99)).toBe(false)
-    expect(utils.fileMatchSize({size: 100}, null, 99)).toBe(false)
+    expect(utils.fileMatchSize({size: 100}, undefined, 100)).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, null, 100)).toEqual([true, null])
+    expect(utils.fileMatchSize({size: 100}, undefined, 99)).toEqual([false, { code: 'file-too-large', message: 'File is larger than 99 bytes' }])
+    expect(utils.fileMatchSize({size: 100}, null, 99)).toEqual([false, { code: 'file-too-large', message: 'File is larger than 99 bytes' }])
   })
 })
 
@@ -190,3 +190,53 @@ describe('composeEventHandlers', () => {
     expect(fn2).not.toHaveBeenCalled()
   })
 })
+
+describe('fileAccepted', () => {
+  let utils
+  beforeEach(async done => {
+    utils = await import('./index')
+    done()
+  })
+
+  it('accepts bogus firefox file', () => {
+    const file = createFile('bogus.png', 100, 'application/x-moz-file');
+    expect(utils.fileAccepted(file, '.pdf')).toEqual([true, null])
+  })
+
+  it('accepts file when single accept criteria', () => {
+    const file = createFile('hamster.pdf', 100, 'application/pdf');
+    expect(utils.fileAccepted(file, '.pdf')).toEqual([true, null])
+  })
+
+  it('accepts file when multiple accept criteria', () => {
+    const file = createFile('hamster.pdf', 100, 'application/pdf');
+    expect(utils.fileAccepted(file, ['.pdf', '.png'])).toEqual([true, null])
+  })
+
+  it('rejects file when single accept criteria', () => {
+    const file = createFile('hamster.pdf', 100, 'application/pdf');
+    expect(utils.fileAccepted(file, '.png')).toEqual([false, { code: 'file-invalid-type', message: 'File type must be .png' }])
+  })
+
+  it('rejects file when multiple accept criteria', () => {
+    const file = createFile('hamster.pdf', 100, 'application/pdf');
+    expect(utils.fileAccepted(file, ['.gif', '.png'])).toEqual([false, { code: 'file-invalid-type', message: 'File type must be one of .gif, .png' }])
+  })
+
+it('rejects file when single accept criteria as array', () => {
+  const file = createFile('hamster.pdf', 100, 'application/pdf');
+  expect(utils.fileAccepted(file, ['.gif'])).toEqual([false, { code: 'file-invalid-type', message: 'File type must be .gif' }])
+})
+
+})
+
+function createFile(name, size, type) {
+  const file = new File([], name, { type })
+  Object.defineProperty(file, 'size', {
+    get() {
+      return size
+    }
+  })
+  return file
+}
+
