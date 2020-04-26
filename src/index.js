@@ -19,7 +19,8 @@ import {
   isEvtWithFiles,
   isIeOrEdge,
   isPropagationStopped,
-  onDocumentDragOver
+  onDocumentDragOver,
+  TOO_MANY_FILES_REJECTION
 } from './utils/index'
 
 /**
@@ -61,7 +62,7 @@ Dropzone.propTypes = {
    * @param {boolean} params.isDragReject Some dragged files are rejected
    * @param {File[]} params.draggedFiles Files in active drag
    * @param {File[]} params.acceptedFiles Accepted files
-   * @param {File[]} params.rejectedFiles Rejected files
+   * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected
    */
   children: PropTypes.func,
 
@@ -181,7 +182,7 @@ Dropzone.propTypes = {
    * ```
    *
    * @param {File[]} acceptedFiles
-   * @param {File[]} rejectedFiles
+   * @param {FileRejection[]} fileRejections
    * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
    */
   onDrop: PropTypes.func,
@@ -199,7 +200,7 @@ Dropzone.propTypes = {
    * Cb for when the `drop` event occurs.
    * Note that if no files are rejected, this callback is not invoked.
    *
-   * @param {object[]} files
+   * @param {FileRejection[]} fileRejections
    * @param {(DragEvent|Event)} event
    */
   onDropRejected: PropTypes.func
@@ -222,7 +223,7 @@ export default Dropzone
  *
  * @callback dropCb
  * @param {File[]} acceptedFiles List of accepted files
- * @param {File[]} rejectedFiles List of rejected files
+ * @param {FileRejection[]} fileRejections List of rejected files and why they were rejected
  * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
  */
 
@@ -268,7 +269,7 @@ export default Dropzone
  * @property {boolean} isDragReject Some dragged files are rejected
  * @property {File[]} draggedFiles Files in active drag
  * @property {File[]} acceptedFiles Accepted files
- * @property {File[]} rejectedFiles Rejected files
+ * @property {FileRejection[]} fileRejections Rejected files and why they were rejected
  */
 
 const initialState = {
@@ -279,7 +280,7 @@ const initialState = {
   isDragReject: false,
   draggedFiles: [],
   acceptedFiles: [],
-  rejectedFiles: []
+  fileRejections: []
 }
 
 /**
@@ -577,32 +578,39 @@ export function useDropzone({
           }
 
           const acceptedFiles = []
-          const rejectedFiles = []
+          const fileRejections = []
 
           files.forEach(file => {
-            if (fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)) {
+            const [accepted, acceptError] = fileAccepted(file, accept)
+            const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
+            if (accepted && sizeMatch) {
               acceptedFiles.push(file)
             } else {
-              rejectedFiles.push(file)
+              const errors = [acceptError, sizeError].filter(e => e)
+              fileRejections.push({ file, errors })
             }
           })
 
           if (!multiple && acceptedFiles.length > 1) {
-            rejectedFiles.push(...acceptedFiles.splice(0)) // Reject everything and empty accepted files
+            // Reject everything and empty accepted files
+            acceptedFiles.forEach(file => {
+              fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
+            })
+            acceptedFiles.splice(0)
           }
 
           dispatch({
             acceptedFiles,
-            rejectedFiles,
+            fileRejections,
             type: 'setFiles'
           })
 
           if (onDrop) {
-            onDrop(acceptedFiles, rejectedFiles, event)
+            onDrop(acceptedFiles, fileRejections, event)
           }
 
-          if (rejectedFiles.length > 0 && onDropRejected) {
-            onDropRejected(rejectedFiles, event)
+          if (fileRejections.length > 0 && onDropRejected) {
+            onDropRejected(fileRejections, event)
           }
 
           if (acceptedFiles.length > 0 && onDropAccepted) {
@@ -762,7 +770,7 @@ function reducer(state, action) {
       return {
         ...state,
         acceptedFiles: action.acceptedFiles,
-        rejectedFiles: action.rejectedFiles
+        fileRejections: action.fileRejections
       }
     case 'reset':
       return {
@@ -771,7 +779,7 @@ function reducer(state, action) {
         isDragActive: false,
         draggedFiles: [],
         acceptedFiles: [],
-        rejectedFiles: [],
+        fileRejections: [],
       }
     default:
       return state

@@ -1,21 +1,58 @@
 import accepts from 'attr-accept'
 
+// Error codes
+export const FILE_INVALID_TYPE = 'file-invalid-type'
+export const FILE_TOO_LARGE = 'file-too-large'
+export const FILE_TOO_SMALL = 'file-too-small'
+export const TOO_MANY_FILES = 'too-many-files'
+
+// File Errors
+export const getInvalidTypeRejectionErr = accept => {
+  accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
+  const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
+  return {
+    code: FILE_INVALID_TYPE,
+    message: `File type must be ${messageSuffix}`
+  }
+}
+
+export const getTooLargeRejectionErr = maxSize => {
+  return {
+    code: FILE_TOO_LARGE,
+    message: `File is larger than ${maxSize} bytes`
+  }
+}
+
+export const getTooSmallRejectionErr = minSize => {
+  return {
+    code: FILE_TOO_SMALL,
+    message: `File is smaller than ${minSize} bytes`
+  }
+}
+
+export const TOO_MANY_FILES_REJECTION = {
+  code: TOO_MANY_FILES,
+  message: 'Too many files'
+}
+
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
-  return file.type === 'application/x-moz-file' || accepts(file, accept)
+  const isAcceptable = file.type === 'application/x-moz-file' || accepts(file, accept)
+  return [isAcceptable, isAcceptable ? null : getInvalidTypeRejectionErr(accept)]
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
   if (isDefined(file.size)) {
-    if (isDefined(minSize) && isDefined(maxSize))
-      return file.size >= minSize && file.size <= maxSize
-    else if (isDefined(minSize))
-      return file.size >= minSize
-    else if (isDefined(maxSize))
-      return file.size <= maxSize
+    if (isDefined(minSize) && isDefined(maxSize)) {
+      if (file.size > maxSize) return [false, getTooLargeRejectionErr(maxSize)]
+      if (file.size < minSize) return [false, getTooSmallRejectionErr(minSize)]
+    } else if (isDefined(minSize) && file.size < minSize)
+      return [false, getTooSmallRejectionErr(minSize)]
+    else if (isDefined(maxSize) && file.size > maxSize)
+      return [false, getTooLargeRejectionErr(maxSize)]
   }
-  return true
+  return [true, null]
 }
 
 function isDefined(value) {
@@ -28,7 +65,9 @@ export function allFilesAccepted({ files, accept, minSize, maxSize, multiple }) 
   }
 
   return files.every(file => {
-    return fileAccepted(file, accept) && fileMatchSize(file, minSize, maxSize)
+    const [accepted] = fileAccepted(file, accept)
+    const [sizeMatch] = fileMatchSize(file, minSize, maxSize)
+    return accepted && sizeMatch
   })
 }
 
