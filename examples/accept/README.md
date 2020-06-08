@@ -14,17 +14,17 @@ import React from 'react';
 import {useDropzone} from 'react-dropzone';
 
 function Accept(props) {
-  const {acceptedFiles, rejectedFiles, getRootProps, getInputProps} = useDropzone({
+  const {acceptedFiles, fileRejections, getRootProps, getInputProps} = useDropzone({
     accept: 'image/jpeg, image/png'
   });
-  
+
   const acceptedFilesItems = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
   ));
 
-  const rejectedFilesItems = rejectedFiles.map(file => (
+  const fileRejectionsItems = fileRejections.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
@@ -44,7 +44,7 @@ function Accept(props) {
         </ul>
         <h4>Rejected files</h4>
         <ul>
-          {rejectedFilesItems}
+          {fileRejectionsItems}
         </ul>
       </aside>
     </section>
@@ -125,4 +125,3 @@ function Accept(props) {
 ### Notes
 
 Mime type determination is not reliable accross platforms. CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows. In some cases there might not be a mime type set at all.
-

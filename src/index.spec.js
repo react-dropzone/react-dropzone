@@ -1920,7 +1920,7 @@ describe('useDropzone() hook', () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
     })
 
-    it('sets {acceptedFiles, rejectedFiles}', async () => {
+    it('sets {acceptedFiles, fileRejections}', async () => {
       const FileList = (props = { files: [] }) => (
         <ul>
           {props.files.map(file => (
