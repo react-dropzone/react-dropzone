@@ -6,8 +6,8 @@ export default class Test extends React.Component {
     return (
       <div>
         <Dropzone
-          onDrop={(acceptedFiles, rejectedFiles, event) =>
-            console.log(acceptedFiles, rejectedFiles, event)}
+          onDrop={(acceptedFiles, fileRejections, event) =>
+            console.log(acceptedFiles, fileRejections, event)}
           onDragEnter={event => console.log(event)}
           onDragOver={event => console.log(event)}
           onDragLeave={event => console.log(event)}
