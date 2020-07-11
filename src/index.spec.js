@@ -1920,12 +1920,29 @@ describe('useDropzone() hook', () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
     })
 
-    it('sets {acceptedFiles, rejectedFiles}', async () => {
-      const FileList = (props = { files: [] }) => (
+    it('sets {acceptedFiles, fileRejections}', async () => {
+      const FileList = ({ files = [] }) => (
         <ul>
-          {props.files.map(file => (
-            <li key={file.name} data-type={props.type}>
+          {files.map(file => (
+            <li key={file.name} data-type={'accepted'}>
               {file.name}
+            </li>
+          ))}
+        </ul>
+      )
+
+      const RejectedFileList = ({ fileRejections = [] }) => (
+        <ul>
+          {fileRejections.map(({ file, errors }) => (
+            <li key={file.name}>
+              <span data-type={"rejected"}>{file.name}</span>
+              <ul>
+                {errors.map(e => (
+                  <li key={e.code} data-type={"error"}>
+                    {e.code}
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>
@@ -1933,16 +1950,19 @@ describe('useDropzone() hook', () => {
 
       const getAcceptedFiles = node => node.querySelectorAll(`[data-type="accepted"]`)
       const getRejectedFiles = node => node.querySelectorAll(`[data-type="rejected"]`)
+      const getRejectedFilesErrors = node => node.querySelectorAll(`[data-type="error"]`)
       const matchToFiles = (fileList, files) =>
         Array.from(fileList).every(item => !!files.find(file => file.name === item.textContent))
+      const matchToErrorCode = (errorList, code) =>
+        Array.from(errorList).every(item => item.textContent === code)
 
       const ui = (
         <Dropzone accept="image/*">
           {({ getRootProps, getInputProps, acceptedFiles, fileRejections }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
-              <FileList files={acceptedFiles} type="accepted" />
-              <FileList files={fileRejections.map(rejection => rejection.file)} type="rejected" />
+              <FileList files={acceptedFiles} />
+              <RejectedFileList fileRejections={fileRejections} />
             </div>
           )}
         </Dropzone>
@@ -1961,8 +1981,12 @@ describe('useDropzone() hook', () => {
       const rejectedFileList = getRejectedFiles(dropzone)
       expect(rejectedFileList).toHaveLength(files.length)
       expect(matchToFiles(rejectedFileList, files)).toBe(true)
+      const rejectedFileErrorList = getRejectedFilesErrors(dropzone)
+      expect(rejectedFileErrorList).toHaveLength(files.length)
+      expect(matchToErrorCode(rejectedFileErrorList, 'file-invalid-type')).toBe(true)
     })
 
+    
     it('resets {isDragActive, isDragAccept, isDragReject}', async () => {
       const ui = (
         <Dropzone>
