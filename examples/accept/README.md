@@ -29,7 +29,7 @@ function Accept(props) {
     </li>
   ));
 
-  const fileRejectionItems = fileRejections.map({ file, errors}) => (
+  const fileRejectionItems = fileRejections.map(({ file, errors }) => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
       <ul>
