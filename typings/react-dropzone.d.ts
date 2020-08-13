@@ -1,6 +1,7 @@
 import * as React from "react";
 
 export { FileWithPath } from "file-selector";
+
 export default function Dropzone(props: DropzoneProps & React.RefAttributes<DropzoneRef>): JSX.Element;
 export function useDropzone(options?: DropzoneOptions): DropzoneState;
 
@@ -8,9 +9,10 @@ export interface DropzoneProps extends DropzoneOptions {
   children?(state: DropzoneState): JSX.Element;
 }
 
+
 export interface FileError {
   message: string;
-  code: string;
+  code:  "file-invalid-type"|"file-too-large"|"file-too-small"|"too-many-files" ;
 }
 
 export interface FileRejection {
