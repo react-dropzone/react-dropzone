@@ -28,11 +28,11 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   noDrag?: boolean;
   noDragEventsBubbling?: boolean;
   disabled?: boolean;
-  onDrop?<T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent): void;
-  onDropAccepted?<T extends File>(files: T[], event: DropEvent): void;
-  onDropRejected?(fileRejections: FileRejection[], event: DropEvent): void;
-  getFilesFromEvent?(event: DropEvent): Promise<Array<File | DataTransferItem>>;
-  onFileDialogCancel?(): void;
+  onDrop?: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
+  onDropAccepted?: <T extends File>(files: T[], event: DropEvent) => void;
+  onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
+  getFilesFromEvent?: (event: DropEvent) => Promise<Array<File | DataTransferItem>>;
+  onFileDialogCancel?: () => void;
 };
 
 export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
@@ -48,12 +48,12 @@ export type DropzoneState = DropzoneRef & {
   fileRejections: FileRejection[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
-  getRootProps(props?: DropzoneRootProps): DropzoneRootProps;
-  getInputProps(props?: DropzoneInputProps): DropzoneInputProps;
+  getRootProps: (props?: DropzoneRootProps) => DropzoneRootProps;
+  getInputProps: (props?: DropzoneInputProps) => DropzoneInputProps;
 };
 
 export interface DropzoneRef {
-  open(): void;
+  open: () => void;
 }
 
 export interface DropzoneRootProps extends React.HTMLAttributes<HTMLElement> {
