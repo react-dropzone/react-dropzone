@@ -262,7 +262,7 @@ test('invoke onDragEnter when dragenter event occurs', async () => {
   const dropzone = container.querySelector('div')
 
   dispatchEvt(dropzone, 'dragenter', data)
-  await flushPromises(ui, container)
+  await flushPromises()
 
   expect(onDragEnter).toHaveBeenCalled()
 })
