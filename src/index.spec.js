@@ -1,6 +1,6 @@
 /* eslint react/prop-types: 0, jsx-a11y/label-has-for: 0 */
 import React, { createRef } from 'react'
-import { cleanup, fireEvent, render } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
 import { fromEvent } from 'file-selector'
 import * as utils from './utils'
@@ -148,7 +148,7 @@ describe('useDropzone() hook', () => {
       expect(dropzone).toHaveAttribute('aria-label', ariaLabel)
     })
 
-    it('runs the custom callback handlers provided to the root props getter', () => {
+    it('runs the custom callback handlers provided to the root props getter', async () => {
       const event = createDtWithFiles(files)
 
       const rootProps = {
@@ -172,7 +172,7 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const dropzone = container.querySelector('div')
 
@@ -188,6 +188,7 @@ describe('useDropzone() hook', () => {
       expect(rootProps.onBlur).toHaveBeenCalled()
 
       fireEvent.dragEnter(dropzone, event)
+      await flushPromises(rerender, ui)
       expect(rootProps.onDragEnter).toHaveBeenCalled()
 
       fireEvent.dragOver(dropzone, event)
@@ -197,10 +198,11 @@ describe('useDropzone() hook', () => {
       expect(rootProps.onDragLeave).toHaveBeenCalled()
 
       fireEvent.drop(dropzone, event)
+      await flushPromises(rerender, ui)
       expect(rootProps.onDrop).toHaveBeenCalled()
     })
 
-    it('runs the custom callback handlers provided to the input props getter', () => {
+    it('runs the custom callback handlers provided to the input props getter', async () => {
       const inputProps = {
         onClick: jest.fn(),
         onChange: jest.fn()
@@ -216,14 +218,16 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const input = container.querySelector('input')
 
       fireEvent.click(input)
+      await flushPromises(rerender, ui)
       expect(inputProps.onClick).toHaveBeenCalled()
 
       fireEvent.change(input)
+      await flushPromises(rerender, ui)
       expect(inputProps.onChange).toHaveBeenCalled()
     })
 
@@ -308,7 +312,7 @@ describe('useDropzone() hook', () => {
       const dropzoneRef = createRef()
       const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
 
-      const { rerender } = render(
+      const ui = (
         <Dropzone ref={dropzoneRef}>
           {({ getRootProps, getInputProps, isFocused }) => (
             <div {...getRootProps()}>
@@ -319,11 +323,12 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
+      const { rerender } = render(ui)
+
       expect(dropzoneRef.current).not.toBeNull()
       expect(typeof dropzoneRef.current.open).toEqual('function')
 
-      dropzoneRef.current.open()
-
+      act(() => dropzoneRef.current.open())
       expect(onClickSpy).toHaveBeenCalled()
 
       rerender(null)
@@ -336,7 +341,7 @@ describe('useDropzone() hook', () => {
       const setRef = ref => (dropzoneRef = ref)
       const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
 
-      const { rerender } = render(
+      const ui = (
         <Dropzone ref={setRef}>
           {({ getRootProps, getInputProps, isFocused }) => (
             <div {...getRootProps()}>
@@ -347,15 +352,15 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
+      const { rerender } = render(ui)
+
       expect(dropzoneRef).not.toBeNull()
       expect(typeof dropzoneRef.open).toEqual('function')
 
-      dropzoneRef.open()
-
+      act(() => dropzoneRef.open())
       expect(onClickSpy).toHaveBeenCalled()
 
       rerender(null)
-
       expect(dropzoneRef).toBeNull()
     })
 
@@ -499,12 +504,12 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('#dropzone')
 
       const fn = async () => {
         fireDrop(dropzone, data)
-        await flushPromises(ui, container)
+        await flushPromises(rerender, ui)
         done()
       }
 
@@ -665,7 +670,7 @@ describe('useDropzone() hook', () => {
       const dropEvt = new Event('drop', { bubbles: true })
       const dropEvtPreventDefaultSpy = jest.spyOn(dropEvt, 'preventDefault')
       fireEvent(document.body, dropEvt)
-      expect(dropEvtPreventDefaultSpy).toHaveBeenCalledTimes(1) // TODO: Figure out who calls the preventDefault()
+      expect(dropEvtPreventDefaultSpy).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -708,12 +713,12 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const innerDropzone = container.querySelector('#inner-dropzone')
 
       fireDragEnter(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDragEnter).toHaveBeenCalled()
       expect(parentProps.onDragEnter).toHaveBeenCalled()
 
@@ -726,7 +731,7 @@ describe('useDropzone() hook', () => {
       expect(parentProps.onDragLeave).toHaveBeenCalled()
 
       fireDrop(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDrop).toHaveBeenCalled()
       expect(parentProps.onDrop).toHaveBeenCalled()
     })
@@ -774,12 +779,12 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const innerDropzone = container.querySelector('#inner-dropzone')
 
       fireDragEnter(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDragEnter).toHaveBeenCalled()
       expect(parentProps.onDragEnter).not.toHaveBeenCalled()
 
@@ -792,7 +797,7 @@ describe('useDropzone() hook', () => {
       expect(parentProps.onDragLeave).not.toHaveBeenCalled()
 
       fireDrop(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDrop).toHaveBeenCalled()
       expect(parentProps.onDrop).not.toHaveBeenCalled()
     })
@@ -833,17 +838,17 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const outerDropzone = container.querySelector('#outer-dropzone')
       const innerDropzone = container.querySelector('#inner-dropzone')
 
       // Sets drag targets on the outer dropzone
       fireDragEnter(outerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       fireDragEnter(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDragEnter).toHaveBeenCalled()
       expect(parentProps.onDragEnter).toHaveBeenCalledTimes(1)
 
@@ -856,7 +861,7 @@ describe('useDropzone() hook', () => {
       expect(parentProps.onDragLeave).not.toHaveBeenCalled()
 
       fireDrop(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(innerProps.onDrop).toHaveBeenCalled()
       expect(parentProps.onDrop).not.toHaveBeenCalled()
     })
@@ -885,16 +890,16 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
 
       const parentDropzone = container.querySelector('#parent-dropzone')
 
       fireDragEnter(parentDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       const innerDropzone = container.querySelector('#inner-dropzone')
       fireDragEnter(innerDropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       fireDragLeave(innerDropzone, data)
       expect(innerDragLeave).toHaveBeenCalled()
@@ -923,11 +928,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -937,7 +942,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).toHaveBeenCalled()
 
       expect(props.getFilesFromEvent).toHaveBeenCalledTimes(2)
@@ -1277,7 +1282,7 @@ describe('useDropzone() hook', () => {
       const isIeOrEdgeSpy = jest.spyOn(utils, 'isIeOrEdge').mockReturnValueOnce(true)
       const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
 
-      const { container } = render(
+      const ui = (
         <Dropzone>
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
@@ -1287,10 +1292,12 @@ describe('useDropzone() hook', () => {
         </Dropzone>
       )
 
+      const { container } = render(ui)
+
       const dropzone = container.querySelector('div')
 
       fireEvent.click(dropzone)
-      jest.runAllTimers()
+      drainTimers()
 
       expect(onClickSpy).toHaveBeenCalled()
       jest.useRealTimers()
@@ -1467,11 +1474,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -1481,7 +1488,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).toHaveBeenCalled()
     })
 
@@ -1506,11 +1513,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, emptyData)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).toHaveBeenCalled()
 
       fireDragOver(dropzone, emptyData)
@@ -1521,7 +1528,7 @@ describe('useDropzone() hook', () => {
 
       const data = createDtWithFiles(files)
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).toHaveBeenCalled()
       expect(props.onDropAccepted).toHaveBeenCalledWith(files, expect.any(Object))
       expect(props.onDropRejected).not.toHaveBeenCalled()
@@ -1553,11 +1560,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -1567,7 +1574,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).not.toHaveBeenCalled()
       expect(props.onDropAccepted).not.toHaveBeenCalled()
       expect(props.onDropRejected).not.toHaveBeenCalled()
@@ -1594,11 +1601,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -1608,7 +1615,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).not.toHaveBeenCalled()
       expect(props.onDropAccepted).not.toHaveBeenCalled()
       expect(props.onDropRejected).not.toHaveBeenCalled()
@@ -1637,7 +1644,7 @@ describe('useDropzone() hook', () => {
       const dropzone = container.querySelector('div')
 
       fireDragEnter(dropzone, data)
-      await flushPromises(noDragUi, container)
+      await flushPromises(rerender, noDragUi)
       expect(props.onDragEnter).not.toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -1647,7 +1654,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).not.toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(noDragUi, container)
+      await flushPromises(rerender, noDragUi)
       expect(props.onDrop).not.toHaveBeenCalled()
 
       const ui = (
@@ -1662,7 +1669,7 @@ describe('useDropzone() hook', () => {
       rerender(ui)
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDragEnter).toHaveBeenCalled()
 
       fireDragOver(dropzone, data)
@@ -1672,7 +1679,7 @@ describe('useDropzone() hook', () => {
       expect(props.onDragLeave).toHaveBeenCalled()
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(props.onDrop).toHaveBeenCalled()
     })
 
@@ -1689,12 +1696,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(files)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).toHaveTextContent('dragAccept')
@@ -1714,12 +1721,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles([...files, ...images])
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).not.toHaveTextContent('dragAccept')
@@ -1738,12 +1745,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(files)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).toHaveTextContent('dragReject')
@@ -1762,12 +1769,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(images)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).not.toHaveTextContent('dragAccept')
@@ -1788,12 +1795,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(files)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       const event = new Event('dragleave', { bubbles: true })
       Object.defineProperty(event, 'target', {
@@ -1823,7 +1830,7 @@ describe('useDropzone() hook', () => {
 
       const data = createDtWithFiles(images)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).toHaveTextContent('dragAccept')
@@ -1863,29 +1870,29 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(images)
 
       fireDragEnter(container.querySelector('#child'), data)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
 
       fireDragLeave(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
 
       fireDragLeave(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(dropzone).not.toHaveTextContent('dragActive')
       expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
@@ -1909,13 +1916,13 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const input = container.querySelector('input')
 
       Object.defineProperty(input, 'files', { value: files })
 
       dispatchEvt(input, 'change')
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
     })
@@ -1967,17 +1974,17 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       const acceptedFileList = getAcceptedFiles(dropzone)
       expect(acceptedFileList).toHaveLength(images.length)
       expect(matchToFiles(acceptedFileList, images)).toBe(true)
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       const rejectedFileList = getRejectedFiles(dropzone)
       expect(rejectedFileList).toHaveLength(files.length)
       expect(matchToFiles(rejectedFileList, files)).toBe(true)
@@ -1986,7 +1993,6 @@ describe('useDropzone() hook', () => {
       expect(matchToErrorCode(rejectedFileErrorList, 'file-invalid-type')).toBe(true)
     })
 
-    
     it('resets {isDragActive, isDragAccept, isDragReject}', async () => {
       const ui = (
         <Dropzone>
@@ -2000,20 +2006,20 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const data = createDtWithFiles(files)
 
       fireDragEnter(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).toHaveTextContent('dragActive')
       expect(dropzone).toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
 
       fireDrop(dropzone, data)
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(dropzone).not.toHaveTextContent('dragActive')
       expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(dropzone).not.toHaveTextContent('dragReject')
@@ -2030,11 +2036,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
           file: files[0],
@@ -2059,11 +2065,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
           file: images[0],
@@ -2098,10 +2104,10 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).toHaveBeenCalled()
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
@@ -2137,15 +2143,15 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).not.toHaveBeenCalled()
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
     })
-    
+
     it('accepts a single files if {multiple} is false and {accept} criteria is met', async () => {
       const onDropSpy = jest.fn()
       const ui = (
@@ -2157,12 +2163,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const [image] = images
       fireDrop(dropzone, createDtWithFiles([image]))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith([image], [], expect.anything())
     })
 
@@ -2177,11 +2183,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything())
     })
 
@@ -2203,7 +2209,7 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
       const btn = container.querySelector('button')
 
@@ -2213,7 +2219,7 @@ describe('useDropzone() hook', () => {
       expect(dropzone).toContainElement(ref)
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(dropzone).not.toContainElement(ref)
     })
@@ -2229,11 +2235,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
           file: files[0],
@@ -2248,12 +2254,12 @@ describe('useDropzone() hook', () => {
       onDropSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
       onDropSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles([...files, ...images]))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropSpy).toHaveBeenCalledWith(images, [
         {
           file: files[0],
@@ -2278,21 +2284,21 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropAcceptedSpy).not.toHaveBeenCalled()
       onDropAcceptedSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything())
       onDropAcceptedSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles([...files, ...images]))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything())
     })
 
@@ -2307,11 +2313,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).toHaveBeenCalledWith([
         {
           file: files[0],
@@ -2326,12 +2332,12 @@ describe('useDropzone() hook', () => {
       onDropRejectedSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).not.toHaveBeenCalled()
       onDropRejectedSpy.mockClear()
 
       fireDrop(dropzone, createDtWithFiles([...files, ...images]))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).toHaveBeenCalledWith([
         {
           file: files[0],
@@ -2356,12 +2362,12 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       const images = [createFile('bogus.gif', 1234, 'application/x-moz-file')]
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
     })
@@ -2377,11 +2383,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(images))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
@@ -2416,11 +2422,11 @@ describe('useDropzone() hook', () => {
           )}
         </Dropzone>
       )
-      const { container } = render(ui)
+      const { container, rerender } = render(ui)
       const dropzone = container.querySelector('div')
 
       fireDrop(dropzone, createDtWithFiles(files))
-      await flushPromises(ui, container)
+      await flushPromises(rerender, ui)
 
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
@@ -2459,7 +2465,7 @@ describe('useDropzone() hook', () => {
       )
 
       dispatchEvt(document.body, 'focus')
-      jest.runAllTimers()
+      drainTimers()
 
       expect(onFileDialogCancelSpy).not.toHaveBeenCalled()
     })
@@ -2487,13 +2493,13 @@ describe('useDropzone() hook', () => {
       const btn = container.querySelector('button')
 
       btn.click()
-      jest.runAllTimers()
+      drainTimers()
       const ref = activeRef.current
       expect(ref).not.toBeNull()
       expect(dropzone).toContainElement(ref)
 
       dispatchEvt(document.body, 'focus')
-      jest.runAllTimers()
+      drainTimers()
 
       expect(onFileDialogCancelSpy).toHaveBeenCalled()
       expect(dropzone).not.toContainElement(ref)
@@ -2516,17 +2522,17 @@ describe('useDropzone() hook', () => {
 
       const btn = container.querySelector('button')
       btn.click()
-      jest.runAllTimers()
+      drainTimers()
 
       rerender(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
           {({ getRootProps }) => <div {...getRootProps()} />}
         </Dropzone>
       )
-      jest.runAllTimers()
+      drainTimers()
 
       dispatchEvt(document.body, 'focus')
-      jest.runAllTimers()
+      drainTimers()
 
       expect(onFileDialogCancelSpy).not.toHaveBeenCalled()
     })
@@ -2552,10 +2558,10 @@ describe('useDropzone() hook', () => {
 
       const btn = container.querySelector('button')
       btn.click()
-      jest.runAllTimers()
+      drainTimers()
 
       dispatchEvt(document.body, 'focus')
-      jest.runAllTimers()
+      drainTimers()
 
       expect(onFileDialogCancelSpy).not.toHaveBeenCalled()
     })
@@ -2576,11 +2582,11 @@ describe('useDropzone() hook', () => {
 
       const btn = container.querySelector('button')
       btn.click()
-      jest.runAllTimers()
+      drainTimers()
 
       const fn = () => {
         dispatchEvt(document.body, 'focus')
-        jest.runAllTimers()
+        drainTimers()
       }
       expect(fn).not.toThrow()
     })
@@ -2679,13 +2685,12 @@ describe('useDropzone() hook', () => {
   })
 })
 
-function flushPromises(ui, container) {
-  return new Promise(resolve =>
-    global.setImmediate(() => {
-      render(ui, { container })
-      resolve(container)
-    })
-  )
+async function flushPromises(rerender, ui) {
+  await act(() => waitFor(() => rerender(ui)))
+}
+
+function drainTimers() {
+  act(() => jest.runAllTimers())
 }
 
 function createDtWithFiles(files = []) {

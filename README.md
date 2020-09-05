@@ -231,16 +231,11 @@ dropzoneRef.open()
 
 ## Testing
 
-*Important*: `react-dropzone` makes some of its drag 'n' drop callbacks asynchronous to enable promise based `getFilesFromEvent()` functions. In order to properly test this, you may want to utilize a helper function to run all promises like this:
-```js static
-const flushPromises = () => new Promise(resolve => setImmediate(resolve))
-```
-
-Example with [react-testing-library](https://github.com/kentcdodds/react-testing-library):
+*Important*: `react-dropzone` makes some of its drag 'n' drop callbacks asynchronous to enable promise based `getFilesFromEvent()` functions. In order to test components that use this library, you may want to use the [react-testing-library](https://github.com/testing-library/react-testing-library):
 ```js static
 import React from 'react'
 import Dropzone from 'react-dropzone'
-import { fireEvent, render } from 'react-testing-library'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 
 test('invoke onDragEnter when dragenter event occurs', async () => {
   const file = new File([
@@ -258,22 +253,17 @@ test('invoke onDragEnter when dragenter event occurs', async () => {
       )}
     </Dropzone>
   )
-  const { container } = render(ui)
+  const { container, rerender } = render(ui)
   const dropzone = container.querySelector('div')
 
   dispatchEvt(dropzone, 'dragenter', data)
-  await flushPromises(ui, container)
+  await flushPromises(rerender, ui)
 
   expect(onDragEnter).toHaveBeenCalled()
 })
 
-function flushPromises(ui, container) {
-  return new Promise(resolve =>
-    setImmediate(() => {
-      render(ui, { container })
-      resolve(container)
-    })
-  )
+async function flushPromises(rerender, ui) {
+  await act(() => waitFor(() => rerender(ui)))
 }
 
 function dispatchEvt(node, type, data) {
