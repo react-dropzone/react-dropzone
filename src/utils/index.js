@@ -30,6 +30,10 @@ export const getTooSmallRejectionErr = minSize => {
   }
 }
 
+export const TOO_MANY_FILES_REJECTION = {
+  code: TOO_MANY_FILES,
+  message: 'Too many files'
+}
 
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
