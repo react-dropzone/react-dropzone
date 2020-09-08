@@ -35,7 +35,6 @@ export const TOO_MANY_FILES_REJECTION = {
   message: 'Too many files'
 }
 
-
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
