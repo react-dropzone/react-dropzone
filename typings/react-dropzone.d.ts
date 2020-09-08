@@ -12,6 +12,7 @@ export interface FileError {
   message: string;
   code: "file-too-large" | "file-too-small"|"too-many-files"|"file-invalid-type";
 }
+
 export interface FileRejection {
   file: File;
   errors: FileError[];
