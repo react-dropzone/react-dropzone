@@ -10,7 +10,7 @@ export interface DropzoneProps extends DropzoneOptions {
 
 export interface FileError {
   message: string;
-  code: string;
+  code: "file-too-large" | "file-too-small"|"too-many-files"|"file-invalid-type";
 }
 
 export interface FileRejection {
