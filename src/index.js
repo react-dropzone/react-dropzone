@@ -116,6 +116,12 @@ Dropzone.propTypes = {
    * Maximum file size (in bytes)
    */
   maxSize: PropTypes.number,
+  /**
+   * Maximum accepted number of files
+   * The default value is 0 which means there is no limitation in the accepted number of files
+   * The minimum accepted value is 2
+   */
+  maxNumber: PropTypes.number,
 
   /**
    * Enable/disable the dropzone
@@ -362,6 +368,7 @@ export function useDropzone({
   maxSize = Infinity,
   minSize = 0,
   multiple = true,
+  maxNumber=0,
   onDragEnter,
   onDragLeave,
   onDragOver,
@@ -595,6 +602,13 @@ export function useDropzone({
           })
 
           if (!multiple && acceptedFiles.length > 1) {
+            // Reject everything and empty accepted files
+            acceptedFiles.forEach(file => {
+              fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
+            })
+            acceptedFiles.splice(0)
+          }
+          if (multiple && maxNumber>1 &&  acceptedFiles.length > maxNumber) {
             // Reject everything and empty accepted files
             acceptedFiles.forEach(file => {
               fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
