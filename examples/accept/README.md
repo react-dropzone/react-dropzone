@@ -35,7 +35,7 @@ function Accept(props) {
       <ul>
         {errors.map(e => (
           <li key={e.code}>{e.message}</li>
-        )}
+        ))}
       </ul>
     </li>
   ));
