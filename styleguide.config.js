@@ -46,6 +46,10 @@ module.exports = {
           content: 'examples/accept/README.md'
         },
         {
+          name: 'Accepting specific number of files',
+          content: 'examples/maxFiles/README.md'
+        },
+        {
           name: 'Opening File Dialog Programmatically',
           content: 'examples/file-dialog/README.md'
         },

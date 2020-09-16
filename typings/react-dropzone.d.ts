@@ -22,7 +22,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   accept?: string | string[];
   minSize?: number;
   maxSize?: number;
-  maxNumber?: number;
+  maxFiles?: number;
   preventDropOnDocument?: boolean;
   noClick?: boolean;
   noKeyboard?: boolean;

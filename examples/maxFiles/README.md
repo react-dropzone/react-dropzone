@@ -1,20 +1,21 @@
-By providing `maxNumber` prop you can make the dropzone accept specific number of files.
+By providing `maxFiles` prop you can limit how many files the drop zone accepts.
 
-Attention this prop is enabled when the `multiple` props in true.
-by default, this props has 0 value which means no limitation in the accepted number of files.
+**Note** that this prop is enabled when the `multiple` prop is enabled.
+The default value for this prop is 0, which means there's no limitation to how many files are accepted.
+
 
 ```jsx harmony
 import React from 'react';
 import {useDropzone} from 'react-dropzone';
 
-function AcceptNumberOfFiles(props) {
+function AcceptMaxFiles(props) {
   const {
     acceptedFiles,
     fileRejections,
     getRootProps,
     getInputProps
   } = useDropzone({    
-    maxNumber:2
+    maxFiles:2
   });
 
   const acceptedFileItems = acceptedFiles.map(file => (
@@ -23,13 +24,13 @@ function AcceptNumberOfFiles(props) {
     </li>
   ));
 
-  const fileRejectionItems = fileRejections.map( ( { file, errors  } ) => { 
+  const fileRejectionItems = fileRejections.map(({ file, errors  }) => { 
    return(
      <li key={file.path}>
           {file.path} - {file.size} bytes
           <ul>
-         {errors.map(e => <li key={e.code}>{e.message}</li>)
-         }
+            {errors.map(e => <li key={e.code}>{e.message}</li>)
+            }
          </ul>
 
      </li>
@@ -54,5 +55,5 @@ function AcceptNumberOfFiles(props) {
   );
 }
 
-<AcceptNumberOfFiles />
+<AcceptMaxFiles />
 ```
