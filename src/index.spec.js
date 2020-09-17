@@ -2102,7 +2102,6 @@ describe('useDropzone() hook', () => {
       )
       const { container } = render(ui)
       const dropzone = container.querySelector('div')
-
       fireDrop(dropzone, createDtWithFiles(threeImages))
       await flushPromises(ui, container)
       expect(onDropRejectedSpy).toHaveBeenCalled()
@@ -2152,7 +2151,6 @@ describe('useDropzone() hook', () => {
       const { container } = render(ui)
       const dropzone = container.querySelector('div')
 
-      
       fireDrop(dropzone, createDtWithFiles(threeImages))
       await flushPromises(ui, container)
       expect(onDropRejectedSpy).not.toHaveBeenCalled()
