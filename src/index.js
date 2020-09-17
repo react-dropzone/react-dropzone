@@ -118,7 +118,7 @@ Dropzone.propTypes = {
   maxSize: PropTypes.number,
   /**
    * Maximum accepted number of files
-   * The default value is 0 which means there is no limitation in the accepted number of files
+   * The default value is 0 which means there is no limitation to how many files are accepted.
    * The minimum accepted value is 2
    */
   maxFiles: PropTypes.number,
