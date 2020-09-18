@@ -9,12 +9,10 @@ import Dropzone, { useDropzone } from './index'
 describe('useDropzone() hook', () => {
   let files
   let images
-  let threeImages
 
   beforeEach(() => {
     files = [createFile('file1.pdf', 1111, 'application/pdf')]
     images = [createFile('cats.gif', 1234, 'image/gif'), createFile('dogs.gif', 2345, 'image/jpeg')]
-    threeImages = [createFile('cats.gif', 1234, 'image/gif'), createFile('dogs.gif', 2345, 'image/jpeg'),createFile('fish.gif', 2345, 'image/jpeg')]
   })
 
   afterEach(cleanup)
@@ -2092,7 +2090,7 @@ describe('useDropzone() hook', () => {
       const onDropSpy = jest.fn()
       const onDropRejectedSpy = jest.fn()
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={2}>
+        <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={1}>
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2102,12 +2100,12 @@ describe('useDropzone() hook', () => {
       )
       const { container } = render(ui)
       const dropzone = container.querySelector('div')
-      fireDrop(dropzone, createDtWithFiles(threeImages))
+      fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
       expect(onDropRejectedSpy).toHaveBeenCalled()
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
-          file: threeImages[0],
+          file: images[0],
           errors: [
             {
               code: 'too-many-files',
@@ -2116,23 +2114,14 @@ describe('useDropzone() hook', () => {
           ]
         },
         {
-          file: threeImages[1],
+          file: images[1],
           errors: [
             {
               code: 'too-many-files',
               message: 'Too many files',
             }
           ]
-        },
-        {
-          file: threeImages[2],
-          errors: [
-            {
-              code: 'too-many-files',
-              message: 'Too many files',
-            }
-          ]
-        },
+        }
       ], expect.anything())
     })
 
@@ -2151,10 +2140,10 @@ describe('useDropzone() hook', () => {
       const { container } = render(ui)
       const dropzone = container.querySelector('div')
 
-      fireDrop(dropzone, createDtWithFiles(threeImages))
+      fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(ui, container)
       expect(onDropRejectedSpy).not.toHaveBeenCalled()
-      expect(onDropSpy).toHaveBeenCalledWith(threeImages, [], expect.anything())
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
     })
     
     it('accepts a single files if {multiple} is false and {accept} criteria is met', async () => {

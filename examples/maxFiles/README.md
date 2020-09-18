@@ -1,4 +1,4 @@
-By providing `maxFiles` prop you can limit how many files the drop zone accepts.
+By providing `maxFiles` prop you can limit how many files the dropzone accepts.
 
 **Note** that this prop is enabled when the `multiple` prop is enabled.
 The default value for this prop is 0, which means there's no limitation to how many files are accepted.
@@ -25,17 +25,16 @@ function AcceptMaxFiles(props) {
   ));
 
   const fileRejectionItems = fileRejections.map(({ file, errors  }) => { 
-   return(
+   return (
      <li key={file.path}>
           {file.path} - {file.size} bytes
           <ul>
-            {errors.map(e => <li key={e.code}>{e.message}</li>)
-            }
+            {errors.map(e => <li key={e.code}>{e.message}</li>)}
          </ul>
 
      </li>
    ) 
-  }  );
+  });
   
 
   return (
@@ -43,7 +42,7 @@ function AcceptMaxFiles(props) {
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
-        <em>(2 files are the maximum number of file you can drop here)</em>
+        <em>(2 files are the maximum number of files you can drop here)</em>
       </div>
       <aside>
         <h4>Accepted files</h4>
