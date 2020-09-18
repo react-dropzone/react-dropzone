@@ -2086,6 +2086,66 @@ describe('useDropzone() hook', () => {
       ], expect.anything())
     })
 
+    it('rejects all files if {multiple} is true and maxFiles is less than files and {accept} criteria is met', async () => {
+      const onDropSpy = jest.fn()
+      const onDropRejectedSpy = jest.fn()
+      const ui = (
+        <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={1}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const dropzone = container.querySelector('div')
+      fireDrop(dropzone, createDtWithFiles(images))
+      await flushPromises(ui, container)
+      expect(onDropRejectedSpy).toHaveBeenCalled()
+      expect(onDropSpy).toHaveBeenCalledWith([], [
+        {
+          file: images[0],
+          errors: [
+            {
+              code: 'too-many-files',
+              message: 'Too many files',
+            }
+          ]
+        },
+        {
+          file: images[1],
+          errors: [
+            {
+              code: 'too-many-files',
+              message: 'Too many files',
+            }
+          ]
+        }
+      ], expect.anything())
+    })
+
+    it('accepts multiple files if {multiple} is true and {accept} criteria is met', async () => {
+      const onDropSpy = jest.fn()
+      const onDropRejectedSpy = jest.fn()
+      const ui = (
+        <Dropzone accept="image/*" onDrop={onDropSpy} multiple={true} maxFiles={3} onDropRejected={onDropRejectedSpy}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+      const { container } = render(ui)
+      const dropzone = container.querySelector('div')
+
+      fireDrop(dropzone, createDtWithFiles(images))
+      await flushPromises(ui, container)
+      expect(onDropRejectedSpy).not.toHaveBeenCalled()
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything())
+    })
+    
     it('accepts a single files if {multiple} is false and {accept} criteria is met', async () => {
       const onDropSpy = jest.fn()
       const ui = (

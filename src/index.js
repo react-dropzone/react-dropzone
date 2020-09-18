@@ -116,6 +116,11 @@ Dropzone.propTypes = {
    * Maximum file size (in bytes)
    */
   maxSize: PropTypes.number,
+  /**
+   * Maximum accepted number of files
+   * The default value is 0 which means there is no limitation to how many files are accepted.
+   */
+  maxFiles: PropTypes.number,
 
   /**
    * Enable/disable the dropzone
@@ -161,7 +166,7 @@ Dropzone.propTypes = {
    *
    * Files are accepted or rejected based on the `accept`, `multiple`, `minSize` and `maxSize` props.
    * `accept` must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
-   * If `multiple` is set to false and additional files are droppped,
+   * If `multiple` is set to false and additional files are dropped,
    * all files besides the first will be rejected.
    * Any file which does not have a size in the [`minSize`, `maxSize`] range, will be rejected as well.
    *
@@ -331,7 +336,7 @@ const initialState = {
  *
  * Files are accepted or rejected based on the `accept`, `multiple`, `minSize` and `maxSize` props.
  * `accept` must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
- * If `multiple` is set to false and additional files are droppped,
+ * If `multiple` is set to false and additional files are dropped,
  * all files besides the first will be rejected.
  * Any file which does not have a size in the [`minSize`, `maxSize`] range, will be rejected as well.
  *
@@ -362,6 +367,7 @@ export function useDropzone({
   maxSize = Infinity,
   minSize = 0,
   multiple = true,
+  maxFiles = 0,
   onDragEnter,
   onDragLeave,
   onDragOver,
@@ -594,14 +600,14 @@ export function useDropzone({
             }
           })
 
-          if (!multiple && acceptedFiles.length > 1) {
+          if ((!multiple && acceptedFiles.length > 1) || (multiple && maxFiles >= 1 &&  acceptedFiles.length > maxFiles)) {
             // Reject everything and empty accepted files
             acceptedFiles.forEach(file => {
               fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
             })
             acceptedFiles.splice(0)
           }
-
+        
           dispatch({
             acceptedFiles,
             fileRejections,
