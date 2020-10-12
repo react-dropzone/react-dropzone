@@ -1,22 +1,22 @@
 If you're still using class components, you can use the [`<Dropzone>`](https://react-dropzone.js.org/#components) component provided by the lib:
 
 ```jsx harmony
-import React, {Component} from 'react';
-import Dropzone from 'react-dropzone';
+import React, { Component } from "react";
+import Dropzone from "react-dropzone";
 
 class Basic extends Component {
   constructor() {
     super();
     this.onDrop = (files) => {
-      this.setState({files})
+      this.setState({ files });
     };
     this.state = {
-      files: []
+      files: [],
     };
   }
 
   render() {
-    const files = this.state.files.map(file => (
+    const files = this.state.files.map((file) => (
       <li key={file.name}>
         {file.name} - {file.size} bytes
       </li>
@@ -24,11 +24,11 @@ class Basic extends Component {
 
     return (
       <Dropzone onDrop={this.onDrop}>
-        {({getRootProps, getInputProps}) => (
+        {({ getRootProps, getInputProps }) => (
           <section className="container">
-            <div {...getRootProps({className: 'dropzone'})}>
+            <div {...getRootProps({ className: "dropzone" })}>
               <input {...getInputProps()} />
-              <p>Drag 'n' drop some files here, or click to select files</p>
+              <p>Click or drag file to this area to upload</p>
             </div>
             <aside>
               <h4>Files</h4>
@@ -41,5 +41,5 @@ class Basic extends Component {
   }
 }
 
-<Basic />
+<Basic />;
 ```
