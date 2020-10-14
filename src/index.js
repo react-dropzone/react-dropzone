@@ -63,7 +63,7 @@ const defaultProps = {
   noDragEventsBubbling: false
 }
 
-Dropzone.defaultProps = DefaultProps
+Dropzone.defaultProps = defaultProps
 
 Dropzone.propTypes = {
   /**
@@ -400,7 +400,7 @@ export function useDropzone(options = {}) {
     noDrag,
     noDragEventsBubbling
   } = {
-    ...DefaultProps,
+    ...defaultProps,
     ...options
   }
 
