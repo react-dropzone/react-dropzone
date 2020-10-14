@@ -49,7 +49,7 @@ const Dropzone = forwardRef(({ children, ...params }, ref) => {
 Dropzone.displayName = 'Dropzone'
 
 // Add default props for react-docgen
-const DefaultProps = {
+const defaultProps = {
   disabled: false,
   getFilesFromEvent: fromEvent,
   maxSize: Infinity,
