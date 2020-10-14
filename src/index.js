@@ -674,17 +674,21 @@ export function useDropzone({
   }
 
   const removeFiles = React.useCallback( files => {
-    
+    let removedFiles=[]
       const acceptedFiles = state.acceptedFiles && state.acceptedFiles.
         filter(acceptedFile => files.indexOf(acceptedFile) ===-1);
       const fileRejections = state.fileRejections && state.fileRejections.
         filter(rejectedFile => files.indexOf(rejectedFile) ===-1);
+
+        removedFiles.push(...files.filter(x => state.acceptedFiles.indexOf(x)!==-1));
+        removedFiles.push(...files.filter(x => state.fileRejections.indexOf(x)!==-1));
+
       dispatch({
         acceptedFiles,
         fileRejections,
         type: 'setFiles'
       })
-      onRemoveFiles && onRemoveFiles(files)
+      onRemoveFiles && onRemoveFiles(removedFiles)
     },
      [state, onRemoveFiles]
    )

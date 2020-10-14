@@ -13,14 +13,17 @@ function RemoveFiles(props) {
     getInputProps,
     onRemoveFiles,
     removeFiles
-  } = useDropzone({});
+  } = useDropzone({
+    onRemoveFiles: files => {
+      console.log(files);
+    }
+  });
 
   const acceptedFileItems = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
   ));
-  console.log(fileRejections);
   const fileRejectionItems = fileRejections.map(({ file, errors }) => {
     return (
       <li key={file.path}>
@@ -38,8 +41,7 @@ function RemoveFiles(props) {
     <section className="container">
       <div
         {...getRootProps({
-          className: "dropzone",
-          onRemoveFiles: files => console.log(files)
+          className: "dropzone"
         })}
       >
         <input {...getInputProps()} />
@@ -48,7 +50,6 @@ function RemoveFiles(props) {
       <aside>
         <button
           onClick={() => {
-            console.log("remove");
             removeFiles([acceptedFiles[0]]);
           }}
         >
