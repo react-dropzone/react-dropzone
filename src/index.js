@@ -47,6 +47,24 @@ const Dropzone = forwardRef(({ children, ...params }, ref) => {
 })
 
 Dropzone.displayName = 'Dropzone'
+
+// Add default props for react-docgen
+const defaultProps = {
+  disabled: false,
+  getFilesFromEvent: fromEvent,
+  maxSize: Infinity,
+  minSize: 0,
+  multiple: true,
+  maxFiles: 0,
+  preventDropOnDocument: true,
+  noClick: false,
+  noKeyboard: false,
+  noDrag: false,
+  noDragEventsBubbling: false
+}
+
+Dropzone.defaultProps = defaultProps
+
 Dropzone.propTypes = {
   /**
    * Render function that exposes the dropzone state and prop getter fns
@@ -360,27 +378,32 @@ const initialState = {
  *
  * @returns {DropzoneState}
  */
-export function useDropzone({
-  accept,
-  disabled = false,
-  getFilesFromEvent = fromEvent,
-  maxSize = Infinity,
-  minSize = 0,
-  multiple = true,
-  maxFiles = 0,
-  onDragEnter,
-  onDragLeave,
-  onDragOver,
-  onDrop,
-  onDropAccepted,
-  onDropRejected,
-  onFileDialogCancel,
-  preventDropOnDocument = true,
-  noClick = false,
-  noKeyboard = false,
-  noDrag = false,
-  noDragEventsBubbling = false
-} = {}) {
+export function useDropzone(options = {}) {
+  const {
+    accept,
+    disabled,
+    getFilesFromEvent,
+    maxSize,
+    minSize,
+    multiple,
+    maxFiles,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
+    onDrop,
+    onDropAccepted,
+    onDropRejected,
+    onFileDialogCancel,
+    preventDropOnDocument,
+    noClick,
+    noKeyboard,
+    noDrag,
+    noDragEventsBubbling
+  } = {
+    ...defaultProps,
+    ...options
+  }
+
   const rootRef = useRef(null)
   const inputRef = useRef(null)
 
