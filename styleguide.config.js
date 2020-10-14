@@ -64,6 +64,10 @@ module.exports = {
         {
           name: 'Extending Dropzone',
           content: 'examples/plugins/README.md'
+        },
+        {
+          name: 'Remove Files',
+          content: 'examples/removeFiles/README.md'
         }
       ]
     }

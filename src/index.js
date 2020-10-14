@@ -208,7 +208,18 @@ Dropzone.propTypes = {
    * @param {FileRejection[]} fileRejections
    * @param {(DragEvent|Event)} event
    */
-  onDropRejected: PropTypes.func
+  onDropRejected: PropTypes.func,
+
+   /**
+   * @param {files[]} filesToBeRemoved
+   */
+  removeFiles: PropTypes.func,
+
+    /**
+     * Cb for when files were removed by removeFiles
+     * @param {files[]}  removedFiles
+     */
+  onRemovedFiles: PropTypes.func
 }
 
 export default Dropzone
@@ -275,6 +286,7 @@ export default Dropzone
  * @property {File[]} draggedFiles Files in active drag
  * @property {File[]} acceptedFiles Accepted files
  * @property {FileRejection[]} fileRejections Rejected files and why they were rejected
+ * @property {Function} removeFiles Accepts an array of File objects to be removed
  */
 
 const initialState = {
@@ -285,7 +297,7 @@ const initialState = {
   isDragReject: false,
   draggedFiles: [],
   acceptedFiles: [],
-  fileRejections: []
+  fileRejections: [],
 }
 
 /**
@@ -379,7 +391,8 @@ export function useDropzone({
   noClick = false,
   noKeyboard = false,
   noDrag = false,
-  noDragEventsBubbling = false
+  noDragEventsBubbling = false,
+  onRemoveFiles
 } = {}) {
   const rootRef = useRef(null)
   const inputRef = useRef(null)
@@ -660,6 +673,22 @@ export function useDropzone({
     }
   }
 
+  const removeFiles = React.useCallback( files => {
+    
+      const acceptedFiles = state.acceptedFiles && state.acceptedFiles.
+        filter(acceptedFile => files.indexOf(acceptedFile) ===-1);
+      const fileRejections = state.fileRejections && state.fileRejections.
+        filter(rejectedFile => files.indexOf(rejectedFile) ===-1);
+      dispatch({
+        acceptedFiles,
+        fileRejections,
+        type: 'setFiles'
+      })
+      onRemoveFiles && onRemoveFiles(files)
+    },
+     [state, onRemoveFiles]
+   )
+
   const getRootProps = useMemo(
     () => ({
       refKey = 'ref',
@@ -740,7 +769,8 @@ export function useDropzone({
     getInputProps,
     rootRef,
     inputRef,
-    open: composeHandler(openFileDialog)
+    open: composeHandler(openFileDialog),
+    removeFiles
   }
 }
 
