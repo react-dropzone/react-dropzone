@@ -34,6 +34,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
   getFilesFromEvent?: (event: DropEvent) => Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?: () => void;
+  onRemoveFiles?: <T extends File>(files: T[])=>void;
 };
 
 export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
@@ -51,6 +52,7 @@ export type DropzoneState = DropzoneRef & {
   inputRef: React.RefObject<HTMLInputElement>;
   getRootProps: (props?: DropzoneRootProps) => DropzoneRootProps;
   getInputProps: (props?: DropzoneInputProps) => DropzoneInputProps;
+  removeFiles?: (File :[])=>void;
 };
 
 export interface DropzoneRef {

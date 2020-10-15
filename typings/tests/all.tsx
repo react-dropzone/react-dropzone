@@ -14,6 +14,7 @@ export default class Test extends React.Component {
           onDropAccepted={(files, event) => console.log(files, event)}
           onDropRejected={(files, event) => console.log(files, event)}
           onFileDialogCancel={() => console.log("abc")}
+          onRemoveFiles={(files)=> console.log(files)}
           minSize={2000}
           maxSize={Infinity}
           preventDropOnDocument
