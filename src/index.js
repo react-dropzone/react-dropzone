@@ -63,6 +63,7 @@ Dropzone.propTypes = {
    * @param {File[]} params.draggedFiles Files in active drag
    * @param {File[]} params.acceptedFiles Accepted files
    * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected
+   * @param {Function} params.removeFiles RemoveFiles Accepts an array of File objects to be removed
    */
   children: PropTypes.func,
 
@@ -674,20 +675,22 @@ export function useDropzone({
   }
 
   const removeFiles = React.useCallback( files => {
-    let removedFiles=[]
-      const acceptedFiles = state.acceptedFiles && state.acceptedFiles.
-        filter(acceptedFile => files.indexOf(acceptedFile) ===-1);
-      const fileRejections = state.fileRejections && state.fileRejections.
-        filter(rejectedFile => files.indexOf(rejectedFile) ===-1);
-
-        removedFiles.push(...files.filter(x => state.acceptedFiles.indexOf(x)!==-1));
-        removedFiles.push(...files.filter(x => state.fileRejections.indexOf(x)!==-1));
-
-      dispatch({
-        acceptedFiles,
-        fileRejections,
-        type: 'setFiles'
-      })
+    
+    if( !files || files.length===0) return onRemoveFiles && onRemoveFiles([])
+    const removedFiles=[]
+    const acceptedFiles =  state.acceptedFiles && state.acceptedFiles.
+    filter(acceptedFile => files.indexOf(acceptedFile) ===-1);
+    const fileRejections = state.fileRejections && state.fileRejections.
+    filter(rejectedFile => files.indexOf(rejectedFile) ===-1);
+    
+    removedFiles.push(...files.filter(x => state.acceptedFiles.indexOf(x)!==-1));
+    removedFiles.push(...files.filter(x => state.fileRejections.indexOf(x)!==-1));
+    
+    dispatch({
+      acceptedFiles,
+      fileRejections,
+      type: 'setFiles'
+    })
       onRemoveFiles && onRemoveFiles(removedFiles)
     },
      [state, onRemoveFiles]

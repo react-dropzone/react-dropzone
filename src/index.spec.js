@@ -2683,6 +2683,45 @@ describe('useDropzone() hook', () => {
       expect(fn).not.toThrow()
     })
   })
+
+  it('remove files function should removed 1 file from acceptedFiles and fire onRemoveFiles', async () => {
+    const onRemoveFilesSpy=jest.fn()
+    const onDropAcceptedSpy=jest.fn()
+    const getAcceptedFiles = node => node.querySelectorAll(`[data-type="accepted"]`)
+    const FileList = ({ files = [] }) => (
+      <ul>
+        {files.map(file => (
+          <li key={file.name} data-type={'accepted'}>
+            {file.name}
+          </li>
+        ))}
+      </ul>
+    )
+    const ui = (
+      <Dropzone onRemoveFiles={onRemoveFilesSpy} accept="image/*" onDropAccepted={onDropAcceptedSpy}>
+        {({ getRootProps, getInputProps, removeFiles,acceptedFiles }) => (
+          <div {...getRootProps()} >
+            <input {...getInputProps()} />
+            <button onClick={()=>removeFiles([acceptedFiles[0]])}>
+            <FileList files={acceptedFiles} />
+            </button>
+          </div>
+        )}
+      </Dropzone>
+    )
+
+    const { container, rerender, getByRole } = render(ui)
+    const dropzone = container.querySelector('div')
+    const button= getByRole('button');      
+    fireDrop(dropzone, createDtWithFiles(images))
+    await flushPromises(rerender, ui)
+    fireEvent.click(button)
+    expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything())
+    expect(onRemoveFilesSpy).toHaveBeenCalledWith([images[0]])
+    const acceptedFileList = getAcceptedFiles(dropzone)
+    expect(acceptedFileList).toHaveLength(images.length-1)
+  })
+
 })
 
 async function flushPromises(rerender, ui) {
