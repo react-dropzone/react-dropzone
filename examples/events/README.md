@@ -33,6 +33,8 @@ function InnerDropzone(props) {
 
 Note that internally we use `event.stopPropagation()` to achieve the behavior illustrated above, but this comes with its own [drawbacks](https://javascript.info/bubbling-and-capturing#stopping-bubbling).
 
+If you'd like to prevent click events propagation from the child to parent, you can use the `{noClickEventsBubbling}` property on the child.
+
 If you'd like to selectively turn off the default dropzone behavior for `onClick`, use the `{noClick}` property:
 ```jsx harmony
 import React from 'react';

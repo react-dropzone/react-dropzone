@@ -7,7 +7,8 @@ export default class Test extends React.Component {
       <div>
         <Dropzone
           onDrop={(acceptedFiles, fileRejections, event) =>
-            console.log(acceptedFiles, fileRejections, event)}
+            console.log(acceptedFiles, fileRejections, event)
+          }
           onDragEnter={event => console.log(event)}
           onDragOver={event => console.log(event)}
           onDragLeave={event => console.log(event)}
@@ -18,6 +19,7 @@ export default class Test extends React.Component {
           maxSize={Infinity}
           preventDropOnDocument
           noClick={false}
+          noClickEventsBubbling={false}
           noKeyboard={false}
           noDrag={false}
           noDragEventsBubbling={false}
@@ -25,7 +27,7 @@ export default class Test extends React.Component {
           multiple={false}
           accept="*.png"
         >
-          {({getRootProps, getInputProps}) => (
+          {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
