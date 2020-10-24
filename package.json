@@ -91,7 +91,7 @@
   },
   "dependencies": {
     "attr-accept": "^2.2.1",
-    "file-selector": "^0.1.12",
+    "file-selector": "^0.2.2",
     "prop-types": "^15.7.2"
   },
   "devDependencies": {
