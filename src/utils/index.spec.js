@@ -229,6 +229,7 @@ it('rejects file when single accept criteria as array', () => {
 })
 
 })
+
 describe('allFilesAccepted()', () => {
   let utils
   beforeEach(async done => {
