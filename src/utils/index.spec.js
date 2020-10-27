@@ -230,7 +230,6 @@ it('rejects file when single accept criteria as array', () => {
 
 })
 describe('allFilesAccepted()', () => {
-  
   let utils
   beforeEach(async done => {
     utils = await import('./index')
@@ -249,6 +248,7 @@ describe('allFilesAccepted()', () => {
     expect(utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 })).toEqual(false)
   })
 })
+
 function createFile(name, size, type) {
   const file = new File([], name, { type })
   Object.defineProperty(file, 'size', {

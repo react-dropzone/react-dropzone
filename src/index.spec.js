@@ -2095,8 +2095,8 @@ describe('useDropzone() hook', () => {
     it('rejects all files if {multiple} is true and maxFiles is less than files and {accept} criteria is met', async () => {
       const onDropSpy = jest.fn()
       const onDropRejectedSpy = jest.fn()
-      const ui = ( 
-         <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={1}>
+      const ui = (
+        <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={1}>
           {({ getRootProps, getInputProps, isDragReject, isDragAccept }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
