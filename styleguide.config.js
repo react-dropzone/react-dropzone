@@ -1,12 +1,15 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 const path = require('path')
-const { createConfig, babel, css } = require('webpack-blocks')
+const { createConfig, babel, css, devServer } = require('webpack-blocks')
 
 // https://react-styleguidist.js.org/docs/configuration.html
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
-  webpackConfig: createConfig([babel(), css()]),
+  webpackConfig: createConfig([babel(), css(), devServer({
+    disableHostCheck: true,
+    host: '0.0.0.0',
+  })]),
   exampleMode: 'expand',
   usageMode: 'expand',
   showSidebar: false,
