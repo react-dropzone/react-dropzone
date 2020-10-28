@@ -657,6 +657,7 @@ export function useDropzone(options = {}) {
       accept,
       minSize,
       maxSize,
+      maxFiles,
       getFilesFromEvent,
       onDrop,
       onDropAccepted,
