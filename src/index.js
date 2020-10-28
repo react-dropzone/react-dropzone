@@ -751,7 +751,7 @@ export function useDropzone(options = {}) {
   )
 
   const fileCount = draggedFiles.length
-  const isDragAccept = fileCount > 0 && allFilesAccepted({ files: draggedFiles, accept, minSize, maxSize, multiple })
+  const isDragAccept = fileCount > 0 && allFilesAccepted({ files: draggedFiles, accept, minSize, maxSize, multiple, maxFiles })
   const isDragReject = fileCount > 0 && !isDragAccept
 
   return {

@@ -2097,9 +2097,11 @@ describe('useDropzone() hook', () => {
       const onDropRejectedSpy = jest.fn()
       const ui = (
         <Dropzone accept="image/*" onDrop={onDropSpy} onDropRejected={onDropRejectedSpy} multiple={true} maxFiles={1}>
-          {({ getRootProps, getInputProps }) => (
+          {({ getRootProps, getInputProps, isDragReject, isDragAccept }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
+               {isDragReject && 'dragReject'}
+               {isDragAccept && 'dragAccept'}
             </div>
           )}
         </Dropzone>
@@ -2109,6 +2111,10 @@ describe('useDropzone() hook', () => {
       fireDrop(dropzone, createDtWithFiles(images))
       await flushPromises(rerender, ui)
       expect(onDropRejectedSpy).toHaveBeenCalled()
+      fireDragEnter(dropzone, createDtWithFiles(images))
+      await flushPromises(rerender, ui)
+      expect(dropzone).toHaveTextContent('dragReject')
+      expect(dropzone).not.toHaveTextContent('dragAccept')
       expect(onDropSpy).toHaveBeenCalledWith([], [
         {
           file: images[0],

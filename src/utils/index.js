@@ -59,8 +59,8 @@ function isDefined(value) {
   return value !== undefined && value !== null
 }
 
-export function allFilesAccepted({ files, accept, minSize, maxSize, multiple }) {
-  if (!multiple && files.length > 1) {
+export function allFilesAccepted({ files, accept, minSize, maxSize, multiple, maxFiles }) {
+  if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 &&  files.length > maxFiles) ) {
     return false;
   }
 
