@@ -6,18 +6,25 @@ const { createConfig, babel, css, devServer } = require('webpack-blocks')
 module.exports = {
   title: 'react-dropzone',
   styleguideDir: path.join(__dirname, 'styleguide'),
+  template: {
+    favicon: 'https://github.com/react-dropzone/react-dropzone/raw/master/logo/logo.png'
+  },
   webpackConfig: createConfig([babel(), css(), devServer({
     disableHostCheck: true,
     host: '0.0.0.0',
   })]),
   exampleMode: 'expand',
   usageMode: 'expand',
-  showSidebar: false,
+  showSidebar: true,
   serverPort: 8080,
   moduleAliases: {
-    'react-dropzone': path.resolve(__dirname, './src')
+    'react-dropzone': path.resolve(__dirname, './src'),
+    'doka': path.resolve(__dirname, './vendor/doka/doka.esm.min.js')
   },
-  require: [path.join(__dirname, 'examples/theme.css')],
+  require: [
+    path.join(__dirname, 'examples/theme.css'),
+    path.join(__dirname, 'vendor/doka/doka.min.css'),
+  ],
   sections: [
     {
       name: '',
@@ -67,6 +74,15 @@ module.exports = {
         {
           name: 'Extending Dropzone',
           content: 'examples/plugins/README.md'
+        }
+      ]
+    },
+    {
+      name: 'Integrations',
+      sections: [
+        {
+          name: 'Doka',
+          content: 'examples/doka/README.md'
         }
       ]
     }
