@@ -3,11 +3,11 @@
 # react-dropzone
 
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
-![Build Status](https://github.com/react-dropzone/react-dropzone/workflows/Test/badge.svg)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/react-dropzone/react-dropzone/Test?label=tests&style=flat-square)](https://github.com/react-dropzone/react-dropzone/actions?query=workflow%3ATest)
 [![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
 [![Open Collective](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
 [![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/react-dropzone/react-dropzone) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/react-dropzone/react-dropzone) 
 
 Simple React hook to create a HTML5-compliant drag'n'drop zone for files.
 
@@ -292,6 +292,11 @@ function mockData(files) {
 
 More examples for this can be found in `react-dropzone`s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
 
+## Need image editing?
+
+React Dropzone integrates perfectly with [Doka Image Editor](https://pqina.nl/doka/?ref=react-dropzone), creating a modern image editing experience. Doka supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
+
+Checkout the [integration example](https://react-dropzone.js.org/#!/Doka).
 
 ## Support
 
