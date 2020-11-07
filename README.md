@@ -298,6 +298,10 @@ React Dropzone integrates perfectly with [Doka Image Editor](https://pqina.nl/do
 
 Checkout the [integration example](https://react-dropzone.js.org/#!/Doka).
 
+## Supported Browsers
+
+We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).
+
 ## Support
 
 ### Backers

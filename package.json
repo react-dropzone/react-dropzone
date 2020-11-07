@@ -169,5 +169,8 @@
   "version": "0.0.0-development",
   "engines": {
     "node": ">= 10"
-  }
+  },
+  "browserslist": [
+    "defaults"
+  ]
 }
