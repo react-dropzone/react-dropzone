@@ -6,7 +6,7 @@
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/react-dropzone/react-dropzone/Test?label=tests&style=flat-square)](https://github.com/react-dropzone/react-dropzone/actions?query=workflow%3ATest)
 [![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
 [![Open Collective](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
-[![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
+[![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors) [![Meercode CI Score](https://meercode.io/badge/react-dropzone/react-dropzone?type=ci-score&branch=master)](https://meercode.io/react-dropzone/react-dropzone)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/react-dropzone/react-dropzone) 
 
 Simple React hook to create a HTML5-compliant drag'n'drop zone for files.
