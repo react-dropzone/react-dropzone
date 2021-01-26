@@ -2719,6 +2719,47 @@ describe('useDropzone() hook', () => {
       expect(fn).not.toThrow()
     })
   })
+
+  describe('validator', () => {
+    it('rejects with custom error', async () => {
+      const validator = file => {
+        if (/dogs/i.test(file.name))
+          return { code: 'dogs-not-allowed', message: 'Dogs not allowed' };
+
+        return null;
+      }
+      
+      const onDropSpy = jest.fn()
+
+      const ui = (
+        <Dropzone validator={validator} onDrop={onDropSpy} multiple={true}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const { container, rerender } = render(ui)
+      const dropzone = container.querySelector('div')
+
+      fireDrop(dropzone, createDtWithFiles(images))
+      await flushPromises(rerender, ui)
+
+      expect(onDropSpy).toHaveBeenCalledWith([images[0]], [
+        {
+          file: images[1],
+          errors: [
+            {
+              code: 'dogs-not-allowed',
+              message: 'Dogs not allowed',
+            }
+          ]
+        }
+      ], expect.anything())
+    })
+  })
 })
 
 async function flushPromises(rerender, ui) {
