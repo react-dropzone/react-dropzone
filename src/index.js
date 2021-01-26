@@ -624,7 +624,7 @@ export function useDropzone(options = {}) {
           files.forEach(file => {
             const [accepted, acceptError] = fileAccepted(file, accept)
             const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
-            const customErrors = validator?.(file);
+            const customErrors = validator ? validator(file) : null;
 
             if (accepted && sizeMatch && !customErrors) {
               acceptedFiles.push(file)
