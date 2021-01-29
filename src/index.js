@@ -631,8 +631,9 @@ export function useDropzone(options = {}) {
             } else {
               let errors = [acceptError, sizeError];
               
-              if(customErrors)
+              if (customErrors) {
                 errors = errors.concat(customErrors);
+              }
 
               fileRejections.push({ file, errors: errors.filter(e => e) })
             }
