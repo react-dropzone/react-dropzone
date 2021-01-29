@@ -60,6 +60,10 @@ module.exports = {
           content: 'examples/maxFiles/README.md'
         },
         {
+          name: 'Custom validation',
+          content: 'examples/validator/README.md'
+        },
+        {
           name: 'Opening File Dialog Programmatically',
           content: 'examples/file-dialog/README.md'
         },
