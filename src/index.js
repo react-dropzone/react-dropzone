@@ -60,7 +60,8 @@ const defaultProps = {
   noClick: false,
   noKeyboard: false,
   noDrag: false,
-  noDragEventsBubbling: false
+  noDragEventsBubbling: false,
+  validator: null
 }
 
 Dropzone.defaultProps = defaultProps
@@ -226,7 +227,14 @@ Dropzone.propTypes = {
    * @param {FileRejection[]} fileRejections
    * @param {(DragEvent|Event)} event
    */
-  onDropRejected: PropTypes.func
+  onDropRejected: PropTypes.func,
+
+  /**
+   * Custom validation function 
+   * @param {File} file
+   * @returns {FileError|FileError[]}
+   */
+  validator: PropTypes.func
 }
 
 export default Dropzone
@@ -398,7 +406,8 @@ export function useDropzone(options = {}) {
     noClick,
     noKeyboard,
     noDrag,
-    noDragEventsBubbling
+    noDragEventsBubbling,
+    validator
   } = {
     ...defaultProps,
     ...options
@@ -615,11 +624,18 @@ export function useDropzone(options = {}) {
           files.forEach(file => {
             const [accepted, acceptError] = fileAccepted(file, accept)
             const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
-            if (accepted && sizeMatch) {
+            const customErrors = validator ? validator(file) : null;
+
+            if (accepted && sizeMatch && !customErrors) {
               acceptedFiles.push(file)
             } else {
-              const errors = [acceptError, sizeError].filter(e => e)
-              fileRejections.push({ file, errors })
+              let errors = [acceptError, sizeError];
+              
+              if (customErrors) {
+                errors = errors.concat(customErrors);
+              }
+
+              fileRejections.push({ file, errors: errors.filter(e => e) })
             }
           })
 

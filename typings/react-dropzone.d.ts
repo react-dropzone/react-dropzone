@@ -10,7 +10,7 @@ export interface DropzoneProps extends DropzoneOptions {
 
 export interface FileError {
   message: string;
-  code: "file-too-large" | "file-too-small"|"too-many-files"|"file-invalid-type";
+  code: "file-too-large" | "file-too-small" | "too-many-files" | "file-invalid-type" | string;
 }
 
 export interface FileRejection {
@@ -34,6 +34,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
   getFilesFromEvent?: (event: DropEvent) => Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?: () => void;
+  validator?: <T extends File>(file: T) => FileError | FileError[]; 
 };
 
 export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
