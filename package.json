@@ -90,7 +90,7 @@
     "react": ">= 16.8"
   },
   "dependencies": {
-    "attr-accept": "^2.2.1",
+    "attr-accept": "^2.2.2",
     "file-selector": "^0.2.2",
     "prop-types": "^15.7.2"
   },
