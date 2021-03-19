@@ -554,13 +554,14 @@ export function useDropzone(options = {}) {
       event.persist()
       stopPropagation(event)
 
-      if (event.dataTransfer) {
+      const hasFiles = isEvtWithFiles(event);
+      if (hasFiles && event.dataTransfer) {
         try {
           event.dataTransfer.dropEffect = 'copy'
         } catch {} /* eslint-disable-line no-empty */
       }
 
-      if (isEvtWithFiles(event) && onDragOver) {
+      if (hasFiles && onDragOver) {
         onDragOver(event)
       }
 
