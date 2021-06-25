@@ -825,12 +825,7 @@ function reducer(state, action) {
       }
     case 'reset':
       return {
-        ...state,
-        isFileDialogActive: false,
-        isDragActive: false,
-        draggedFiles: [],
-        acceptedFiles: [],
-        fileRejections: [],
+        ...initialState
       }
     default:
       return state
