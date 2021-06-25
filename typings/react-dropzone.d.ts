@@ -50,8 +50,8 @@ export type DropzoneState = DropzoneRef & {
   fileRejections: FileRejection[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
-  getRootProps: (props?: DropzoneRootProps) => DropzoneRootProps;
-  getInputProps: (props?: DropzoneInputProps) => DropzoneInputProps;
+  getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
+  getInputProps: <T extends DropzoneInputProps>(props?: T) => T;
 };
 
 export interface DropzoneRef {
