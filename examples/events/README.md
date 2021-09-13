@@ -86,7 +86,7 @@ function DropzoneWithoutKeyboard(props) {
 <DropzoneWithoutKeyboard />
 ```
 
-Note that you can prevent the default behavior for click and keyboard events if you ommit the input:
+Note that you can prevent the default behavior for click and keyboard events if you omit the input:
 ```jsx harmony
 import React from 'react';
 import {useDropzone} from 'react-dropzone';
