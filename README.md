@@ -294,9 +294,11 @@ More examples for this can be found in `react-dropzone`s own [test suites](https
 
 ## Need image editing?
 
-React Dropzone integrates perfectly with [Doka Image Editor](https://pqina.nl/doka/?ref=react-dropzone), creating a modern image editing experience. Doka supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
 
-Checkout the [integration example](https://react-dropzone.js.org/#!/Doka).
+
+React Dropzone integrates perfectly with [Pintura Image Editor](https://pqina.nl/pintura/?ref=react-dropzone), creating a modern image editing experience. Pintura supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
+
+Checkout the [Pintura integration example](https://codesandbox.io/s/react-dropzone-pintura-40xh4?file=/src/App.js).
 
 ## Supported Browsers
 
