@@ -6,3 +6,4 @@ styleguide/
 coverage/
 yarn.lock
 .babelrc
+vendor
