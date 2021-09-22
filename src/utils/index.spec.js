@@ -260,3 +260,18 @@ function createFile(name, size, type) {
   return file
 }
 
+describe('ErrorCode', () => {
+  let utils
+  beforeEach(async done => {
+    utils = await import('./index')
+    done()
+  })
+
+  it('should exist and have known error code properties', () => {
+    expect(utils.ErrorCode.FileInvalidType).toEqual(utils.FILE_INVALID_TYPE)
+    expect(utils.ErrorCode.FileTooLarge).toEqual(utils.FILE_TOO_LARGE)
+    expect(utils.ErrorCode.FileTooSmall).toEqual(utils.FILE_TOO_SMALL)
+    expect(utils.ErrorCode.TooManyFiles).toEqual(utils.TOO_MANY_FILES)
+  })
+})
+
