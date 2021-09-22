@@ -6,6 +6,13 @@ export const FILE_TOO_LARGE = 'file-too-large'
 export const FILE_TOO_SMALL = 'file-too-small'
 export const TOO_MANY_FILES = 'too-many-files'
 
+export const ErrorCode = {
+  FileInvalidType: FILE_INVALID_TYPE,
+  FileTooLarge: FILE_TOO_LARGE,
+  FileTooSmall: FILE_TOO_SMALL,
+  TooManyFiles: TOO_MANY_FILES,
+}
+
 // File Errors
 export const getInvalidTypeRejectionErr = accept => {
   accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
