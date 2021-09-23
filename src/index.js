@@ -831,3 +831,5 @@ function reducer(state, action) {
       return state
   }
 }
+
+export { ErrorCode } from './utils'
