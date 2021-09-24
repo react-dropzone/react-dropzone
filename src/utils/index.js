@@ -1,16 +1,10 @@
 import accepts from 'attr-accept'
 
-// Error codes
-export const FILE_INVALID_TYPE = 'file-invalid-type'
-export const FILE_TOO_LARGE = 'file-too-large'
-export const FILE_TOO_SMALL = 'file-too-small'
-export const TOO_MANY_FILES = 'too-many-files'
-
 export const ErrorCode = {
-  FileInvalidType: FILE_INVALID_TYPE,
-  FileTooLarge: FILE_TOO_LARGE,
-  FileTooSmall: FILE_TOO_SMALL,
-  TooManyFiles: TOO_MANY_FILES,
+  FileInvalidType: 'file-invalid-type',
+  FileTooLarge: 'file-too-large',
+  FileTooSmall: 'file-too-small',
+  TooManyFiles: 'too-many-files',
 }
 
 // File Errors
@@ -18,27 +12,27 @@ export const getInvalidTypeRejectionErr = accept => {
   accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept
   const messageSuffix = Array.isArray(accept) ? `one of ${accept.join(', ')}` : accept
   return {
-    code: FILE_INVALID_TYPE,
+    code: ErrorCode.FileInvalidType,
     message: `File type must be ${messageSuffix}`
   }
 }
 
 export const getTooLargeRejectionErr = maxSize => {
   return {
-    code: FILE_TOO_LARGE,
+    code: ErrorCode.FileTooLarge,
     message: `File is larger than ${maxSize} bytes`
   }
 }
 
 export const getTooSmallRejectionErr = minSize => {
   return {
-    code: FILE_TOO_SMALL,
+    code: ErrorCode.FileTooSmall,
     message: `File is smaller than ${minSize} bytes`
   }
 }
 
 export const TOO_MANY_FILES_REJECTION = {
-  code: TOO_MANY_FILES,
+  code: ErrorCode.TooManyFiles,
   message: 'Too many files'
 }
 
