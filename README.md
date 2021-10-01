@@ -138,6 +138,7 @@ This is in order to avoid your props being overridden (or overriding the props r
   })}
 />
 ```
+> ♿ this is also where you pass accessibility props like `role`, `aria-labelledby` ...etc.
 
 In the example above, the provided `{onClick}` handler will be invoked before the internal one, therefore, internal callbacks can be prevented by simply using [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation).
 See [Events](https://react-dropzone.js.org#events) for more examples.
