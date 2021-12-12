@@ -13,7 +13,8 @@ export default class Test extends React.Component {
           onDragLeave={event => console.log(event)}
           onDropAccepted={(files, event) => console.log(files, event)}
           onDropRejected={(files, event) => console.log(files, event)}
-          onFileDialogCancel={() => console.log("abc")}
+          onFileDialogCancel={() => console.log("onFileDialogCancel invoked")}
+          onFileDialogOpen={() => console.log("onFileDialogOpen invoked")}
           minSize={2000}
           maxSize={Infinity}
           preventDropOnDocument
