@@ -3,6 +3,7 @@
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "module": "dist/es/index.js",
+  "sideEffects": false,
   "scripts": {
     "ci": "git-cz",
     "clean": "rimraf ./dist",
