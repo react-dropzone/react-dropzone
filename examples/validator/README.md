@@ -1,6 +1,6 @@
 By providing `validator` prop you can specify custom validation for files.
 
-The value must be a function that accepts File object and returns null if file should be accepted or error object/array of error objects if file should me rejected.
+The value must be a function that accepts File object and returns null if file should be accepted or error object/array of error objects if file should be rejected.
 
 ```jsx harmony
 import React from 'react';
