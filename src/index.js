@@ -158,6 +158,11 @@ Dropzone.propTypes = {
    */
   onFileDialogCancel: PropTypes.func,
 
+    /**
+     * Cb for when opening the file dialog
+     */
+  onFileDialogOpen: PropTypes.func,
+
   /**
    * Cb for when the `dragenter` event occurs.
    *
@@ -230,7 +235,7 @@ Dropzone.propTypes = {
   onDropRejected: PropTypes.func,
 
   /**
-   * Custom validation function 
+   * Custom validation function
    * @param {File} file
    * @returns {FileError|FileError[]}
    */
@@ -354,6 +359,7 @@ const initialState = {
  * @param {boolean} [props.disabled=false] Enable/disable the dropzone
  * @param {getFilesFromEvent} [props.getFilesFromEvent] Use this to provide a custom file aggregator
  * @param {Function} [props.onFileDialogCancel] Cb for when closing the file dialog with no selection
+ * @param {Function} [props.onFileDialogOpen] Cb for when opening the file dialog
  * @param {dragCb} [props.onDragEnter] Cb for when the `dragenter` event occurs.
  * @param {dragCb} [props.onDragLeave] Cb for when the `dragleave` event occurs
  * @param {dragCb} [props.onDragOver] Cb for when the `dragover` event occurs
@@ -402,6 +408,7 @@ export function useDropzone(options = {}) {
     onDropAccepted,
     onDropRejected,
     onFileDialogCancel,
+    onFileDialogOpen,
     preventDropOnDocument,
     noClick,
     noKeyboard,
@@ -423,10 +430,13 @@ export function useDropzone(options = {}) {
   const openFileDialog = useCallback(() => {
     if (inputRef.current) {
       dispatch({ type: 'openDialog' })
+      if (typeof onFileDialogOpen === 'function') {
+        onFileDialogOpen()
+      }
       inputRef.current.value = null
       inputRef.current.click()
     }
-  }, [dispatch])
+  }, [dispatch, onFileDialogOpen])
 
   // Update file dialog active state when the window is focused on
   const onWindowFocus = () => {
@@ -467,7 +477,7 @@ export function useDropzone(options = {}) {
         openFileDialog()
       }
     },
-    [rootRef, inputRef]
+    [rootRef, inputRef, openFileDialog]
   )
 
   // Update focus state for the dropzone
@@ -492,7 +502,7 @@ export function useDropzone(options = {}) {
     } else {
       openFileDialog()
     }
-  }, [inputRef, noClick])
+  }, [inputRef, noClick, openFileDialog])
 
   const dragTargetsRef = useRef([])
   const onDocumentDrop = event => {
@@ -631,7 +641,7 @@ export function useDropzone(options = {}) {
               acceptedFiles.push(file)
             } else {
               let errors = [acceptError, sizeError];
-              
+
               if (customErrors) {
                 errors = errors.concat(customErrors);
               }
@@ -647,7 +657,7 @@ export function useDropzone(options = {}) {
             })
             acceptedFiles.splice(0)
           }
-        
+
           dispatch({
             acceptedFiles,
             fileRejections,

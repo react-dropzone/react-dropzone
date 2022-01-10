@@ -2628,6 +2628,49 @@ describe('useDropzone() hook', () => {
     })
   })
 
+  describe('onFileDialogOpen', () => {
+    it('is invoked when opening the file dialog', () => {
+      const onFileDialogOpenSpy = jest.fn()
+      const { container } = render(
+        <Dropzone
+          onFileDialogOpen={onFileDialogOpenSpy}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const dropzone = container.querySelector('div')
+      fireEvent.click(dropzone)
+
+      expect(onFileDialogOpenSpy).toHaveBeenCalled()
+    })
+
+    it('is invoked when opening the file dialog programmatically', () => {
+      const onFileDialogOpenSpy = jest.fn()
+      const { container } = render(
+        <Dropzone
+          onFileDialogOpen={onFileDialogOpenSpy}>
+          {({ getRootProps, getInputProps, open }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <button type="button" onClick={open}>
+                Open
+              </button>
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const btn = container.querySelector('button')
+      btn.click()
+
+      expect(onFileDialogOpenSpy).toHaveBeenCalled()
+    })
+  })
+
   describe('{open}', () => {
     it('can open file dialog programmatically', () => {
       const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
@@ -2728,7 +2771,7 @@ describe('useDropzone() hook', () => {
 
         return null;
       }
-      
+
       const onDropSpy = jest.fn()
 
       const ui = (
