@@ -1,140 +1,144 @@
-If you'd like to integrate the dropzone with the [doka](https://pqina.nl/doka/?ref=react-dropzone) image editor, you just need to pass either of the selected images to the `create()` method exported by doka:
+If you'd like to integrate the dropzone with the [Pintura](https://pqina.nl/pintura/?ref=react-dropzone) image editor, you just need to pass either of the selected images to the `openDefaultEditor()` method exported by Pintura:
 
-```jsx harmony
-import React, {useEffect, useState} from 'react';
-import {useDropzone} from 'react-dropzone';
+```jsx
+import React, { useState, useEffect } from 'react';
 
-import {create} from 'doka';
+// React Dropzone
+import { useDropzone } from 'react-dropzone';
 
+// Pintura Image Editor
+import 'pintura/pintura.css';
+import { openDefaultEditor } from 'pintura';
+
+// Based on the default React Dropzone image thumbnail example
+// The `thumbButton` style positions the edit button in the bottom right corner of the thumbnail
 const thumbsContainer = {
-  display: "flex",
-  flexDirection: "row",
-  flexWrap: "wrap",
-  marginTop: 16,
-  padding: 20
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16,
+    padding: 20,
 };
 
 const thumb = {
-  position: "relative",
-  display: "inline-flex",
-  borderRadius: 2,
-  border: "1px solid #eaeaea",
-  marginBottom: 8,
-  marginRight: 8,
-  width: 100,
-  height: 100,
-  padding: 4,
-  boxSizing: "border-box"
+    position: 'relative',
+    display: 'inline-flex',
+    borderRadius: 2,
+    border: '1px solid #eaeaea',
+    marginBottom: 8,
+    marginRight: 8,
+    width: 100,
+    height: 100,
+    padding: 4,
+    boxSizing: 'border-box',
 };
 
 const thumbInner = {
-  display: "flex",
-  minWidth: 0,
-  overflow: "hidden"
+    display: 'flex',
+    minWidth: 0,
+    overflow: 'hidden',
 };
 
 const img = {
-  display: "block",
-  width: "auto",
-  height: "100%"
+    display: 'block',
+    width: 'auto',
+    height: '100%',
 };
 
 const thumbButton = {
-  position: "absolute",
-  right: 10,
-  bottom: 10,
-  background: "rgba(0,0,0,.8)",
-  color: "#fff",
-  border: 0,
-  borderRadius: ".325em",
-  cursor: "pointer"
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
 };
 
+// This function is called when the user taps the edit button.
+// It opens the editor and returns the modified file when done
 const editImage = (image, done) => {
-  const imageFile = image.doka ? image.doka.file : image;
-  const imageState = image.doka ? image.doka.data : {};
-  create({
-    // recreate previous state
-    ...imageState,
+    const imageFile = image.pintura ? image.pintura.file : image;
+    const imageState = image.pintura ? image.pintura.data : {};
 
-    // load original image file
-    src: imageFile,
-    outputData: true,
+    const editor = openDefaultEditor({
+        src: imageFile,
+        imageState,
+    });
 
-    onconfirm: ({ file, data }) => {
-      Object.assign(file, {
-        doka: { file: imageFile, data }
-      });
-      done(file);
-    }
-  });
+    editor.on('close', () => {
+        // the user cancelled editing the image
+    });
+
+    editor.on('process', ({ dest, imageState }) => {
+        Object.assign(dest, {
+            pintura: { file: imageFile, data: imageState },
+        });
+        done(dest);
+    });
 };
 
-function Doka(props) {
-  const [files, setFiles] = useState([]);
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/*",
-    onDrop: (acceptedFiles) => {
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file)
-          })
-        )
-      );
-    }
-  });
+function App() {
+    const [files, setFiles] = useState([]);
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: 'image/*',
+        onDrop: (acceptedFiles) => {
+            setFiles(
+                acceptedFiles.map((file) =>
+                    Object.assign(file, {
+                        preview: URL.createObjectURL(file),
+                    })
+                )
+            );
+        },
+    });
 
-  const thumbs = files.map((file, index) => (
-    <div style={thumb} key={file.name}>
-      <div style={thumbInner}>
-        <img src={file.preview} style={img} alt="" />
-      </div>
-      <button
-        style={thumbButton}
-        onClick={() =>
-          editImage(file, (output) => {
-            const updatedFiles = [...files];
+    const thumbs = files.map((file, index) => (
+        <div style={thumb} key={file.name}>
+            <div style={thumbInner}>
+                <img src={file.preview} style={img} alt="" />
+            </div>
+            <button
+                style={thumbButton}
+                onClick={() =>
+                    editImage(file, (output) => {
+                        const updatedFiles = [...files];
 
-            // replace original image with new image
-            updatedFiles[index] = output;
+                        // replace original image with new image
+                        updatedFiles[index] = output;
 
-            // revoke preview URL for old image
-            if (file.preview) URL.revokeObjectURL(file.preview);
+                        // revoke preview URL for old image
+                        if (file.preview) URL.revokeObjectURL(file.preview);
 
-            // set new preview URL
-            Object.assign(output, {
-              preview: URL.createObjectURL(output)
-            });
+                        // set new preview URL
+                        Object.assign(output, {
+                            preview: URL.createObjectURL(output),
+                        });
 
-            // update view
-            setFiles(updatedFiles);
-          })
-        }
-      >
-        edit
-      </button>
-    </div>
-  ));
+                        // update view
+                        setFiles(updatedFiles);
+                    })
+                }
+            >
+                Edit
+            </button>
+        </div>
+    ));
 
-  useEffect(
-    () => () => {
-      // Make sure to revoke the data uris to avoid memory leaks
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
-    },
-    [files]
-  );
+    useEffect(
+        () => () => {
+            // Make sure to revoke the Object URL to avoid memory leaks
+            files.forEach((file) => URL.revokeObjectURL(file.preview));
+        },
+        [files]
+    );
 
-  return (
-    <section className="container">
-      <div {...getRootProps({ className: "dropzone" })}>
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-      </div>
-      <aside style={thumbsContainer}>{thumbs}</aside>
-    </section>
-  );
+    return (
+        <section className="container">
+            <div {...getRootProps({ className: 'dropzone' })}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+            <aside style={thumbsContainer}>{thumbs}</aside>
+        </section>
+    );
 }
 
-<Doka />
+export default App;
 ```
