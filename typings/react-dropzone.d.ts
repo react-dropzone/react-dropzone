@@ -41,6 +41,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
   getFilesFromEvent?: (event: DropEvent) => Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?: () => void;
+  onFileDialogOpen?: ()=> void;
   validator?: <T extends File>(file: T) => FileError | FileError[] | null;
 };
 
