@@ -1,6 +1,6 @@
 If you'd like to integrate the dropzone with the [Pintura](https://pqina.nl/pintura/?ref=react-dropzone) image editor, you just need to pass either of the selected images to the `openDefaultEditor()` method exported by Pintura:
 
-```jsx
+```jsx static
 import React, { useState, useEffect } from 'react';
 
 // React Dropzone
