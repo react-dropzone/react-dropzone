@@ -22,7 +22,7 @@ const baseStyle = {
   transition: 'border .24s ease-in-out'
 };
 
-const activeStyle = {
+const focusedStyle = {
   borderColor: '#2196f3'
 };
 
@@ -38,20 +38,20 @@ function StyledDropzone(props) {
   const {
     getRootProps,
     getInputProps,
-    isDragActive,
+    isFocused,
     isDragAccept,
     isDragReject
   } = useDropzone({accept: 'image/*'});
 
   const style = useMemo(() => ({
     ...baseStyle,
-    ...(isDragActive ? activeStyle : {}),
+    ...(isFocused ? focusedStyle : {}),
     ...(isDragAccept ? acceptStyle : {}),
     ...(isDragReject ? rejectStyle : {})
   }), [
-    isDragActive,
-    isDragReject,
-    isDragAccept
+    isFocused,
+    isDragAccept,
+    isDragReject
   ]);
 
   return (
@@ -81,7 +81,7 @@ const getColor = (props) => {
   if (props.isDragReject) {
       return '#ff1744';
   }
-  if (props.isDragActive) {
+  if (props.isFocused) {
       return '#2196f3';
   }
   return '#eeeeee';
@@ -107,14 +107,14 @@ function StyledDropzone(props) {
   const {
     getRootProps,
     getInputProps,
-    isDragActive,
+    isFocused,
     isDragAccept,
     isDragReject
   } = useDropzone({accept: 'image/*'});
   
   return (
     <div className="container">
-      <Container {...getRootProps({isDragActive, isDragAccept, isDragReject})}>
+      <Container {...getRootProps({isFocused, isDragAccept, isDragReject})}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
       </Container>

@@ -2,7 +2,10 @@ import React from "react";
 import Dropzone from "../../";
 
 export const dropzone = (
-  <Dropzone onDrop={files => console.log(files)}>
+  <Dropzone
+    onDrop={files => console.log(files)}
+    onFileDialogCancel={() => console.log("onFileDialogCancel invoked")}
+    onFileDialogOpen={() => console.log("onFileDialogOpen invoked")}>
     {({getRootProps, getInputProps, open}) => (
       <div {...getRootProps()}>
         <input {...getInputProps()} />

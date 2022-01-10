@@ -138,11 +138,12 @@ This is in order to avoid your props being overridden (or overriding the props r
   })}
 />
 ```
+> ♿ this is also where you pass accessibility props like `role`, `aria-labelledby` ...etc.
 
 In the example above, the provided `{onClick}` handler will be invoked before the internal one, therefore, internal callbacks can be prevented by simply using [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation).
 See [Events](https://react-dropzone.js.org#events) for more examples.
 
-*Important*: if you ommit rendering an `<input>` and/or binding the props from `getInputProps()`, opening a file dialog will not be possible.
+*Important*: if you omit rendering an `<input>` and/or binding the props from `getInputProps()`, opening a file dialog will not be possible.
 
 ## Refs
 
@@ -294,9 +295,11 @@ More examples for this can be found in `react-dropzone`s own [test suites](https
 
 ## Need image editing?
 
-React Dropzone integrates perfectly with [Doka Image Editor](https://pqina.nl/doka/?ref=react-dropzone), creating a modern image editing experience. Doka supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
 
-Checkout the [integration example](https://react-dropzone.js.org/#!/Doka).
+
+React Dropzone integrates perfectly with [Pintura Image Editor](https://pqina.nl/pintura/?ref=react-dropzone), creating a modern image editing experience. Pintura supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
+
+Checkout the [Pintura integration example](https://codesandbox.io/s/react-dropzone-pintura-40xh4?file=/src/App.js).
 
 ## Supported Browsers
 
