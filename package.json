@@ -91,9 +91,9 @@
     "react": ">= 16.8"
   },
   "dependencies": {
-    "attr-accept": "^2.2.1",
-    "file-selector": "^0.2.2",
-    "prop-types": "^15.7.2"
+    "attr-accept": "^2.2.2",
+    "file-selector": "^0.2.4",
+    "prop-types": "^15.8.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
