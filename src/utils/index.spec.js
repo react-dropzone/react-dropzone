@@ -5,9 +5,8 @@ beforeEach(() => {
 
 describe('fileMatchSize()', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('should return true if the file object doesn\'t have a {size} property', () => {
@@ -42,9 +41,8 @@ describe('fileMatchSize()', () => {
 
 describe('isIeOrEdge', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('should return true for IE10', () => {
@@ -89,9 +87,8 @@ describe('isPropagationStopped()', () => {
   const trueFn = jest.fn(() => true)
 
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('should return result of isPropagationStopped() if isPropagationStopped exists', () => {
@@ -109,9 +106,8 @@ describe('isPropagationStopped()', () => {
 
 describe('isEvtWithFiles()', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('should return true if some dragged types are files', () => {
@@ -145,9 +141,8 @@ describe('isEvtWithFiles()', () => {
 
 describe('composeEventHandlers', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('returns a fn', () => {
@@ -193,9 +188,8 @@ describe('composeEventHandlers', () => {
 
 describe('fileAccepted', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('accepts bogus firefox file', () => {
@@ -232,9 +226,8 @@ it('rejects file when single accept criteria as array', () => {
 
 describe('allFilesAccepted()', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
   it('rejects file when multiple accept criteria', () => {
     const files = [createFile('hamster.pdf', 100, 'application/pdf'),createFile('fish.pdf', 100, 'application/pdf')];
@@ -242,8 +235,8 @@ describe('allFilesAccepted()', () => {
     expect(utils.allFilesAccepted({ files, multiple: true})).toEqual(true)
     expect(utils.allFilesAccepted({ files, multiple: true, maxFiles: 10 })).toEqual(true)
     expect(utils.allFilesAccepted({ files, multiple: false, maxFiles: 10 })).toEqual(false)
-    expect(utils.allFilesAccepted({ files, multiple: true, accept:'image/jpeg' })).toEqual(false) 
-    expect(utils.allFilesAccepted({ files: images, multiple: true,accept:'image/*' })).toEqual(true) 
+    expect(utils.allFilesAccepted({ files, multiple: true, accept:'image/jpeg' })).toEqual(false)
+    expect(utils.allFilesAccepted({ files: images, multiple: true,accept:'image/*' })).toEqual(true)
     expect(utils.allFilesAccepted({ files, multiple: true, minSize: 110 })).toEqual(false)
     expect(utils.allFilesAccepted({ files, multiple: true, maxSize: 99 })).toEqual(false)
     expect(utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 })).toEqual(false)
@@ -262,9 +255,8 @@ function createFile(name, size, type) {
 
 describe('ErrorCode', () => {
   let utils
-  beforeEach(async done => {
+  beforeEach(async () => {
     utils = await import('./index')
-    done()
   })
 
   it('should exist and have known error code properties', () => {

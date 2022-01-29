@@ -1,6 +1,6 @@
 {
   "root": true,
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 2017,
     "sourceType": "module"
@@ -23,12 +23,16 @@
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
-    "prettier",
-    "prettier/react"
+    "prettier"
   ],
   "rules": {
     "react-hooks/rules-of-hooks": 2,
     "react/forbid-prop-types": 0,
     "react/require-default-props": 0
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
