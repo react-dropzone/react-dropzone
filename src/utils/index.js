@@ -26,14 +26,14 @@ export const getInvalidTypeRejectionErr = accept => {
 export const getTooLargeRejectionErr = maxSize => {
   return {
     code: FILE_TOO_LARGE,
-    message: `File is larger than ${maxSize} bytes`
+    message: `File is larger than ${maxSize} ${maxSize === 1 ? 'byte' : 'bytes'}`
   }
 }
 
 export const getTooSmallRejectionErr = minSize => {
   return {
     code: FILE_TOO_SMALL,
-    message: `File is smaller than ${minSize} bytes`
+    message: `File is smaller than ${minSize} ${minSize === 1 ? 'byte' : 'bytes'}`
   }
 }
 
