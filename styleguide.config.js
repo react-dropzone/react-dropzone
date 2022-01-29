@@ -19,11 +19,9 @@ module.exports = {
   serverPort: 8080,
   moduleAliases: {
     'react-dropzone': path.resolve(__dirname, './src'),
-    'doka': path.resolve(__dirname, './vendor/doka/doka.esm.min.js')
   },
   require: [
     path.join(__dirname, 'examples/theme.css'),
-    path.join(__dirname, 'vendor/doka/doka.min.css'),
   ],
   sections: [
     {
@@ -85,8 +83,8 @@ module.exports = {
       name: 'Integrations',
       sections: [
         {
-          name: 'Doka',
-          content: 'examples/doka/README.md'
+          name: 'Pintura',
+          content: 'examples/pintura/README.md'
         }
       ]
     }
