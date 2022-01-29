@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_version: [10, 12, 14]
+        node_version: [14]
 
     steps:
       - uses: actions/checkout@master
@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
       - name: Install
-        run: npm ci
+        run: yarn install --pure-lockfile
       - name: Test
-        run: npm test
+        run: yarn test
       - uses: coverallsapp/github-action@v1.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

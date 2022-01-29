@@ -1,7 +1,7 @@
-const nodeResolve = require('rollup-plugin-node-resolve')
-const commonjs = require('rollup-plugin-commonjs')
-const babel = require('rollup-plugin-babel')
-const { uglify } = require('rollup-plugin-uglify')
+const { nodeResolve } = require('@rollup/plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
+const { babel } = require('@rollup/plugin-babel')
+const { terser } = require('rollup-plugin-terser')
 
 const umdGlobals = {
   react: 'React',
@@ -23,8 +23,11 @@ module.exports = [
     plugins: [
       nodeResolve(),
       commonjs({ include: '**/node_modules/**' }),
-      babel({ exclude: '**/node_modules/**' }),
-      uglify()
+      babel({
+        exclude: '**/node_modules/**',
+        babelHelpers: 'bundled',
+      }),
+      terser()
     ]
   }
 ]
