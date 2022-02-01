@@ -86,7 +86,7 @@ function DropzoneWithoutKeyboard(props) {
 <DropzoneWithoutKeyboard />
 ```
 
-Note that you can prevent the default behavior for click and keyboard events if you omit the input:
+Or you can prevent the default behavior for both click and keyboard events if you omit the input:
 ```jsx harmony
 import React from 'react';
 import {useDropzone} from 'react-dropzone';
@@ -110,6 +110,8 @@ function DropzoneWithoutClick(props) {
 
 <DropzoneWithoutClick />
 ```
+
+**NOTE** If the browser supports the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), removing the `<input>` has no effect.
 
 If you'd like to selectively turn off the default dropzone behavior for drag events, use the `{noDrag}` property:
 ```jsx harmony
