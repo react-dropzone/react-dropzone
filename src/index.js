@@ -10,12 +10,14 @@ import React, {
   useRef
 } from 'react'
 import PropTypes from 'prop-types'
-import { fromEvent } from 'file-selector'
+import {fromEvent} from 'file-selector'
 import {
   allFilesAccepted,
   composeEventHandlers,
   fileAccepted,
   fileMatchSize,
+  filePickerOptionsTypes,
+  canUseFileSystemAccessAPI,
   isEvtWithFiles,
   isIeOrEdge,
   isPropagationStopped,
@@ -37,13 +39,13 @@ import {
  * </Dropzone>
  * ```
  */
-const Dropzone = forwardRef(({ children, ...params }, ref) => {
-  const { open, ...props } = useDropzone(params)
+const Dropzone = forwardRef(({children, ...params}, ref) => {
+  const {open, ...props} = useDropzone(params)
 
-  useImperativeHandle(ref, () => ({ open }), [open])
+  useImperativeHandle(ref, () => ({open}), [open])
 
   // TODO: Figure out why react-styleguidist cannot create docs if we don't return a jsx element
-  return <Fragment>{children({ ...props, open })}</Fragment>
+  return <Fragment>{children({...props, open})}</Fragment>
 })
 
 Dropzone.displayName = 'Dropzone'
@@ -158,9 +160,9 @@ Dropzone.propTypes = {
    */
   onFileDialogCancel: PropTypes.func,
 
-    /**
-     * Cb for when opening the file dialog
-     */
+  /**
+   * Cb for when opening the file dialog
+   */
   onFileDialogOpen: PropTypes.func,
 
   /**
@@ -420,23 +422,18 @@ export function useDropzone(options = {}) {
     ...options
   }
 
+  const onFileDialogOpenCb = useMemo(
+    () => typeof onFileDialogOpen === 'function' ? onFileDialogOpen : noop,
+    [onFileDialogOpen])
+  const onFileDialogCancelCb = useMemo(
+    () => typeof onFileDialogCancel === 'function' ? onFileDialogCancel : noop,
+    [onFileDialogCancel])
+
   const rootRef = useRef(null)
   const inputRef = useRef(null)
 
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { isFocused, isFileDialogActive, draggedFiles } = state
-
-  // Fn for opening the file dialog programmatically
-  const openFileDialog = useCallback(() => {
-    if (inputRef.current) {
-      dispatch({ type: 'openDialog' })
-      if (typeof onFileDialogOpen === 'function') {
-        onFileDialogOpen()
-      }
-      inputRef.current.value = null
-      inputRef.current.click()
-    }
-  }, [dispatch, onFileDialogOpen])
+  const {isFocused, isFileDialogActive, draggedFiles} = state
 
   // Update file dialog active state when the window is focused on
   const onWindowFocus = () => {
@@ -444,65 +441,26 @@ export function useDropzone(options = {}) {
     if (isFileDialogActive) {
       setTimeout(() => {
         if (inputRef.current) {
-          const { files } = inputRef.current
+          const {files} = inputRef.current
 
           if (!files.length) {
-            dispatch({ type: 'closeDialog' })
-
-            if (typeof onFileDialogCancel === 'function') {
-              onFileDialogCancel()
-            }
+            dispatch({type: 'closeDialog'})
+            onFileDialogCancelCb()
           }
         }
       }, 300)
     }
   }
   useEffect(() => {
+    if (canUseFileSystemAccessAPI()) {
+      return () => {}
+    }
+
     window.addEventListener('focus', onWindowFocus, false)
     return () => {
       window.removeEventListener('focus', onWindowFocus, false)
     }
-  }, [inputRef, isFileDialogActive, onFileDialogCancel])
-
-  // Cb to open the file dialog when SPACE/ENTER occurs on the dropzone
-  const onKeyDownCb = useCallback(
-    event => {
-      // Ignore keyboard events bubbling up the DOM tree
-      if (!rootRef.current || !rootRef.current.isEqualNode(event.target)) {
-        return
-      }
-
-      if (event.keyCode === 32 || event.keyCode === 13) {
-        event.preventDefault()
-        openFileDialog()
-      }
-    },
-    [rootRef, inputRef, openFileDialog]
-  )
-
-  // Update focus state for the dropzone
-  const onFocusCb = useCallback(() => {
-    dispatch({ type: 'focus' })
-  }, [])
-  const onBlurCb = useCallback(() => {
-    dispatch({ type: 'blur' })
-  }, [])
-
-  // Cb to open the file dialog when click occurs on the dropzone
-  const onClickCb = useCallback(() => {
-    if (noClick) {
-      return
-    }
-
-    // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
-    // to ensure React can handle state changes
-    // See: https://github.com/react-dropzone/react-dropzone/issues/450
-    if (isIeOrEdge()) {
-      setTimeout(openFileDialog, 0)
-    } else {
-      openFileDialog()
-    }
-  }, [inputRef, noClick, openFileDialog])
+  }, [inputRef, isFileDialogActive, onFileDialogCancelCb])
 
   const dragTargetsRef = useRef([])
   const onDocumentDrop = event => {
@@ -614,6 +572,66 @@ export function useDropzone(options = {}) {
     [rootRef, onDragLeave, noDragEventsBubbling]
   )
 
+  const setFiles = useCallback((files, event) => {
+    const acceptedFiles = []
+    const fileRejections = []
+
+    files.forEach(file => {
+      const [accepted, acceptError] = fileAccepted(file, accept)
+      const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
+      const customErrors = validator ? validator(file) : null;
+
+      if (accepted && sizeMatch && !customErrors) {
+        acceptedFiles.push(file)
+      } else {
+        let errors = [acceptError, sizeError];
+
+        if (customErrors) {
+          errors = errors.concat(customErrors);
+        }
+
+        fileRejections.push({file, errors: errors.filter(e => e)})
+      }
+    })
+
+    if ((!multiple && acceptedFiles.length > 1) || (multiple && maxFiles >= 1 && acceptedFiles.length > maxFiles)) {
+      // Reject everything and empty accepted files
+      acceptedFiles.forEach(file => {
+        fileRejections.push({file, errors: [TOO_MANY_FILES_REJECTION]})
+      })
+      acceptedFiles.splice(0)
+    }
+
+    dispatch({
+      acceptedFiles,
+      fileRejections,
+      type: 'setFiles'
+    })
+
+    if (onDrop) {
+      onDrop(acceptedFiles, fileRejections, event)
+    }
+
+    if (fileRejections.length > 0 && onDropRejected) {
+      onDropRejected(fileRejections, event)
+    }
+
+    if (acceptedFiles.length > 0 && onDropAccepted) {
+      onDropAccepted(acceptedFiles, event)
+    }
+  }, [
+    dispatch,
+    multiple,
+    accept,
+    minSize,
+    maxSize,
+    maxFiles,
+    onDrop,
+    onDropAccepted,
+    onDropRejected,
+    validator
+  ]);
+
   const onDropCb = useCallback(
     event => {
       event.preventDefault()
@@ -628,71 +646,90 @@ export function useDropzone(options = {}) {
           if (isPropagationStopped(event) && !noDragEventsBubbling) {
             return
           }
-
-          const acceptedFiles = []
-          const fileRejections = []
-
-          files.forEach(file => {
-            const [accepted, acceptError] = fileAccepted(file, accept)
-            const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize)
-            const customErrors = validator ? validator(file) : null;
-
-            if (accepted && sizeMatch && !customErrors) {
-              acceptedFiles.push(file)
-            } else {
-              let errors = [acceptError, sizeError];
-
-              if (customErrors) {
-                errors = errors.concat(customErrors);
-              }
-
-              fileRejections.push({ file, errors: errors.filter(e => e) })
-            }
-          })
-
-          if ((!multiple && acceptedFiles.length > 1) || (multiple && maxFiles >= 1 &&  acceptedFiles.length > maxFiles)) {
-            // Reject everything and empty accepted files
-            acceptedFiles.forEach(file => {
-              fileRejections.push({ file, errors: [TOO_MANY_FILES_REJECTION] })
-            })
-            acceptedFiles.splice(0)
-          }
-
-          dispatch({
-            acceptedFiles,
-            fileRejections,
-            type: 'setFiles'
-          })
-
-          if (onDrop) {
-            onDrop(acceptedFiles, fileRejections, event)
-          }
-
-          if (fileRejections.length > 0 && onDropRejected) {
-            onDropRejected(fileRejections, event)
-          }
-
-          if (acceptedFiles.length > 0 && onDropAccepted) {
-            onDropAccepted(acceptedFiles, event)
-          }
+          setFiles(files, event)
         })
       }
-      dispatch({ type: 'reset' })
+      dispatch({type: 'reset'})
     },
     [
-      multiple,
-      accept,
-      minSize,
-      maxSize,
-      maxFiles,
       getFilesFromEvent,
-      onDrop,
-      onDropAccepted,
-      onDropRejected,
-      noDragEventsBubbling,
-      validator
+      setFiles,
+      noDragEventsBubbling
     ]
   )
+
+  // Fn for opening the file dialog programmatically
+  const openFileDialog = useCallback(() => {
+    if (canUseFileSystemAccessAPI()) {
+      dispatch({type: 'openDialog'})
+      onFileDialogOpenCb()
+      // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
+      const opts = {
+        multiple,
+        types: filePickerOptionsTypes(accept)
+      };
+      window.showOpenFilePicker(opts)
+        .then(handles => getFilesFromEvent(handles))
+        .then(files => setFiles(files, null))
+        .catch(e => onFileDialogCancelCb(e))
+        .finally(() => dispatch({type: 'closeDialog'}));
+      return
+    }
+
+    if (inputRef.current) {
+      dispatch({type: 'openDialog'})
+      onFileDialogOpenCb()
+      inputRef.current.value = null
+      inputRef.current.click()
+    }
+  }, [
+    dispatch,
+    onFileDialogOpenCb,
+    onFileDialogCancelCb,
+    setFiles,
+    accept,
+    multiple
+  ])
+
+  // Cb to open the file dialog when SPACE/ENTER occurs on the dropzone
+  const onKeyDownCb = useCallback(
+    event => {
+      // Ignore keyboard events bubbling up the DOM tree
+      if (!rootRef.current || !rootRef.current.isEqualNode(event.target)) {
+        return
+      }
+
+      if (event.keyCode === 32 || event.keyCode === 13) {
+        event.preventDefault()
+        openFileDialog()
+      }
+    },
+    [rootRef, inputRef, openFileDialog]
+  )
+
+  // Update focus state for the dropzone
+  const onFocusCb = useCallback(() => {
+    dispatch({type: 'focus'})
+  }, [])
+  const onBlurCb = useCallback(() => {
+    dispatch({type: 'blur'})
+  }, [])
+
+  // Cb to open the file dialog when click occurs on the dropzone
+  const onClickCb = useCallback(() => {
+    if (noClick) {
+      return
+    }
+
+    // In IE11/Edge the file-browser dialog is blocking, therefore, use setTimeout()
+    // to ensure React can handle state changes
+    // See: https://github.com/react-dropzone/react-dropzone/issues/450
+    if (isIeOrEdge()) {
+      setTimeout(openFileDialog, 0)
+    } else {
+      openFileDialog()
+    }
+  }, [inputRef, noClick, openFileDialog])
 
   const composeHandler = fn => {
     return disabled ? null : fn
@@ -734,7 +771,7 @@ export function useDropzone(options = {}) {
       onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
       onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
       [refKey]: rootRef,
-      ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
+      ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
       ...rest
     }),
     [
@@ -758,12 +795,12 @@ export function useDropzone(options = {}) {
   }, [])
 
   const getInputProps = useMemo(
-    () => ({ refKey = 'ref', onChange, onClick, ...rest } = {}) => {
+    () => ({refKey = 'ref', onChange, onClick, ...rest} = {}) => {
       const inputProps = {
         accept,
         multiple,
         type: 'file',
-        style: { display: 'none' },
+        style: {display: 'none'},
         onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
         onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
         autoComplete: 'off',
@@ -780,7 +817,7 @@ export function useDropzone(options = {}) {
   )
 
   const fileCount = draggedFiles.length
-  const isDragAccept = fileCount > 0 && allFilesAccepted({ files: draggedFiles, accept, minSize, maxSize, multiple, maxFiles })
+  const isDragAccept = fileCount > 0 && allFilesAccepted({files: draggedFiles, accept, minSize, maxSize, multiple, maxFiles})
   const isDragReject = fileCount > 0 && !isDragAccept
 
   return {
@@ -811,7 +848,7 @@ function reducer(state, action) {
       }
     case 'openDialog':
       return {
-        ...state,
+        ...initialState,
         isFileDialogActive: true
       }
     case 'closeDialog':
@@ -821,7 +858,7 @@ function reducer(state, action) {
       }
     case 'setDraggedFiles':
       /* eslint no-case-declarations: 0 */
-      const { isDragActive, draggedFiles } = action
+      const {isDragActive, draggedFiles} = action
       return {
         ...state,
         draggedFiles,
@@ -842,4 +879,6 @@ function reducer(state, action) {
   }
 }
 
-export { ErrorCode } from './utils'
+function noop() {}
+
+export {ErrorCode} from './utils'

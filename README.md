@@ -1,13 +1,12 @@
 ![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/react-dropzone/master/logo/logo.png)
 
 # react-dropzone
-
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/react-dropzone/react-dropzone/Test?label=tests&style=flat-square)](https://github.com/react-dropzone/react-dropzone/actions?query=workflow%3ATest)
+[![Tests](https://img.shields.io/github/workflow/status/react-dropzone/react-dropzone/Test?label=tests&style=flat-square)](https://github.com/react-dropzone/react-dropzone/actions?query=workflow%3ATest)
 [![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
-[![Open Collective](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
-[![Open Collective](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/react-dropzone/react-dropzone) 
+[![Open Collective Backers](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
+[![Open Collective Sponsors](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
+[![Gitpod](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/react-dropzone/react-dropzone) 
 
 Simple React hook to create a HTML5-compliant drag'n'drop zone for files.
 
@@ -15,7 +14,6 @@ Documentation and examples at https://react-dropzone.js.org. Source code at http
 
 
 ## Installation
-
 Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
 
 ```bash
@@ -53,8 +51,6 @@ function MyDropzone() {
 }
 ```
 
-**IMPORTANT**: Under the hood, this lib makes use of [hooks](https://reactjs.org/docs/hooks-intro.html), therefore, using it requires React `>= 16.8`.
-
 Or the wrapper component for the hook:
 ```jsx static
 import React from 'react'
@@ -72,10 +68,7 @@ import Dropzone from 'react-dropzone'
 </Dropzone>
 ```
 
-
-**Warning**: On most recent browsers versions, the files given by `onDrop` won't have properties `path` or `fullPath`, see [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
-
-Furthermore, if you want to access file contents you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader):
+If you want to access file contents you have to use the [FileReader API](https://developer.mozilla.org/en-US/docs/Web/API/FileReader):
 
 ```jsx static
 import React, {useCallback} from 'react'
@@ -110,7 +103,6 @@ function MyDropzone() {
 
 
 ## Dropzone Props Getters
-
 The dropzone property getters are just two functions that return objects with properties which you need to use to create the drag 'n' drop zone.
 The root properties can be applied to whatever element you want, whereas the input properties must be applied to an `<input>`:
 ```jsx static
@@ -134,11 +126,13 @@ This is in order to avoid your props being overridden (or overriding the props r
 ```jsx static
 <div
   {...getRootProps({
-    onClick: event => console.log(event)
+    onClick: event => console.log(event),
+    role: 'button',
+    'aria-label': 'drag and drop area',
+    ...
   })}
 />
 ```
-> ♿ this is also where you pass accessibility props like `role`, `aria-labelledby` ...etc.
 
 In the example above, the provided `{onClick}` handler will be invoked before the internal one, therefore, internal callbacks can be prevented by simply using [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation).
 See [Events](https://react-dropzone.js.org#events) for more examples.
@@ -146,10 +140,9 @@ See [Events](https://react-dropzone.js.org#events) for more examples.
 *Important*: if you omit rendering an `<input>` and/or binding the props from `getInputProps()`, opening a file dialog will not be possible.
 
 ## Refs
-
 Both `getRootProps` and `getInputProps` accept a custom `refKey` (defaults to `ref`) as one of the attributes passed down in the parameter.
 
-This can be useful when the element you're trying to apply the props from either one of those fns does not expose a reference to the element, e.g.:
+This can be useful when the element you're trying to apply the props from either one of those fns does not expose a reference to the element, e.g:
 
 ```jsx static
 import React from 'react'
@@ -170,7 +163,7 @@ function Example() {
 }
 ```
 
-If you're working with [Material UI](https://material-ui.com) and would like to apply the root props on some component that does not expose a ref, use [RootRef](https://material-ui.com/api/root-ref):
+If you're working with [Material UI v4](https://v4.mui.com/) and would like to apply the root props on some component that does not expose a ref, use [RootRef](https://v4.mui.com/api/root-ref/):
 
 ```jsx static
 import React from 'react'
@@ -190,7 +183,7 @@ function PaperDropzone() {
 }
 ```
 
-*Important*: do not set the `ref` prop on the elements where `getRootProps()`/`getInputProps()` props are set, instead, get the refs from the hook itself:
+**IMPORTANT**: do not set the `ref` prop on the elements where `getRootProps()`/`getInputProps()` props are set, instead, get the refs from the hook itself:
 
 ```jsx static
 import React from 'react'
@@ -232,12 +225,11 @@ dropzoneRef.open()
 
 
 ## Testing
-
-*Important*: `react-dropzone` makes some of its drag 'n' drop callbacks asynchronous to enable promise based `getFilesFromEvent()` functions. In order to test components that use this library, you may want to use the [react-testing-library](https://github.com/testing-library/react-testing-library):
+`react-dropzone` makes some of its drag 'n' drop callbacks asynchronous to enable promise based `getFilesFromEvent()` functions. In order to test components that use this library, you need to use the [react-testing-library](https://github.com/testing-library/react-testing-library):
 ```js static
 import React from 'react'
 import Dropzone from 'react-dropzone'
-import { act, fireEvent, render, waitFor } from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 
 test('invoke onDragEnter when dragenter event occurs', async () => {
   const file = new File([
@@ -289,21 +281,78 @@ function mockData(files) {
 }
 ```
 
-*Note*: using [Enzyme](https://airbnb.io/enzyme) for testing is not supported at the moment, see [#2011](https://github.com/airbnb/enzyme/issues/2011).
+**NOTE**: using [Enzyme](https://airbnb.io/enzyme) for testing is not supported at the moment, see [#2011](https://github.com/airbnb/enzyme/issues/2011).
 
-More examples for this can be found in `react-dropzone`s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
+More examples for this can be found in `react-dropzone`'s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
+
+## Caveats
+### Required React Version
+React [16.8](https://reactjs.org/blog/2019/02/06/react-v16.8.0.html) or above is required because we use [hooks](https://reactjs.org/docs/hooks-intro.html) (the lib itself is a hook).
+
+### File Paths
+Files returned by the hook or passed as arg to the `onDrop` cb won't have the properties `path` or `fullPath`.
+For more inf check [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
+
+### Not a File Uploader
+This lib is not a file uploader; as such, it does not process files or provide any way to make HTTP requests to some server; if you're looking for that, checkout [filepond](https://pqina.nl/filepond) or [uppy.io](https://uppy.io/).
+
+### Using \<label\> as Root
+If you use [\<label\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label) as the root element, the file dialog will be opened twice; see [#1107](https://github.com/react-dropzone/react-dropzone/issues/1107) why. To avoid this, use `noClick`:
+```jsx static
+import React, {useCallback} from 'react'
+import {useDropzone} from 'react-dropzone'
+
+function MyDropzone() {
+  const {getRootProps, getInputProps} = useDropzone({noClick: true})
+
+  return (
+    <label {...getRootProps()}>
+      <input {...getInputProps()} />
+    </label>
+  )
+}
+```
+
+### Using open() on Click
+If you bind a click event on an inner element and use `open()`, it will trigger a click on the root element too, resulting in the file dialog opening twice. To prevent this, use the `noClick` on the root:
+```jsx static
+import React, {useCallback} from 'react'
+import {useDropzone} from 'react-dropzone'
+
+function MyDropzone() {
+  const {getRootProps, getInputProps, open} = useDropzone({noClick: true})
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <button type="button" onClick={open}>
+        Open
+      </button>
+    </div>
+  )
+}
+```
+
+### File Dialog Cancel Callback
+The `onFileDialogCancel()` cb is unstable in most browsers, meaning, there's a good chance of it being triggered even though you have selected files.
+
+We rely on using a timeout of `300ms` after the window is focused (the window `onfocus` event is triggered when the file select dialog is closed) to check if any files were selected and trigger `onFileDialogCancel` if none were selected.
+
+As one can imagine, this doesn't really work if there's a lot of files or large files as by the time we trigger the check, the browser is still processing the files and no `onchange` events are triggered yet on the input. Check [#1031](https://github.com/react-dropzone/react-dropzone/issues/1031) for more info.
+
+Fortunately, there's the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), which is currently a working draft and some browsers support it (see [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker#browser_compatibility)), that provides a reliable way to prompt the user for file selection and capture cancellation. 
+
+And this lib makes use of it if available. Though, there's a small catch: using file extensions for the `accept` property is not supported; you must use MIME types as described in [common MIME types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types). Also check [accepting specific file types](https://react-dropzone.js.org/#section-accepting-specific-file-types) for more info on the subject of `accept` limitations.
+
+## Supported Browsers
+We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).
+
 
 ## Need image editing?
-
-
-
 React Dropzone integrates perfectly with [Pintura Image Editor](https://pqina.nl/pintura/?ref=react-dropzone), creating a modern image editing experience. Pintura supports crop aspect ratios, resizing, rotating, cropping, annotating, filtering, and much more.
 
 Checkout the [Pintura integration example](https://codesandbox.io/s/react-dropzone-pintura-40xh4?file=/src/App.js).
 
-## Supported Browsers
-
-We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).
 
 ## Support
 
@@ -378,5 +427,4 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 
 
 ## License
-
 MIT

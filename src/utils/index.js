@@ -66,8 +66,8 @@ function isDefined(value) {
   return value !== undefined && value !== null
 }
 
-export function allFilesAccepted({ files, accept, minSize, maxSize, multiple, maxFiles }) {
-  if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 &&  files.length > maxFiles) ) {
+export function allFilesAccepted({files, accept, minSize, maxSize, multiple, maxFiles}) {
+  if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 && files.length > maxFiles)) {
     return false;
   }
 
@@ -141,4 +141,38 @@ export function composeEventHandlers(...fns) {
       }
       return isPropagationStopped(event)
     })
+}
+
+/**
+ * canUseFileSystemAccessAPI checks if the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API)
+ * is supported by the browser.
+ * @returns {boolean}
+ */
+export function canUseFileSystemAccessAPI() {
+  return 'showOpenFilePicker' in window;
+}
+
+/**
+ * filePickerOptionsTypes returns the {types} option for https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
+ * based on the accept attr (see https://github.com/react-dropzone/attr-accept)
+ * E.g: converts ['image/*', 'text/*'] to {'image/*': [], 'text/*': []}
+ * @param {string|string[]} accept
+ */
+export function filePickerOptionsTypes(accept) {
+  accept = typeof accept === 'string' ? accept.split(',') : accept
+  return [{
+    description: 'everything',
+    // TODO: Need to handle filtering more elegantly than this!
+    accept: Array.isArray(accept)
+      // Accept just MIME types as per spec
+      // NOTE: accept can be https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers
+      ? accept.filter(item =>
+        item === 'audio/*' ||
+        item === 'video/*' ||
+        item === 'image/*' ||
+        item === 'text/*' ||
+        /\w+\/[-+.\w]+/g.test(item)
+      ).reduce((a, b) => ({...a, [b]: []}), {})
+      : {},
+  }];
 }

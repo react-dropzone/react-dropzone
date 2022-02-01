@@ -2,7 +2,6 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-
 describe('fileMatchSize()', () => {
   let utils
   beforeEach(async () => {
@@ -243,16 +242,6 @@ describe('allFilesAccepted()', () => {
   })
 })
 
-function createFile(name, size, type) {
-  const file = new File([], name, { type })
-  Object.defineProperty(file, 'size', {
-    get() {
-      return size
-    }
-  })
-  return file
-}
-
 describe('ErrorCode', () => {
   let utils
   beforeEach(async () => {
@@ -267,3 +256,85 @@ describe('ErrorCode', () => {
   })
 })
 
+describe('canUseFileSystemAccessAPI()', () => {
+  let utils
+  beforeEach(async () => {
+    utils = await import('./index')
+  })
+
+  it('should return false if not', () => {
+    expect(utils.canUseFileSystemAccessAPI()).toBe(false)
+  })
+
+  it('should return true if yes', () => {
+    // TODO: If we use these in other tests, restore once test is done
+    window.showOpenFilePicker = jest.fn()
+    expect(utils.canUseFileSystemAccessAPI()).toBe(true)
+  })
+})
+
+describe('filePickerOptionsTypes()', () => {
+  let utils
+  beforeEach(async () => {
+    utils = await import('./index')
+  })
+
+  it('should return proper types when the arg is a MIME type', () => {
+    expect(utils.filePickerOptionsTypes('application/zip')).toEqual([{
+      description: 'everything',
+      accept: {'application/zip': []}
+    }])
+  })
+
+  it('should return proper types when the arg is an array of MIME types', () => {
+    expect(utils.filePickerOptionsTypes(['application/zip', 'application/json'])).toEqual([{
+      description: 'everything',
+      accept: {
+        'application/zip': [],
+        'application/json': []
+      }
+    }])
+  })
+
+  it("should exclude anything that's not a MIME type", () => {
+    expect(utils.filePickerOptionsTypes(['audio/*', 'video/*', 'image/*', '.txt', 'text/*'])).toEqual([{
+      description: 'everything',
+      accept: {
+        'audio/*': [],
+        'video/*': [],
+        'image/*': [],
+        'text/*': [],
+      }
+    }])
+  })
+
+  it("should work with comma separated string of MIME types", () => {
+    expect(utils.filePickerOptionsTypes('audio/*,video/*,image/*,.txt,text/*,application/zip')).toEqual([{
+      description: 'everything',
+      accept: {
+        'audio/*': [],
+        'video/*': [],
+        'image/*': [],
+        'text/*': [],
+        'application/zip': []
+      }
+    }])
+  })
+
+  it('should return empty otherwise', () => {
+    expect(utils.filePickerOptionsTypes('')).toEqual([{
+      description: 'everything',
+      accept: {}
+    }])
+  })
+})
+
+function createFile(name, size, type) {
+  const file = new File([], name, { type })
+  Object.defineProperty(file, 'size', {
+    get() {
+      return size
+    }
+  })
+  return file
+}
