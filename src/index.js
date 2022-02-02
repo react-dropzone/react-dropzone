@@ -752,6 +752,7 @@ export function useDropzone(options = {}) {
   const getRootProps = useMemo(
     () => ({
       refKey = 'ref',
+      role,
       onKeyDown,
       onFocus,
       onBlur,
@@ -770,6 +771,7 @@ export function useDropzone(options = {}) {
       onDragOver: composeDragHandler(composeEventHandlers(onDragOver, onDragOverCb)),
       onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
       onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
+      role: typeof role === 'string' && role !== '' ? role : 'button',
       [refKey]: rootRef,
       ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
       ...rest
