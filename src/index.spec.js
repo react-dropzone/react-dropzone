@@ -2996,6 +2996,34 @@ describe('useDropzone() hook', () => {
       ], expect.anything())
     })
   })
+
+  describe('accessibility', () => {
+    it('sets the role attribute to button by default on the root', () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps }) => (
+            <div id="root" {...getRootProps()} />
+          )}
+        </Dropzone>
+      )
+      const root = container.querySelector('#root')
+
+      expect(root).toHaveAttribute('role', 'button')
+    })
+
+    test('users can override the default role attribute on the root', () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps }) => (
+            <div id="root" {...getRootProps({role: 'generic'})} />
+          )}
+        </Dropzone>
+      )
+      const root = container.querySelector('#root')
+
+      expect(root).toHaveAttribute('role', 'generic')
+    })
+  })
 })
 
 async function flushPromises(rerender, ui) {
