@@ -1,0 +1,14 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    rebase-strategy: auto
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "*"
+        dependency-type: "production"
+    commit-message:
+      prefix: "feat(deps):"
+    versioning-strategy: widen
