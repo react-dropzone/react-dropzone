@@ -74,6 +74,10 @@ module.exports = {
           content: 'examples/class-component/README.md'
         },
         {
+          name: 'No JSX',
+          content: 'examples/no-jsx/README.md'
+        },
+        {
           name: 'Extending Dropzone',
           content: 'examples/plugins/README.md'
         }
