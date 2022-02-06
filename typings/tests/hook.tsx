@@ -1,15 +1,15 @@
 import React from "react";
-import {useDropzone, DropzoneProps} from "../../";
+import { useDropzone, DropzoneProps } from "../../";
 
-export const Dropzone = ({children, ...opts}: DropzoneProps) => {
-  const {...state} = useDropzone(opts);
+export const Dropzone = ({ children, ...opts }: DropzoneProps) => {
+  const { ...state } = useDropzone(opts);
   return children(state);
-}
+};
 
 <Dropzone>
-  {({getRootProps, getInputProps}) => (
+  {({ getRootProps, getInputProps }) => (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
     </div>
   )}
-</Dropzone>
+</Dropzone>;

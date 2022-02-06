@@ -4,7 +4,7 @@ import Dropzone from "../../";
 export default class Accept extends React.Component {
   state = {
     accepted: [],
-    rejected: []
+    rejected: [],
   };
 
   render() {
@@ -17,10 +17,11 @@ export default class Accept extends React.Component {
               this.setState({ accepted, rejected });
             }}
           >
-            {({getRootProps}) => (
+            {({ getRootProps }) => (
               <div {...getRootProps()}>
                 <p>
-                  Try dropping some files here, or click to select files to upload.
+                  Try dropping some files here, or click to select files to
+                  upload.
                 </p>
                 <p>Only *.jpeg and *.png images will be accepted</p>
               </div>
@@ -30,7 +31,7 @@ export default class Accept extends React.Component {
         <aside>
           <h2>Accepted files</h2>
           <ul>
-            {this.state.accepted.map(f => (
+            {this.state.accepted.map((f) => (
               <li key={f.name}>
                 {f.name} - {f.size} bytes
               </li>
@@ -38,7 +39,7 @@ export default class Accept extends React.Component {
           </ul>
           <h2>Rejected files</h2>
           <ul>
-            {this.state.rejected.map(f => (
+            {this.state.rejected.map((f) => (
               <li key={f.name}>
                 {f.name} - {f.size} bytes
               </li>
@@ -52,7 +53,7 @@ export default class Accept extends React.Component {
 
 export const acceptExt = (
   <Dropzone accept=".jpeg,.png">
-    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
       <div {...getRootProps()}>
         {isDragAccept && "All files will be accepted"}
         {isDragReject && "Some files will be rejected"}
@@ -64,7 +65,7 @@ export const acceptExt = (
 
 export const acceptMime = (
   <Dropzone accept="image/jpeg, image/png">
-    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
       <div {...getRootProps()}>
         {isDragAccept && "All files will be accepted"}
         {isDragReject && "Some files will be rejected"}
@@ -75,8 +76,8 @@ export const acceptMime = (
 );
 
 export const acceptArray = (
-  <Dropzone accept={['image/jpeg', 'image/png']}>
-    {({getRootProps, isDragActive, isDragAccept, isDragReject}) => (
+  <Dropzone accept={["image/jpeg", "image/png"]}>
+    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
       <div {...getRootProps()}>
         {isDragAccept && "All files will be accepted"}
         {isDragReject && "Some files will be rejected"}

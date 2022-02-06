@@ -8,16 +8,18 @@ export class Events extends React.Component {
         <div className="dropzone">
           <Dropzone
             onDrop={(acceptedFiles, fileRejections, event) =>
-              console.log(acceptedFiles, fileRejections, event)}
-            onDragEnter={event => console.log(event)}
-            onDragOver={event => console.log(event)}
-            onDragLeave={event => console.log(event)}
+              console.log(acceptedFiles, fileRejections, event)
+            }
+            onDragEnter={(event) => console.log(event)}
+            onDragOver={(event) => console.log(event)}
+            onDragLeave={(event) => console.log(event)}
           >
-            {({getRootProps, getInputProps}) => (
+            {({ getRootProps, getInputProps }) => (
               <div {...getRootProps()}>
                 <input {...getInputProps()} />
                 <p>
-                  Try dropping some files here, or click to select files to upload.
+                  Try dropping some files here, or click to select files to
+                  upload.
                 </p>
               </div>
             )}

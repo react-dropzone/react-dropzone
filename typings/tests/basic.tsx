@@ -7,20 +7,21 @@ export default class Basic extends React.Component {
 
   onDrop = (files: FileWithPath[]) => {
     this.setState({
-      files
+      files,
     });
-  }
+  };
 
   render() {
     return (
       <section>
         <div className="dropzone">
           <Dropzone onDrop={this.onDrop}>
-            {({getRootProps, getInputProps}) => (
+            {({ getRootProps, getInputProps }) => (
               <div {...getRootProps()}>
                 <input {...getInputProps()} />
                 <p>
-                  Try dropping some files here, or click to select files to upload.
+                  Try dropping some files here, or click to select files to
+                  upload.
                 </p>
               </div>
             )}
@@ -29,7 +30,7 @@ export default class Basic extends React.Component {
         <aside>
           <h2>Dropped files</h2>
           <ul>
-            {this.state.files.map(f => (
+            {this.state.files.map((f) => (
               <li key={f.name}>
                 {f.name} - {f.size} bytes
               </li>
@@ -43,10 +44,10 @@ export default class Basic extends React.Component {
 
 export const optional = (
   <Dropzone>
-    {({getRootProps, getInputProps}) => (
+    {({ getRootProps, getInputProps }) => (
       <div {...getRootProps()}>
         <input {...getInputProps()} />
       </div>
     )}
   </Dropzone>
-)
+);
