@@ -15,10 +15,8 @@
     "prettier"
   ],
   "extends": [
-    // TODO: Fix this so we can use
-    // "okonet/node"
     "eslint:recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "strict": 0,
