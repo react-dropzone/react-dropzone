@@ -64,7 +64,7 @@ const defaultProps = {
   noDrag: false,
   noDragEventsBubbling: false,
   validator: null,
-  useFsAccessApi: false,
+  useFsAccessApi: true,
 };
 
 Dropzone.defaultProps = defaultProps;
