@@ -1370,6 +1370,7 @@ describe("useDropzone() hook", () => {
           onFileDialogOpen={onFileDialogOpenSpy}
           accept="application/pdf"
           multiple
+          useFsAccessApi={false}
         >
           {({ getRootProps, getInputProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
