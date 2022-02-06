@@ -1318,7 +1318,60 @@ describe('useDropzone() hook', () => {
       isIeOrEdgeSpy.mockClear()
     })
 
-    it('should use showOpenFilePicker() if supported and not trigger click on input', async () => {
+    it('should not use showOpenFilePicker() if supported and {useFsAccessApi} is not true', async () => {
+      jest.useFakeTimers()
+
+      const activeRef = createRef()
+      const active = <span ref={activeRef}>I am active</span>
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
+
+      const handlers = files.map(f => createFileSystemFileHandle(f))
+      const showOpenFilePickerMock = jest.fn().mockReturnValue(Promise.resolve(handlers))
+
+      window.showOpenFilePicker = showOpenFilePickerMock
+
+      const onDropSpy = jest.fn()
+      const onFileDialogOpenSpy = jest.fn()
+
+      const ui = (
+        <Dropzone
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept="application/pdf"
+          multiple
+        >
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      )
+
+      const { container, rerender } = render(ui)
+
+      const dropzone = container.querySelector('div')
+
+      fireEvent.click(dropzone)
+
+      await flushPromises(rerender, ui)
+
+      dispatchEvt(document.body, 'focus')
+      drainTimers()
+
+      expect(onFileDialogOpenSpy).toHaveBeenCalled()
+
+      expect(activeRef.current).toBeNull()
+      expect(dropzone).not.toContainElement(activeRef.current)
+      expect(onClickSpy).toHaveBeenCalled()
+      expect(showOpenFilePickerMock).not.toHaveBeenCalled()
+      expect(onDropSpy).not.toHaveBeenCalled()
+
+      jest.useRealTimers()
+    })
+
+    it('should use showOpenFilePicker() if supported and {useFsAccessApi} is true, and not trigger click on input', async () => {
       const activeRef = createRef()
       const active = <span ref={activeRef}>I am active</span>
       const onClickSpy = jest.spyOn(HTMLInputElement.prototype, 'click')
@@ -1338,6 +1391,7 @@ describe('useDropzone() hook', () => {
           onFileDialogOpen={onFileDialogOpenSpy}
           accept="application/pdf"
           multiple
+          useFsAccessApi
         >
           {({ getRootProps, getInputProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
@@ -1376,7 +1430,7 @@ describe('useDropzone() hook', () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], null)
     })
 
-    test('if showOpenFilePicker() is supported it should work without the <input>', async () => {
+    test('if showOpenFilePicker() is supported and {useFsAccessApi} is true, it should work without the <input>', async () => {
       const activeRef = createRef()
       const active = <span ref={activeRef}>I am active</span>
 
@@ -1389,7 +1443,11 @@ describe('useDropzone() hook', () => {
       const onFileDialogOpenSpy = jest.fn()
 
       const ui = (
-        <Dropzone onDrop={onDropSpy} onFileDialogOpen={onFileDialogOpenSpy}>
+        <Dropzone
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          useFsAccessApi
+        >
           {({ getRootProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
               {isFileDialogActive && active}
@@ -1412,7 +1470,7 @@ describe('useDropzone() hook', () => {
       expect(onFileDialogOpenSpy).toHaveBeenCalled()
     })
 
-    test('if showOpenFilePicker() is supported and the user cancels it should call onFileDialogCancel', async () => {
+    test('if showOpenFilePicker() is supported and {useFsAccessApi} is true, and the user cancels it should call onFileDialogCancel', async () => {
       const activeRef = createRef()
       const active = <span ref={activeRef}>I am active</span>
 
@@ -1424,7 +1482,11 @@ describe('useDropzone() hook', () => {
       const onFileDialogCancelSpy = jest.fn()
 
       const ui = (
-        <Dropzone onDrop={onDropSpy} onFileDialogCancel={onFileDialogCancelSpy}>
+        <Dropzone
+          onDrop={onDropSpy}
+          onFileDialogCancel={onFileDialogCancelSpy}
+          useFsAccessApi
+        >
           {({ getRootProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
               {isFileDialogActive && active}
@@ -1447,7 +1509,7 @@ describe('useDropzone() hook', () => {
       expect(onFileDialogCancelSpy).toHaveBeenCalled()
     })
 
-    test('window focus evt is not bound if showOpenFilePicker() is supported', async () => {
+    test('window focus evt is not bound if showOpenFilePicker() is supported and {useFsAccessApi} is true', async () => {
       jest.useFakeTimers()
 
       const activeRef = createRef()
@@ -1460,7 +1522,11 @@ describe('useDropzone() hook', () => {
       window.showOpenFilePicker = showOpenFilePickerMock
 
       const ui = (
-        <Dropzone onFileDialogCancel={onFileDialogCancelSpy} noClick>
+        <Dropzone
+          onFileDialogCancel={onFileDialogCancelSpy}
+          noClick
+          useFsAccessApi
+        >
           {({ getRootProps, isFileDialogActive, open }) => (
             <div {...getRootProps()}>
               {isFileDialogActive && active}
