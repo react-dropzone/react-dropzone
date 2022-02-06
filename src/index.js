@@ -63,7 +63,8 @@ const defaultProps = {
   noKeyboard: false,
   noDrag: false,
   noDragEventsBubbling: false,
-  validator: null
+  validator: null,
+  useFsAccessApi: false,
 }
 
 Dropzone.defaultProps = defaultProps
@@ -164,6 +165,12 @@ Dropzone.propTypes = {
    * Cb for when opening the file dialog
    */
   onFileDialogOpen: PropTypes.func,
+
+  /**
+   * Set to true to use the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API
+   * to open the file picker instead of using an `<input type="file">` click event.
+   */
+  useFsAccessApi: PropTypes.bool,
 
   /**
    * Cb for when the `dragenter` event occurs.
@@ -361,6 +368,8 @@ const initialState = {
  * @param {boolean} [props.disabled=false] Enable/disable the dropzone
  * @param {getFilesFromEvent} [props.getFilesFromEvent] Use this to provide a custom file aggregator
  * @param {Function} [props.onFileDialogCancel] Cb for when closing the file dialog with no selection
+ * @param {boolean} [props.useFsAccessApi] Set to true to use the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API
+ * to open the file picker instead of using an `<input type="file">` click event.
  * @param {Function} [props.onFileDialogOpen] Cb for when opening the file dialog
  * @param {dragCb} [props.onDragEnter] Cb for when the `dragenter` event occurs.
  * @param {dragCb} [props.onDragLeave] Cb for when the `dragleave` event occurs
@@ -411,6 +420,7 @@ export function useDropzone(options = {}) {
     onDropRejected,
     onFileDialogCancel,
     onFileDialogOpen,
+    useFsAccessApi,
     preventDropOnDocument,
     noClick,
     noKeyboard,
@@ -452,7 +462,7 @@ export function useDropzone(options = {}) {
     }
   }
   useEffect(() => {
-    if (canUseFileSystemAccessAPI()) {
+    if (useFsAccessApi && canUseFileSystemAccessAPI()) {
       return () => {}
     }
 
@@ -460,7 +470,7 @@ export function useDropzone(options = {}) {
     return () => {
       window.removeEventListener('focus', onWindowFocus, false)
     }
-  }, [inputRef, isFileDialogActive, onFileDialogCancelCb])
+  }, [inputRef, isFileDialogActive, onFileDialogCancelCb, useFsAccessApi])
 
   const dragTargetsRef = useRef([])
   const onDocumentDrop = event => {
@@ -660,7 +670,7 @@ export function useDropzone(options = {}) {
 
   // Fn for opening the file dialog programmatically
   const openFileDialog = useCallback(() => {
-    if (canUseFileSystemAccessAPI()) {
+    if (useFsAccessApi && canUseFileSystemAccessAPI()) {
       dispatch({type: 'openDialog'})
       onFileDialogOpenCb()
       // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
@@ -686,6 +696,7 @@ export function useDropzone(options = {}) {
     dispatch,
     onFileDialogOpenCb,
     onFileDialogCancelCb,
+    useFsAccessApi,
     setFiles,
     accept,
     multiple
