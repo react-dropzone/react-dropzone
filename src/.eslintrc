@@ -19,11 +19,10 @@
     "react-hooks"
   ],
   "extends": [
-    //"okonet/react",
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "react-hooks/rules-of-hooks": 2,

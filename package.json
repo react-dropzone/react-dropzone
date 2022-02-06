@@ -12,9 +12,10 @@
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore '**/*.spec.js'",
     "start": "styleguidist server",
     "styleguide": "styleguidist build",
-    "test": "cross-env NODE_ENV=test yarn eslint:src && jest --coverage && yarn typescript",
+    "test": "cross-env NODE_ENV=test yarn lint && jest --coverage && yarn typescript",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
-    "eslint:src": "eslint .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "commitmsg": "commitlint -e",
     "prepublish": "yarn build && yarn size",
     "postinstall": "husky install",
@@ -38,7 +39,7 @@
   ],
   "lint-staged": {
     "*.js": [
-      "eslint --fix"
+      "eslint . --fix"
     ],
     "*.ts": [
       "eslint ."
