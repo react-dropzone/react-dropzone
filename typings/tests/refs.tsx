@@ -1,11 +1,11 @@
-import React, {createRef} from "react";
-import Dropzone, {DropzoneRef} from "../../";
+import React, { createRef } from "react";
+import Dropzone, { DropzoneRef } from "../../";
 
-const ref = createRef<DropzoneRef>()
+const ref = createRef<DropzoneRef>();
 
 export const dropzone = (
   <Dropzone ref={ref}>
-    {({getRootProps, getInputProps}) => (
+    {({ getRootProps, getInputProps }) => (
       <div {...getRootProps()}>
         <input {...getInputProps()} />
         <p>Drop some files here.</p>
