@@ -26,6 +26,7 @@ export default class Test extends React.Component {
           disabled
           multiple={false}
           accept="*.png"
+          useFsAccessApi={false}
         >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
