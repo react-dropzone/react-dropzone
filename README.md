@@ -230,7 +230,7 @@ dropzoneRef.open()
 ```js static
 import React from 'react'
 import Dropzone from 'react-dropzone'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render} from '@testing-library/react'
 
 test('invoke onDragEnter when dragenter event occurs', async () => {
   const file = new File([
@@ -248,24 +248,16 @@ test('invoke onDragEnter when dragenter event occurs', async () => {
       )}
     </Dropzone>
   )
-  const { container, rerender } = render(ui)
-  const dropzone = container.querySelector('div')
+  const { container } = render(ui)
 
-  dispatchEvt(dropzone, 'dragenter', data)
-  await flushPromises(rerender, ui)
-
+  await act(
+    () => fireEvent.dragEnter(
+      container.querySelector('div'),
+      data,
+    )
+  );
   expect(onDragEnter).toHaveBeenCalled()
 })
-
-async function flushPromises(rerender, ui) {
-  await act(() => waitFor(() => rerender(ui)))
-}
-
-function dispatchEvt(node, type, data) {
-  const event = new Event(type, { bubbles: true })
-  Object.assign(event, data)
-  fireEvent(node, event)
-}
 
 function mockData(files) {
   return {

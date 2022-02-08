@@ -85,7 +85,6 @@ Dropzone.propTypes = {
    * @param {boolean} params.isDragActive Active drag is in progress
    * @param {boolean} params.isDragAccept Dragged files are accepted
    * @param {boolean} params.isDragReject Some dragged files are rejected
-   * @param {File[]} params.draggedFiles Files in active drag
    * @param {File[]} params.acceptedFiles Accepted files
    * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected
    */
@@ -310,20 +309,25 @@ export default Dropzone;
  */
 
 /**
- * An object with the current dropzone state and some helper functions.
+ * An object with the current dropzone state.
  *
  * @typedef {object} DropzoneState
- * @property {Function} getRootProps Returns the props you should apply to the root drop container you render
- * @property {Function} getInputProps Returns the props you should apply to hidden file input you render
- * @property {Function} open Open the native file selection dialog
  * @property {boolean} isFocused Dropzone area is in focus
  * @property {boolean} isFileDialogActive File dialog is opened
  * @property {boolean} isDragActive Active drag is in progress
  * @property {boolean} isDragAccept Dragged files are accepted
  * @property {boolean} isDragReject Some dragged files are rejected
- * @property {File[]} draggedFiles Files in active drag
  * @property {File[]} acceptedFiles Accepted files
  * @property {FileRejection[]} fileRejections Rejected files and why they were rejected
+ */
+
+/**
+ * An object with the dropzone methods.
+ *
+ * @typedef {object} DropzoneMethods
+ * @property {Function} getRootProps Returns the props you should apply to the root drop container you render
+ * @property {Function} getInputProps Returns the props you should apply to hidden file input you render
+ * @property {Function} open Open the native file selection dialog
  */
 
 const initialState = {
@@ -332,7 +336,6 @@ const initialState = {
   isDragActive: false,
   isDragAccept: false,
   isDragReject: false,
-  draggedFiles: [],
   acceptedFiles: [],
   fileRejections: [],
 };
@@ -410,7 +413,7 @@ const initialState = {
  * @param {dropRejectedCb} [props.onDropRejected]
  * @param {(error: Error) => void} [props.onError]
  *
- * @returns {DropzoneState}
+ * @returns {DropzoneState & DropzoneMethods}
  */
 export function useDropzone(props = {}) {
   const {
@@ -459,7 +462,7 @@ export function useDropzone(props = {}) {
   const inputRef = useRef(null);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFocused, isFileDialogActive, draggedFiles } = state;
+  const { isFocused, isFileDialogActive } = state;
 
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" &&
@@ -538,13 +541,27 @@ export function useDropzone(props = {}) {
 
       if (isEvtWithFiles(event)) {
         Promise.resolve(getFilesFromEvent(event))
-          .then((draggedFiles) => {
+          .then((files) => {
             if (isPropagationStopped(event) && !noDragEventsBubbling) {
               return;
             }
 
+            const fileCount = files.length;
+            const isDragAccept =
+              fileCount > 0 &&
+              allFilesAccepted({
+                files,
+                accept: acceptAttr,
+                minSize,
+                maxSize,
+                multiple,
+                maxFiles,
+              });
+            const isDragReject = fileCount > 0 && !isDragAccept;
+
             dispatch({
-              draggedFiles,
+              isDragAccept,
+              isDragReject,
               isDragActive: true,
               type: "setDraggedFiles",
             });
@@ -556,7 +573,17 @@ export function useDropzone(props = {}) {
           .catch((e) => onErrCb(e));
       }
     },
-    [getFilesFromEvent, onDragEnter, onErrCb, noDragEventsBubbling]
+    [
+      getFilesFromEvent,
+      onDragEnter,
+      onErrCb,
+      noDragEventsBubbling,
+      acceptAttr,
+      minSize,
+      maxSize,
+      multiple,
+      maxFiles,
+    ]
   );
 
   const onDragOverCb = useCallback(
@@ -603,9 +630,10 @@ export function useDropzone(props = {}) {
       }
 
       dispatch({
-        isDragActive: false,
         type: "setDraggedFiles",
-        draggedFiles: [],
+        isDragActive: false,
+        isDragAccept: false,
+        isDragReject: false,
       });
 
       if (isEvtWithFiles(event) && onDragLeave) {
@@ -906,23 +934,8 @@ export function useDropzone(props = {}) {
     [inputRef, accept, multiple, onDropCb, disabled]
   );
 
-  const fileCount = draggedFiles.length;
-  const isDragAccept =
-    fileCount > 0 &&
-    allFilesAccepted({
-      files: draggedFiles,
-      accept: acceptAttr,
-      minSize,
-      maxSize,
-      multiple,
-      maxFiles,
-    });
-  const isDragReject = fileCount > 0 && !isDragAccept;
-
   return {
     ...state,
-    isDragAccept,
-    isDragReject,
     isFocused: isFocused && !disabled,
     getRootProps,
     getInputProps,
@@ -932,6 +945,11 @@ export function useDropzone(props = {}) {
   };
 }
 
+/**
+ * @param {DropzoneState} state
+ * @param {{type: string} & DropzoneState} action
+ * @returns {DropzoneState}
+ */
 function reducer(state, action) {
   /* istanbul ignore next */
   switch (action.type) {
@@ -956,12 +974,11 @@ function reducer(state, action) {
         isFileDialogActive: false,
       };
     case "setDraggedFiles":
-      /* eslint no-case-declarations: 0 */
-      const { isDragActive, draggedFiles } = action;
       return {
         ...state,
-        draggedFiles,
-        isDragActive,
+        isDragActive: action.isDragActive,
+        isDragAccept: action.isDragAccept,
+        isDragReject: action.isDragReject,
       };
     case "setFiles":
       return {
