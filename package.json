@@ -95,7 +95,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "react": ">= 16.8"
+    "react": ">= 16.8 || 18.0.0"
   },
   "dependencies": {
     "attr-accept": "^2.2.2",
@@ -129,8 +129,8 @@
     "@size-limit/webpack-why": "^7.0.5",
     "@testing-library/dom": "^8.11.3",
     "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/react-hooks": "^7.0.2",
+    "@testing-library/react": "^13.1.1",
+    "@testing-library/react-hooks": "^8.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -156,10 +156,10 @@
     "markdownlint-cli": "^0.30.0",
     "pinst": "^2.1.6",
     "prettier": "^2.5.1",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
     "react-styleguidist": "^11.2.0",
-    "react-test-renderer": "^17.0.0",
+    "react-test-renderer": "^18.1.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.66.1",
     "rollup-plugin-terser": "^7.0.2",

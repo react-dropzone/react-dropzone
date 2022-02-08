@@ -66,7 +66,6 @@ export type DropzoneState = DropzoneRef & {
   isDragAccept: boolean;
   isDragReject: boolean;
   isFileDialogActive: boolean;
-  draggedFiles: File[];
   acceptedFiles: File[];
   fileRejections: FileRejection[];
   rootRef: React.RefObject<HTMLElement>;
