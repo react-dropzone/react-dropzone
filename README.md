@@ -345,6 +345,8 @@ Fortunately, there's the [File System Access API](https://developer.mozilla.org/
 
 And this lib makes use of it if available. Though, there's a small catch: using file extensions for the `accept` property is not supported; you must use MIME types as described in [common MIME types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types). Also check [accepting specific file types](https://react-dropzone.js.org/#section-accepting-specific-file-types) for more info on the subject of `accept` limitations.
 
+**NOTE** You can disable using the FS access API with the `useFsAccessApi` property: `useDropzone({useFsAccessApi: false})`.
+
 ## Supported Browsers
 We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).
 

@@ -7,7 +7,14 @@ The value must be a comma-separated list of unique content type specifiers:
 * video/* representing video files.
 * image/* representing image files.
 
-For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input
+For more information see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input.
+
+**IMPORTANT** As of [v12.0.0](https://github.com/react-dropzone/react-dropzone/releases/tag/v12.0.0), there has been some changes that affect how `accept` works.
+See [file dialog cancel callback](../../README.md#file-dialog-cancel-callback) to read more about why this change was introduced. In summary:
+1. In browsers that **do not support** the FS access API, the `accept` attr works exactly the same as in previous versions of react-dropozone, for both file picker and dag 'n' drop
+2. In browsers that **support** the FS access API, when passing file extensions to `accept` (e.g `".jpg,.png"`), the file picker will not apply those filters, but drag 'n' drop will - though, the [browser limitations](#browser-limitations) described in this document still apply
+3. If you want the same behaviour in all browsers, regardless of using the FS access API or not, you need to use MIME types - [browser limitations](#browser-limitations) still apply
+4. The use of FS access API can be turned off via `useDropzone({useFsAccessApi: false})`
 
 ```jsx harmony
 import React from 'react';
@@ -20,7 +27,7 @@ function Accept(props) {
     getRootProps,
     getInputProps
   } = useDropzone({
-    accept: 'image/jpeg, image/png'
+    accept: 'image/jpeg,image/png'
   });
 
   const acceptedFileItems = acceptedFiles.map(file => (
@@ -110,7 +117,7 @@ function Accept(props) {
     isDragAccept,
     isDragReject
   } = useDropzone({
-    accept: 'image/jpeg, image/png'
+    accept: 'image/jpeg,image/png'
   });
 
   return (
