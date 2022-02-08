@@ -468,7 +468,11 @@ export function useDropzone(options = {}) {
     }
   };
   useEffect(() => {
-    if (useFsAccessApi && canUseFileSystemAccessAPI()) {
+    if (
+      window.isSecureContext &&
+      useFsAccessApi &&
+      canUseFileSystemAccessAPI()
+    ) {
       return () => {};
     }
 
@@ -678,7 +682,13 @@ export function useDropzone(options = {}) {
 
   // Fn for opening the file dialog programmatically
   const openFileDialog = useCallback(() => {
-    if (useFsAccessApi && canUseFileSystemAccessAPI()) {
+    // No point to use FS access APIs if context is not secure
+    // https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts#feature_detection
+    if (
+      window.isSecureContext &&
+      useFsAccessApi &&
+      canUseFileSystemAccessAPI()
+    ) {
       dispatch({ type: "openDialog" });
       onFileDialogOpenCb();
       // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
