@@ -1403,6 +1403,64 @@ describe("useDropzone() hook", () => {
       jest.useRealTimers();
     });
 
+    it("should not use showOpenFilePicker() if supported and {isSecureContext} is not true", async () => {
+      jest.useFakeTimers();
+
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, "click");
+
+      const handlers = files.map((f) => createFileSystemFileHandle(f));
+      const showOpenFilePickerMock = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(handlers));
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+      window.isSecureContext = false;
+
+      const onDropSpy = jest.fn();
+      const onFileDialogOpenSpy = jest.fn();
+
+      const ui = (
+        <Dropzone
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept="application/pdf"
+          multiple
+        >
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const { container, rerender } = render(ui);
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      await flushPromises(rerender, ui);
+
+      dispatchEvt(document.body, "focus");
+      drainTimers();
+
+      expect(onFileDialogOpenSpy).toHaveBeenCalled();
+
+      expect(activeRef.current).toBeNull();
+      expect(dropzone).not.toContainElement(activeRef.current);
+      expect(onClickSpy).toHaveBeenCalled();
+      expect(showOpenFilePickerMock).not.toHaveBeenCalled();
+      expect(onDropSpy).not.toHaveBeenCalled();
+
+      jest.useRealTimers();
+
+      window.isSecureContext = true;
+    });
+
     it("should use showOpenFilePicker() if supported and {useFsAccessApi} is true, and not trigger click on input", async () => {
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
