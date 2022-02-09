@@ -1660,6 +1660,114 @@ describe("useDropzone() hook", () => {
 
       jest.useRealTimers();
     });
+
+    it("should try to use showOpenFilePicker() and fallback to input in case of a security error", async () => {
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+      const onClickSpy = jest.spyOn(HTMLInputElement.prototype, "click");
+
+      const thenable = createThenable();
+      const showOpenFilePickerMock = jest
+        .fn()
+        .mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const onDropSpy = jest.fn();
+      const onFileDialogOpenSpy = jest.fn();
+
+      const ui = (
+        <Dropzone
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept="application/pdf"
+          multiple
+          useFsAccessApi
+        >
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const { container, rerender } = render(ui);
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      await flushPromises(rerender, ui);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onFileDialogOpenSpy).toHaveBeenCalled();
+
+      thenable.cancel(
+        new DOMException("Cannot use this API cross-origin", "SecurityError")
+      );
+      await flushPromises(rerender, ui);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onClickSpy).toHaveBeenCalled();
+    });
+
+    test("window focus evt is bound if showOpenFilePicker() is supported but errors due to a security error", async () => {
+      jest.useFakeTimers();
+
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+      const onFileDialogCancelSpy = jest.fn();
+
+      const thenable = createThenable();
+      const showOpenFilePickerMock = jest
+        .fn()
+        .mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const ui = (
+        <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const { container, rerender } = render(ui);
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      drainTimers();
+      await flushPromises(rerender, ui);
+
+      const ref = activeRef.current;
+      expect(ref).not.toBeNull();
+      expect(dropzone).toContainElement(ref);
+
+      thenable.cancel(
+        new DOMException("Cannot use this API cross-origin", "SecurityError")
+      );
+
+      await flushPromises(rerender, ui);
+
+      dispatchEvt(document.body, "focus");
+      drainTimers();
+      await flushPromises(rerender, ui);
+
+      expect(onFileDialogCancelSpy).toHaveBeenCalled();
+      expect(dropzone).not.toContainElement(ref);
+
+      jest.useRealTimers();
+    });
   });
 
   describe("onKeyDown", () => {

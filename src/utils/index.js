@@ -203,3 +203,31 @@ export function filePickerOptionsTypes(accept) {
     },
   ];
 }
+
+/**
+ * Check if v is an exception caused by aborting a request (e.g window.showOpenFilePicker()).
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/API/DOMException.
+ * @param {any} v
+ * @returns {boolean} True if v is an abort exception.
+ */
+export function isAbort(v) {
+  return (
+    v instanceof DOMException &&
+    (v.name === "AbortError" || v.code === v.ABORT_ERR)
+  );
+}
+
+/**
+ * Check if v is a security error.
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/API/DOMException.
+ * @param {any} v
+ * @returns {boolean} True if v is a security error.
+ */
+export function isSecurityError(v) {
+  return (
+    v instanceof DOMException &&
+    (v.name === "SecurityError" || v.code === v.SECURITY_ERR)
+  );
+}
