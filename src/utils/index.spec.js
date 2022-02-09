@@ -426,6 +426,60 @@ describe("filePickerOptionsTypes()", () => {
   });
 });
 
+describe("isAbort()", () => {
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("should work as expected", () => {
+    expect(utils.isAbort(new DOMException())).toBe(false);
+    expect(utils.isAbort(new DOMException("some err"))).toBe(false);
+    expect(utils.isAbort(new DOMException("some err", "Noop"))).toBe(false);
+    expect(utils.isAbort(new DOMException("some err", "AbortError"))).toBe(
+      true
+    );
+    const err = new DOMException("some err");
+    const e = new Proxy(err, {
+      get(t, p) {
+        if (p === "code") {
+          return 20;
+        }
+        return t[p];
+      },
+    });
+    expect(utils.isAbort(e)).toBe(true);
+  });
+});
+
+describe("isSecurityError()", () => {
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("should work as expected", () => {
+    expect(utils.isSecurityError(new DOMException())).toBe(false);
+    expect(utils.isSecurityError(new DOMException("some err"))).toBe(false);
+    expect(utils.isSecurityError(new DOMException("some err", "Noop"))).toBe(
+      false
+    );
+    expect(
+      utils.isSecurityError(new DOMException("some err", "SecurityError"))
+    ).toBe(true);
+    const err = new DOMException("some err");
+    const e = new Proxy(err, {
+      get(t, p) {
+        if (p === "code") {
+          return 18;
+        }
+        return t[p];
+      },
+    });
+    expect(utils.isSecurityError(e)).toBe(true);
+  });
+});
+
 function createFile(name, size, type) {
   const file = new File([], name, { type });
   Object.defineProperty(file, "size", {

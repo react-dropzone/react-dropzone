@@ -18,9 +18,11 @@ import {
   fileMatchSize,
   filePickerOptionsTypes,
   canUseFileSystemAccessAPI,
+  isAbort,
   isEvtWithFiles,
   isIeOrEdge,
   isPropagationStopped,
+  isSecurityError,
   onDocumentDragOver,
   TOO_MANY_FILES_REJECTION,
 } from "./utils/index";
@@ -451,10 +453,14 @@ export function useDropzone(options = {}) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isFocused, isFileDialogActive, draggedFiles } = state;
 
+  const fsAccessApiWorksRef = useRef(
+    window.isSecureContext && useFsAccessApi && canUseFileSystemAccessAPI()
+  );
+
   // Update file dialog active state when the window is focused on
   const onWindowFocus = () => {
     // Execute the timeout only if the file dialog is opened in the browser
-    if (isFileDialogActive) {
+    if (!fsAccessApiWorksRef.current && isFileDialogActive) {
       setTimeout(() => {
         if (inputRef.current) {
           const { files } = inputRef.current;
@@ -468,19 +474,11 @@ export function useDropzone(options = {}) {
     }
   };
   useEffect(() => {
-    if (
-      window.isSecureContext &&
-      useFsAccessApi &&
-      canUseFileSystemAccessAPI()
-    ) {
-      return () => {};
-    }
-
     window.addEventListener("focus", onWindowFocus, false);
     return () => {
       window.removeEventListener("focus", onWindowFocus, false);
     };
-  }, [inputRef, isFileDialogActive, onFileDialogCancelCb, useFsAccessApi]);
+  }, [inputRef, isFileDialogActive, onFileDialogCancelCb, fsAccessApiWorksRef]);
 
   const dragTargetsRef = useRef([]);
   const onDocumentDrop = (event) => {
@@ -684,11 +682,7 @@ export function useDropzone(options = {}) {
   const openFileDialog = useCallback(() => {
     // No point to use FS access APIs if context is not secure
     // https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts#feature_detection
-    if (
-      window.isSecureContext &&
-      useFsAccessApi &&
-      canUseFileSystemAccessAPI()
-    ) {
+    if (fsAccessApiWorksRef.current) {
       dispatch({ type: "openDialog" });
       onFileDialogOpenCb();
       // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
@@ -699,9 +693,25 @@ export function useDropzone(options = {}) {
       window
         .showOpenFilePicker(opts)
         .then((handles) => getFilesFromEvent(handles))
-        .then((files) => setFiles(files, null))
-        .catch((e) => onFileDialogCancelCb(e))
-        .finally(() => dispatch({ type: "closeDialog" }));
+        .then((files) => {
+          setFiles(files, null);
+          dispatch({ type: "closeDialog" });
+        })
+        .catch((e) => {
+          // AbortError means the user canceled
+          if (isAbort(e)) {
+            onFileDialogCancelCb(e);
+            dispatch({ type: "closeDialog" });
+          } else if (isSecurityError(e)) {
+            fsAccessApiWorksRef.current = false;
+            // CORS, so cannot use this API
+            // Try using the input
+            if (inputRef.current) {
+              inputRef.current.value = null;
+              inputRef.current.click();
+            }
+          }
+        });
       return;
     }
 
@@ -734,7 +744,7 @@ export function useDropzone(options = {}) {
         openFileDialog();
       }
     },
-    [rootRef, inputRef, openFileDialog]
+    [rootRef, openFileDialog]
   );
 
   // Update focus state for the dropzone
@@ -759,7 +769,7 @@ export function useDropzone(options = {}) {
     } else {
       openFileDialog();
     }
-  }, [inputRef, noClick, openFileDialog]);
+  }, [noClick, openFileDialog]);
 
   const composeHandler = (fn) => {
     return disabled ? null : fn;
