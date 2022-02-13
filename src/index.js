@@ -454,7 +454,10 @@ export function useDropzone(options = {}) {
   const { isFocused, isFileDialogActive, draggedFiles } = state;
 
   const fsAccessApiWorksRef = useRef(
-    typeof window !== "undefined" && window.isSecureContext && useFsAccessApi && canUseFileSystemAccessAPI()
+    typeof window !== "undefined" &&
+      window.isSecureContext &&
+      useFsAccessApi &&
+      canUseFileSystemAccessAPI()
   );
 
   // Update file dialog active state when the window is focused on
