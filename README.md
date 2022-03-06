@@ -431,5 +431,8 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/react-dropzone/sponsor/29/website" target="_blank"><img src="https://opencollective.com/react-dropzone/sponsor/29/avatar.svg"></a>
 
 
+### Hosting
+[react-dropzone.js.org](https://react-dropzone.js.org/) hosting provided by [netlify](https://www.netlify.com/).
+
 ## License
 MIT
