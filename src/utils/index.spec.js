@@ -3,6 +3,10 @@ beforeEach(() => {
 });
 
 describe("fileMatchSize()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -63,6 +67,10 @@ describe("fileMatchSize()", () => {
 });
 
 describe("isIeOrEdge", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -98,6 +106,10 @@ describe("isIeOrEdge", () => {
 
 describe("isKindFile()", () => {
   it('should return true for DataTransferItem of kind "file"', async () => {
+    /**
+     * @constant
+     * @type {import('./index')}
+     */
     const utils = await import("./index");
     expect(utils.isKindFile({ kind: "file" })).toBe(true);
     expect(utils.isKindFile({ kind: "text/html" })).toBe(false);
@@ -109,6 +121,10 @@ describe("isKindFile()", () => {
 describe("isPropagationStopped()", () => {
   const trueFn = jest.fn(() => true);
 
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -130,6 +146,10 @@ describe("isPropagationStopped()", () => {
 });
 
 describe("isEvtWithFiles()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -176,7 +196,11 @@ describe("isEvtWithFiles()", () => {
   });
 });
 
-describe("composeEventHandlers", () => {
+describe("composeEventHandlers()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -223,7 +247,11 @@ describe("composeEventHandlers", () => {
   });
 });
 
-describe("fileAccepted", () => {
+describe("fileAccepted()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -273,6 +301,10 @@ describe("fileAccepted", () => {
 });
 
 describe("allFilesAccepted()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -316,6 +348,10 @@ describe("allFilesAccepted()", () => {
 });
 
 describe("ErrorCode", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -330,6 +366,10 @@ describe("ErrorCode", () => {
 });
 
 describe("canUseFileSystemAccessAPI()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -346,87 +386,109 @@ describe("canUseFileSystemAccessAPI()", () => {
   });
 });
 
-describe("filePickerOptionsTypes()", () => {
+describe("pickerOptionsFromAccept()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
   });
 
-  it("should return proper types when the arg is a MIME type", () => {
-    expect(utils.filePickerOptionsTypes("application/zip")).toEqual([
-      {
-        description: "everything",
-        accept: { "application/zip": [] },
-      },
-    ]);
-  });
-
-  it("should return proper types when the arg is an array of MIME types", () => {
+  it("converts the {accept} prop to file picker options", () => {
     expect(
-      utils.filePickerOptionsTypes(["application/zip", "application/json"])
+      utils.pickerOptionsFromAccept({
+        "image/*": [".png", ".jpg"], // ok
+        "text/*": [".txt", ".pdf"], // ok
+        "audio/*": ["mp3"], // not ok
+        "*": [".p12"], // not ok
+      })
     ).toEqual([
       {
-        description: "everything",
         accept: {
-          "application/zip": [],
-          "application/json": [],
+          "image/*": [".png", ".jpg"],
         },
       },
-    ]);
-  });
-
-  it("should exclude anything that's not a MIME type", () => {
-    expect(
-      utils.filePickerOptionsTypes([
-        "audio/*",
-        "video/*",
-        "image/*",
-        ".txt",
-        "text/*",
-      ])
-    ).toEqual([
       {
-        description: "everything",
         accept: {
-          "audio/*": [],
-          "video/*": [],
-          "image/*": [],
-          "text/*": [],
+          "text/*": [".txt", ".pdf"],
         },
-      },
-    ]);
-  });
-
-  it("should work with comma separated string of MIME types", () => {
-    expect(
-      utils.filePickerOptionsTypes(
-        "audio/*,video/*,image/*,.txt,text/*,application/zip"
-      )
-    ).toEqual([
-      {
-        description: "everything",
-        accept: {
-          "audio/*": [],
-          "video/*": [],
-          "image/*": [],
-          "text/*": [],
-          "application/zip": [],
-        },
-      },
-    ]);
-  });
-
-  it("should return empty otherwise", () => {
-    expect(utils.filePickerOptionsTypes("")).toEqual([
-      {
-        description: "everything",
-        accept: {},
       },
     ]);
   });
 });
 
+describe("acceptPropAsAcceptAttr()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("converts {accept} to an array of strings", () => {
+    expect(
+      utils.acceptPropAsAcceptAttr({
+        "image/*": [".png", ".jpg"],
+        "text/*": [".txt", ".pdf"],
+        "audio/*": ["mp3"], // `mp3` not ok
+        "*": [".p12"], // `*` not ok
+      })
+    ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
+  });
+});
+
+describe("isMIMEType()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("checks that the value is a valid MIME type string", () => {
+    expect(utils.isMIMEType("text/html")).toBe(true);
+    expect(utils.isMIMEType("text/*")).toBe(true);
+    expect(utils.isMIMEType("image/*")).toBe(true);
+    expect(utils.isMIMEType("video/*")).toBe(true);
+    expect(utils.isMIMEType("audio/*")).toBe(true);
+    expect(utils.isMIMEType("test/*")).toBe(false);
+    expect(utils.isMIMEType("text")).toBe(false);
+    expect(utils.isMIMEType("")).toBe(false);
+    expect(utils.isMIMEType(undefined)).toBe(false);
+  });
+});
+
+describe("isExt()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("checks that the value is a valid file extension", () => {
+    expect(utils.isExt(".jpg")).toBe(true);
+    expect(utils.isExt("me.jpg")).toBe(true);
+    expect(utils.isExt("me.prev.png")).toBe(true);
+    expect(utils.isExt("")).toBe(false);
+    expect(utils.isExt("text")).toBe(false);
+    expect(utils.isExt(undefined)).toBe(false);
+  });
+});
+
 describe("isAbort()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");
@@ -453,6 +515,10 @@ describe("isAbort()", () => {
 });
 
 describe("isSecurityError()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
   let utils;
   beforeEach(async () => {
     utils = await import("./index");

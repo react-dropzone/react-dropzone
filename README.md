@@ -343,8 +343,6 @@ As one can imagine, this doesn't really work if there's a lot of files or large 
 
 Fortunately, there's the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), which is currently a working draft and some browsers support it (see [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker#browser_compatibility)), that provides a reliable way to prompt the user for file selection and capture cancellation. 
 
-And this lib makes use of it if available. Though, there's a small catch: using file extensions for the `accept` property is not supported; you must use MIME types as described in [common MIME types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types). Also check [accepting specific file types](https://react-dropzone.js.org/#section-accepting-specific-file-types) for more info on the subject of `accept` limitations.
-
 Also keep in mind that the FS access API can only be used in [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
 
 **NOTE** You can disable using the FS access API with the `useFsAccessApi` property: `useDropzone({useFsAccessApi: false})`.

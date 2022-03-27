@@ -175,33 +175,60 @@ export function canUseFileSystemAccessAPI() {
 }
 
 /**
- * filePickerOptionsTypes returns the {types} option for https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
- * based on the accept attr (see https://github.com/react-dropzone/attr-accept)
- * E.g: converts ['image/*', 'text/*'] to {'image/*': [], 'text/*': []}
- * @param {string|string[]} accept
+ * Convert the `{accept}` dropzone prop to the
+ * `{types}` option for https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
+ *
+ * @param {AcceptProp} accept
+ * @returns {{accept: string[]}[]}
  */
-export function filePickerOptionsTypes(accept) {
-  accept = typeof accept === "string" ? accept.split(",") : accept;
-  return [
-    {
-      description: "everything",
-      // TODO: Need to handle filtering more elegantly than this!
-      accept: Array.isArray(accept)
-        ? // Accept just MIME types as per spec
-          // NOTE: accept can be https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers
-          accept
-            .filter(
-              (item) =>
-                item === "audio/*" ||
-                item === "video/*" ||
-                item === "image/*" ||
-                item === "text/*" ||
-                /\w+\/[-+.\w]+/g.test(item)
-            )
-            .reduce((a, b) => ({ ...a, [b]: [] }), {})
-        : {},
-    },
-  ];
+export function pickerOptionsFromAccept(accept) {
+  if (isDefined(accept)) {
+    return Object.entries(accept)
+      .filter(([mimeType, ext]) => {
+        let ok = true;
+
+        if (!isMIMEType(mimeType)) {
+          console.warn(
+            `Skipped "${mimeType}" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.`
+          );
+          ok = false;
+        }
+
+        if (!Array.isArray(ext) || !ext.every(isExt)) {
+          console.warn(
+            `Skipped "${mimeType}" because an invalid file extension was provided.`
+          );
+          ok = false;
+        }
+
+        return ok;
+      })
+      .map(([mimeType, ext]) => ({
+        accept: {
+          [mimeType]: ext,
+        },
+      }));
+  }
+  return accept;
+}
+
+/**
+ * Convert the `{accept}` dropzone prop to an array of MIME types/extensions.
+ * @param {AcceptProp} accept
+ * @returns {string}
+ */
+export function acceptPropAsAcceptAttr(accept) {
+  if (isDefined(accept)) {
+    return (
+      Object.entries(accept)
+        .reduce((a, [mimeType, ext]) => [...a, mimeType, ...ext], [])
+        // Silently discard invalid entries as pickerOptionsFromAccept warns about these
+        .filter((v) => isMIMEType(v) || isExt(v))
+        .join(",")
+    );
+  }
+
+  return undefined;
 }
 
 /**
@@ -231,3 +258,32 @@ export function isSecurityError(v) {
     (v.name === "SecurityError" || v.code === v.SECURITY_ERR)
   );
 }
+
+/**
+ * Check if v is a MIME type string.
+ *
+ * See accepted format: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers.
+ *
+ * @param {string} v
+ */
+export function isMIMEType(v) {
+  return (
+    v === "audio/*" ||
+    v === "video/*" ||
+    v === "image/*" ||
+    v === "text/*" ||
+    /\w+\/[-+.\w]+/g.test(v)
+  );
+}
+
+/**
+ * Check if v is a file extension.
+ * @param {string} v
+ */
+export function isExt(v) {
+  return /^.*\.[\w]+$/.test(v);
+}
+
+/**
+ * @typedef {Object.<string, string[]>} AcceptProp
+ */

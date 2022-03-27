@@ -77,7 +77,9 @@ const editImage = (image, done) => {
 function App() {
     const [files, setFiles] = useState([]);
     const { getRootProps, getInputProps } = useDropzone({
-        accept: 'image/*',
+        accept: {
+          'image/*': [],
+        },
         onDrop: (acceptedFiles) => {
             setFiles(
                 acceptedFiles.map((file) =>

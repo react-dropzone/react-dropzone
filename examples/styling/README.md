@@ -41,7 +41,7 @@ function StyledDropzone(props) {
     isFocused,
     isDragAccept,
     isDragReject
-  } = useDropzone({accept: 'image/*'});
+  } = useDropzone({accept: {'image/*': []}});
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -110,7 +110,7 @@ function StyledDropzone(props) {
     isFocused,
     isDragAccept,
     isDragReject
-  } = useDropzone({accept: 'image/*'});
+  } = useDropzone({accept: {'image/*': []}});
   
   return (
     <div className="container">

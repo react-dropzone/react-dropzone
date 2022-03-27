@@ -41,7 +41,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {accept} prop on the <input>", () => {
-      const accept = "image/jpeg";
+      const accept = {
+        "image/jpeg": [],
+      };
       const { container } = render(
         <Dropzone accept={accept}>
           {({ getRootProps, getInputProps }) => (
@@ -54,12 +56,16 @@ describe("useDropzone() hook", () => {
 
       const input = container.querySelector("input");
 
-      expect(input).toHaveAttribute("accept", accept);
+      expect(input).toHaveAttribute("accept", "image/jpeg");
     });
 
     it("updates {multiple} prop on the <input> when it changes", () => {
       const { container, rerender } = render(
-        <Dropzone accept="image/jpeg">
+        <Dropzone
+          accept={{
+            "image/jpeg": [],
+          }}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -74,7 +80,11 @@ describe("useDropzone() hook", () => {
       );
 
       rerender(
-        <Dropzone accept="image/png">
+        <Dropzone
+          accept={{
+            "image/png": [],
+          }}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -1368,7 +1378,9 @@ describe("useDropzone() hook", () => {
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
-          accept="application/pdf"
+          accept={{
+            "application/pdf": [],
+          }}
           multiple
           useFsAccessApi={false}
         >
@@ -1425,7 +1437,9 @@ describe("useDropzone() hook", () => {
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
-          accept="application/pdf"
+          accept={{
+            "application/pdf": [],
+          }}
           multiple
         >
           {({ getRootProps, getInputProps, isFileDialogActive }) => (
@@ -1481,7 +1495,9 @@ describe("useDropzone() hook", () => {
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
-          accept="application/pdf"
+          accept={{
+            "application/pdf": [],
+          }}
           multiple
           useFsAccessApi
         >
@@ -1516,7 +1532,6 @@ describe("useDropzone() hook", () => {
         multiple: true,
         types: [
           {
-            description: "everything",
             accept: { "application/pdf": [] },
           },
         ],
@@ -1680,7 +1695,9 @@ describe("useDropzone() hook", () => {
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
-          accept="application/pdf"
+          accept={{
+            "application/pdf": [],
+          }}
           multiple
           useFsAccessApi
         >
@@ -2215,7 +2232,11 @@ describe("useDropzone() hook", () => {
 
     it("sets {isDragActive} and {isDragReject} of some files are not accepted on dragenter", async () => {
       const ui = (
-        <Dropzone accept="image/*">
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+        >
           {({
             getRootProps,
             getInputProps,
@@ -2269,7 +2290,12 @@ describe("useDropzone() hook", () => {
 
     it("sets {isDragActive, isDragAccept, isDragReject} if any files are rejected and {multiple} is false on dragenter", async () => {
       const ui = (
-        <Dropzone accept="image/*" multiple={false}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          multiple={false}
+        >
           {({
             getRootProps,
             getInputProps,
@@ -2337,7 +2363,11 @@ describe("useDropzone() hook", () => {
 
     it("updates {isDragActive} if {accept} changes mid-drag", async () => {
       const ui = (
-        <Dropzone accept="image/*">
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+        >
           {({
             getRootProps,
             getInputProps,
@@ -2366,7 +2396,11 @@ describe("useDropzone() hook", () => {
       expect(dropzone).not.toHaveTextContent("dragReject");
 
       rerender(
-        <Dropzone accept="text/*">
+        <Dropzone
+          accept={{
+            "text/*": [],
+          }}
+        >
           {({
             getRootProps,
             getInputProps,
@@ -2391,7 +2425,11 @@ describe("useDropzone() hook", () => {
 
     it("resets {isDragActive, isDragAccept, isDragReject} on dragleave", async () => {
       const ui = (
-        <Dropzone accept="image/*">
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+        >
           {({
             getRootProps,
             getInputProps,
@@ -2514,7 +2552,11 @@ describe("useDropzone() hook", () => {
         Array.from(errorList).every((item) => item.textContent === code);
 
       const ui = (
-        <Dropzone accept="image/*">
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+        >
           {({ getRootProps, getInputProps, acceptedFiles, fileRejections }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2586,7 +2628,13 @@ describe("useDropzone() hook", () => {
     it("rejects all files if {multiple} is false and {accept} criteria is not met", async () => {
       const onDropSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy} multiple={false}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDrop={onDropSpy}
+          multiple={false}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2619,7 +2667,13 @@ describe("useDropzone() hook", () => {
     it("rejects all files if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy} multiple={false}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDrop={onDropSpy}
+          multiple={false}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2663,7 +2717,9 @@ describe("useDropzone() hook", () => {
       const onDropRejectedSpy = jest.fn();
       const ui = (
         <Dropzone
-          accept="image/*"
+          accept={{
+            "image/*": [],
+          }}
           onDrop={onDropSpy}
           onDropRejected={onDropRejectedSpy}
           multiple={true}
@@ -2718,7 +2774,9 @@ describe("useDropzone() hook", () => {
       const onDropRejectedSpy = jest.fn();
       const ui = (maxFiles) => (
         <Dropzone
-          accept="image/*"
+          accept={{
+            "image/*": [],
+          }}
           onDrop={onDropSpy}
           multiple={true}
           maxFiles={maxFiles}
@@ -2758,7 +2816,9 @@ describe("useDropzone() hook", () => {
       const onDropRejectedSpy = jest.fn();
       const ui = (
         <Dropzone
-          accept="image/*"
+          accept={{
+            "image/*": [],
+          }}
           onDrop={onDropSpy}
           multiple={true}
           maxFiles={3}
@@ -2783,7 +2843,13 @@ describe("useDropzone() hook", () => {
     it("accepts a single files if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy} multiple={false}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDrop={onDropSpy}
+          multiple={false}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2855,7 +2921,12 @@ describe("useDropzone() hook", () => {
     it("gets invoked with both accepted/rejected files", async () => {
       const onDropSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDrop={onDropSpy}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2912,7 +2983,12 @@ describe("useDropzone() hook", () => {
     test("onDropAccepted callback is invoked if some files are accepted", async () => {
       const onDropAcceptedSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDropAccepted={onDropAcceptedSpy}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDropAccepted={onDropAcceptedSpy}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2941,7 +3017,12 @@ describe("useDropzone() hook", () => {
     test("onDropRejected callback is invoked if some files are rejected", async () => {
       const onDropRejectedSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDropRejected={onDropRejectedSpy}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDropRejected={onDropRejectedSpy}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
@@ -2996,7 +3077,12 @@ describe("useDropzone() hook", () => {
     it("accepts a dropped image when Firefox provides a bogus file type", async () => {
       const onDropSpy = jest.fn();
       const ui = (
-        <Dropzone accept="image/*" onDrop={onDropSpy}>
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+          onDrop={onDropSpy}
+        >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
