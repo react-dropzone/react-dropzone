@@ -12,7 +12,9 @@ export default class Accept extends React.Component {
       <section>
         <div className="dropzone">
           <Dropzone
-            accept="image/jpeg, image/png"
+            accept={{
+              "image/*": [".jpeg", ".png"],
+            }}
             onDrop={(accepted, rejected) => {
               this.setState({ accepted, rejected });
             }}
@@ -50,39 +52,3 @@ export default class Accept extends React.Component {
     );
   }
 }
-
-export const acceptExt = (
-  <Dropzone accept=".jpeg,.png">
-    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
-      <div {...getRootProps()}>
-        {isDragAccept && "All files will be accepted"}
-        {isDragReject && "Some files will be rejected"}
-        {isDragActive && "Drop some files here ..."}
-      </div>
-    )}
-  </Dropzone>
-);
-
-export const acceptMime = (
-  <Dropzone accept="image/jpeg, image/png">
-    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
-      <div {...getRootProps()}>
-        {isDragAccept && "All files will be accepted"}
-        {isDragReject && "Some files will be rejected"}
-        {isDragActive && "Drop some files here ..."}
-      </div>
-    )}
-  </Dropzone>
-);
-
-export const acceptArray = (
-  <Dropzone accept={["image/jpeg", "image/png"]}>
-    {({ getRootProps, isDragActive, isDragAccept, isDragReject }) => (
-      <div {...getRootProps()}>
-        {isDragAccept && "All files will be accepted"}
-        {isDragReject && "Some files will be rejected"}
-        {isDragActive && "Drop some files here ..."}
-      </div>
-    )}
-  </Dropzone>
-);

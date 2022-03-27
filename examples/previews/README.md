@@ -41,7 +41,9 @@ const img = {
 function Previews(props) {
   const [files, setFiles] = useState([]);
   const {getRootProps, getInputProps} = useDropzone({
-    accept: 'image/*',
+    accept: {
+      'image/*': []
+    },
     onDrop: acceptedFiles => {
       setFiles(acceptedFiles.map(file => Object.assign(file, {
         preview: URL.createObjectURL(file)

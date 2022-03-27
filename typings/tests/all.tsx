@@ -25,7 +25,9 @@ export default class Test extends React.Component {
           noDragEventsBubbling={false}
           disabled
           multiple={false}
-          accept="*.png"
+          accept={{
+            "image/*": [".png"],
+          }}
           useFsAccessApi={false}
         >
           {({ getRootProps, getInputProps }) => (

@@ -12,11 +12,11 @@ import React, {
 import PropTypes from "prop-types";
 import { fromEvent } from "file-selector";
 import {
+  acceptPropAsAcceptAttr,
   allFilesAccepted,
   composeEventHandlers,
   fileAccepted,
   fileMatchSize,
-  filePickerOptionsTypes,
   canUseFileSystemAccessAPI,
   isAbort,
   isEvtWithFiles,
@@ -24,6 +24,7 @@ import {
   isPropagationStopped,
   isSecurityError,
   onDocumentDragOver,
+  pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION,
 } from "./utils/index";
 
@@ -92,16 +93,12 @@ Dropzone.propTypes = {
 
   /**
    * Set accepted file types.
-   * See https://github.com/okonet/attr-accept for more information.
+   * Checkout https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker types option for more information.
    * Keep in mind that mime type determination is not reliable across platforms. CSV files,
    * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
-   * Windows. In some cases there might not be a mime type set at all.
-   * See: https://github.com/react-dropzone/react-dropzone/issues/276
+   * Windows. In some cases there might not be a mime type set at all (https://github.com/react-dropzone/react-dropzone/issues/276).
    */
-  accept: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]),
+  accept: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)),
 
   /**
    * Allow drag 'n' drop (or selection from the file dialog) of multiple files
@@ -355,12 +352,11 @@ const initialState = {
  * @function useDropzone
  *
  * @param {object} props
- * @param {string|string[]} [props.accept] Set accepted file types.
- * See https://github.com/okonet/attr-accept for more information.
+ * @param {import("./utils").AcceptProp} [props.accept] Set accepted file types.
+ * Checkout https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker types option for more information.
  * Keep in mind that mime type determination is not reliable across platforms. CSV files,
  * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
- * Windows. In some cases there might not be a mime type set at all.
- * See: https://github.com/react-dropzone/react-dropzone/issues/276
+ * Windows. In some cases there might not be a mime type set at all (https://github.com/react-dropzone/react-dropzone/issues/276).
  * @param {boolean} [props.multiple=true] Allow drag 'n' drop (or selection from the file dialog) of multiple files
  * @param {boolean} [props.preventDropOnDocument=true] If false, allow dropped items to take over the current browser window
  * @param {boolean} [props.noClick=false] If true, disables click to open the native file selection dialog
@@ -383,7 +379,7 @@ const initialState = {
  * Note that this callback is invoked after the `getFilesFromEvent` callback is done.
  *
  * Files are accepted or rejected based on the `accept`, `multiple`, `minSize` and `maxSize` props.
- * `accept` must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
+ * `accept` must be an object with keys as a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) and the value an array of file extensions (optional).
  * If `multiple` is set to false and additional files are dropped,
  * all files besides the first will be rejected.
  * Any file which does not have a size in the [`minSize`, `maxSize`] range, will be rejected as well.
@@ -408,7 +404,7 @@ const initialState = {
  *
  * @returns {DropzoneState}
  */
-export function useDropzone(options = {}) {
+export function useDropzone(props = {}) {
   const {
     accept,
     disabled,
@@ -434,8 +430,11 @@ export function useDropzone(options = {}) {
     validator,
   } = {
     ...defaultProps,
-    ...options,
+    ...props,
   };
+
+  const acceptAttr = useMemo(() => acceptPropAsAcceptAttr(accept), [accept]);
+  const pickerTypes = useMemo(() => pickerOptionsFromAccept(accept), [accept]);
 
   const onFileDialogOpenCb = useMemo(
     () => (typeof onFileDialogOpen === "function" ? onFileDialogOpen : noop),
@@ -599,7 +598,7 @@ export function useDropzone(options = {}) {
       const fileRejections = [];
 
       files.forEach((file) => {
-        const [accepted, acceptError] = fileAccepted(file, accept);
+        const [accepted, acceptError] = fileAccepted(file, acceptAttr);
         const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize);
         const customErrors = validator ? validator(file) : null;
 
@@ -648,7 +647,7 @@ export function useDropzone(options = {}) {
     [
       dispatch,
       multiple,
-      accept,
+      acceptAttr,
       minSize,
       maxSize,
       maxFiles,
@@ -691,7 +690,7 @@ export function useDropzone(options = {}) {
       // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
       const opts = {
         multiple,
-        types: filePickerOptionsTypes(accept),
+        types: pickerTypes,
       };
       window
         .showOpenFilePicker(opts)
@@ -713,6 +712,8 @@ export function useDropzone(options = {}) {
               inputRef.current.value = null;
               inputRef.current.click();
             }
+          } else {
+            console.error(e);
           }
         });
       return;
@@ -730,7 +731,7 @@ export function useDropzone(options = {}) {
     onFileDialogCancelCb,
     useFsAccessApi,
     setFiles,
-    accept,
+    pickerTypes,
     multiple,
   ]);
 
@@ -859,7 +860,7 @@ export function useDropzone(options = {}) {
     () =>
       ({ refKey = "ref", onChange, onClick, ...rest } = {}) => {
         const inputProps = {
-          accept,
+          accept: acceptAttr,
           multiple,
           type: "file",
           style: { display: "none" },
@@ -884,7 +885,7 @@ export function useDropzone(options = {}) {
     fileCount > 0 &&
     allFilesAccepted({
       files: draggedFiles,
-      accept,
+      accept: acceptAttr,
       minSize,
       maxSize,
       multiple,
