@@ -744,7 +744,6 @@ export function useDropzone(options = {}) {
 
       if (
         (event.key === 'Enter' || event.key === ' ') ||
-        (event.code === 'Enter' || event.code === 'Space') ||
         (event.keyCode === 32 || event.keyCode === 13)
       ) {
         event.preventDefault();
