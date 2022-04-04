@@ -743,8 +743,10 @@ export function useDropzone(options = {}) {
       }
 
       if (
-        event.key === 'Enter' || event.key === ' ' ||
-        event.keyCode === 32 || event.keyCode === 13
+        event.key === " " ||
+        event.key === "Enter" ||
+        event.keyCode === 32 ||
+        event.keyCode === 13
       ) {
         event.preventDefault();
         openFileDialog();
