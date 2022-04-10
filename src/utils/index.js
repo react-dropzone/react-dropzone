@@ -76,6 +76,18 @@ function isDefined(value) {
   return value !== undefined && value !== null;
 }
 
+/**
+ *
+ * @param {object} options
+ * @param {File[]} options.files
+ * @param {string|string[]} [options.accept]
+ * @param {number} [options.minSize]
+ * @param {number} [options.maxSize]
+ * @param {boolean} [options.multiple]
+ * @param {number} [options.maxFiles]
+ * @param {(f: File) => FileError|FileError[]|null} [options.validator]
+ * @returns
+ */
 export function allFilesAccepted({
   files,
   accept,
@@ -83,6 +95,7 @@ export function allFilesAccepted({
   maxSize,
   multiple,
   maxFiles,
+  validator,
 }) {
   if (
     (!multiple && files.length > 1) ||
@@ -94,7 +107,8 @@ export function allFilesAccepted({
   return files.every((file) => {
     const [accepted] = fileAccepted(file, accept);
     const [sizeMatch] = fileMatchSize(file, minSize, maxSize);
-    return accepted && sizeMatch;
+    const customErrors = validator ? validator(file) : null;
+    return accepted && sizeMatch && !customErrors;
   });
 }
 
@@ -286,4 +300,14 @@ export function isExt(v) {
 
 /**
  * @typedef {Object.<string, string[]>} AcceptProp
+ */
+
+/**
+ * @typedef {object} FileError
+ * @property {string} message
+ * @property {ErrorCode|string} code
+ */
+
+/**
+ * @typedef {"file-invalid-type"|"file-too-large"|"file-too-small"|"too-many-files"} ErrorCode
  */

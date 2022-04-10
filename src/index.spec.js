@@ -3441,6 +3441,34 @@ describe("useDropzone() hook", () => {
         expect.anything()
       );
     });
+
+    it("sets {isDragAccept, isDragReject}", async () => {
+      const data = createDtWithFiles(images);
+      const validator = () => ({
+        code: "not-allowed",
+        message: "Cannot do this!",
+      });
+
+      const ui = (
+        <Dropzone validator={validator} multiple={true}>
+          {({ getRootProps, getInputProps, isDragAccept, isDragReject }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragAccept && "dragAccept"}
+              {isDragReject && "dragReject"}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const { container } = render(ui);
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, data));
+
+      expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).toHaveTextContent("dragReject");
+    });
   });
 
   describe("accessibility", () => {

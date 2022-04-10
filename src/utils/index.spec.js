@@ -344,6 +344,13 @@ describe("allFilesAccepted()", () => {
     expect(
       utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 })
     ).toEqual(false);
+
+    expect(
+      utils.allFilesAccepted({
+        files,
+        validator: () => ({ code: "not-allowed", message: "Cannot do this!" }),
+      })
+    ).toEqual(false);
   });
 });
 
