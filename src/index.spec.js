@@ -978,6 +978,42 @@ describe("useDropzone() hook", () => {
 
       expect(props.getFilesFromEvent).toHaveBeenCalledTimes(2);
     });
+
+    it("calls {onError} when getFilesFromEvent() rejects", async () => {
+      const data = createDtWithFiles(files);
+
+      const props = {
+        getFilesFromEvent: jest
+          .fn()
+          .mockImplementation(() => Promise.reject("oops :(")),
+        onDragEnter: jest.fn(),
+        onDrop: jest.fn(),
+        onError: jest.fn(),
+      };
+
+      const ui = (
+        <Dropzone {...props}>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      const { container, rerender } = render(ui);
+      const dropzone = container.querySelector("div");
+
+      fireDragEnter(dropzone, data);
+      await flushPromises(rerender, ui);
+      expect(props.onDragEnter).not.toHaveBeenCalled();
+
+      fireDrop(dropzone, data);
+      await flushPromises(rerender, ui);
+      expect(props.onDrop).not.toHaveBeenCalled();
+
+      expect(props.getFilesFromEvent).toHaveBeenCalledTimes(2);
+      expect(props.onError).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe("onFocus", () => {
@@ -1784,6 +1820,62 @@ describe("useDropzone() hook", () => {
       expect(dropzone).not.toContainElement(ref);
 
       jest.useRealTimers();
+    });
+
+    test("showOpenFilePicker() should call {onError} when an unexpected error occurs", async () => {
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+
+      const thenable = createThenable();
+      const showOpenFilePickerMock = jest
+        .fn()
+        .mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const onErrorSpy = jest.fn();
+      const onDropSpy = jest.fn();
+      const onFileDialogOpenSpy = jest.fn();
+
+      const ui = (
+        <Dropzone
+          onError={onErrorSpy}
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept={{
+            "application/pdf": [],
+          }}
+          multiple
+          useFsAccessApi
+        >
+          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const { container, rerender } = render(ui);
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      await flushPromises(rerender, ui);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onFileDialogOpenSpy).toHaveBeenCalled();
+
+      const err = new Error("oops :(");
+      thenable.cancel(err);
+      await flushPromises(rerender, ui);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onErrorSpy).toHaveBeenCalledWith(err);
     });
   });
 

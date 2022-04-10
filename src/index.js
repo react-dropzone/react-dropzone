@@ -246,6 +246,13 @@ Dropzone.propTypes = {
   onDropRejected: PropTypes.func,
 
   /**
+   * Cb for when there's some error from any of the promises.
+   *
+   * @param {Error} error
+   */
+  onError: PropTypes.func,
+
+  /**
    * Custom validation function
    * @param {File} file
    * @returns {FileError|FileError[]}
@@ -401,6 +408,7 @@ const initialState = {
  * ```
  * @param {dropAcceptedCb} [props.onDropAccepted]
  * @param {dropRejectedCb} [props.onDropRejected]
+ * @param {(error: Error) => void} [props.onError]
  *
  * @returns {DropzoneState}
  */
@@ -427,6 +435,7 @@ export function useDropzone(props = {}) {
     noKeyboard,
     noDrag,
     noDragEventsBubbling,
+    onError,
     validator,
   } = {
     ...defaultProps,
@@ -506,6 +515,18 @@ export function useDropzone(props = {}) {
     };
   }, [rootRef, preventDropOnDocument]);
 
+  const onErrCb = useCallback(
+    (e) => {
+      if (onError) {
+        onError(e);
+      } else {
+        // Let the user know something's gone wrong if they haven't provided the onError cb.
+        console.error(e);
+      }
+    },
+    [onError]
+  );
+
   const onDragEnterCb = useCallback(
     (event) => {
       event.preventDefault();
@@ -516,24 +537,26 @@ export function useDropzone(props = {}) {
       dragTargetsRef.current = [...dragTargetsRef.current, event.target];
 
       if (isEvtWithFiles(event)) {
-        Promise.resolve(getFilesFromEvent(event)).then((draggedFiles) => {
-          if (isPropagationStopped(event) && !noDragEventsBubbling) {
-            return;
-          }
+        Promise.resolve(getFilesFromEvent(event))
+          .then((draggedFiles) => {
+            if (isPropagationStopped(event) && !noDragEventsBubbling) {
+              return;
+            }
 
-          dispatch({
-            draggedFiles,
-            isDragActive: true,
-            type: "setDraggedFiles",
-          });
+            dispatch({
+              draggedFiles,
+              isDragActive: true,
+              type: "setDraggedFiles",
+            });
 
-          if (onDragEnter) {
-            onDragEnter(event);
-          }
-        });
+            if (onDragEnter) {
+              onDragEnter(event);
+            }
+          })
+          .catch((e) => onErrCb(e));
       }
     },
-    [getFilesFromEvent, onDragEnter, noDragEventsBubbling]
+    [getFilesFromEvent, onDragEnter, onErrCb, noDragEventsBubbling]
   );
 
   const onDragOverCb = useCallback(
@@ -668,16 +691,18 @@ export function useDropzone(props = {}) {
       dragTargetsRef.current = [];
 
       if (isEvtWithFiles(event)) {
-        Promise.resolve(getFilesFromEvent(event)).then((files) => {
-          if (isPropagationStopped(event) && !noDragEventsBubbling) {
-            return;
-          }
-          setFiles(files, event);
-        });
+        Promise.resolve(getFilesFromEvent(event))
+          .then((files) => {
+            if (isPropagationStopped(event) && !noDragEventsBubbling) {
+              return;
+            }
+            setFiles(files, event);
+          })
+          .catch((e) => onErrCb(e));
       }
       dispatch({ type: "reset" });
     },
-    [getFilesFromEvent, setFiles, noDragEventsBubbling]
+    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling]
   );
 
   // Fn for opening the file dialog programmatically
@@ -713,7 +738,7 @@ export function useDropzone(props = {}) {
               inputRef.current.click();
             }
           } else {
-            console.error(e);
+            onErrCb(e);
           }
         });
       return;
@@ -731,6 +756,7 @@ export function useDropzone(props = {}) {
     onFileDialogCancelCb,
     useFsAccessApi,
     setFiles,
+    onErrCb,
     pickerTypes,
     multiple,
   ]);
