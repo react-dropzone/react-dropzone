@@ -258,9 +258,9 @@ Dropzone.propTypes = {
   onError: PropTypes.func,
 
   /**
-   * Custom validation function
+   * Custom validation function. It must return null if there's no errors.
    * @param {File} file
-   * @returns {FileError|FileError[]}
+   * @returns {FileError|FileError[]|null}
    */
   validator: PropTypes.func,
 };
@@ -577,6 +577,7 @@ export function useDropzone(props = {}) {
                 maxSize,
                 multiple,
                 maxFiles,
+                validator,
               });
             const isDragReject = fileCount > 0 && !isDragAccept;
 
@@ -604,6 +605,7 @@ export function useDropzone(props = {}) {
       maxSize,
       multiple,
       maxFiles,
+      validator,
     ]
   );
 
