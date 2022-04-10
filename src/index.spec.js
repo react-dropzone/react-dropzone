@@ -1789,17 +1789,25 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32,
+        keyCode: 32, // Space
       });
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 13,
+        keyCode: 13, // Enter
+      });
+
+      fireEvent.keyDown(dropzone, {
+        key: " ", // Space
+      });
+
+      fireEvent.keyDown(dropzone, {
+        key: "Enter",
       });
 
       const ref = activeRef.current;
       expect(ref).not.toBeNull();
       expect(dropzone).toContainElement(ref);
-      expect(onClickSpy).toHaveBeenCalledTimes(2);
+      expect(onClickSpy).toHaveBeenCalledTimes(4);
     });
 
     it("does not trigger the click event on the input if the dropzone is not in focus", () => {
@@ -1817,7 +1825,11 @@ describe("useDropzone() hook", () => {
       const input = container.querySelector("input");
 
       fireEvent.keyDown(input, {
-        keyCode: 32,
+        keyCode: 32, // Space
+      });
+
+      fireEvent.keyDown(input, {
+        key: " ", // Space
       });
 
       expect(onClickSpy).not.toHaveBeenCalled();
@@ -1842,7 +1854,10 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32,
+        keyCode: 32, // Space
+      });
+      fireEvent.keyDown(dropzone, {
+        key: " ", // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
@@ -1862,7 +1877,10 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32,
+        keyCode: 32, // Space
+      });
+      fireEvent.keyDown(dropzone, {
+        key: " ", // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
@@ -1882,7 +1900,10 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32,
+        keyCode: 32, // Space
+      });
+      fireEvent.keyDown(dropzone, {
+        key: " ", // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
 
@@ -1897,9 +1918,12 @@ describe("useDropzone() hook", () => {
       );
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32,
+        keyCode: 32, // Space
       });
-      expect(onClickSpy).toHaveBeenCalled();
+      fireEvent.keyDown(dropzone, {
+        key: " ", // Space
+      });
+      expect(onClickSpy).toHaveBeenCalledTimes(2);
     });
 
     it("does not trigger the click event on the input for other keys", () => {
@@ -1917,7 +1941,10 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 97,
+        keyCode: 97, // Numpad1
+      });
+      fireEvent.keyDown(dropzone, {
+        key: "1",
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
