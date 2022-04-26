@@ -55,15 +55,17 @@ function Previews(props) {
         <img
           src={file.preview}
           style={img}
+          // Revoke data uri after image is loaded
+          onLoad={() => { URL.revokeObjectURL(file.preview) }}
         />
       </div>
     </div>
   ));
 
   useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks
-    files.forEach(file => URL.revokeObjectURL(file.preview));
-  }, [files]);
+    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+  }, []);
 
   return (
     <section className="container">
