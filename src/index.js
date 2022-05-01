@@ -885,7 +885,7 @@ export function useDropzone(props = {}) {
           composeEventHandlers(onDragLeave, onDragLeaveCb)
         ),
         onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
-        role: typeof role === "string" && role !== "" ? role : "button",
+        role: typeof role === "string" && role !== "" ? role : "presentation",
         [refKey]: rootRef,
         ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
         ...rest,

@@ -3408,7 +3408,7 @@ describe("useDropzone() hook", () => {
 
       expect(container.querySelector("#root")).toHaveAttribute(
         "role",
-        "button"
+        "presentation"
       );
     });
 
