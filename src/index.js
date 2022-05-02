@@ -68,6 +68,7 @@ const defaultProps = {
   noDragEventsBubbling: false,
   validator: null,
   useFsAccessApi: true,
+  autoFocus: false,
 };
 
 Dropzone.defaultProps = defaultProps;
@@ -172,6 +173,11 @@ Dropzone.propTypes = {
    * to open the file picker instead of using an `<input type="file">` click event.
    */
   useFsAccessApi: PropTypes.bool,
+
+  /**
+   * Set to true to focus the root element on render
+   */
+  autoFocus: PropTypes.bool,
 
   /**
    * Cb for when the `dragenter` event occurs.
@@ -381,6 +387,7 @@ const initialState = {
  * @param {Function} [props.onFileDialogCancel] Cb for when closing the file dialog with no selection
  * @param {boolean} [props.useFsAccessApi] Set to true to use the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API
  * to open the file picker instead of using an `<input type="file">` click event.
+ * @param {boolean} autoFocus Set to true to auto focus the root element.
  * @param {Function} [props.onFileDialogOpen] Cb for when opening the file dialog
  * @param {dragCb} [props.onDragEnter] Cb for when the `dragenter` event occurs.
  * @param {dragCb} [props.onDragLeave] Cb for when the `dragleave` event occurs
@@ -433,6 +440,7 @@ export function useDropzone(props = {}) {
     onFileDialogCancel,
     onFileDialogOpen,
     useFsAccessApi,
+    autoFocus,
     preventDropOnDocument,
     noClick,
     noKeyboard,
@@ -458,7 +466,12 @@ export function useDropzone(props = {}) {
     [onFileDialogCancel]
   );
 
+  /**
+   * @constant
+   * @type {React.MutableRefObject<HTMLElement>}
+   */
   const rootRef = useRef(null);
+
   const inputRef = useRef(null);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -517,6 +530,14 @@ export function useDropzone(props = {}) {
       }
     };
   }, [rootRef, preventDropOnDocument]);
+
+  // Auto focus the root when autoFocus is true
+  useEffect(() => {
+    if (!disabled && autoFocus && rootRef.current) {
+      rootRef.current.focus();
+    }
+    return () => {};
+  }, [rootRef, autoFocus, disabled]);
 
   const onErrCb = useCallback(
     (e) => {

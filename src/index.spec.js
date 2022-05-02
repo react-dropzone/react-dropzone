@@ -1064,6 +1064,51 @@ describe("useDropzone() hook", () => {
       fireEvent.focus(dropzone);
       expect(dropzone.querySelector("#focus")).not.toBeNull();
     });
+
+    it("{autoFocus} sets the focus state on render", () => {
+      const { container, rerender } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      expect(dropzone.querySelector("#focus")).toBeNull();
+
+      rerender(
+        /* eslint-disable-next-line jsx-a11y/no-autofocus */
+        <Dropzone autoFocus>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      expect(dropzone.querySelector("#focus")).not.toBeNull();
+
+      rerender(
+        /* eslint-disable-next-line jsx-a11y/no-autofocus */
+        <Dropzone autoFocus disabled>
+          {({ getRootProps, getInputProps, isFocused }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFocused && <div id="focus" />}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      expect(dropzone.querySelector("#focus")).toBeNull();
+    });
   });
 
   describe("onBlur", () => {
