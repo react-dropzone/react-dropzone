@@ -52,6 +52,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   onFileDialogOpen?: () => void;
   validator?: <T extends File>(file: T) => FileError | FileError[] | null;
   useFsAccessApi?: boolean;
+  autoFocus?: boolean;
 };
 
 export type DropEvent =
