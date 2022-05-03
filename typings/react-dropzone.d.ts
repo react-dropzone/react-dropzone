@@ -50,6 +50,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, PropTypes> & {
   ) => Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?: () => void;
   onFileDialogOpen?: () => void;
+  onError?: (err: Error) => void;
   validator?: <T extends File>(file: T) => FileError | FileError[] | null;
   useFsAccessApi?: boolean;
   autoFocus?: boolean;
