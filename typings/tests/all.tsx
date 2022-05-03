@@ -16,8 +16,11 @@ export default class Test extends React.Component {
           onDropRejected={(files, event) => console.log(files, event)}
           onFileDialogCancel={() => console.log("onFileDialogCancel invoked")}
           onFileDialogOpen={() => console.log("onFileDialogOpen invoked")}
+          onError={(e) => console.log(e)}
+          validator={(f) => ({ message: f.name, code: "" })}
           minSize={2000}
           maxSize={Infinity}
+          maxFiles={100}
           preventDropOnDocument
           noClick={false}
           noKeyboard={false}
@@ -29,6 +32,7 @@ export default class Test extends React.Component {
             "image/*": [".png"],
           }}
           useFsAccessApi={false}
+          autoFocus
         >
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
