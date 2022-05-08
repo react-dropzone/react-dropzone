@@ -787,6 +787,12 @@ export function useDropzone(props = {}) {
             if (inputRef.current) {
               inputRef.current.value = null;
               inputRef.current.click();
+            } else {
+              onErrCb(
+                new Error(
+                  "Cannot open the file picker because the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API is not supported and no <input> was provided."
+                )
+              );
             }
           } else {
             onErrCb(e);

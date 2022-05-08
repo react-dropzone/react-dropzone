@@ -1833,6 +1833,55 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toContainElement(activeRef.current);
       expect(onErrorSpy).toHaveBeenCalledWith(err);
     });
+
+    test("showOpenFilePicker() should call {onError} when a security error occurs and no <input> was provided", async () => {
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+
+      const thenable = createThenable();
+      const showOpenFilePickerMock = jest
+        .fn()
+        .mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const onErrorSpy = jest.fn();
+      const onDropSpy = jest.fn();
+      const onFileDialogOpenSpy = jest.fn();
+
+      const ui = (
+        <Dropzone
+          onError={onErrorSpy}
+          onDrop={onDropSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept={{
+            "application/pdf": [],
+          }}
+          multiple
+          useFsAccessApi
+        >
+          {({ getRootProps, isFileDialogActive }) => (
+            <div {...getRootProps()}>{isFileDialogActive && active}</div>
+          )}
+        </Dropzone>
+      );
+
+      const { container } = render(ui);
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onFileDialogOpenSpy).toHaveBeenCalled();
+
+      const err = new DOMException("oops :(", "SecurityError");
+      await act(() => thenable.cancel(err));
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onErrorSpy).toHaveBeenCalled();
+    });
   });
 
   describe("onKeyDown", () => {
