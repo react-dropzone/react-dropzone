@@ -1,6 +1,6 @@
 Starting with version 7.0.0, the `{preview}` property generation on the [File](https://developer.mozilla.org/en-US/docs/Web/API/File) objects and the `{disablePreview}` property on the `<Dropzone>` have been removed.
 
-If you need need the `{preview}`, it can be easily achieved in the `onDrop()` callback:
+If you need the `{preview}`, it can be easily achieved in the `onDrop()` callback:
 
 ```jsx harmony
 import React, {useEffect, useState} from 'react';
