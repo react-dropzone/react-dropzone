@@ -197,7 +197,7 @@ export function canUseFileSystemAccessAPI() {
  */
 export function pickerOptionsFromAccept(accept) {
   if (isDefined(accept)) {
-    return Object.entries(accept)
+    const acceptForPicker = Object.entries(accept)
       .filter(([mimeType, ext]) => {
         let ok = true;
 
@@ -217,11 +217,18 @@ export function pickerOptionsFromAccept(accept) {
 
         return ok;
       })
-      .map(([mimeType, ext]) => ({
-        accept: {
+      .reduce(
+        (agg, [mimeType, ext]) => ({
+          ...agg,
           [mimeType]: ext,
-        },
-      }));
+        }),
+        {}
+      );
+    return [
+      {
+        accept: acceptForPicker,
+      },
+    ];
   }
   return accept;
 }
