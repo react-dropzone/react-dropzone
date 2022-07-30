@@ -69,6 +69,7 @@ const defaultProps = {
   validator: null,
   useFsAccessApi: true,
   autoFocus: false,
+  placeholder: "Drag and drop some files here, or click to select files.",
 };
 
 Dropzone.defaultProps = defaultProps;
@@ -263,6 +264,10 @@ Dropzone.propTypes = {
    * @returns {FileError|FileError[]|null}
    */
   validator: PropTypes.func,
+  /**
+   * Instructions for the file input.
+   */
+  placeholder: PropTypes.string,
 };
 
 export default Dropzone;
@@ -448,6 +453,7 @@ export function useDropzone(props = {}) {
     noDragEventsBubbling,
     onError,
     validator,
+    placeholder,
   } = {
     ...defaultProps,
     ...props,
@@ -946,7 +952,19 @@ export function useDropzone(props = {}) {
           accept: acceptAttr,
           multiple,
           type: "file",
-          style: { display: "none" },
+          style: {
+            border: 0,
+            clip: 'rect(0, 0, 0, 0)',
+            'clip-path': 'inset(50%)',
+            height: '1px',
+            margin: '0 -1px -1px 0',
+            overflow: 'hidden',
+            padding: 0,
+            position: 'absolute',
+            width: '1px',
+            'white-space': 'nowrap',
+          },
+          'aria-placeholder': placeholder,
           onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
           onClick: composeHandler(
             composeEventHandlers(onClick, onInputElementClick)
