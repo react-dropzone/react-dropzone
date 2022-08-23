@@ -415,10 +415,6 @@ describe("pickerOptionsFromAccept()", () => {
       {
         accept: {
           "image/*": [".png", ".jpg"],
-        },
-      },
-      {
-        accept: {
           "text/*": [".txt", ".pdf"],
         },
       },
