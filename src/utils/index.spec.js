@@ -413,6 +413,7 @@ describe("pickerOptionsFromAccept()", () => {
       })
     ).toEqual([
       {
+        description: "Files",
         accept: {
           "image/*": [".png", ".jpg"],
           "text/*": [".txt", ".pdf"],

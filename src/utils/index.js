@@ -226,6 +226,8 @@ export function pickerOptionsFromAccept(accept) {
       );
     return [
       {
+        // description is required due to https://crbug.com/1264708
+        description: "Files",
         accept: acceptForPicker,
       },
     ];
