@@ -1537,6 +1537,7 @@ describe("useDropzone() hook", () => {
         multiple: true,
         types: [
           {
+            description: "Files",
             accept: { "application/pdf": [] },
           },
         ],
