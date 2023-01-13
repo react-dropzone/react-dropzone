@@ -438,10 +438,11 @@ describe("acceptPropAsAcceptAttr()", () => {
       utils.acceptPropAsAcceptAttr({
         "image/*": [".png", ".jpg"],
         "text/*": [".txt", ".pdf"],
+        "video/*": [],
         "audio/*": ["mp3"], // `mp3` not ok
         "*": [".p12"], // `*` not ok
       })
-    ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
+    ).toEqual(".png,.jpg,.txt,.pdf,video/*,audio/*,.p12");
   });
 });
 
