@@ -244,7 +244,10 @@ export function acceptPropAsAcceptAttr(accept) {
   if (isDefined(accept)) {
     return (
       Object.entries(accept)
-        .reduce((a, [mimeType, ext]) => [...a, mimeType, ...ext], [])
+        .reduce((a, [mimeType, ext]) => {
+          const validExt = ext.filter(isExt);
+          return [...a, ...(validExt.length > 0 ? validExt : [mimeType])];
+        }, [])
         // Silently discard invalid entries as pickerOptionsFromAccept warns about these
         .filter((v) => isMIMEType(v) || isExt(v))
         .join(",")
