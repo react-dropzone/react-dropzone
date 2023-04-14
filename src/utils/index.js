@@ -1,4 +1,6 @@
-import accepts from "attr-accept";
+import _accepts from "attr-accept";
+
+const accepts = typeof _accepts === "function" ? _accepts : _accepts.default;
 
 // Error codes
 export const FILE_INVALID_TYPE = "file-invalid-type";

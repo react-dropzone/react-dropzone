@@ -3,6 +3,12 @@
   "description": "Simple HTML5 drag-drop zone with React.js",
   "main": "dist/index.js",
   "module": "dist/es/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/es/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "cz": "git-cz",
