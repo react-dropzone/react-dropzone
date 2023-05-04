@@ -348,6 +348,10 @@ React Dropzone integrates perfectly with [Pintura Image Editor](https://pqina.nl
 
 Checkout the [Pintura integration example](https://codesandbox.io/s/react-dropzone-pintura-40xh4?file=/src/App.js).
 
+## Need storage?
+React Dropzone integrates with [Zupload](https://www.zupload.io/) to provide a developer friendly way of storing files, pictures, anything. Their free tier is 10gb, with just a few steps you can integrate react-dropzone with Zupload to solve all your storage needs.
+
+Checkout the [Zupload integration example](https://github.com/zupload/zupload-examples/tree/main/nextjs).
 
 ## Support
 

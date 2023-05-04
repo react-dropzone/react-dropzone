@@ -93,6 +93,10 @@ module.exports = {
           name: "Pintura",
           content: "examples/pintura/README.md",
         },
+        {
+          name: "Zupload",
+          content: "examples/zupload/README.md",
+        },
       ],
     },
   ],
