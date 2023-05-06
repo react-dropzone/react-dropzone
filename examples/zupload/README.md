@@ -6,31 +6,51 @@ If you'd like to integrate the dropzone with the [Zupload](https://www.zupload.i
 ```jsx static 
 // .env
 ZUPLOAD_API_KEY='YOUR_API_KEY'
+ZUPLOAD_BUCKET_KEY='YOUR_BUCKET_KEY`
 ```
 
-3. setup your API handler for zupload
+3. setup your File Route Handlers and API handler
 ```jsx static
-// api/zupload/[id].ts
-import { createNextApiHandler } from "@zupload/nextjs";
+// /lib/zupload/routes.ts
+import { createZuploadRoute } from '@zupload/nextjs'
+import { NextApiRequest } from 'next'
+ 
+// Used on the server
+export const fileRouter = createZuploadRoute<NextApiRequest>()
+    .route('files')
+    // Set a maxfile size of 1GB
+    .maxFileSize(1024 * 1024 * 1024)
+    // Accept all files
+    .fileTypes(['*'])
+    .bucketKey(process.env.ZUPLOAD_BUCKET_KEY)
+ 
+// Used on the client
+export const fileRouterConfig = fileRouter.getClientConfig();
 
+
+// /api/zupload/[...id].ts
+import { createNextApiHandler } from '@zupload/nextjs';
+import { fileRouter } from '@lib/zupload/routes'
+ 
 export default createNextApiHandler({
-  apiKey: process.env.ZUPLOAD_API_KEY || "",
+    apiKey: process.env.ZUPLOAD_API_KEY,
+    routes: [fileRouter],
 });
+
 ```
 4. use react-dropzone and Zupload together
 ```jsx static
 // index.tsx
-import { useDownload, useUpload } from "@zupload/nextjs";
+import { fileRouterConfig } from "@/lib/zupload/routes";
+import { useZupload } from "@zupload/nextjs";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
-const config = { bucketKey: "YOUR_BUCKET_KEY" };
-
 type ProcessingState = "idle" | "uploading" | "downloading";
 function Homepage() {
-  const upload = useUpload(config);
-  const download = useDownload(config);
-  const [processingState, setProcessingState] = useState<ProcessingState>("idle");
+  const { upload, download } = useZupload(fileRouterConfig);
+  const [processingState, setProcessingState] =
+    useState<ProcessingState>("idle");
   const [fileUrl, setFileUrl] = useState<string | undefined>();
 
   const onDrop = useCallback(
@@ -55,14 +75,15 @@ function Homepage() {
   });
 
   return (
-    <main>
-      <h1>Zupload Demo</h1>
-      <p>
+    <main className="p-16">
+      <h1 className="leading-8 text-2xl">Zupload Demo</h1>
+      <p className="mt-2 mb-6">
         This demo will upload a image on drop, and then immediately download
         that image to display in the browser
       </p>
       <div
         {...getRootProps()}
+        className="border border-dashed rounded-md p-16 cursor-pointer hover:border-orange-500 hover:text-orange-500"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -72,14 +93,16 @@ function Homepage() {
         )}
       </div>
       {processingState !== "idle" && (
-        <div>
+        <div className="mt-6 flex items-center">
           <p>
-            <span>{processingState}</span> file...
+            <span className="capitalize">{processingState}</span> file...
           </p>
+          <div className=" ml-6 animate-spin h-4 w-4 bg-white" />
         </div>
       )}
       {fileUrl && (
-        <div>
+        <div className="mt-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={fileUrl} alt="Uploaded file" />
         </div>
       )}
