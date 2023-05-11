@@ -162,3 +162,33 @@ import Dropzone from 'react-dropzone';
   )}
 </Dropzone>
 ```
+
+If you would like to apply react-dropzone's event handling behavior only to file drag events, use the `{ignoreNonFileDragEvents}` flag. This can be helpful to prevent interference when used in conjunction with other drag and drop libraries:
+```jsx harmony
+import React from 'react';
+import {useDropzone} from 'react-dropzone';
+
+function Dropzone(props) {
+  const { getRootProps } = useDropzone({
+    ignoreNonFileDragEvents: true,
+    noDragEventsBubbling: true,
+    // Note how this callback is never invoked if you drag a link over the dropzone
+    onDragoOver: files => console.log(files)
+  });
+
+  // this callback is invoked if you drop a link over the dropzone because the dropzone
+  // will ignore the noEventBubbling flag for non-file drag events
+  const handleLinkDrop= event => {
+    console.log(event)
+    // Do something with the link
+  };
+
+  return (
+    <div className="container" onDrop={handleLinkDrop}>
+      <div {...getRootProps()}>
+        <Dropzone />
+      </div>
+    </div>
+  );
+}
+```

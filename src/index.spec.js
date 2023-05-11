@@ -900,6 +900,119 @@ describe("useDropzone() hook", () => {
       expect(innerDragLeave).toHaveBeenCalled();
       expect(parentDragLeave).not.toHaveBeenCalled();
     });
+
+    test("non-file drag events are ignored when {ignoreNonFileDragEvents} is set to true", async () => {
+      const nonFileDtEvent = createDtWithoutFiles();
+
+      const dragEnterSpy = jest.fn();
+      const dragOverSpy = jest.fn();
+      const dragLeaveSpy = jest.fn();
+      const dropSpy = jest.fn();
+
+      const { container } = render(
+        <Dropzone
+          ignoreNonFileDragEvents
+          onDragLeave={dragLeaveSpy}
+          onDragEnter={dragEnterSpy}
+          onDragOver={dragOverSpy}
+          onDrop={dropSpy}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div id="dropzone" {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const zone = container.querySelector("#dropzone");
+
+      await act(() => fireEvent.dragEnter(zone, nonFileDtEvent));
+      await act(() => fireEvent.dragOver(zone, nonFileDtEvent));
+      await act(() => fireEvent.drop(zone, nonFileDtEvent));
+      await act(() => fireEvent.dragLeave(zone, nonFileDtEvent));
+
+      expect(dragEnterSpy).not.toHaveBeenCalled();
+      expect(dragOverSpy).not.toHaveBeenCalled();
+      expect(dragLeaveSpy).not.toHaveBeenCalled();
+      expect(dropSpy).not.toHaveBeenCalled();
+    });
+
+    test("non-file drag events bubble when {ignoreNonFileDragEvents} is set to true", async () => {
+      const nonFileDtEvent = createDtWithoutFiles();
+
+      const dragEnterSpy = jest.fn();
+      const dragOverSpy = jest.fn();
+      const dragLeaveSpy = jest.fn();
+      const dropSpy = jest.fn();
+
+      const { container } = render(
+        <div
+          id="container"
+          onDragLeave={dragLeaveSpy}
+          onDragEnter={dragEnterSpy}
+          onDragOver={dragOverSpy}
+          onDrop={dropSpy}
+        >
+          <Dropzone ignoreNonFileDragEvents noDragEventsBubbling>
+            {({ getRootProps, getInputProps }) => (
+              <div id="dropzone" {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        </div>
+      );
+
+      const zone = container.querySelector("#dropzone");
+
+      await act(() => fireEvent.dragEnter(zone, nonFileDtEvent));
+      await act(() => fireEvent.dragOver(zone, nonFileDtEvent));
+      await act(() => fireEvent.drop(zone, nonFileDtEvent));
+      await act(() => fireEvent.dragLeave(zone, nonFileDtEvent));
+
+      expect(dragEnterSpy).toHaveBeenCalled();
+      expect(dragOverSpy).toHaveBeenCalled();
+      expect(dragLeaveSpy).toHaveBeenCalled();
+      expect(dropSpy).toHaveBeenCalled();
+    });
+
+    test("file drag events do not bubble when {ignoreNonFileDragEvents} is set to true", async () => {
+      const dragEnterSpy = jest.fn();
+      const dragOverSpy = jest.fn();
+      const dragLeaveSpy = jest.fn();
+      const dropSpy = jest.fn();
+
+      const { container } = render(
+        <div
+          id="container"
+          onDragLeave={dragLeaveSpy}
+          onDragEnter={dragEnterSpy}
+          onDragOver={dragOverSpy}
+          onDrop={dropSpy}
+        >
+          <Dropzone ignoreNonFileDragEvents noDragEventsBubbling>
+            {({ getRootProps, getInputProps }) => (
+              <div id="dropzone" {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        </div>
+      );
+
+      const zone = container.querySelector("#dropzone");
+
+      await act(() => fireEvent.dragEnter(zone, data));
+      await act(() => fireEvent.dragOver(zone, data));
+      await act(() => fireEvent.drop(zone, data));
+      await act(() => fireEvent.dragLeave(zone, data));
+
+      expect(dragEnterSpy).not.toHaveBeenCalled();
+      expect(dragOverSpy).not.toHaveBeenCalled();
+      expect(dragLeaveSpy).not.toHaveBeenCalled();
+      expect(dropSpy).not.toHaveBeenCalled();
+    });
   });
 
   describe("plugin integration", () => {
@@ -3585,6 +3698,20 @@ function createDtWithFiles(files = []) {
         getAsFile: () => file,
       })),
       types: ["Files"],
+    },
+  };
+}
+
+/**
+ * createDtWithoutFiles creates a mock data transfer object that can be used for non-file drop events
+ * @param {File[]} files
+ */
+function createDtWithoutFiles() {
+  return {
+    dataTransfer: {
+      files: [],
+      items: [],
+      types: [],
     },
   };
 }

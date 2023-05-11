@@ -66,6 +66,7 @@ const defaultProps = {
   noKeyboard: false,
   noDrag: false,
   noDragEventsBubbling: false,
+  ignoreNonFileDragEvents: false,
   validator: null,
   useFsAccessApi: true,
   autoFocus: false,
@@ -130,6 +131,12 @@ Dropzone.propTypes = {
    * If true, stops drag event propagation to parents
    */
   noDragEventsBubbling: PropTypes.bool,
+
+  /**
+   * If true, ignores non file drag events,
+   * If used in combination with noDragEventsBubbling, allows bubbling of non-file drag events
+   */
+  ignoreNonFileDragEvents: PropTypes.bool,
 
   /**
    * Minimum file size (in bytes)
@@ -380,6 +387,7 @@ const initialState = {
  * Note that it also stops tracking the focus state.
  * @param {boolean} [props.noDrag=false] If true, disables drag 'n' drop
  * @param {boolean} [props.noDragEventsBubbling=false] If true, stops drag event propagation to parents
+ * @param {boolean} [props.ignoreNonFileDragEvents=false] If true, ignores drag events that do not contain files
  * @param {number} [props.minSize=0] Minimum file size (in bytes)
  * @param {number} [props.maxSize=Infinity] Maximum file size (in bytes)
  * @param {boolean} [props.disabled=false] Enable/disable the dropzone
@@ -446,6 +454,7 @@ export function useDropzone(props = {}) {
     noKeyboard,
     noDrag,
     noDragEventsBubbling,
+    ignoreNonFileDragEvents,
     onError,
     validator,
   } = {
@@ -872,7 +881,18 @@ export function useDropzone(props = {}) {
   };
 
   const composeDragHandler = (fn) => {
-    return noDrag ? null : composeHandler(fn);
+    if (noDrag) {
+      return null;
+    }
+    if (ignoreNonFileDragEvents) {
+      return (event, ...args) => {
+        if (!isEvtWithFiles(event)) {
+          return;
+        }
+        composeHandler(fn)(event, ...args);
+      };
+    }
+    return composeHandler(fn);
   };
 
   const stopPropagation = (event) => {
