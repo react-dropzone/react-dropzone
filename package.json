@@ -30,11 +30,11 @@
   "size-limit": [
     {
       "path": "dist/index.js",
-      "limit": "8 KB"
+      "limit": "25 KB"
     },
     {
       "path": "dist/es/index.js",
-      "limit": "8 KB"
+      "limit": "25 KB"
     }
   ],
   "lint-staged": {
@@ -101,6 +101,7 @@
     "attr-accept": "^2.2.2",
     "file-selector": "^0.6.0",
     "i18next": "^22.5.0",
+    "i18next-browser-languagedetector": "^7.0.1",
     "prop-types": "^15.8.1",
     "react-i18next": "^12.3.1"
   },
