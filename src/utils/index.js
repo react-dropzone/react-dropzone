@@ -1,5 +1,7 @@
 import accepts from "attr-accept";
 
+import i18n from "../i18n";
+
 // Error codes
 export const FILE_INVALID_TYPE = "file-invalid-type";
 export const FILE_TOO_LARGE = "file-too-large";
@@ -21,31 +23,33 @@ export const getInvalidTypeRejectionErr = (accept) => {
     : accept;
   return {
     code: FILE_INVALID_TYPE,
-    message: `File type must be ${messageSuffix}`,
+    message: i18n.t("fileInvalidType", { messageSuffix: messageSuffix }),
   };
 };
 
 export const getTooLargeRejectionErr = (maxSize) => {
   return {
     code: FILE_TOO_LARGE,
-    message: `File is larger than ${maxSize} ${
-      maxSize === 1 ? "byte" : "bytes"
-    }`,
+    message: i18n.t("fileTooLarge", {
+      maxSize: maxSize,
+      unit: `${maxSize === 1 ? "byte" : "bytes"}`,
+    }),
   };
 };
 
 export const getTooSmallRejectionErr = (minSize) => {
   return {
     code: FILE_TOO_SMALL,
-    message: `File is smaller than ${minSize} ${
-      minSize === 1 ? "byte" : "bytes"
-    }`,
+    message: i18n.t("fileTooSmall", {
+      minSize: minSize,
+      unit: `${minSize === 1 ? "byte" : "bytes"}`,
+    }),
   };
 };
 
 export const TOO_MANY_FILES_REJECTION = {
   code: TOO_MANY_FILES,
-  message: "Too many files",
+  message: i18n.t("tooManyFiles"),
 };
 
 // Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
