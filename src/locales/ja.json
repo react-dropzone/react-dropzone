@@ -1,6 +1,0 @@
-{
-  "fileInvalidType": "アップロードできるファイルの拡張子は {{ messageSuffix }} です",
-  "fileTooLarge": "アップロードできる最大ファイルサイズは {{ maxSize }}{{ unit }} です",
-  "fileTooSmall": "アップロードできる最小ファイルサイズは {{ minSize }}{{ unit }} です",
-  "tooManyFiles": "アップロードできるファイル数を超えています"
-}

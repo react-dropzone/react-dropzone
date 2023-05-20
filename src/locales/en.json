@@ -1,6 +1,0 @@
-{
-  "fileInvalidType": "File type must be {{ messageSuffix }}",
-  "fileTooLarge": "File is larger than {{ maxSize }}{{ unit }}",
-  "fileTooSmall": "File is smaller than {{ minSize }}{{ unit }}",
-  "tooManyFiles": "Too many files"
-}
