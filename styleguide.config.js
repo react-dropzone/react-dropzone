@@ -49,6 +49,10 @@ module.exports = {
           content: "examples/events/README.md",
         },
         {
+          name: "Forms",
+          content: "examples/forms/README.md",
+        },
+        {
           name: "Styling Dropzone",
           content: "examples/styling/README.md",
         },
