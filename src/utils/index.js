@@ -25,11 +25,14 @@ export const getInvalidTypeRejectionErr = (accept) => {
   };
 };
 
+function getSizeintoKB(bytes) {
+  return `${Math.floor(bytes / 1024)  } KB`
+}
+
 export const getTooLargeRejectionErr = (maxSize) => {
   return {
     code: FILE_TOO_LARGE,
-    message: `File is larger than ${maxSize} ${
-      maxSize === 1 ? "byte" : "bytes"
+    message: `File is larger than ${getSizeintoKB(maxSize)}
     }`,
   };
 };
