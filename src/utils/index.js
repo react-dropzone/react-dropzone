@@ -6,6 +6,10 @@ export const FILE_TOO_LARGE = "file-too-large";
 export const FILE_TOO_SMALL = "file-too-small";
 export const TOO_MANY_FILES = "too-many-files";
 
+function getSizeintoKB(bytes) {
+  return `${Math.floor(bytes / 1024)  } KB`
+}
+
 export const ErrorCode = {
   FileInvalidType: FILE_INVALID_TYPE,
   FileTooLarge: FILE_TOO_LARGE,
@@ -37,8 +41,7 @@ export const getTooLargeRejectionErr = (maxSize) => {
 export const getTooSmallRejectionErr = (minSize) => {
   return {
     code: FILE_TOO_SMALL,
-    message: `File is smaller than ${minSize} ${
-      minSize === 1 ? "byte" : "bytes"
+    message: `File is smaller than ${getSizeintoKB(minSize)}
     }`,
   };
 };
