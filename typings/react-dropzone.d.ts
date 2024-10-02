@@ -1,6 +1,7 @@
 import * as React from "react";
 
-export { FileWithPath } from "file-selector";
+import { FileWithPath } from "file-selector";
+export { FileWithPath };
 export default function Dropzone(
   props: DropzoneProps & React.RefAttributes<DropzoneRef>
 ): JSX.Element;
@@ -23,7 +24,7 @@ export interface FileError {
 }
 
 export interface FileRejection {
-  file: File;
+  file: FileWithPath;
   errors: readonly FileError[];
 }
 
@@ -68,7 +69,7 @@ export type DropzoneState = DropzoneRef & {
   isDragAccept: boolean;
   isDragReject: boolean;
   isFileDialogActive: boolean;
-  acceptedFiles: readonly File[];
+  acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
