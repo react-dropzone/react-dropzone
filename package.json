@@ -149,8 +149,8 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.4",
-    "imagemin-cli": "^7.0.0",
-    "imagemin-pngquant": "^9.0.2",
+    "imagemin-cli": "^8.0.0",
+    "imagemin-pngquant": "^10.0.0",
     "jest": "^27.4.7",
     "lint-staged": "^12.3.2",
     "markdownlint-cli": "^0.30.0",
@@ -173,9 +173,13 @@
   "typings": "typings/react-dropzone.d.ts",
   "version": "0.0.0-development",
   "engines": {
-    "node": ">= 10.13"
+    "node": ">= 20.17"
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "packageManager": "yarn@1.22.22",
+  "resolutions": {
+    "node-sass": "^9.0.0"
+  }
 }
