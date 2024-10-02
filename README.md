@@ -2,7 +2,7 @@
 
 # react-dropzone
 [![npm](https://img.shields.io/npm/v/react-dropzone.svg?style=flat-square)](https://www.npmjs.com/package/react-dropzone)
-[![Tests](https://img.shields.io/github/workflow/status/react-dropzone/react-dropzone/Test?label=tests&style=flat-square)](https://github.com/react-dropzone/react-dropzone/actions?query=workflow%3ATest)
+![Tests](https://img.shields.io/github/actions/workflow/status/react-dropzone/react-dropzone/test.yml?branch=master&style=flat-square&label=tests)
 [![codecov](https://img.shields.io/codecov/c/gh/react-dropzone/react-dropzone/master.svg?style=flat-square)](https://codecov.io/gh/react-dropzone/react-dropzone)
 [![Open Collective Backers](https://img.shields.io/opencollective/backers/react-dropzone.svg?style=flat-square)](#backers)
 [![Open Collective Sponsors](https://img.shields.io/opencollective/sponsors/react-dropzone.svg?style=flat-square)](#sponsors)
