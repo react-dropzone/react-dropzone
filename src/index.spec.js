@@ -1408,7 +1408,6 @@ describe("useDropzone() hook", () => {
             "application/pdf": [],
           }}
           multiple
-          useFsAccessApi={false}
         >
           {({ getRootProps, getInputProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
@@ -1751,7 +1750,7 @@ describe("useDropzone() hook", () => {
       window.showOpenFilePicker = showOpenFilePickerMock;
 
       const { container } = render(
-        <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
+        <Dropzone onFileDialogCancel={onFileDialogCancelSpy} useFsAccessApi>
           {({ getRootProps, getInputProps, isFileDialogActive }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
