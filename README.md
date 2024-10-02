@@ -337,7 +337,7 @@ Fortunately, there's the [File System Access API](https://developer.mozilla.org/
 
 Also keep in mind that the FS access API can only be used in [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
 
-**NOTE** You can disable using the FS access API with the `useFsAccessApi` property: `useDropzone({useFsAccessApi: false})`.
+**NOTE** You can enable using the FS access API with the `useFsAccessApi` property: `useDropzone({useFsAccessApi: true})`.
 
 ## Supported Browsers
 We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).

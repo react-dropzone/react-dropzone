@@ -67,7 +67,7 @@ const defaultProps = {
   noDrag: false,
   noDragEventsBubbling: false,
   validator: null,
-  useFsAccessApi: true,
+  useFsAccessApi: false,
   autoFocus: false,
 };
 

@@ -111,7 +111,7 @@ function DropzoneWithoutClick(props) {
 <DropzoneWithoutClick />
 ```
 
-**NOTE** If the browser supports the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), removing the `<input>` has no effect.
+**NOTE** If the browser supports the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API) and you've set the `useFsAccessApi` to true, removing the `<input>` has no effect.
 
 If you'd like to selectively turn off the default dropzone behavior for drag events, use the `{noDrag}` property:
 ```jsx harmony
