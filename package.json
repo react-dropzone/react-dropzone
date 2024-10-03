@@ -185,7 +185,7 @@
   "typings": "typings/react-dropzone.d.ts",
   "version": "0.0.0-development",
   "engines": {
-    "node": ">= 20.17"
+    "node": ">= 10.13"
   },
   "browserslist": [
     "defaults"
