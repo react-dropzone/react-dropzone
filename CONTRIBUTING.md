@@ -88,7 +88,7 @@ Enhancement suggestions are tracked as [GitHub issues](/../../issues). If you ha
 
 ### Your First Code Contribution
 
-Make sure your node version is at least 18, then:
+Make sure your node version is at least 20, then:
 
 1. Fork this repo
 2. Clone your fork:

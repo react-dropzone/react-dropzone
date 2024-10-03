@@ -1,6 +1,56 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 const path = require("path");
-const { createConfig, babel, css, devServer } = require("webpack-blocks");
+const webpack = require("webpack");
+
+// https://github.com/styleguidist/react-styleguidist/issues/2153
+// https://github.com/styleguidist/react-styleguidist/blob/master/src/scripts/build.ts
+// https://storybook.js.org/
+
+const babelLoader = {
+  test: /\.(js|jsx)$/,
+  exclude: /node_modules/,
+  use: [{ loader: "babel-loader", options: { cacheDirectory: true } }],
+};
+
+const cssLoader = {
+  test: /\.css$/,
+  use: [
+    { loader: "style-loader", options: {} },
+    { loader: "css-loader", options: ["styleLoader"] },
+  ],
+};
+
+const devServer = {
+  hot: true,
+  hotOnly: true,
+  historyApiFallback: true,
+  inline: true,
+  clientLogLevel: "error",
+  stats: "errors-only",
+  host: "0.0.0.0",
+  allowedHosts: "all",
+};
+
+const webpackConfig = {
+  resolve: {
+    extensions: [".js", ".json"],
+  },
+  // Less noisy than default settings
+  stats: {
+    children: false,
+    chunks: false,
+    modules: false,
+    reasons: false,
+  },
+  module: {
+    rules: [babelLoader, cssLoader],
+  },
+  plugins: [
+    // TODO: If prod, do not use?
+    new webpack.HotModuleReplacementPlugin(),
+  ],
+  devServer,
+};
 
 // https://react-styleguidist.js.org/docs/configuration.html
 module.exports = {
@@ -10,14 +60,7 @@ module.exports = {
     favicon:
       "https://github.com/react-dropzone/react-dropzone/raw/master/logo/logo.png",
   },
-  webpackConfig: createConfig([
-    babel(),
-    css(),
-    devServer({
-      disableHostCheck: true,
-      host: "0.0.0.0",
-    }),
-  ]),
+  webpackConfig,
   exampleMode: "expand",
   usageMode: "expand",
   showSidebar: true,
