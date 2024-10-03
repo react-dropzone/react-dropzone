@@ -59,7 +59,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
     * OS, Platform and Version (Windows, Linux, macOS, x86, ARM)
     * Version of the interpreter, compiler, SDK, runtime environment, package manager, depending on what seems relevant.
     * Possibly your input and the output
-    * Can you reliably reproduce the issue? And can you also reproduce it with older versions?
+    * Can you reliably reproduce the issue? And can you also reproduce it with older versions? (you can use the [codesandbox template](https://codesandbox.io/p/devbox/currying-thunder-jq6d5) to illustrate the issue)
 
 #### How Do I Submit a Good Bug Report?
 
