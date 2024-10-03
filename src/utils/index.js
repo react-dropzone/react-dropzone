@@ -54,7 +54,7 @@ export const TOO_MANY_FILES_REJECTION = {
 // that MIME type will always be accepted
 export function fileAccepted(file, accept) {
   const isAcceptable =
-    file.type === "application/x-moz-file" || accepts(file, accept);
+    file.type === "application/x-moz-file" || file.type === '' || accepts(file, accept);
   return [
     isAcceptable,
     isAcceptable ? null : getInvalidTypeRejectionErr(accept),
