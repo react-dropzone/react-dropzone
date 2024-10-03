@@ -36,7 +36,7 @@ Before you ask a question, it is best to search for existing [Issues](/../../iss
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
-* Open an [Issue](/../../issues/new).
+* Open an [Issue](/../../issues/new/choose).
 * Provide as much context as you can about what you're running into.
 * Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
 
@@ -63,7 +63,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 #### How Do I Submit a Good Bug Report?
 
-We use GitHub issues to track bugs and errors. If you run into an issue with the project, open an [Issue](/../../issues/new), select the `Bug Report` and fill in all the details.
+We use GitHub issues to track bugs and errors. If you run into an issue with the project, open an [Issue](/../../issues/new/choose), select the `Bug Report` and fill in all the details.
 
 Once it's filed:
 
@@ -84,7 +84,7 @@ This section guides you through submitting an enhancement suggestion for this pr
 
 #### How Do I Submit a Good Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [GitHub issues](/../../issues). If you have a suggestion, open an [Issue](/../../issues/new), select the `Feature Request` and fill in all the details.
+Enhancement suggestions are tracked as [GitHub issues](/../../issues). If you have a suggestion, open an [Issue](/../../issues/new/choose), select the `Feature Request` and fill in all the details.
 
 ### Your First Code Contribution
 
