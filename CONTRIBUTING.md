@@ -88,29 +88,31 @@ Enhancement suggestions are tracked as [GitHub issues](/issues). If you have a s
 
 ### Your First Code Contribution
 
+Make sure your node version is at least 18, then:
+
 1. Fork this repo
-1. Clone your fork:
+2. Clone your fork:
 ```bash
 git clone https://github.com/myusername/react-dropzone.git
 ```
-2. Install system dependencies (needed for local development):
+3. Install system dependencies (needed for local development):
 ```bash
 # macOS
 brew install libpng libimagequant
 # Linux
 sudo apt-get install -y libpng-dev libimagequant-dev
 ```
-3. Install project dependencies:
+4. Install project dependencies:
 ```bash
 yarn install
 ```
-4. Create a new branch:
+5. Create a new branch:
 ```bash
 git checkout -b fix/fix-some-bug
 ```
-5. Start hacking
-6. Commit and push your code
-7. Make a PR
+6. Start hacking
+7. Commit and push your code
+8. Make a PR
 
 **NOTE** If you're using Apple silicon, you'll need to install Rosetta 2 (see [imagemin/pngquant-bin#121](https://github.com/imagemin/pngquant-bin/issues/121) and [SO](https://stackoverflow.com/a/66662497/1092007)):
 ```bash
