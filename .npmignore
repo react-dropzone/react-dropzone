@@ -1,9 +1,0 @@
-.npmignore
-.idea
-.github
-logo/
-styleguide/
-coverage/
-yarn.lock
-.babelrc
-vendor

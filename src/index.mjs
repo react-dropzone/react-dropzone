@@ -1,4 +1,6 @@
 /* eslint prefer-template: 0 */
+// TODO: Why is the next lint error occurring?
+/* eslint-disable-next-line no-unused-vars */
 import React, {
   forwardRef,
   Fragment,
@@ -26,7 +28,7 @@ import {
   onDocumentDragOver,
   pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION,
-} from "./utils/index";
+} from "./utils/index.mjs";
 
 /**
  * Convenience wrapper component for the `useDropzone` hook
@@ -458,12 +460,12 @@ export function useDropzone(props = {}) {
 
   const onFileDialogOpenCb = useMemo(
     () => (typeof onFileDialogOpen === "function" ? onFileDialogOpen : noop),
-    [onFileDialogOpen]
+    [onFileDialogOpen],
   );
   const onFileDialogCancelCb = useMemo(
     () =>
       typeof onFileDialogCancel === "function" ? onFileDialogCancel : noop,
-    [onFileDialogCancel]
+    [onFileDialogCancel],
   );
 
   /**
@@ -481,7 +483,7 @@ export function useDropzone(props = {}) {
     typeof window !== "undefined" &&
       window.isSecureContext &&
       useFsAccessApi &&
-      canUseFileSystemAccessAPI()
+      canUseFileSystemAccessAPI(),
   );
 
   // Update file dialog active state when the window is focused on
@@ -548,7 +550,7 @@ export function useDropzone(props = {}) {
         console.error(e);
       }
     },
-    [onError]
+    [onError],
   );
 
   const onDragEnterCb = useCallback(
@@ -606,7 +608,7 @@ export function useDropzone(props = {}) {
       multiple,
       maxFiles,
       validator,
-    ]
+    ],
   );
 
   const onDragOverCb = useCallback(
@@ -619,7 +621,8 @@ export function useDropzone(props = {}) {
       if (hasFiles && event.dataTransfer) {
         try {
           event.dataTransfer.dropEffect = "copy";
-        } catch {} /* eslint-disable-line no-empty */
+          /* eslint-disable-next-line no-empty */
+        } catch {}
       }
 
       if (hasFiles && onDragOver) {
@@ -628,7 +631,7 @@ export function useDropzone(props = {}) {
 
       return false;
     },
-    [onDragOver, noDragEventsBubbling]
+    [onDragOver, noDragEventsBubbling],
   );
 
   const onDragLeaveCb = useCallback(
@@ -639,7 +642,7 @@ export function useDropzone(props = {}) {
 
       // Only deactivate once the dropzone and all children have been left
       const targets = dragTargetsRef.current.filter(
-        (target) => rootRef.current && rootRef.current.contains(target)
+        (target) => rootRef.current && rootRef.current.contains(target),
       );
       // Make sure to remove a target present multiple times only once
       // (Firefox may fire dragenter/dragleave multiple times on the same element)
@@ -663,7 +666,7 @@ export function useDropzone(props = {}) {
         onDragLeave(event);
       }
     },
-    [rootRef, onDragLeave, noDragEventsBubbling]
+    [rootRef, onDragLeave, noDragEventsBubbling],
   );
 
   const setFiles = useCallback(
@@ -729,7 +732,7 @@ export function useDropzone(props = {}) {
       onDropAccepted,
       onDropRejected,
       validator,
-    ]
+    ],
   );
 
   const onDropCb = useCallback(
@@ -753,7 +756,7 @@ export function useDropzone(props = {}) {
       }
       dispatch({ type: "reset" });
     },
-    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling]
+    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling],
   );
 
   // Fn for opening the file dialog programmatically
@@ -790,8 +793,8 @@ export function useDropzone(props = {}) {
             } else {
               onErrCb(
                 new Error(
-                  "Cannot open the file picker because the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API is not supported and no <input> was provided."
-                )
+                  "Cannot open the file picker because the https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API is not supported and no <input> was provided.",
+                ),
               );
             }
           } else {
@@ -836,7 +839,7 @@ export function useDropzone(props = {}) {
         openFileDialog();
       }
     },
-    [rootRef, openFileDialog]
+    [rootRef, openFileDialog],
   );
 
   // Update focus state for the dropzone
@@ -897,21 +900,21 @@ export function useDropzone(props = {}) {
         ...rest
       } = {}) => ({
         onKeyDown: composeKeyboardHandler(
-          composeEventHandlers(onKeyDown, onKeyDownCb)
+          composeEventHandlers(onKeyDown, onKeyDownCb),
         ),
         onFocus: composeKeyboardHandler(
-          composeEventHandlers(onFocus, onFocusCb)
+          composeEventHandlers(onFocus, onFocusCb),
         ),
         onBlur: composeKeyboardHandler(composeEventHandlers(onBlur, onBlurCb)),
         onClick: composeHandler(composeEventHandlers(onClick, onClickCb)),
         onDragEnter: composeDragHandler(
-          composeEventHandlers(onDragEnter, onDragEnterCb)
+          composeEventHandlers(onDragEnter, onDragEnterCb),
         ),
         onDragOver: composeDragHandler(
-          composeEventHandlers(onDragOver, onDragOverCb)
+          composeEventHandlers(onDragOver, onDragOverCb),
         ),
         onDragLeave: composeDragHandler(
-          composeEventHandlers(onDragLeave, onDragLeaveCb)
+          composeEventHandlers(onDragLeave, onDragLeaveCb),
         ),
         onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
         role: typeof role === "string" && role !== "" ? role : "presentation",
@@ -932,7 +935,7 @@ export function useDropzone(props = {}) {
       noKeyboard,
       noDrag,
       disabled,
-    ]
+    ],
   );
 
   const onInputElementClick = useCallback((event) => {
@@ -949,7 +952,7 @@ export function useDropzone(props = {}) {
           style: { display: "none" },
           onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
           onClick: composeHandler(
-            composeEventHandlers(onClick, onInputElementClick)
+            composeEventHandlers(onClick, onInputElementClick),
           ),
           tabIndex: -1,
           [refKey]: inputRef,
@@ -960,7 +963,7 @@ export function useDropzone(props = {}) {
           ...rest,
         };
       },
-    [inputRef, accept, multiple, onDropCb, disabled]
+    [inputRef, accept, multiple, onDropCb, disabled],
   );
 
   return {
@@ -1026,4 +1029,4 @@ function reducer(state, action) {
 
 function noop() {}
 
-export { ErrorCode } from "./utils";
+export { ErrorCode } from "./utils/index.mjs";

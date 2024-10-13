@@ -1,10 +1,16 @@
+import { jest } from "@jest/globals";
+
+jest.unstable_mockModule("./utils/index.mjs", () => ({
+  isIeOrEdge: jest.fn(),
+}));
+
 /* eslint react/prop-types: 0, jsx-a11y/label-has-for: 0 */
 import React, { createRef } from "react";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { renderHook } from "@testing-library/react-hooks";
 import { fromEvent } from "file-selector";
-import * as utils from "./utils";
-import Dropzone, { useDropzone } from "./index";
+const utils = await import("./utils/index.mjs");
+import Dropzone, { useDropzone } from "./index.mjs";
 
 describe("useDropzone() hook", () => {
   let files;
@@ -29,7 +35,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       expect(container.innerHTML).toMatchSnapshot();
     });
@@ -45,12 +51,12 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute(
         "accept",
-        "image/jpeg"
+        "image/jpeg",
       );
     });
 
@@ -66,12 +72,12 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute(
         "accept",
-        "image/jpeg"
+        "image/jpeg",
       );
 
       rerender(
@@ -85,12 +91,12 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute(
         "accept",
-        "image/png"
+        "image/png",
       );
     });
 
@@ -102,7 +108,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute("multiple");
@@ -116,7 +122,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).not.toHaveAttribute("multiple");
@@ -128,7 +134,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute("multiple");
@@ -143,7 +149,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps({ name })} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("input")).toHaveAttribute("name", name);
@@ -158,12 +164,12 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("div")).toHaveAttribute(
         "aria-label",
-        ariaLabel
+        ariaLabel,
       );
     });
 
@@ -188,7 +194,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -230,7 +236,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps(inputProps)} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const input = container.querySelector("input");
@@ -268,7 +274,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps(inputProps)} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -312,7 +318,7 @@ describe("useDropzone() hook", () => {
       const { container } = render(
         <div {...getRootProps()}>
           <input {...getInputProps()} />
-        </div>
+        </div>,
       );
 
       expect(container.querySelector("div")).toEqual(rootRef.current);
@@ -385,13 +391,13 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       rerender(
         <Dropzone ref={setRef}>
           {({ getRootProps }) => <div {...getRootProps()} />}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(setRef).toHaveBeenCalledTimes(1);
@@ -406,7 +412,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -422,7 +428,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(dropzone.querySelector("#focus")).toBeNull();
@@ -436,7 +442,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       expect(container.querySelector("div")).toHaveAttribute("tabindex", "0");
     });
@@ -449,7 +455,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("div")).toHaveAttribute("tabindex", "0");
@@ -461,7 +467,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("div")).not.toHaveAttribute("tabindex");
@@ -475,7 +481,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("div")).toHaveAttribute("tabindex", "0");
@@ -487,7 +493,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("div")).not.toHaveAttribute("tabindex");
@@ -542,7 +548,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </label>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("label");
@@ -565,7 +571,7 @@ describe("useDropzone() hook", () => {
           ...acc,
           [eventName]: rest,
         }),
-        {}
+        {},
       );
 
     it("installs hooks to prevent stray drops from taking over the browser window", () => {
@@ -576,7 +582,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
@@ -602,7 +608,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       unmount();
@@ -611,7 +617,7 @@ describe("useDropzone() hook", () => {
 
       const addEventCalls = collectEventListenerCalls(addEventListenerSpy);
       const removeEventCalls = collectEventListenerCalls(
-        removeEventListenerSpy
+        removeEventListenerSpy,
       );
       const events = Object.keys(removeEventCalls);
 
@@ -633,7 +639,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dragEvt = new Event("dragover", { bubbles: true });
@@ -655,7 +661,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropEvt = new Event("drop", { bubbles: true });
@@ -675,7 +681,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropEvt = new Event("drop", { bubbles: true });
@@ -721,7 +727,7 @@ describe("useDropzone() hook", () => {
               <InnerDropzone />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const innerDropzone = container.querySelector("#inner-dropzone");
@@ -755,7 +761,7 @@ describe("useDropzone() hook", () => {
         innerProps[prop].mockImplementation((...args) => {
           const event = prop === "onDrop" ? args.pop() : args.shift();
           event.stopPropagation();
-        })
+        }),
       );
 
       const InnerDropzone = () => (
@@ -783,7 +789,7 @@ describe("useDropzone() hook", () => {
               <InnerDropzone />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const innerDropzone = container.querySelector("#inner-dropzone");
@@ -838,7 +844,7 @@ describe("useDropzone() hook", () => {
               <InnerDropzone />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const outerDropzone = container.querySelector("#outer-dropzone");
@@ -886,7 +892,7 @@ describe("useDropzone() hook", () => {
               <InnerDropzone />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const parentDropzone = container.querySelector("#parent-dropzone");
@@ -923,7 +929,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -986,7 +992,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1006,7 +1012,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1024,7 +1030,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1042,7 +1048,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1058,7 +1064,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.focus(dropzone);
@@ -1074,7 +1080,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1090,7 +1096,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(dropzone.querySelector("#focus")).not.toBeNull();
@@ -1104,7 +1110,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(dropzone.querySelector("#focus")).toBeNull();
@@ -1121,7 +1127,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1144,7 +1150,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1164,7 +1170,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1180,7 +1186,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.blur(dropzone);
@@ -1196,7 +1202,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1212,7 +1218,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.blur(dropzone);
@@ -1226,7 +1232,7 @@ describe("useDropzone() hook", () => {
               {isFocused && <div id="focus" />}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.blur(dropzone);
@@ -1262,7 +1268,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1284,7 +1290,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -1300,7 +1306,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -1316,7 +1322,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1331,7 +1337,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(dropzone);
@@ -1350,7 +1356,7 @@ describe("useDropzone() hook", () => {
               <button onClick={btnClickSpy} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -1375,7 +1381,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -1415,7 +1421,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1468,7 +1474,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1525,7 +1531,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1579,7 +1585,7 @@ describe("useDropzone() hook", () => {
           {({ getRootProps, isFileDialogActive }) => (
             <div {...getRootProps()}>{isFileDialogActive && active}</div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1619,7 +1625,7 @@ describe("useDropzone() hook", () => {
           {({ getRootProps, isFileDialogActive }) => (
             <div {...getRootProps()}>{isFileDialogActive && active}</div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1629,7 +1635,7 @@ describe("useDropzone() hook", () => {
       expect(showOpenFilePickerMock).toHaveBeenCalled();
 
       await act(() =>
-        thenable.cancel(new DOMException("user aborted request", "AbortError"))
+        thenable.cancel(new DOMException("user aborted request", "AbortError")),
       );
 
       expect(activeRef.current).toBeNull();
@@ -1657,7 +1663,7 @@ describe("useDropzone() hook", () => {
           {({ getRootProps, isFileDialogActive }) => (
             <div {...getRootProps()}>{isFileDialogActive && active}</div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1668,7 +1674,7 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toContainElement(activeRef.current);
 
       await act(() =>
-        thenable.cancel(new DOMException("user aborted request", "AbortError"))
+        thenable.cancel(new DOMException("user aborted request", "AbortError")),
       );
 
       // Try to focus window and run timers
@@ -1713,7 +1719,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1726,8 +1732,8 @@ describe("useDropzone() hook", () => {
 
       await act(() =>
         thenable.cancel(
-          new DOMException("Cannot use this API cross-origin", "SecurityError")
-        )
+          new DOMException("Cannot use this API cross-origin", "SecurityError"),
+        ),
       );
 
       expect(activeRef.current).not.toBeNull();
@@ -1757,7 +1763,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1769,8 +1775,8 @@ describe("useDropzone() hook", () => {
 
       await act(() =>
         thenable.cancel(
-          new DOMException("Cannot use this API cross-origin", "SecurityError")
-        )
+          new DOMException("Cannot use this API cross-origin", "SecurityError"),
+        ),
       );
 
       focusWindow();
@@ -1897,7 +1903,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1933,7 +1939,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const input = container.querySelector("input");
@@ -1962,7 +1968,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -1985,7 +1991,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -2008,7 +2014,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -2028,7 +2034,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.keyDown(dropzone, {
@@ -2049,7 +2055,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -2082,7 +2088,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2118,7 +2124,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2136,7 +2142,7 @@ describe("useDropzone() hook", () => {
       expect(props.onDrop).toHaveBeenCalled();
       expect(props.onDropAccepted).toHaveBeenCalledWith(
         files,
-        expect.any(Object)
+        expect.any(Object),
       );
       expect(props.onDropRejected).not.toHaveBeenCalled();
     });
@@ -2165,7 +2171,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2203,7 +2209,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2239,7 +2245,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2262,7 +2268,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(() => fireEvent.dragEnter(dropzone, data));
@@ -2295,7 +2301,7 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2327,12 +2333,12 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
       await act(() =>
-        fireEvent.dragEnter(dropzone, createDtWithFiles([...files, ...images]))
+        fireEvent.dragEnter(dropzone, createDtWithFiles([...files, ...images])),
       );
 
       expect(dropzone).toHaveTextContent("dragActive");
@@ -2350,7 +2356,7 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2382,7 +2388,7 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2412,7 +2418,7 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2454,14 +2460,14 @@ describe("useDropzone() hook", () => {
               )}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
       const data = createDtWithFiles(images);
 
       await act(() =>
-        fireEvent.dragEnter(container.querySelector("#child"), data)
+        fireEvent.dragEnter(container.querySelector("#child"), data),
       );
       await act(() => fireEvent.dragEnter(dropzone, data));
 
@@ -2498,13 +2504,13 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(async () =>
         fireEvent.change(container.querySelector("input"), {
           target: { files },
-        })
+        }),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
@@ -2547,7 +2553,7 @@ describe("useDropzone() hook", () => {
 
       const matchToFiles = (fileList, files) =>
         Array.from(fileList).every(
-          (item) => !!files.find((file) => file.name === item.textContent)
+          (item) => !!files.find((file) => file.name === item.textContent),
         );
       const matchToErrorCode = (errorList, code) =>
         Array.from(errorList).every((item) => item.textContent === code);
@@ -2565,7 +2571,7 @@ describe("useDropzone() hook", () => {
               <RejectedFileList fileRejections={fileRejections} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2583,7 +2589,7 @@ describe("useDropzone() hook", () => {
       const rejectedFileErrorList = getRejectedFilesErrors(dropzone);
       expect(rejectedFileErrorList).toHaveLength(files.length);
       expect(matchToErrorCode(rejectedFileErrorList, "file-invalid-type")).toBe(
-        true
+        true,
       );
     });
 
@@ -2604,7 +2610,7 @@ describe("useDropzone() hook", () => {
               {isDragReject && "dragReject"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2639,7 +2645,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2658,7 +2664,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -2678,7 +2684,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2706,7 +2712,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -2731,7 +2737,7 @@ describe("useDropzone() hook", () => {
               {isDragAccept && "dragAccept"}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2765,7 +2771,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -2806,10 +2812,10 @@ describe("useDropzone() hook", () => {
       expect(onDropRejectedSpy).toHaveBeenCalledWith(
         expect.arrayContaining(
           images.map((image) =>
-            expect.objectContaining({ errors: expect.any(Array), file: image })
-          )
+            expect.objectContaining({ errors: expect.any(Array), file: image }),
+          ),
         ),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -2832,14 +2838,14 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(() =>
         fireEvent.drop(
           container.querySelector("div"),
-          createDtWithFiles(images)
-        )
+          createDtWithFiles(images),
+        ),
       );
 
       expect(onDropRejectedSpy).not.toHaveBeenCalled();
@@ -2862,15 +2868,15 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const [image] = images;
       await act(() =>
         fireEvent.drop(
           container.querySelector("div"),
-          createDtWithFiles([image])
-        )
+          createDtWithFiles([image]),
+        ),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith([image], [], expect.anything());
@@ -2886,11 +2892,14 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(() =>
-        fireEvent.drop(container.querySelector("div"), createDtWithFiles(files))
+        fireEvent.drop(
+          container.querySelector("div"),
+          createDtWithFiles(files),
+        ),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
@@ -2909,7 +2918,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -2940,7 +2949,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -2959,7 +2968,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
       onDropSpy.mockClear();
 
@@ -2969,7 +2978,7 @@ describe("useDropzone() hook", () => {
       onDropSpy.mockClear();
 
       await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
+        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(
@@ -2985,7 +2994,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -3004,7 +3013,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -3018,7 +3027,7 @@ describe("useDropzone() hook", () => {
       onDropAcceptedSpy.mockClear();
 
       await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
+        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])),
       );
 
       expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything());
@@ -3039,7 +3048,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -3057,7 +3066,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
       onDropRejectedSpy.mockClear();
 
@@ -3067,7 +3076,7 @@ describe("useDropzone() hook", () => {
       onDropRejectedSpy.mockClear();
 
       await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
+        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])),
       );
 
       expect(onDropRejectedSpy).toHaveBeenCalledWith(
@@ -3082,7 +3091,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -3101,15 +3110,15 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const images = [createFile("bogus.gif", 1234, "application/x-moz-file")];
       await act(() =>
         fireEvent.drop(
           container.querySelector("div"),
-          createDtWithFiles(images)
-        )
+          createDtWithFiles(images),
+        ),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
@@ -3125,14 +3134,14 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(() =>
         fireEvent.drop(
           container.querySelector("div"),
-          createDtWithFiles(images)
-        )
+          createDtWithFiles(images),
+        ),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(
@@ -3157,7 +3166,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -3171,7 +3180,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
       const dropzone = container.querySelector("div");
 
@@ -3190,7 +3199,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -3214,7 +3223,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       focusWindow();
@@ -3236,7 +3245,7 @@ describe("useDropzone() hook", () => {
               {isFileDialogActive && active}
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const dropzone = container.querySelector("div");
@@ -3262,7 +3271,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -3271,7 +3280,7 @@ describe("useDropzone() hook", () => {
       rerender(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
           {({ getRootProps }) => <div {...getRootProps()} />}
-        </Dropzone>
+        </Dropzone>,
       );
 
       focusWindow();
@@ -3290,13 +3299,13 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(async () =>
         fireEvent.change(container.querySelector("input"), {
           target: { files },
-        })
+        }),
       );
       fireEvent.click(container.querySelector("div"));
 
@@ -3314,7 +3323,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -3337,7 +3346,7 @@ describe("useDropzone() hook", () => {
               <input {...getInputProps()} />
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("div"));
@@ -3357,7 +3366,7 @@ describe("useDropzone() hook", () => {
               </button>
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("button"));
@@ -3379,7 +3388,7 @@ describe("useDropzone() hook", () => {
               </button>
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("button"));
@@ -3401,14 +3410,14 @@ describe("useDropzone() hook", () => {
               </button>
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("button"));
 
       expect(activeRef.current).not.toBeNull();
       expect(container.querySelector("div")).toContainElement(
-        activeRef.current
+        activeRef.current,
       );
     });
 
@@ -3424,7 +3433,7 @@ describe("useDropzone() hook", () => {
               </button>
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       fireEvent.click(container.querySelector("button"));
@@ -3442,7 +3451,7 @@ describe("useDropzone() hook", () => {
               </button>
             </div>
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       const fn = () => fireEvent.click(container.querySelector("button"));
@@ -3464,14 +3473,14 @@ describe("useDropzone() hook", () => {
       const { container } = render(
         <Dropzone validator={validator} onDrop={onDropSpy} multiple={true}>
           {({ getRootProps }) => <div {...getRootProps()} />}
-        </Dropzone>
+        </Dropzone>,
       );
 
       await act(() =>
         fireEvent.drop(
           container.querySelector("div"),
-          createDtWithFiles(images)
-        )
+          createDtWithFiles(images),
+        ),
       );
 
       expect(onDropSpy).toHaveBeenCalledWith(
@@ -3487,7 +3496,7 @@ describe("useDropzone() hook", () => {
             ],
           },
         ],
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -3525,12 +3534,12 @@ describe("useDropzone() hook", () => {
       const { container } = render(
         <Dropzone>
           {({ getRootProps }) => <div id="root" {...getRootProps()} />}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("#root")).toHaveAttribute(
         "role",
-        "presentation"
+        "presentation",
       );
     });
 
@@ -3540,12 +3549,12 @@ describe("useDropzone() hook", () => {
           {({ getRootProps }) => (
             <div id="root" {...getRootProps({ role: "generic" })} />
           )}
-        </Dropzone>
+        </Dropzone>,
       );
 
       expect(container.querySelector("#root")).toHaveAttribute(
         "role",
-        "generic"
+        "generic",
       );
     });
   });

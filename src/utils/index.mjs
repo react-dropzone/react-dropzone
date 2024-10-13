@@ -134,7 +134,7 @@ export function isEvtWithFiles(event) {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
   return Array.prototype.some.call(
     event.dataTransfer.types,
-    (type) => type === "Files" || type === "application/x-moz-file"
+    (type) => type === "Files" || type === "application/x-moz-file",
   );
 }
 
@@ -205,14 +205,14 @@ export function pickerOptionsFromAccept(accept) {
 
         if (!isMIMEType(mimeType)) {
           console.warn(
-            `Skipped "${mimeType}" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.`
+            `Skipped "${mimeType}" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.`,
           );
           ok = false;
         }
 
         if (!Array.isArray(ext) || !ext.every(isExt)) {
           console.warn(
-            `Skipped "${mimeType}" because an invalid file extension was provided.`
+            `Skipped "${mimeType}" because an invalid file extension was provided.`,
           );
           ok = false;
         }
@@ -224,7 +224,7 @@ export function pickerOptionsFromAccept(accept) {
           ...agg,
           [mimeType]: ext,
         }),
-        {}
+        {},
       );
     return [
       {
