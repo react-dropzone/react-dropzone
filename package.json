@@ -5,9 +5,14 @@
   "module": "dist/es/index.js",
   "exports": {
     ".": {
-      "import": "./dist/es/index.js",
-      "require": "./dist/index.js",
-      "types": "./typings/react-dropzone.d.ts"
+      "import": {
+        "types": "./typings/react-dropzone.d.ts",
+        "default": "./dist/es/index.js"
+      },
+      "require": {
+        "types": "./typings/react-dropzone.d.ts",
+        "default" : "./dist/index.js"
+      }
     }
   },
   "typesVersions": {
