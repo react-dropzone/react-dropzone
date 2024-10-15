@@ -35,7 +35,7 @@ module.exports = {
     // See https://github.com/reactjs/react-docgen/issues/332
     {
       name: "Components",
-      components: "./src/index.js",
+      components: "./src/index.mjs",
     },
     {
       name: "Examples",

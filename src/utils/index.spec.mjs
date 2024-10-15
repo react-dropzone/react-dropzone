@@ -1,3 +1,5 @@
+import { jest } from "@jest/globals";
+
 beforeEach(() => {
   jest.resetModules();
 });
@@ -5,11 +7,11 @@ beforeEach(() => {
 describe("fileMatchSize()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should return true if the file object doesn't have a {size} property", () => {
@@ -69,11 +71,11 @@ describe("fileMatchSize()", () => {
 describe("isIeOrEdge", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should return true for IE10", () => {
@@ -108,9 +110,9 @@ describe("isKindFile()", () => {
   it('should return true for DataTransferItem of kind "file"', async () => {
     /**
      * @constant
-     * @type {import('./index')}
+     * @type {import('./index.mjs')}
      */
-    const utils = await import("./index");
+    const utils = await import("./index.mjs");
     expect(utils.isKindFile({ kind: "file" })).toBe(true);
     expect(utils.isKindFile({ kind: "text/html" })).toBe(false);
     expect(utils.isKindFile({})).toBe(false);
@@ -123,16 +125,16 @@ describe("isPropagationStopped()", () => {
 
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should return result of isPropagationStopped() if isPropagationStopped exists", () => {
     expect(utils.isPropagationStopped({ isPropagationStopped: trueFn })).toBe(
-      true
+      true,
     );
   });
 
@@ -148,42 +150,42 @@ describe("isPropagationStopped()", () => {
 describe("isEvtWithFiles()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should return true if some dragged types are files", () => {
     expect(utils.isEvtWithFiles({ dataTransfer: { types: ["Files"] } })).toBe(
-      true
+      true,
     );
     expect(
       utils.isEvtWithFiles({
         dataTransfer: { types: ["application/x-moz-file"] },
-      })
+      }),
     ).toBe(true);
     expect(
       utils.isEvtWithFiles({
         dataTransfer: { types: ["Files", "application/x-moz-file"] },
-      })
+      }),
     ).toBe(true);
     expect(
-      utils.isEvtWithFiles({ dataTransfer: { types: ["text/plain"] } })
+      utils.isEvtWithFiles({ dataTransfer: { types: ["text/plain"] } }),
     ).toBe(false);
     expect(
-      utils.isEvtWithFiles({ dataTransfer: { types: ["text/html"] } })
+      utils.isEvtWithFiles({ dataTransfer: { types: ["text/html"] } }),
     ).toBe(false);
     expect(
       utils.isEvtWithFiles({
         dataTransfer: { types: ["Files", "application/test"] },
-      })
+      }),
     ).toBe(true);
     expect(
       utils.isEvtWithFiles({
         dataTransfer: { types: ["application/x-moz-file", "application/test"] },
-      })
+      }),
     ).toBe(true);
   });
 
@@ -199,11 +201,11 @@ describe("isEvtWithFiles()", () => {
 describe("composeEventHandlers()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("returns a fn", () => {
@@ -250,11 +252,11 @@ describe("composeEventHandlers()", () => {
 describe("fileAccepted()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("accepts bogus firefox file", () => {
@@ -303,11 +305,11 @@ describe("fileAccepted()", () => {
 describe("allFilesAccepted()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
   it("rejects file when multiple accept criteria", () => {
     const files = [
@@ -320,36 +322,36 @@ describe("allFilesAccepted()", () => {
     ];
     expect(utils.allFilesAccepted({ files, multiple: true })).toEqual(true);
     expect(
-      utils.allFilesAccepted({ files, multiple: true, maxFiles: 10 })
+      utils.allFilesAccepted({ files, multiple: true, maxFiles: 10 }),
     ).toEqual(true);
     expect(
-      utils.allFilesAccepted({ files, multiple: false, maxFiles: 10 })
+      utils.allFilesAccepted({ files, multiple: false, maxFiles: 10 }),
     ).toEqual(false);
     expect(
-      utils.allFilesAccepted({ files, multiple: true, accept: "image/jpeg" })
+      utils.allFilesAccepted({ files, multiple: true, accept: "image/jpeg" }),
     ).toEqual(false);
     expect(
       utils.allFilesAccepted({
         files: images,
         multiple: true,
         accept: "image/*",
-      })
+      }),
     ).toEqual(true);
     expect(
-      utils.allFilesAccepted({ files, multiple: true, minSize: 110 })
+      utils.allFilesAccepted({ files, multiple: true, minSize: 110 }),
     ).toEqual(false);
     expect(
-      utils.allFilesAccepted({ files, multiple: true, maxSize: 99 })
+      utils.allFilesAccepted({ files, multiple: true, maxSize: 99 }),
     ).toEqual(false);
     expect(
-      utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 })
+      utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 }),
     ).toEqual(false);
 
     expect(
       utils.allFilesAccepted({
         files,
         validator: () => ({ code: "not-allowed", message: "Cannot do this!" }),
-      })
+      }),
     ).toEqual(false);
   });
 });
@@ -357,11 +359,11 @@ describe("allFilesAccepted()", () => {
 describe("ErrorCode", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should exist and have known error code properties", () => {
@@ -375,11 +377,11 @@ describe("ErrorCode", () => {
 describe("canUseFileSystemAccessAPI()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should return false if not", () => {
@@ -396,11 +398,11 @@ describe("canUseFileSystemAccessAPI()", () => {
 describe("pickerOptionsFromAccept()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("converts the {accept} prop to file picker options", () => {
@@ -410,7 +412,7 @@ describe("pickerOptionsFromAccept()", () => {
         "text/*": [".txt", ".pdf"], // ok
         "audio/*": ["mp3"], // not ok
         "*": [".p12"], // not ok
-      })
+      }),
     ).toEqual([
       {
         description: "Files",
@@ -426,11 +428,11 @@ describe("pickerOptionsFromAccept()", () => {
 describe("acceptPropAsAcceptAttr()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("converts {accept} to an array of strings", () => {
@@ -440,7 +442,7 @@ describe("acceptPropAsAcceptAttr()", () => {
         "text/*": [".txt", ".pdf"],
         "audio/*": ["mp3"], // `mp3` not ok
         "*": [".p12"], // `*` not ok
-      })
+      }),
     ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
   });
 });
@@ -448,11 +450,11 @@ describe("acceptPropAsAcceptAttr()", () => {
 describe("isMIMEType()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("checks that the value is a valid MIME type string", () => {
@@ -471,11 +473,11 @@ describe("isMIMEType()", () => {
 describe("isExt()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("checks that the value is a valid file extension", () => {
@@ -491,11 +493,11 @@ describe("isExt()", () => {
 describe("isAbort()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should work as expected", () => {
@@ -503,7 +505,7 @@ describe("isAbort()", () => {
     expect(utils.isAbort(new DOMException("some err"))).toBe(false);
     expect(utils.isAbort(new DOMException("some err", "Noop"))).toBe(false);
     expect(utils.isAbort(new DOMException("some err", "AbortError"))).toBe(
-      true
+      true,
     );
     const err = new DOMException("some err");
     const e = new Proxy(err, {
@@ -521,21 +523,21 @@ describe("isAbort()", () => {
 describe("isSecurityError()", () => {
   /**
    * @constant
-   * @type {import('./index')}
+   * @type {import('./index.mjs')}
    */
   let utils;
   beforeEach(async () => {
-    utils = await import("./index");
+    utils = await import("./index.mjs");
   });
 
   it("should work as expected", () => {
     expect(utils.isSecurityError(new DOMException())).toBe(false);
     expect(utils.isSecurityError(new DOMException("some err"))).toBe(false);
     expect(utils.isSecurityError(new DOMException("some err", "Noop"))).toBe(
-      false
+      false,
     );
     expect(
-      utils.isSecurityError(new DOMException("some err", "SecurityError"))
+      utils.isSecurityError(new DOMException("some err", "SecurityError")),
     ).toBe(true);
     const err = new DOMException("some err");
     const e = new Proxy(err, {

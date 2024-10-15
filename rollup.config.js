@@ -1,7 +1,7 @@
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
-const commonjs = require("@rollup/plugin-commonjs");
-const { babel } = require("@rollup/plugin-babel");
-const { terser } = require("rollup-plugin-terser");
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import { babel } from "@rollup/plugin-babel";
+import { terser } from "rollup-plugin-terser";
 
 const umdGlobals = {
   react: "React",
@@ -10,7 +10,7 @@ const umdGlobals = {
 
 module.exports = [
   {
-    input: "./src/index.js",
+    input: "./src/index.mjs",
     output: {
       file: "dist/index.js",
       format: "umd",
