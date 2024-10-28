@@ -26,7 +26,7 @@ import {
   onDocumentDragOver,
   pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION,
-} from "./utils/index";
+} from "./utils/index.js";
 
 /**
  * Convenience wrapper component for the `useDropzone` hook
@@ -1039,4 +1039,4 @@ function reducer(state, action) {
 
 function noop() {}
 
-export { ErrorCode } from "./utils";
+export { ErrorCode } from "./utils/index.js";
