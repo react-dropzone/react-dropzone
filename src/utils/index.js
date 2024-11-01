@@ -297,6 +297,7 @@ export function isMIMEType(v) {
     v === "video/*" ||
     v === "image/*" ||
     v === "text/*" ||
+    v === "application/*" ||
     /\w+\/[-+.\w]+/g.test(v)
   );
 }
