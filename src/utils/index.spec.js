@@ -461,6 +461,7 @@ describe("isMIMEType()", () => {
     expect(utils.isMIMEType("image/*")).toBe(true);
     expect(utils.isMIMEType("video/*")).toBe(true);
     expect(utils.isMIMEType("audio/*")).toBe(true);
+    expect(utils.isMIMEType("application/*")).toBe(true);
     expect(utils.isMIMEType("test/*")).toBe(false);
     expect(utils.isMIMEType("text")).toBe(false);
     expect(utils.isMIMEType("")).toBe(false);
