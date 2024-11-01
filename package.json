@@ -115,7 +115,7 @@
     "react": ">= 16.8 || 18.0.0"
   },
   "dependencies": {
-    "attr-accept": "^2.2.2",
+    "attr-accept": "^2.2.4",
     "file-selector": "^1.2.0",
     "prop-types": "^15.8.1"
   },
