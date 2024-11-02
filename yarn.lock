@@ -6249,10 +6249,10 @@ file-loader@^6.0.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
-file-selector@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/file-selector/-/file-selector-1.2.0.tgz#3a63009334a60387d6904e1c5047ef208c77118c"
-  integrity sha512-49855884Jfcij/ec+RGkUYmZo45CwBpN+gfxuOTiOGCBTwvr5p8ZpfBQo1n2sdJz8Pl6FCmNDxyltjptHVPFNQ==
+file-selector@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/file-selector/-/file-selector-2.1.0.tgz#beb164ca5ce48af8a48d3e632c94750bc573581a"
+  integrity sha512-ZuXAqGePcSPz4JuerOY06Dzzq0hrmQ6VGoXVzGyFI1npeOfBgqGIKKpznfYWRkSLJlXutkqVC5WvGZtkFVhu9Q==
   dependencies:
     tslib "^2.7.0"
 
