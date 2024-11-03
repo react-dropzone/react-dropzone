@@ -703,6 +703,7 @@ export function useDropzone(props = {}) {
       dispatch({
         acceptedFiles,
         fileRejections,
+        isDragReject: fileRejections.length > 0,
         type: "setFiles",
       });
 
@@ -1025,6 +1026,7 @@ function reducer(state, action) {
         ...state,
         acceptedFiles: action.acceptedFiles,
         fileRejections: action.fileRejections,
+        isDragReject: action.isDragReject,
       };
     case "reset":
       return {
