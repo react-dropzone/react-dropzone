@@ -2510,7 +2510,7 @@ describe("useDropzone() hook", () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
     });
 
-    it("sets {acceptedFiles, fileRejections}", async () => {
+    it("sets {acceptedFiles, fileRejections, isDragReject}", async () => {
       const FileList = ({ files = [] }) => (
         <ul>
           {files.map((file) => (
@@ -2558,11 +2558,18 @@ describe("useDropzone() hook", () => {
             "image/*": [],
           }}
         >
-          {({ getRootProps, getInputProps, acceptedFiles, fileRejections }) => (
+          {({
+            getRootProps,
+            getInputProps,
+            acceptedFiles,
+            fileRejections,
+            isDragReject,
+          }) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <FileList files={acceptedFiles} />
               <RejectedFileList fileRejections={fileRejections} />
+              {isDragReject && "dragReject"}
             </div>
           )}
         </Dropzone>
@@ -2574,6 +2581,7 @@ describe("useDropzone() hook", () => {
       const acceptedFileList = getAcceptedFiles(dropzone);
       expect(acceptedFileList).toHaveLength(images.length);
       expect(matchToFiles(acceptedFileList, images)).toBe(true);
+      expect(dropzone).not.toHaveTextContent("dragReject");
 
       await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
 
@@ -2585,6 +2593,7 @@ describe("useDropzone() hook", () => {
       expect(matchToErrorCode(rejectedFileErrorList, "file-invalid-type")).toBe(
         true
       );
+      expect(dropzone).toHaveTextContent("dragReject");
     });
 
     it("resets {isDragActive, isDragAccept, isDragReject}", async () => {
