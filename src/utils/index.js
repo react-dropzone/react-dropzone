@@ -15,15 +15,18 @@ export const ErrorCode = {
   TooManyFiles: TOO_MANY_FILES,
 };
 
-// File Errors
-export const getInvalidTypeRejectionErr = (accept) => {
-  accept = Array.isArray(accept) && accept.length === 1 ? accept[0] : accept;
-  const messageSuffix = Array.isArray(accept)
-    ? `one of ${accept.join(", ")}`
-    : accept;
+/**
+ *
+ * @param {string} accept
+ */
+export const getInvalidTypeRejectionErr = (accept = "") => {
+  const acceptArr = accept.split(",");
+  const msg =
+    acceptArr.length > 1 ? `one of ${acceptArr.join(", ")}` : acceptArr[0];
+
   return {
     code: FILE_INVALID_TYPE,
-    message: `File type must be ${messageSuffix}`,
+    message: `File type must be ${msg}`,
   };
 };
 
@@ -50,8 +53,16 @@ export const TOO_MANY_FILES_REJECTION = {
   message: "Too many files",
 };
 
-// Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
-// that MIME type will always be accepted
+/**
+ * Check if file is accepted.
+ *
+ * Firefox versions prior to 53 return a bogus MIME type for every file drag,
+ * so dragovers with that MIME type will always be accepted.
+ *
+ * @param {File} file
+ * @param {string} accept
+ * @returns
+ */
 export function fileAccepted(file, accept) {
   const isAcceptable =
     file.type === "application/x-moz-file" || accepts(file, accept);
@@ -82,7 +93,7 @@ function isDefined(value) {
  *
  * @param {object} options
  * @param {File[]} options.files
- * @param {string|string[]} [options.accept]
+ * @param {string} [options.accept]
  * @param {number} [options.minSize]
  * @param {number} [options.maxSize]
  * @param {boolean} [options.multiple]

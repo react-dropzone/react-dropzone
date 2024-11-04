@@ -269,7 +269,7 @@ describe("fileAccepted()", () => {
 
   it("accepts file when multiple accept criteria", () => {
     const file = createFile("hamster.pdf", 100, "application/pdf");
-    expect(utils.fileAccepted(file, [".pdf", ".png"])).toEqual([true, null]);
+    expect(utils.fileAccepted(file, ".pdf,.png")).toEqual([true, null]);
   });
 
   it("rejects file when single accept criteria", () => {
@@ -282,7 +282,7 @@ describe("fileAccepted()", () => {
 
   it("rejects file when multiple accept criteria", () => {
     const file = createFile("hamster.pdf", 100, "application/pdf");
-    expect(utils.fileAccepted(file, [".gif", ".png"])).toEqual([
+    expect(utils.fileAccepted(file, ".gif,.png")).toEqual([
       false,
       {
         code: "file-invalid-type",
@@ -290,13 +290,51 @@ describe("fileAccepted()", () => {
       },
     ]);
   });
+});
 
-  it("rejects file when single accept criteria as array", () => {
-    const file = createFile("hamster.pdf", 100, "application/pdf");
-    expect(utils.fileAccepted(file, [".gif"])).toEqual([
-      false,
-      { code: "file-invalid-type", message: "File type must be .gif" },
-    ]);
+describe("getTooLargeRejectionErr()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("prints byte when maxSize is 1", () => {
+    expect(utils.getTooLargeRejectionErr(1).message).toEqual(
+      "File is larger than 1 byte"
+    );
+  });
+
+  it("prints bytes when maxSize > 1", () => {
+    expect(utils.getTooLargeRejectionErr(100).message).toEqual(
+      "File is larger than 100 bytes"
+    );
+  });
+});
+
+describe("getTooSmallRejectionErr()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("prints byte when minSize is 1", () => {
+    expect(utils.getTooSmallRejectionErr(1).message).toEqual(
+      "File is smaller than 1 byte"
+    );
+  });
+
+  it("prints bytes when minSize > 1", () => {
+    expect(utils.getTooSmallRejectionErr(100).message).toEqual(
+      "File is smaller than 100 bytes"
+    );
   });
 });
 
