@@ -339,6 +339,19 @@ Also keep in mind that the FS access API can only be used in [secure contexts](h
 
 **NOTE** You can enable using the FS access API with the `useFsAccessApi` property: `useDropzone({useFsAccessApi: true})`.
 
+### File System Access API
+
+When setting `useFsAccessApi` to `true`, you're switching to the [File System API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API) (see the [file system access](https://wicg.github.io/file-system-access/) RFC).
+
+What this essentially does is that it will use the [showOpenFilePicker](https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker) method to open the file picker window so that the user can select files.
+
+In contrast, the traditional way (when the `useFsAccessApi` is not set to `true` or not specified) uses an `<input type="file">` (see [docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file)) on which a click event is triggered.
+
+With the use of the file system access API enabled, there's a couple of caveats to keep in mind:
+1. The users will not be able to select directories
+2. It requires the app to run in a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts)
+3. In [Electron](https://www.electronjs.org/), the path may not be set (see [#1249](https://github.com/react-dropzone/react-dropzone/issues/1249))
+
 ## Supported Browsers
 We use [browserslist](https://github.com/browserslist/browserslist) config to state the browser support for this lib, so check it out on [browserslist.dev](https://browserslist.dev/?q=ZGVmYXVsdHM%3D).
 
