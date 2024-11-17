@@ -11,13 +11,15 @@
       },
       "require": {
         "types": "./typings/react-dropzone.d.ts",
-        "default" : "./dist/index.js"
+        "default": "./dist/index.js"
       }
     }
   },
   "typesVersions": {
     "*": {
-      ".": ["./typings/react-dropzone.d.ts"]
+      ".": [
+        "./typings/react-dropzone.d.ts"
+      ]
     }
   },
   "sideEffects": false,
@@ -42,7 +44,10 @@
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "typescript": "tsc --project ./typings/tests"
+    "typescript": "tsc --project ./typings/tests",
+    "docs:dev": "vitepress dev docs --port 8080",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --port 8080"
   },
   "size-limit": [
     {
@@ -152,6 +157,7 @@
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "@vitejs/plugin-react": "^4.3.3",
     "babel-jest": "^27.4.6",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-dynamic-import-node": "^2.3.3",
@@ -184,6 +190,7 @@
     "style-loader": "^3.3.1",
     "styled-components": "^5.3.3",
     "typescript": "^5.6.3",
+    "vitepress": "^1.5.0",
     "webpack": "^5.67.0",
     "webpack-blocks": "^2.1.0"
   },
