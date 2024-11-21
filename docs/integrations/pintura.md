@@ -1,17 +1,15 @@
+# Pintura
+
 If you'd like to integrate the dropzone with the [Pintura](https://pqina.nl/pintura/?ref=react-dropzone) image editor, you just need to pass either of the selected images to the `openDefaultEditor()` method exported by Pintura:
 
 ```jsx
 import React, { useState, useEffect } from 'react';
-
-// React Dropzone
 import { useDropzone } from 'react-dropzone';
-
-// Pintura Image Editor
+// Pintura image editor sources here.
 import 'pintura/pintura.css';
 import { openDefaultEditor } from 'pintura';
 
-// Based on the default React Dropzone image thumbnail example
-// The `thumbButton` style positions the edit button in the bottom right corner of the thumbnail
+// A bit of styling based on the preview example.
 const thumbsContainer = {
     display: 'flex',
     flexDirection: 'row',
@@ -52,7 +50,7 @@ const thumbButton = {
 };
 
 // This function is called when the user taps the edit button.
-// It opens the editor and returns the modified file when done
+// It opens the editor and returns the modified file when done.
 const editImage = (image, done) => {
     const imageFile = image.pintura ? image.pintura.file : image;
     const imageState = image.pintura ? image.pintura.data : {};

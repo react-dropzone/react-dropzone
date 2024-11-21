@@ -11,13 +11,15 @@
       },
       "require": {
         "types": "./typings/react-dropzone.d.ts",
-        "default" : "./dist/index.js"
+        "default": "./dist/index.js"
       }
     }
   },
   "typesVersions": {
     "*": {
-      ".": ["./typings/react-dropzone.d.ts"]
+      ".": [
+        "./typings/react-dropzone.d.ts"
+      ]
     }
   },
   "sideEffects": false,
@@ -27,8 +29,6 @@
     "build": "yarn clean && yarn build:umd && yarn build:es",
     "build:umd": "cross-env NODE_ENV=es rollup -c",
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore '**/*.spec.js'",
-    "start": "styleguidist server",
-    "styleguide": "styleguidist build",
     "test": "cross-env NODE_ENV=test yarn lint && jest --coverage && yarn typescript",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "lint": "eslint .",
@@ -42,7 +42,10 @@
     "imagemin": "imagemin --out-dir=logo --plugin=pngquant --plugin=svgo",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "typescript": "tsc --project ./typings/tests"
+    "typescript": "tsc --project ./typings/tests",
+    "docs:dev": "vitepress dev docs --port 8080",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --port 8080"
   },
   "size-limit": [
     {
@@ -135,7 +138,7 @@
     "@babel/preset-react": "^7.16.7",
     "@babel/register": "^7.16.9",
     "@commitlint/cli": "^16.1.0",
-    "@commitlint/config-angular": "^16.0.0",
+    "@commitlint/config-conventional": "^16.0.0",
     "@commitlint/prompt": "^16.1.0",
     "@commitlint/prompt-cli": "^16.1.0",
     "@rollup/plugin-babel": "^5.3.0",
@@ -152,6 +155,7 @@
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "@vitejs/plugin-react": "^4.3.3",
     "babel-jest": "^27.4.6",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-dynamic-import-node": "^2.3.3",
@@ -175,7 +179,6 @@
     "prettier": "^2.5.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-styleguidist": "^11.2.0",
     "react-test-renderer": "^18.1.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.66.1",
@@ -184,8 +187,8 @@
     "style-loader": "^3.3.1",
     "styled-components": "^5.3.3",
     "typescript": "^5.6.3",
-    "webpack": "^5.67.0",
-    "webpack-blocks": "^2.1.0"
+    "vitepress": "^1.5.0",
+    "webpack": "^5.67.0"
   },
   "typings": "typings/react-dropzone.d.ts",
   "version": "0.0.0-development",

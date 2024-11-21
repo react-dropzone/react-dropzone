@@ -1,0 +1,8 @@
+[build]
+command = "npm run docs:build"
+publish = "docs/.vitepress/dist"
+
+[[headers]]
+for = "/assets/*"
+  [headers.values]
+    cache-control = "max-age=31536000,immutable"
