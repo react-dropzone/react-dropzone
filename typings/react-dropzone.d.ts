@@ -63,7 +63,8 @@ export type DropEvent =
   | React.DragEvent<HTMLElement>
   | React.ChangeEvent<HTMLInputElement>
   | DragEvent
-  | Event;
+  | Event
+  | Array<FileSystemFileHandle>;
 
 export type DropzoneState = DropzoneRef & {
   isFocused: boolean;

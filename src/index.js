@@ -154,7 +154,7 @@ Dropzone.propTypes = {
   /**
    * Use this to provide a custom file aggregator
    *
-   * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+   * @param {(DragEvent|Event|Array<FileSystemFileHandle>)} event A drag event or input change event (if files were selected via the file dialog)
    */
   getFilesFromEvent: PropTypes.func,
 
@@ -310,7 +310,7 @@ export default Dropzone;
  * in a asynchronous fashion, from drag or input change events.
  *
  * @callback getFilesFromEvent
- * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
+ * @param {(DragEvent|Event|Array<FileSystemFileHandle>)} event A drag event or input change event (if files were selected via the file dialog)
  * @returns {(File[]|Promise<File[]>)}
  */
 
