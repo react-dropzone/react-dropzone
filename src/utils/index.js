@@ -65,7 +65,7 @@ export const TOO_MANY_FILES_REJECTION = {
  */
 export function fileAccepted(file, accept) {
   const isAcceptable =
-    file.type === "application/x-moz-file" || accepts(file, accept);
+    file.type === "application/x-moz-file" || file.type === '' || accepts(file, accept);
   return [
     isAcceptable,
     isAcceptable ? null : getInvalidTypeRejectionErr(accept),
