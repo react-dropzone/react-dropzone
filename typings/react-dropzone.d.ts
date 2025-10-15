@@ -20,7 +20,7 @@ export enum ErrorCode {
 
 export interface FileError {
   message: string;
-  code: ErrorCode | string;
+  code: ErrorCode | `${ErrorCode}` | (string & {});
 }
 
 export interface FileRejection {
