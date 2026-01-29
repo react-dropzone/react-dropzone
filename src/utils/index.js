@@ -54,10 +54,34 @@ export const TOO_MANY_FILES_REJECTION = {
 };
 
 /**
+ * Check if the given file is a DataTransferItem with an empty type.
+ *
+ * During drag events, browsers may return DataTransferItem objects instead of File objects.
+ * Some browsers (e.g., Chrome) return an empty MIME type for certain file types (like .md files)
+ * on DataTransferItem during drag events, even though the type is correctly set during drop.
+ *
+ * This function detects such cases by checking for:
+ * 1. Empty type string
+ * 2. Presence of getAsFile method (indicates it's a DataTransferItem, not a File)
+ *
+ * We accept these during drag to provide proper UI feedback, while maintaining
+ * strict validation during drop when real File objects are available.
+ *
+ * @param {File | DataTransferItem} file
+ * @returns {boolean}
+ */
+export function isDataTransferItemWithEmptyType(file) {
+  return file.type === "" && typeof file.getAsFile === "function";
+}
+
+/**
  * Check if file is accepted.
  *
  * Firefox versions prior to 53 return a bogus MIME type for every file drag,
  * so dragovers with that MIME type will always be accepted.
+ *
+ * Chrome/other browsers may return an empty MIME type for files during drag events,
+ * so we accept those as well (we'll validate properly on drop).
  *
  * @param {File} file
  * @param {string} accept
@@ -65,7 +89,9 @@ export const TOO_MANY_FILES_REJECTION = {
  */
 export function fileAccepted(file, accept) {
   const isAcceptable =
-    file.type === "application/x-moz-file" || accepts(file, accept);
+    file.type === "application/x-moz-file" ||
+    accepts(file, accept) ||
+    isDataTransferItemWithEmptyType(file);
   return [
     isAcceptable,
     isAcceptable ? null : getInvalidTypeRejectionErr(accept),
