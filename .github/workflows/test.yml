@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
       - name: Install
-        run: yarn install --pure-lockfile
+        run: yarn install --pure-lockfile --ignore-engines
       - name: Test
         run: yarn test
       - uses: coverallsapp/github-action@v1.0.1
