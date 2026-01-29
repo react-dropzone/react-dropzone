@@ -2360,6 +2360,46 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toHaveTextContent("dragReject");
     });
 
+    it("accepts files with empty type during dragenter (Chrome .md file issue)", async () => {
+      const markdownFiles = [createFile("README.md", 1234, "text/markdown")];
+
+      const { container } = render(
+        <Dropzone
+          accept={{
+            "text/markdown": [".md"],
+          }}
+        >
+          {({
+            getRootProps,
+            getInputProps,
+            isDragActive,
+            isDragAccept,
+            isDragReject,
+          }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragActive && "dragActive"}
+              {isDragAccept && "dragAccept"}
+              {isDragReject && "dragReject"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      // Simulate Chrome's behavior: during drag, .md files have empty type
+      await act(() =>
+        fireEvent.dragEnter(
+          dropzone,
+          createDtWithFiles(markdownFiles, { emptyTypes: true })
+        )
+      );
+
+      expect(dropzone).toHaveTextContent("dragActive");
+      expect(dropzone).toHaveTextContent("dragAccept");
+      expect(dropzone).not.toHaveTextContent("dragReject");
+    });
+
     it("sets {isDragActive, isDragAccept, isDragReject} if any files are rejected and {multiple} is false on dragenter", async () => {
       const { container } = render(
         <Dropzone
@@ -3581,15 +3621,18 @@ function focusWindow() {
 /**
  * createDtWithFiles creates a mock data transfer object that can be used for drop events
  * @param {File[]} files
+ * @param {object} options
+ * @param {boolean} options.emptyTypes - If true, sets item types to empty string (simulates Chrome drag behavior)
  */
-function createDtWithFiles(files = []) {
+function createDtWithFiles(files = [], options = {}) {
+  const { emptyTypes = false } = options;
   return {
     dataTransfer: {
       files,
       items: files.map((file) => ({
         kind: "file",
         size: file.size,
-        type: file.type,
+        type: emptyTypes ? "" : file.type,
         getAsFile: () => file,
       })),
       types: ["Files"],
