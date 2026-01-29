@@ -146,7 +146,6 @@
     "@rollup/plugin-node-resolve": "^13.1.3",
     "@semantic-release/changelog": "^6.0.0",
     "@semantic-release/commit-analyzer": "^12.0.0",
-    "@semantic-release/git": "^10.0.0",
     "@semantic-release/github": "^10.0.0",
     "@semantic-release/npm": "^13.1.3",
     "@semantic-release/release-notes-generator": "^14.1.0",
