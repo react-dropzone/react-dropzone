@@ -59,13 +59,18 @@ export const TOO_MANY_FILES_REJECTION = {
  * Firefox versions prior to 53 return a bogus MIME type for every file drag,
  * so dragovers with that MIME type will always be accepted.
  *
+ * Chrome/other browsers may return an empty MIME type for files during drag events,
+ * so we accept those as well (we'll validate properly on drop).
+ *
  * @param {File} file
  * @param {string} accept
  * @returns
  */
 export function fileAccepted(file, accept) {
   const isAcceptable =
-    file.type === "application/x-moz-file" || accepts(file, accept);
+    file.type === "application/x-moz-file" ||
+    accepts(file, accept) ||
+    (file.type === "" && typeof file.getAsFile === "function");
   return [
     isAcceptable,
     isAcceptable ? null : getInvalidTypeRejectionErr(accept),

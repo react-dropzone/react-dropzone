@@ -262,6 +262,31 @@ describe("fileAccepted()", () => {
     expect(utils.fileAccepted(file, ".pdf")).toEqual([true, null]);
   });
 
+  it("accepts DataTransferItem with empty type during drag (Chrome .md file issue)", () => {
+    // Simulate Chrome's DataTransferItem during drag with empty type
+    const dataTransferItem = {
+      type: "",
+      kind: "file",
+      getAsFile: () => createFile("README.md", 100, ""),
+    };
+    expect(utils.fileAccepted(dataTransferItem, "text/markdown")).toEqual([
+      true,
+      null,
+    ]);
+  });
+
+  it("rejects regular File with empty type (not DataTransferItem)", () => {
+    // Regular File objects (on drop) with empty type should still be rejected
+    const file = createFile("unknown.xyz", 100, "");
+    expect(utils.fileAccepted(file, "text/markdown")).toEqual([
+      false,
+      {
+        code: "file-invalid-type",
+        message: "File type must be text/markdown",
+      },
+    ]);
+  });
+
   it("accepts file when single accept criteria", () => {
     const file = createFile("hamster.pdf", 100, "application/pdf");
     expect(utils.fileAccepted(file, ".pdf")).toEqual([true, null]);
