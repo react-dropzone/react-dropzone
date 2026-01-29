@@ -57,6 +57,10 @@ module.exports = {
           content: "examples/styling/README.md",
         },
         {
+          name: "Drag Overlay",
+          content: "examples/drag-overlay/README.md",
+        },
+        {
           name: "Accepting specific file types",
           content: "examples/accept/README.md",
         },
