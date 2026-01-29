@@ -2716,7 +2716,9 @@ describe("useDropzone() hook", () => {
       );
       expect(dropzone).toHaveTextContent("dragGlobal");
 
-      fireEvent.dragLeave(document.body, createDtWithFiles(files));
+      await act(() =>
+        fireEvent.dragLeave(document.body, createDtWithFiles(files))
+      );
       expect(dropzone).not.toHaveTextContent("dragGlobal");
     });
 
@@ -2739,6 +2741,28 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toHaveTextContent("dragGlobal");
 
       await act(() => fireEvent.drop(document.body, createDtWithFiles(files)));
+      expect(dropzone).not.toHaveTextContent("dragGlobal");
+    });
+
+    it("sets {isDragGlobal} to false when dragend occurs on document", async () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isDragGlobal }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragGlobal && "dragGlobal"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() =>
+        fireEvent.dragEnter(document.body, createDtWithFiles(files))
+      );
+      expect(dropzone).toHaveTextContent("dragGlobal");
+
+      fireEvent.dragEnd(document.body, createDtWithFiles(files));
       expect(dropzone).not.toHaveTextContent("dragGlobal");
     });
 

@@ -551,11 +551,7 @@ export function useDropzone(props = {}) {
     const onDocumentDragLeave = (event) => {
       // Only deactivate once we've left all children
       globalDragTargetsRef.current = globalDragTargetsRef.current.filter(
-        (el) =>
-          el !== event.target &&
-          el !== null &&
-          rootRef.current &&
-          rootRef.current.contains(el)
+        (el) => el !== event.target && el !== null
       );
 
       if (globalDragTargetsRef.current.length > 0) {
