@@ -86,6 +86,7 @@ Dropzone.propTypes = {
    * @param {boolean} params.isDragActive Active drag is in progress
    * @param {boolean} params.isDragAccept Dragged files are accepted
    * @param {boolean} params.isDragReject Some dragged files are rejected
+   * @param {boolean} params.isDragGlobal Files are being dragged anywhere on the document
    * @param {File[]} params.acceptedFiles Accepted files
    * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected
    */
@@ -323,6 +324,7 @@ export default Dropzone;
  * @property {boolean} isDragActive Active drag is in progress
  * @property {boolean} isDragAccept Dragged files are accepted
  * @property {boolean} isDragReject Some dragged files are rejected
+ * @property {boolean} isDragGlobal Files are being dragged anywhere on the document
  * @property {File[]} acceptedFiles Accepted files
  * @property {FileRejection[]} fileRejections Rejected files and why they were rejected
  */
@@ -342,6 +344,7 @@ const initialState = {
   isDragActive: false,
   isDragAccept: false,
   isDragReject: false,
+  isDragGlobal: false,
   acceptedFiles: [],
   fileRejections: [],
 };
@@ -508,6 +511,7 @@ export function useDropzone(props = {}) {
   }, [inputRef, isFileDialogActive, onFileDialogCancelCb, fsAccessApiWorksRef]);
 
   const dragTargetsRef = useRef([]);
+  const globalDragTargetsRef = useRef([]);
   const onDocumentDrop = (event) => {
     if (rootRef.current && rootRef.current.contains(event.target)) {
       // If we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
@@ -530,6 +534,59 @@ export function useDropzone(props = {}) {
       }
     };
   }, [rootRef, preventDropOnDocument]);
+
+  // Track global drag state for document-level drag events
+  useEffect(() => {
+    const onDocumentDragEnter = (event) => {
+      globalDragTargetsRef.current = [
+        ...globalDragTargetsRef.current,
+        event.target,
+      ];
+
+      if (isEvtWithFiles(event)) {
+        dispatch({ isDragGlobal: true, type: "setDragGlobal" });
+      }
+    };
+
+    const onDocumentDragLeave = (event) => {
+      // Only deactivate once we've left all children
+      globalDragTargetsRef.current = globalDragTargetsRef.current.filter(
+        (el) =>
+          el !== event.target &&
+          el !== null &&
+          rootRef.current &&
+          rootRef.current.contains(el)
+      );
+
+      if (globalDragTargetsRef.current.length > 0) {
+        return;
+      }
+
+      dispatch({ isDragGlobal: false, type: "setDragGlobal" });
+    };
+
+    const onDocumentDragEnd = () => {
+      globalDragTargetsRef.current = [];
+      dispatch({ isDragGlobal: false, type: "setDragGlobal" });
+    };
+
+    const onDocumentDropGlobal = () => {
+      globalDragTargetsRef.current = [];
+      dispatch({ isDragGlobal: false, type: "setDragGlobal" });
+    };
+
+    document.addEventListener("dragenter", onDocumentDragEnter, false);
+    document.addEventListener("dragleave", onDocumentDragLeave, false);
+    document.addEventListener("dragend", onDocumentDragEnd, false);
+    document.addEventListener("drop", onDocumentDropGlobal, false);
+
+    return () => {
+      document.removeEventListener("dragenter", onDocumentDragEnter);
+      document.removeEventListener("dragleave", onDocumentDragLeave);
+      document.removeEventListener("dragend", onDocumentDragEnd);
+      document.removeEventListener("drop", onDocumentDropGlobal);
+    };
+  }, [rootRef]);
 
   // Auto focus the root when autoFocus is true
   useEffect(() => {
@@ -1027,6 +1084,11 @@ function reducer(state, action) {
         acceptedFiles: action.acceptedFiles,
         fileRejections: action.fileRejections,
         isDragReject: action.isDragReject,
+      };
+    case "setDragGlobal":
+      return {
+        ...state,
+        isDragGlobal: action.isDragGlobal,
       };
     case "reset":
       return {
