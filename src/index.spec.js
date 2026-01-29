@@ -579,13 +579,16 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
+      expect(addEventListenerSpy).toHaveBeenCalledTimes(6);
 
       const addEventCalls = collectEventListenerCalls(addEventListenerSpy);
       const events = Object.keys(addEventCalls);
 
       expect(events).toContain("dragover");
       expect(events).toContain("drop");
+      expect(events).toContain("dragenter");
+      expect(events).toContain("dragleave");
+      expect(events).toContain("dragend");
 
       events.forEach((eventName) => {
         const [fn, options] = addEventCalls[eventName];
@@ -607,7 +610,7 @@ describe("useDropzone() hook", () => {
 
       unmount();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
+      expect(removeEventListenerSpy).toHaveBeenCalledTimes(6);
 
       const addEventCalls = collectEventListenerCalls(addEventListenerSpy);
       const removeEventCalls = collectEventListenerCalls(
@@ -617,6 +620,9 @@ describe("useDropzone() hook", () => {
 
       expect(events).toContain("dragover");
       expect(events).toContain("drop");
+      expect(events).toContain("dragenter");
+      expect(events).toContain("dragleave");
+      expect(events).toContain("dragend");
 
       events.forEach((eventName) => {
         const [a] = addEventCalls[eventName];
@@ -2630,6 +2636,70 @@ describe("useDropzone() hook", () => {
       expect(dropzone).not.toHaveTextContent("dragActive");
       expect(dropzone).not.toHaveTextContent("dragAccept");
       expect(dropzone).not.toHaveTextContent("dragReject");
+    });
+
+    it("sets {isDragGlobal} to true when drag event is detected on document", async () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isDragGlobal }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragGlobal && "dragGlobal"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() =>
+        fireEvent.dragEnter(document.body, createDtWithFiles(files))
+      );
+
+      expect(dropzone).toHaveTextContent("dragGlobal");
+    });
+
+    it("sets {isDragGlobal} to false when drag leaves document", async () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isDragGlobal }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragGlobal && "dragGlobal"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() =>
+        fireEvent.dragEnter(document.body, createDtWithFiles(files))
+      );
+      expect(dropzone).toHaveTextContent("dragGlobal");
+
+      fireEvent.dragLeave(document.body, createDtWithFiles(files));
+      expect(dropzone).not.toHaveTextContent("dragGlobal");
+    });
+
+    it("sets {isDragGlobal} to false when drop occurs on document", async () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps, isDragGlobal }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragGlobal && "dragGlobal"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() =>
+        fireEvent.dragEnter(document.body, createDtWithFiles(files))
+      );
+      expect(dropzone).toHaveTextContent("dragGlobal");
+
+      await act(() => fireEvent.drop(document.body, createDtWithFiles(files)));
+      expect(dropzone).not.toHaveTextContent("dragGlobal");
     });
 
     it("rejects all files if {multiple} is false and {accept} criteria is not met", async () => {

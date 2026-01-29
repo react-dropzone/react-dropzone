@@ -71,6 +71,7 @@ export type DropzoneState = DropzoneRef & {
   isDragActive: boolean;
   isDragAccept: boolean;
   isDragReject: boolean;
+  isDragGlobal: boolean;
   isFileDialogActive: boolean;
   acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
