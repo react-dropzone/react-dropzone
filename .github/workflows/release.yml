@@ -5,8 +5,10 @@ on:
       - master
 
 permissions:
-  id-token: write  # Required for OIDC
-  contents: read
+  id-token: write  # Required for OIDC/provenance
+  contents: write  # Required for creating releases and committing CHANGELOG
+  issues: write    # Required for creating release comments
+  pull-requests: write  # Required for commenting on PRs
 
 jobs:
   release:
@@ -22,3 +24,4 @@ jobs:
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
