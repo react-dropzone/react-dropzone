@@ -30,12 +30,19 @@ export const getInvalidTypeRejectionErr = (accept = "") => {
   };
 };
 
-export const getTooLargeRejectionErr = (maxSize) => {
+export const getTooLargeRejectionErr = (maxSizeInBytes) => {
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let size = maxSizeInBytes;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+  const convertedSize = size.toFixed(2);
+  const unit = units[unitIndex];
   return {
     code: FILE_TOO_LARGE,
-    message: `File is larger than ${maxSize} ${
-      maxSize === 1 ? "byte" : "bytes"
-    }`,
+    message: `File is larger than ${convertedSize} ${unit}`,
   };
 };
 
