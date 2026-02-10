@@ -9,7 +9,6 @@
       {
         "npmPublish": true,
         "pkgRoot": ".",
-        "tarballDir": "dist",
         "provenance": true
       }
     ],
@@ -18,7 +17,7 @@
       {
         "assets": [
           {
-            "path": "dist/*.tgz",
+            "path": "*.tgz",
             "label": "Distribution"
           }
         ]
