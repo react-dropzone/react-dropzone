@@ -85,10 +85,10 @@ Dropzone.propTypes = {
    * @param {boolean} params.isFileDialogActive File dialog is opened
    * @param {boolean} params.isDragActive Active drag is in progress
    * @param {boolean} params.isDragAccept Dragged files are accepted
-   * @param {boolean} params.isDragReject Some dragged files are rejected
+   * @param {boolean} params.isDragReject True only during an active drag when some dragged files would be rejected. After drop, this resets to false. Use fileRejections for post-drop errors.
    * @param {boolean} params.isDragGlobal Files are being dragged anywhere on the document
    * @param {File[]} params.acceptedFiles Accepted files
-   * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected
+   * @param {FileRejection[]} params.fileRejections Rejected files and why they were rejected. This persists after drop and is the source of truth for post-drop rejections.
    */
   children: PropTypes.func,
 
@@ -283,7 +283,7 @@ export default Dropzone;
  *
  * @callback dropCb
  * @param {File[]} acceptedFiles List of accepted files
- * @param {FileRejection[]} fileRejections List of rejected files and why they were rejected
+ * @param {FileRejection[]} fileRejections List of rejected files and why they were rejected. This is the authoritative source for post-drop file rejections.
  * @param {(DragEvent|Event)} event A drag event or input change event (if files were selected via the file dialog)
  */
 
@@ -323,10 +323,10 @@ export default Dropzone;
  * @property {boolean} isFileDialogActive File dialog is opened
  * @property {boolean} isDragActive Active drag is in progress
  * @property {boolean} isDragAccept Dragged files are accepted
- * @property {boolean} isDragReject Some dragged files are rejected
+ * @property {boolean} isDragReject True only during an active drag when some dragged files would be rejected. After drop, this resets to false. Use fileRejections for post-drop errors.
  * @property {boolean} isDragGlobal Files are being dragged anywhere on the document
  * @property {File[]} acceptedFiles Accepted files
- * @property {FileRejection[]} fileRejections Rejected files and why they were rejected
+ * @property {FileRejection[]} fileRejections Rejected files and why they were rejected. This persists after drop and is the source of truth for post-drop rejections.
  */
 
 /**
@@ -406,6 +406,10 @@ const initialState = {
  *
  * Note that the `onDrop` callback will always be invoked regardless if the dropped files were accepted or rejected.
  * If you'd like to react to a specific scenario, use the `onDropAccepted`/`onDropRejected` props.
+ *
+ * The second parameter (fileRejections) is the authoritative list of rejected files after a drop.
+ * Use this parameter or the fileRejections state property to handle post-drop file rejections,
+ * as isDragReject only indicates rejection state during active drag operations.
  *
  * `onDrop` will provide you with an array of [File](https://developer.mozilla.org/en-US/docs/Web/API/File) objects which you can then process and send to a server.
  * For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
