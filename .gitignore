@@ -8,6 +8,7 @@ node_modules
 # Generated files
 dist
 styleguide
+*.tgz
 
 #IDE
 .idea
