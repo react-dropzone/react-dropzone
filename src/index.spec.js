@@ -2639,7 +2639,8 @@ describe("useDropzone() hook", () => {
       expect(matchToErrorCode(rejectedFileErrorList, "file-invalid-type")).toBe(
         true
       );
-      expect(dropzone).toHaveTextContent("dragReject");
+      // After drop, isDragReject should be false even if files were rejected
+      expect(dropzone).not.toHaveTextContent("dragReject");
     });
 
     it("resets {isDragActive, isDragAccept, isDragReject}", async () => {
@@ -2675,6 +2676,66 @@ describe("useDropzone() hook", () => {
 
       expect(dropzone).not.toHaveTextContent("dragActive");
       expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).not.toHaveTextContent("dragReject");
+    });
+
+    it("isDragReject is false after rejected drop and updates correctly on new drag", async () => {
+      const { container } = render(
+        <Dropzone
+          accept={{
+            "image/*": [],
+          }}
+        >
+          {({
+            getRootProps,
+            getInputProps,
+            isDragActive,
+            isDragAccept,
+            isDragReject,
+            fileRejections,
+          }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragActive && "dragActive"}
+              {isDragAccept && "dragAccept"}
+              {isDragReject && "dragReject"}
+              {fileRejections.length > 0 && "hasRejections"}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      // Drop rejected files
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      // After drop, isDragReject should be false but fileRejections should be populated
+      expect(dropzone).not.toHaveTextContent("dragActive");
+      expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).not.toHaveTextContent("dragReject");
+      expect(dropzone).toHaveTextContent("hasRejections");
+
+      // New drag with rejected files should set isDragReject to true
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles(files)));
+
+      expect(dropzone).toHaveTextContent("dragActive");
+      expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).toHaveTextContent("dragReject");
+
+      // Drag leave should reset drag state
+      await act(() => fireEvent.dragLeave(dropzone, createDtWithFiles(files)));
+
+      expect(dropzone).not.toHaveTextContent("dragActive");
+      expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).not.toHaveTextContent("dragReject");
+      // But fileRejections should still be there from the previous drop
+      expect(dropzone).toHaveTextContent("hasRejections");
+
+      // New drag with accepted files should set isDragAccept
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles(images)));
+
+      expect(dropzone).toHaveTextContent("dragActive");
+      expect(dropzone).toHaveTextContent("dragAccept");
       expect(dropzone).not.toHaveTextContent("dragReject");
     });
 
