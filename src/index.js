@@ -974,6 +974,7 @@ export function useDropzone(props = {}) {
         role: typeof role === "string" && role !== "" ? role : "presentation",
         [refKey]: rootRef,
         ...(!disabled && !noKeyboard ? { tabIndex: 0 } : {}),
+        ...(disabled ? { "aria-disabled": true } : {}),
         ...rest,
       }),
     [
