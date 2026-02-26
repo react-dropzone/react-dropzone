@@ -467,6 +467,37 @@ describe("useDropzone() hook", () => {
       expect(container.querySelector("div")).not.toHaveAttribute("tabindex");
     });
 
+    test("{aria-disabled} is true if {disabled} is true", () => {
+      const { container } = render(
+        <Dropzone disabled>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).toHaveAttribute(
+        "aria-disabled",
+        "true"
+      );
+    });
+
+    test("{aria-disabled} is not set if {disabled} is false", () => {
+      const { container } = render(
+        <Dropzone>
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).not.toHaveAttribute(
+        "aria-disabled"
+      );
+    });
+
     test("{tabindex} is not set if {noKeyboard} is true", () => {
       const { container, rerender } = render(
         <Dropzone>
