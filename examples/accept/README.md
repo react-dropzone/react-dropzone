@@ -70,41 +70,7 @@ function Accept(props) {
 
 Because of HTML5 File API differences across different browsers during the drag, Dropzone might not be able to detect whether the files are accepted or rejected in Safari nor IE.
 
-Furthermore, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, if you want to react on different file types _during_ the drag operation, _you have to use_ mime types and not extensions! For example, the following example won't work even in Chrome:
-
-```jsx harmony
-import React from 'react';
-import {useDropzone} from 'react-dropzone';
-
-function Accept(props) {
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject
-  } = useDropzone({
-    accept: {
-      'image/jpeg': ['.jpeg', '.png']
-    }
-  });
-
-  return (
-    <div className="container">
-      <div {...getRootProps({className: 'dropzone'})}>
-        <input {...getInputProps()} />
-        {isDragAccept && (<p>All files will be accepted</p>)}
-        {isDragReject && (<p>Some files will be rejected</p>)}
-        {!isDragActive && (<p>Drop some files here ...</p>)}
-      </div>
-    </div>
-  );
-}
-
-<Accept />
-```
-
-but this one will:
+Furthermore, at this moment it's not possible to read file names (and thus, file extensions) during the drag operation. For that reason, drag-time validation (`isDragAccept` / `isDragReject`) is driven by the mime type keys in `accept`, while the file extension values are only checked once the files are dropped. As long as you provide a usable mime type (a specific one such as `image/png`, or a wildcard such as `image/*`), drag-time detection will work in Chromium-based browsers:
 
 ```jsx harmony
 import React from 'react';
