@@ -1003,6 +1003,7 @@ export function useDropzone(props = {}) {
           accept: acceptAttr,
           multiple,
           type: "file",
+          "aria-label": "file upload",
           style: {
             border: 0,
             clip: "rect(0, 0, 0, 0)",
