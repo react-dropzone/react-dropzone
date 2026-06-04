@@ -315,6 +315,32 @@ describe("fileAccepted()", () => {
       },
     ]);
   });
+
+  it("rejects files that match a wildcard MIME type but not its extension list", () => {
+    const file = createFile("cats.gif", 100, "image/gif");
+
+    expect(
+      utils.fileAccepted(file, "image/*,.jpeg,.png", {
+        "image/*": [".jpeg", ".png"],
+      })
+    ).toEqual([
+      false,
+      {
+        code: "file-invalid-type",
+        message: "File type must be one of image/*, .jpeg, .png",
+      },
+    ]);
+  });
+
+  it("accepts files that match both a wildcard MIME type and its extension list", () => {
+    const file = createFile("cats.png", 100, "image/png");
+
+    expect(
+      utils.fileAccepted(file, "image/*,.jpeg,.png", {
+        "image/*": [".jpeg", ".png"],
+      })
+    ).toEqual([true, null]);
+  });
 });
 
 describe("getTooLargeRejectionErr()", () => {
@@ -505,6 +531,19 @@ describe("acceptPropAsAcceptAttr()", () => {
         "*": [".p12"], // `*` not ok
       })
     ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
+  });
+
+  it("can omit wildcard MIME types that already declare file extensions", () => {
+    expect(
+      utils.acceptPropAsAcceptAttr(
+        {
+          "image/*": [".png", ".jpg"],
+          "text/*": [],
+          "application/pdf": [".pdf"],
+        },
+        { omitWildcardMimeTypesWithExtensions: true }
+      )
+    ).toEqual(".png,.jpg,text/*,application/pdf,.pdf");
   });
 });
 

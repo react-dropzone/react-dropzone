@@ -54,6 +54,27 @@ describe("useDropzone() hook", () => {
       );
     });
 
+    it("sets only extensions on the <input> when wildcard MIME types include extensions", () => {
+      const { container } = render(
+        <Dropzone
+          accept={{
+            "image/*": [".jpeg", ".png"],
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      expect(container.querySelector("input")).toHaveAttribute(
+        "accept",
+        ".jpeg,.png"
+      );
+    });
+
     it("updates {multiple} prop on the <input> when it changes", () => {
       const { container, rerender } = render(
         <Dropzone
@@ -2641,6 +2662,51 @@ describe("useDropzone() hook", () => {
       );
       // After drop, isDragReject should be false even if files were rejected
       expect(dropzone).not.toHaveTextContent("dragReject");
+    });
+
+    it("rejects dropped files that match a wildcard MIME type but not its extension list", async () => {
+      const onDropSpy = jest.fn();
+      const acceptedImage = createFile("dogs.jpeg", 2345, "image/jpeg");
+      const rejectedImage = createFile("cats.gif", 1234, "image/gif");
+
+      const { container } = render(
+        <Dropzone
+          accept={{
+            "image/*": [".jpeg", ".png"],
+          }}
+          onDrop={onDropSpy}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() =>
+        fireEvent.drop(
+          dropzone,
+          createDtWithFiles([acceptedImage, rejectedImage])
+        )
+      );
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [acceptedImage],
+        [
+          {
+            file: rejectedImage,
+            errors: [
+              {
+                code: "file-invalid-type",
+                message: "File type must be one of image/*, .jpeg, .png",
+              },
+            ],
+          },
+        ],
+        expect.anything()
+      );
     });
 
     it("resets {isDragActive, isDragAccept, isDragReject}", async () => {

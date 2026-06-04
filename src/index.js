@@ -461,6 +461,13 @@ export function useDropzone(props = {}) {
   };
 
   const acceptAttr = useMemo(() => acceptPropAsAcceptAttr(accept), [accept]);
+  const inputAcceptAttr = useMemo(
+    () =>
+      acceptPropAsAcceptAttr(accept, {
+        omitWildcardMimeTypesWithExtensions: true,
+      }),
+    [accept]
+  );
   const pickerTypes = useMemo(() => pickerOptionsFromAccept(accept), [accept]);
 
   const onFileDialogOpenCb = useMemo(
@@ -729,7 +736,7 @@ export function useDropzone(props = {}) {
       const fileRejections = [];
 
       files.forEach((file) => {
-        const [accepted, acceptError] = fileAccepted(file, acceptAttr);
+        const [accepted, acceptError] = fileAccepted(file, acceptAttr, accept);
         const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize);
         const customErrors = validator ? validator(file) : null;
 
@@ -778,6 +785,7 @@ export function useDropzone(props = {}) {
     [
       dispatch,
       multiple,
+      accept,
       acceptAttr,
       minSize,
       maxSize,
@@ -1000,7 +1008,7 @@ export function useDropzone(props = {}) {
     () =>
       ({ refKey = "ref", onChange, onClick, ...rest } = {}) => {
         const inputProps = {
-          accept: acceptAttr,
+          accept: inputAcceptAttr,
           multiple,
           type: "file",
           style: {
@@ -1028,7 +1036,7 @@ export function useDropzone(props = {}) {
           ...rest,
         };
       },
-    [inputRef, accept, multiple, onDropCb, disabled]
+    [inputRef, inputAcceptAttr, multiple, onDropCb, disabled]
   );
 
   return {

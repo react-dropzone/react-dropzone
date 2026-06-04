@@ -1,6 +1,13 @@
 import _accepts from "attr-accept";
 
 const accepts = typeof _accepts === "function" ? _accepts : _accepts.default;
+const MIME_TYPE_WILDCARDS = [
+  "audio/*",
+  "video/*",
+  "image/*",
+  "text/*",
+  "application/*",
+];
 
 // Error codes
 export const FILE_INVALID_TYPE = "file-invalid-type";
@@ -85,17 +92,62 @@ export function isDataTransferItemWithEmptyType(file) {
  *
  * @param {File} file
  * @param {string} accept
+ * @param {AcceptProp} [acceptProp]
  * @returns
  */
-export function fileAccepted(file, accept) {
+export function fileAccepted(file, accept, acceptProp) {
   const isAcceptable =
     file.type === "application/x-moz-file" ||
-    accepts(file, accept) ||
+    (acceptProp
+      ? acceptsWithAcceptProp(file, accept, acceptProp)
+      : accepts(file, accept)) ||
     isDataTransferItemWithEmptyType(file);
   return [
     isAcceptable,
     isAcceptable ? null : getInvalidTypeRejectionErr(accept),
   ];
+}
+
+function acceptsWithAcceptProp(file, accept, acceptProp) {
+  const validAcceptEntries = Object.entries(acceptProp).filter(
+    ([mimeType, ext]) =>
+      isMIMEType(mimeType) && Array.isArray(ext) && ext.every(isExt)
+  );
+
+  if (validAcceptEntries.length === 0) {
+    return accepts(file, accept);
+  }
+
+  return validAcceptEntries.some(([mimeType, ext]) => {
+    if (isMIMETypeWildcard(mimeType) && ext.length > 0) {
+      return (
+        fileMatchesMimeType(file, mimeType) && fileMatchesExtension(file, ext)
+      );
+    }
+
+    return accepts(file, [mimeType, ...ext].join(","));
+  });
+}
+
+function fileMatchesMimeType(file, mimeType) {
+  const fileType = (file.type || "").toLowerCase();
+  const normalizedMimeType = mimeType.toLowerCase();
+
+  if (!fileType) {
+    return true;
+  }
+
+  if (isMIMETypeWildcard(normalizedMimeType)) {
+    return fileType.startsWith(normalizedMimeType.replace("*", ""));
+  }
+
+  return fileType === normalizedMimeType;
+}
+
+function fileMatchesExtension(file, extensions) {
+  const fileName = (file.name || "").toLowerCase();
+
+  return extensions.some((ext) => fileName.endsWith(ext.toLowerCase()));
 }
 
 export function fileMatchSize(file, minSize, maxSize) {
@@ -277,13 +329,27 @@ export function pickerOptionsFromAccept(accept) {
 /**
  * Convert the `{accept}` dropzone prop to an array of MIME types/extensions.
  * @param {AcceptProp} accept
+ * @param {{omitWildcardMimeTypesWithExtensions?: boolean}} [options]
  * @returns {string}
  */
-export function acceptPropAsAcceptAttr(accept) {
+export function acceptPropAsAcceptAttr(accept, options = {}) {
+  const { omitWildcardMimeTypesWithExtensions = false } = options;
+
   if (isDefined(accept)) {
     return (
       Object.entries(accept)
-        .reduce((a, [mimeType, ext]) => [...a, mimeType, ...ext], [])
+        .reduce(
+          (a, [mimeType, ext]) => [
+            ...a,
+            ...(!omitWildcardMimeTypesWithExtensions ||
+            !isMIMETypeWildcard(mimeType) ||
+            ext.length === 0
+              ? [mimeType]
+              : []),
+            ...ext,
+          ],
+          []
+        )
         // Silently discard invalid entries as pickerOptionsFromAccept warns about these
         .filter((v) => isMIMEType(v) || isExt(v))
         .join(",")
@@ -329,14 +395,11 @@ export function isSecurityError(v) {
  * @param {string} v
  */
 export function isMIMEType(v) {
-  return (
-    v === "audio/*" ||
-    v === "video/*" ||
-    v === "image/*" ||
-    v === "text/*" ||
-    v === "application/*" ||
-    /\w+\/[-+.\w]+/g.test(v)
-  );
+  return isMIMETypeWildcard(v) || /\w+\/[-+.\w]+/g.test(v);
+}
+
+function isMIMETypeWildcard(v) {
+  return MIME_TYPE_WILDCARDS.includes(v);
 }
 
 /**
