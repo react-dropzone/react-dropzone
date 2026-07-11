@@ -1,0 +1,31 @@
+import { Plugin } from '../../components/examples'
+
+# Extending the dropzone (plugins)
+
+The hook accepts a `getFilesFromEvent` prop that lets you customize how dropped file-system objects are handled — e.g. resolving a dropped folder to an array of files.
+
+The provided function must return a `Promise` with a list of `File` objects (or `DataTransferItem` of `{kind: 'file'}`). To add properties to a `File`, use [Object.defineProperty()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) so the result still passes through the internal filter:
+
+<Plugin />
+
+```tsx
+async function myCustomFileGetter(event) {
+    const files = [];
+    const fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+
+    for (let i = 0; i < fileList.length; i++) {
+        const file = fileList.item(i);
+        Object.defineProperty(file, 'myProp', { value: true });
+        files.push(file);
+    }
+
+    return files;
+}
+
+function Plugin() {
+    const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+        getFilesFromEvent: event => myCustomFileGetter(event)
+    });
+    // ...render acceptedFiles, each with f.myProp
+}
+```

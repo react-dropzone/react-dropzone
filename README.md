@@ -15,10 +15,10 @@ Documentation and examples at https://react-dropzone.js.org. Source code at http
 
 
 ## Installation
-Install it from npm and include it in your React build process (using [Webpack](http://webpack.github.io/), [Browserify](http://browserify.org/), etc).
+Install it from npm. `react-dropzone` ships as ESM and CommonJS with TypeScript types included, and works with any modern bundler ([Vite](https://vite.dev/), [webpack](https://webpack.js.org/), [Rspack](https://rspack.rs/), etc.).
 
 ```bash
-npm install --save react-dropzone
+npm install react-dropzone
 ```
 or:
 ```bash
@@ -276,7 +276,7 @@ function mockData(files) {
 
 **NOTE**: using [Enzyme](https://airbnb.io/enzyme) for testing is not supported at the moment, see [#2011](https://github.com/airbnb/enzyme/issues/2011).
 
-More examples for this can be found in `react-dropzone`'s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.js).
+More examples for this can be found in `react-dropzone`'s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.jsx).
 
 ## Caveats
 ### Required React Version

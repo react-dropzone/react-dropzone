@@ -1,0 +1,42 @@
+import { Previews } from '../../components/examples'
+
+# Previews
+
+Since version 7.0.0, `react-dropzone` no longer generates a `preview` on `File` objects. You can create previews yourself in the `onDrop()` callback:
+
+<Previews />
+
+```tsx
+function Previews() {
+    const [files, setFiles] = useState([]);
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: { 'image/*': [] },
+        onDrop: acceptedFiles => {
+            setFiles(acceptedFiles.map(file => Object.assign(file, {
+                preview: URL.createObjectURL(file)
+            })));
+        }
+    });
+
+    const thumbs = files.map(file => (
+        <div key={file.name}>
+            <img src={file.preview} onLoad={() => URL.revokeObjectURL(file.preview)} alt={file.name} />
+        </div>
+    ));
+
+    useEffect(() => {
+        // Revoke the data uris to avoid memory leaks on unmount
+        return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+    }, [files]);
+
+    return (
+        <section className="container">
+            <div {...getRootProps({ className: 'dropzone' })}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+            <aside>{thumbs}</aside>
+        </section>
+    );
+}
+```

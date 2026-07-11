@@ -1,4 +1,6 @@
+# EditorConfig helps developers define and maintain consistent coding styles between different editors and IDEs
 # http://editorconfig.org
+
 root = true
 
 [*]
@@ -11,3 +13,4 @@ insert_final_newline = true
 
 [*.md]
 trim_trailing_whitespace = false
+max_line_length = off

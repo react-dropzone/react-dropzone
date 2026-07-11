@@ -1,5 +1,5 @@
 beforeEach(() => {
-  jest.resetModules();
+  vi.resetModules();
 });
 
 describe("fileMatchSize()", () => {
@@ -119,7 +119,7 @@ describe("isKindFile()", () => {
 });
 
 describe("isPropagationStopped()", () => {
-  const trueFn = jest.fn(() => true);
+  const trueFn = vi.fn(() => true);
 
   /**
    * @constant
@@ -212,8 +212,8 @@ describe("composeEventHandlers()", () => {
   });
 
   it("runs every passed fn in order", () => {
-    const fn1 = jest.fn();
-    const fn2 = jest.fn();
+    const fn1 = vi.fn();
+    const fn2 = vi.fn();
     const fn = utils.composeEventHandlers(fn1, fn2);
     const event = { type: "click" };
     const data = { ping: true };
@@ -223,11 +223,11 @@ describe("composeEventHandlers()", () => {
   });
 
   it("stops after first fn that calls stopPropagation()", () => {
-    const fn1 = jest.fn().mockImplementation((event) => {
+    const fn1 = vi.fn().mockImplementation((event) => {
       Object.defineProperty(event, "cancelBubble", { value: true });
       return event;
     });
-    const fn2 = jest.fn();
+    const fn2 = vi.fn();
     const fn = utils.composeEventHandlers(fn1, fn2);
     const event = new MouseEvent("click");
     fn(event);
@@ -236,8 +236,8 @@ describe("composeEventHandlers()", () => {
   });
 
   it("stops before first fn if bubble is already canceled", () => {
-    const fn1 = jest.fn();
-    const fn2 = jest.fn();
+    const fn1 = vi.fn();
+    const fn2 = vi.fn();
     const fn = utils.composeEventHandlers(fn1, fn2);
     const event = new MouseEvent("click");
     Object.defineProperty(event, "cancelBubble", { value: true });
@@ -451,7 +451,7 @@ describe("canUseFileSystemAccessAPI()", () => {
 
   it("should return true if yes", () => {
     // TODO: If we use these in other tests, restore once test is done
-    window.showOpenFilePicker = jest.fn();
+    window.showOpenFilePicker = vi.fn();
     expect(utils.canUseFileSystemAccessAPI()).toBe(true);
   });
 });

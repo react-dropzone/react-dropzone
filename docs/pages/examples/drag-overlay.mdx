@@ -1,0 +1,30 @@
+import { DragOverlay } from '../../components/examples'
+
+# Drag overlay (`isDragGlobal`)
+
+The `isDragGlobal` state is `true` when files are being dragged anywhere on the document, before they reach the dropzone. This lets you show visual feedback (like a full-page overlay) to indicate where files can be dropped.
+
+<DragOverlay />
+
+```tsx
+function DragOverlay() {
+    const { getRootProps, getInputProps, isDragGlobal, isDragActive, isDragAccept, isDragReject } =
+        useDropzone({ accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.gif'] } });
+
+    return (
+        <div>
+            {isDragGlobal && !isDragActive && (
+                <div className="overlay">Drop files anywhere on this page...</div>
+            )}
+            <div {...getRootProps({ className: 'dropzone' })}>
+                <input {...getInputProps()} />
+                {isDragGlobal && !isDragActive && <p>🌐 Drag detected on page!</p>}
+                {isDragAccept && <p>✅ Drop to upload these files</p>}
+                {isDragReject && <p>❌ Some files will be rejected</p>}
+            </div>
+        </div>
+    );
+}
+```
+
+`isDragGlobal` resets to `false` when the drag leaves the document, files are dropped anywhere, or the drag is cancelled (ESC).
