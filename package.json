@@ -115,7 +115,13 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "react": ">= 16.8 || 18.0.0"
+    "react": ">= 16.8 || 18.0.0",
+    "@types/react": "*"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    }
   },
   "dependencies": {
     "attr-accept": "^2.2.4",
