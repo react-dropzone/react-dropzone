@@ -1,23 +1,28 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
 # Logs
-logs
 *.log
+npm-debug.log*
 
 # Dependency directory
 node_modules
 
-# Generated files
-dist
-styleguide
-*.tgz
-
-#IDE
-.idea
-
+# OS
 .DS_Store
 
+# Direnv
 .envrc
 
+# Build & test output
+dist
 coverage
-Changelog.md
-package-lock.json
+site
 
+# Vocs generated artifacts
+.vocs
+docs/.vocs
+docs/pages.gen.ts
+
+# Misc
+*.tgz
+.idea

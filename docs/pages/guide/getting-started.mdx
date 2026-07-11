@@ -1,0 +1,55 @@
+# Getting Started
+
+`react-dropzone` is a set of React hooks and components for creating a drag 'n' drop
+zone for files.
+
+## Installation
+
+:::code-group
+
+```bash [npm]
+npm install react-dropzone
+```
+
+```bash [pnpm]
+pnpm add react-dropzone
+```
+
+```bash [yarn]
+yarn add react-dropzone
+```
+
+:::
+
+`react-dropzone` ships as ESM and CommonJS with TypeScript types included, and lists
+`react` as a peer dependency (`>= 18`).
+
+## Usage
+
+Use the `useDropzone` hook to bind the necessary handlers to any element:
+
+```tsx
+import React from 'react';
+import { useDropzone } from 'react-dropzone';
+
+function MyDropzone() {
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop: acceptedFiles => {
+            // Do something with the files, e.g. upload to a server
+            console.log(acceptedFiles);
+        }
+    });
+
+    return (
+        <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <p>Drag 'n' drop some files here, or click to select files</p>
+        </div>
+    );
+}
+```
+
+- `getRootProps()` returns the props for the root drag 'n' drop container.
+- `getInputProps()` returns the props for the hidden `<input>` used for click/keyboard access.
+
+See the [Basic example](/examples/basic) for a live, interactive version.

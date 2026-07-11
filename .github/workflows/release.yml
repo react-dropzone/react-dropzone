@@ -5,25 +5,35 @@ on:
       - master
 
 permissions:
-  id-token: write  # Required for OIDC/provenance
-  contents: write  # Required for creating releases and committing CHANGELOG
-  issues: write    # Required for creating release comments
-  pull-requests: write  # Required for commenting on PRs
+  contents: read # for checkout
 
 jobs:
   release:
-    name: release
+    name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # to be able to publish a GitHub release
+      issues: write        # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write      # OIDC for npm trusted publishing (+ provenance)
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v7
         with:
-          fetch-depth: 0  # Required for semantic-release to determine version from commits
-      - uses: actions/setup-node@v4
+          fetch-depth: 0 # fetch all history
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
-      - run: yarn install --pure-lockfile
-      - run: yarn build
-      - run: npx semantic-release
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: npm run build
+
+      - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release@^25

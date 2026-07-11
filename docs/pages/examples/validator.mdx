@@ -1,0 +1,25 @@
+import { CustomValidation } from '../../components/examples'
+
+# Custom validation
+
+By providing the `validator` prop you can specify custom validation for files. It must return `null` if the file should be accepted, or an error object / array of error objects if it should be rejected.
+
+<CustomValidation />
+
+```tsx
+const maxLength = 20;
+
+function nameLengthValidator(file) {
+    if (file.name.length > maxLength) {
+        return { code: 'name-too-large', message: `Name is larger than ${maxLength} characters` };
+    }
+    return null;
+}
+
+function CustomValidation() {
+    const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({
+        validator: nameLengthValidator
+    });
+    // ...render accepted/rejected lists
+}
+```

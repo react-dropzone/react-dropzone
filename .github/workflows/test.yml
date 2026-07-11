@@ -4,34 +4,59 @@ on:
     branches:
       - master
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
 
 jobs:
-  test:
+  lint:
+    name: Lint, format & types
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node_version: [18, 20, 22]
 
     steps:
-      - uses: actions/checkout@master
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v1
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node_version }}
-      - name: Install
-        run: yarn install --pure-lockfile --ignore-engines
-      - name: Test
-        run: yarn test
-      - uses: coverallsapp/github-action@v1.0.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel: true
-  coverage:
-    needs: test
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check (tsc)
+        run: npm run type-check
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      - name: Check formatting (oxfmt)
+        run: npm run format:check
+
+  test:
+    name: Run tests on Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+
     steps:
-      - uses: coverallsapp/github-action@v1.0.1
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:cov
+
+      - name: Collect coverage
+        if: matrix.node-version == 24
+        uses: coverallsapp/github-action@v2
+        with:
+          file: ./coverage/lcov.info

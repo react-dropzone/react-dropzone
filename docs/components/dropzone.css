@@ -1,0 +1,46 @@
+/* Shared styles for the live example demos. Uses Vocs theme variables so the
+   dropzone matches the docs in both light and dark mode. */
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.container > em {
+    font-size: 0.85rem;
+    color: var(--vocs-color-gray10);
+}
+
+.dropzone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    border: 2px dashed var(--vocs-color-gray6);
+    border-radius: 8px;
+    background-color: var(--vocs-color-background2);
+    color: var(--vocs-color-gray10);
+    outline: none;
+    transition: border-color 0.24s ease-in-out;
+    cursor: pointer;
+}
+
+.dropzone:hover,
+.dropzone:focus {
+    border-color: var(--vocs-color-accent);
+}
+
+.dropzone.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.container aside h4 {
+    margin: 0 0 4px;
+}
+
+.container aside ul {
+    margin: 0;
+    padding-left: 20px;
+}

@@ -1,0 +1,49 @@
+import { DropzoneWithButton, RefDropzone } from '../../components/examples'
+
+# Opening the file dialog programmatically
+
+You can open the native file prompt with the `open` method returned by the hook. Most browsers require the call to originate from a direct user interaction (e.g. a click).
+
+<DropzoneWithButton />
+
+```tsx
+function DropzoneWithButton() {
+    const { getRootProps, getInputProps, open } = useDropzone({
+        noClick: true,
+        noKeyboard: true
+    });
+
+    return (
+        <div {...getRootProps({ className: 'dropzone' })}>
+            <input {...getInputProps()} />
+            <button type="button" onClick={open}>Open File Dialog</button>
+        </div>
+    );
+}
+```
+
+## Using the component ref
+
+Or use the `ref` exposed by the `<Dropzone>` component:
+
+<RefDropzone />
+
+```tsx
+import Dropzone, { DropzoneRef } from 'react-dropzone';
+
+function RefDropzone() {
+    const dropzoneRef = useRef<DropzoneRef>(null);
+    return (
+        <Dropzone ref={dropzoneRef} noClick noKeyboard>
+            {({ getRootProps, getInputProps }) => (
+                <div {...getRootProps({ className: 'dropzone' })}>
+                    <input {...getInputProps()} />
+                    <button type="button" onClick={() => dropzoneRef.current?.open()}>
+                        Open File Dialog
+                    </button>
+                </div>
+            )}
+        </Dropzone>
+    );
+}
+```
