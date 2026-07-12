@@ -14,54 +14,45 @@ describe("fileMatchSize()", () => {
 
   it("should return true if the file object doesn't have a {size} property", () => {
     expect(utils.fileMatchSize({})).toEqual([true, null]);
-    expect(utils.fileMatchSize({ size: null })).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: null})).toEqual([true, null]);
   });
 
   it("should return true if the minSize and maxSize were not provided", () => {
-    expect(utils.fileMatchSize({ size: 100 })).toEqual([true, null]);
-    expect(utils.fileMatchSize({ size: 100 }, undefined, undefined)).toEqual([
-      true,
-      null,
-    ]);
-    expect(utils.fileMatchSize({ size: 100 }, null, null)).toEqual([
-      true,
-      null,
-    ]);
+    expect(utils.fileMatchSize({size: 100})).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, undefined, undefined)).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, null, null)).toEqual([true, null]);
   });
 
   it("should return true if the file {size} is within the [minSize, maxSize] range", () => {
-    expect(utils.fileMatchSize({ size: 100 }, 10, 200)).toEqual([true, null]);
-    expect(utils.fileMatchSize({ size: 100 }, 10, 99)).toEqual([
+    expect(utils.fileMatchSize({size: 100}, 10, 200)).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, 10, 99)).toEqual([
       false,
-      { code: "file-too-large", message: "File is larger than 99 bytes" },
+      {code: "file-too-large", message: "File is larger than 99 bytes"}
     ]);
-    expect(utils.fileMatchSize({ size: 100 }, 101, 200)).toEqual([
+    expect(utils.fileMatchSize({size: 100}, 101, 200)).toEqual([
       false,
-      { code: "file-too-small", message: "File is smaller than 101 bytes" },
+      {code: "file-too-small", message: "File is smaller than 101 bytes"}
     ]);
   });
 
   it("should return true if the file {size} is more than minSize", () => {
-    expect(utils.fileMatchSize({ size: 100 }, 100)).toEqual([true, null]);
-    expect(utils.fileMatchSize({ size: 100 }, 101)).toEqual([
+    expect(utils.fileMatchSize({size: 100}, 100)).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, 101)).toEqual([
       false,
-      { code: "file-too-small", message: "File is smaller than 101 bytes" },
+      {code: "file-too-small", message: "File is smaller than 101 bytes"}
     ]);
   });
 
   it("should return true if the file {size} is less than maxSize", () => {
-    expect(utils.fileMatchSize({ size: 100 }, undefined, 100)).toEqual([
-      true,
-      null,
-    ]);
-    expect(utils.fileMatchSize({ size: 100 }, null, 100)).toEqual([true, null]);
-    expect(utils.fileMatchSize({ size: 100 }, undefined, 99)).toEqual([
+    expect(utils.fileMatchSize({size: 100}, undefined, 100)).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, null, 100)).toEqual([true, null]);
+    expect(utils.fileMatchSize({size: 100}, undefined, 99)).toEqual([
       false,
-      { code: "file-too-large", message: "File is larger than 99 bytes" },
+      {code: "file-too-large", message: "File is larger than 99 bytes"}
     ]);
-    expect(utils.fileMatchSize({ size: 100 }, null, 99)).toEqual([
+    expect(utils.fileMatchSize({size: 100}, null, 99)).toEqual([
       false,
-      { code: "file-too-large", message: "File is larger than 99 bytes" },
+      {code: "file-too-large", message: "File is larger than 99 bytes"}
     ]);
   });
 });
@@ -111,8 +102,8 @@ describe("isKindFile()", () => {
      * @type {import('./index')}
      */
     const utils = await import("./index");
-    expect(utils.isKindFile({ kind: "file" })).toBe(true);
-    expect(utils.isKindFile({ kind: "text/html" })).toBe(false);
+    expect(utils.isKindFile({kind: "file"})).toBe(true);
+    expect(utils.isKindFile({kind: "text/html"})).toBe(false);
     expect(utils.isKindFile({})).toBe(false);
     expect(utils.isKindFile(null)).toBe(false);
   });
@@ -131,13 +122,11 @@ describe("isPropagationStopped()", () => {
   });
 
   it("should return result of isPropagationStopped() if isPropagationStopped exists", () => {
-    expect(utils.isPropagationStopped({ isPropagationStopped: trueFn })).toBe(
-      true
-    );
+    expect(utils.isPropagationStopped({isPropagationStopped: trueFn})).toBe(true);
   });
 
   it("should return value of cancelBubble if isPropagationStopped doesnt exist and cancelBubble exists", () => {
-    expect(utils.isPropagationStopped({ cancelBubble: true })).toBe(true);
+    expect(utils.isPropagationStopped({cancelBubble: true})).toBe(true);
   });
 
   it("should return false if isPropagationStopped and cancelBubble are missing", () => {
@@ -156,39 +145,33 @@ describe("isEvtWithFiles()", () => {
   });
 
   it("should return true if some dragged types are files", () => {
-    expect(utils.isEvtWithFiles({ dataTransfer: { types: ["Files"] } })).toBe(
-      true
-    );
+    expect(utils.isEvtWithFiles({dataTransfer: {types: ["Files"]}})).toBe(true);
     expect(
       utils.isEvtWithFiles({
-        dataTransfer: { types: ["application/x-moz-file"] },
+        dataTransfer: {types: ["application/x-moz-file"]}
       })
     ).toBe(true);
     expect(
       utils.isEvtWithFiles({
-        dataTransfer: { types: ["Files", "application/x-moz-file"] },
+        dataTransfer: {types: ["Files", "application/x-moz-file"]}
       })
     ).toBe(true);
-    expect(
-      utils.isEvtWithFiles({ dataTransfer: { types: ["text/plain"] } })
-    ).toBe(false);
-    expect(
-      utils.isEvtWithFiles({ dataTransfer: { types: ["text/html"] } })
-    ).toBe(false);
+    expect(utils.isEvtWithFiles({dataTransfer: {types: ["text/plain"]}})).toBe(false);
+    expect(utils.isEvtWithFiles({dataTransfer: {types: ["text/html"]}})).toBe(false);
     expect(
       utils.isEvtWithFiles({
-        dataTransfer: { types: ["Files", "application/test"] },
+        dataTransfer: {types: ["Files", "application/test"]}
       })
     ).toBe(true);
     expect(
       utils.isEvtWithFiles({
-        dataTransfer: { types: ["application/x-moz-file", "application/test"] },
+        dataTransfer: {types: ["application/x-moz-file", "application/test"]}
       })
     ).toBe(true);
   });
 
   it("should return true if the event has a target with files", () => {
-    expect(utils.isEvtWithFiles({ target: { files: [] } })).toBe(true);
+    expect(utils.isEvtWithFiles({target: {files: []}})).toBe(true);
   });
 
   it("should return false otherwise", () => {
@@ -215,16 +198,16 @@ describe("composeEventHandlers()", () => {
     const fn1 = vi.fn();
     const fn2 = vi.fn();
     const fn = utils.composeEventHandlers(fn1, fn2);
-    const event = { type: "click" };
-    const data = { ping: true };
+    const event = {type: "click"};
+    const data = {ping: true};
     fn(event, data);
     expect(fn1).toHaveBeenCalledWith(event, data);
     expect(fn2).toHaveBeenCalledWith(event, data);
   });
 
   it("stops after first fn that calls stopPropagation()", () => {
-    const fn1 = vi.fn().mockImplementation((event) => {
-      Object.defineProperty(event, "cancelBubble", { value: true });
+    const fn1 = vi.fn().mockImplementation(event => {
+      Object.defineProperty(event, "cancelBubble", {value: true});
       return event;
     });
     const fn2 = vi.fn();
@@ -240,7 +223,7 @@ describe("composeEventHandlers()", () => {
     const fn2 = vi.fn();
     const fn = utils.composeEventHandlers(fn1, fn2);
     const event = new MouseEvent("click");
-    Object.defineProperty(event, "cancelBubble", { value: true });
+    Object.defineProperty(event, "cancelBubble", {value: true});
     fn(event);
     expect(fn1).not.toHaveBeenCalled();
     expect(fn2).not.toHaveBeenCalled();
@@ -267,12 +250,9 @@ describe("fileAccepted()", () => {
     const dataTransferItem = {
       type: "",
       kind: "file",
-      getAsFile: () => createFile("README.md", 100, ""),
+      getAsFile: () => createFile("README.md", 100, "")
     };
-    expect(utils.fileAccepted(dataTransferItem, "text/markdown")).toEqual([
-      true,
-      null,
-    ]);
+    expect(utils.fileAccepted(dataTransferItem, "text/markdown")).toEqual([true, null]);
   });
 
   it("rejects regular File with empty type (not DataTransferItem)", () => {
@@ -282,8 +262,8 @@ describe("fileAccepted()", () => {
       false,
       {
         code: "file-invalid-type",
-        message: "File type must be text/markdown",
-      },
+        message: "File type must be text/markdown"
+      }
     ]);
   });
 
@@ -301,7 +281,7 @@ describe("fileAccepted()", () => {
     const file = createFile("hamster.pdf", 100, "application/pdf");
     expect(utils.fileAccepted(file, ".png")).toEqual([
       false,
-      { code: "file-invalid-type", message: "File type must be .png" },
+      {code: "file-invalid-type", message: "File type must be .png"}
     ]);
   });
 
@@ -311,8 +291,8 @@ describe("fileAccepted()", () => {
       false,
       {
         code: "file-invalid-type",
-        message: "File type must be one of .gif, .png",
-      },
+        message: "File type must be one of .gif, .png"
+      }
     ]);
   });
 });
@@ -328,15 +308,11 @@ describe("getTooLargeRejectionErr()", () => {
   });
 
   it("prints byte when maxSize is 1", () => {
-    expect(utils.getTooLargeRejectionErr(1).message).toEqual(
-      "File is larger than 1 byte"
-    );
+    expect(utils.getTooLargeRejectionErr(1).message).toEqual("File is larger than 1 byte");
   });
 
   it("prints bytes when maxSize > 1", () => {
-    expect(utils.getTooLargeRejectionErr(100).message).toEqual(
-      "File is larger than 100 bytes"
-    );
+    expect(utils.getTooLargeRejectionErr(100).message).toEqual("File is larger than 100 bytes");
   });
 });
 
@@ -351,15 +327,11 @@ describe("getTooSmallRejectionErr()", () => {
   });
 
   it("prints byte when minSize is 1", () => {
-    expect(utils.getTooSmallRejectionErr(1).message).toEqual(
-      "File is smaller than 1 byte"
-    );
+    expect(utils.getTooSmallRejectionErr(1).message).toEqual("File is smaller than 1 byte");
   });
 
   it("prints bytes when minSize > 1", () => {
-    expect(utils.getTooSmallRejectionErr(100).message).toEqual(
-      "File is smaller than 100 bytes"
-    );
+    expect(utils.getTooSmallRejectionErr(100).message).toEqual("File is smaller than 100 bytes");
   });
 });
 
@@ -373,45 +345,27 @@ describe("allFilesAccepted()", () => {
     utils = await import("./index");
   });
   it("rejects file when multiple accept criteria", () => {
-    const files = [
-      createFile("hamster.pdf", 100, "application/pdf"),
-      createFile("fish.pdf", 100, "application/pdf"),
-    ];
-    const images = [
-      createFile("cats.gif", 1234, "image/gif"),
-      createFile("dogs.gif", 2345, "image/jpeg"),
-    ];
-    expect(utils.allFilesAccepted({ files, multiple: true })).toEqual(true);
-    expect(
-      utils.allFilesAccepted({ files, multiple: true, maxFiles: 10 })
-    ).toEqual(true);
-    expect(
-      utils.allFilesAccepted({ files, multiple: false, maxFiles: 10 })
-    ).toEqual(false);
-    expect(
-      utils.allFilesAccepted({ files, multiple: true, accept: "image/jpeg" })
-    ).toEqual(false);
+    const files = [createFile("hamster.pdf", 100, "application/pdf"), createFile("fish.pdf", 100, "application/pdf")];
+    const images = [createFile("cats.gif", 1234, "image/gif"), createFile("dogs.gif", 2345, "image/jpeg")];
+    expect(utils.allFilesAccepted({files, multiple: true})).toEqual(true);
+    expect(utils.allFilesAccepted({files, multiple: true, maxFiles: 10})).toEqual(true);
+    expect(utils.allFilesAccepted({files, multiple: false, maxFiles: 10})).toEqual(false);
+    expect(utils.allFilesAccepted({files, multiple: true, accept: "image/jpeg"})).toEqual(false);
     expect(
       utils.allFilesAccepted({
         files: images,
         multiple: true,
-        accept: "image/*",
+        accept: "image/*"
       })
     ).toEqual(true);
-    expect(
-      utils.allFilesAccepted({ files, multiple: true, minSize: 110 })
-    ).toEqual(false);
-    expect(
-      utils.allFilesAccepted({ files, multiple: true, maxSize: 99 })
-    ).toEqual(false);
-    expect(
-      utils.allFilesAccepted({ files, multiple: true, maxFiles: 1 })
-    ).toEqual(false);
+    expect(utils.allFilesAccepted({files, multiple: true, minSize: 110})).toEqual(false);
+    expect(utils.allFilesAccepted({files, multiple: true, maxSize: 99})).toEqual(false);
+    expect(utils.allFilesAccepted({files, multiple: true, maxFiles: 1})).toEqual(false);
 
     expect(
       utils.allFilesAccepted({
         files,
-        validator: () => ({ code: "not-allowed", message: "Cannot do this!" }),
+        validator: () => ({code: "not-allowed", message: "Cannot do this!"})
       })
     ).toEqual(false);
   });
@@ -472,16 +426,16 @@ describe("pickerOptionsFromAccept()", () => {
         "image/*": [".png", ".jpg"], // ok
         "text/*": [".txt", ".pdf"], // ok
         "audio/*": ["mp3"], // not ok
-        "*": [".p12"], // not ok
+        "*": [".p12"] // not ok
       })
     ).toEqual([
       {
         description: "Files",
         accept: {
           "image/*": [".png", ".jpg"],
-          "text/*": [".txt", ".pdf"],
-        },
-      },
+          "text/*": [".txt", ".pdf"]
+        }
+      }
     ]);
   });
 });
@@ -502,7 +456,7 @@ describe("acceptPropAsAcceptAttr()", () => {
         "image/*": [".png", ".jpg"],
         "text/*": [".txt", ".pdf"],
         "audio/*": ["mp3"], // `mp3` not ok
-        "*": [".p12"], // `*` not ok
+        "*": [".p12"] // `*` not ok
       })
     ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
   });
@@ -566,9 +520,7 @@ describe("isAbort()", () => {
     expect(utils.isAbort(new DOMException())).toBe(false);
     expect(utils.isAbort(new DOMException("some err"))).toBe(false);
     expect(utils.isAbort(new DOMException("some err", "Noop"))).toBe(false);
-    expect(utils.isAbort(new DOMException("some err", "AbortError"))).toBe(
-      true
-    );
+    expect(utils.isAbort(new DOMException("some err", "AbortError"))).toBe(true);
     const err = new DOMException("some err");
     const e = new Proxy(err, {
       get(t, p) {
@@ -576,7 +528,7 @@ describe("isAbort()", () => {
           return 20;
         }
         return t[p];
-      },
+      }
     });
     expect(utils.isAbort(e)).toBe(true);
   });
@@ -595,12 +547,8 @@ describe("isSecurityError()", () => {
   it("should work as expected", () => {
     expect(utils.isSecurityError(new DOMException())).toBe(false);
     expect(utils.isSecurityError(new DOMException("some err"))).toBe(false);
-    expect(utils.isSecurityError(new DOMException("some err", "Noop"))).toBe(
-      false
-    );
-    expect(
-      utils.isSecurityError(new DOMException("some err", "SecurityError"))
-    ).toBe(true);
+    expect(utils.isSecurityError(new DOMException("some err", "Noop"))).toBe(false);
+    expect(utils.isSecurityError(new DOMException("some err", "SecurityError"))).toBe(true);
     const err = new DOMException("some err");
     const e = new Proxy(err, {
       get(t, p) {
@@ -608,18 +556,18 @@ describe("isSecurityError()", () => {
           return 18;
         }
         return t[p];
-      },
+      }
     });
     expect(utils.isSecurityError(e)).toBe(true);
   });
 });
 
 function createFile(name, size, type) {
-  const file = new File([], name, { type });
+  const file = new File([], name, {type});
   Object.defineProperty(file, "size", {
     get() {
       return size;
-    },
+    }
   });
   return file;
 }

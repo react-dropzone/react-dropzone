@@ -29,6 +29,9 @@ jobs:
       - name: Lint (oxlint)
         run: npm run lint
 
+      - name: Type-aware lint (oxlint)
+        run: npm run lint:type-aware
+
       - name: Check formatting (oxfmt)
         run: npm run format:check
 

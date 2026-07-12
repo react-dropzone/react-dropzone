@@ -11,5 +11,5 @@
   "arrowParens": "avoid",
   "bracketSameLine": false,
   "bracketSpacing": false,
-  "ignorePatterns": []
+  "ignorePatterns": ["node_modules", "dist", "site", "coverage", "docs", "*.md", "netlify.toml", ".github"]
 }

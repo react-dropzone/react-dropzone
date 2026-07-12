@@ -2,40 +2,18 @@
   "name": "react-dropzone",
   "version": "0.0.0-development",
   "description": "Simple HTML5 drag-drop zone with React.js",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./typings/react-dropzone.d.ts",
-  "exports": {
-    ".": {
-      "types": "./typings/react-dropzone.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "sideEffects": false,
-  "files": [
-    "dist",
-    "src",
-    "typings",
-    "!src/**/*.spec.*"
-  ],
   "keywords": [
-    "react-component",
-    "react",
     "drag",
     "drop",
+    "react",
+    "react-component",
     "upload"
   ],
   "homepage": "https://github.com/react-dropzone/react-dropzone",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/react-dropzone/react-dropzone.git"
-  },
   "bugs": {
     "url": "https://github.com/react-dropzone/react-dropzone/issues"
   },
+  "license": "MIT",
   "author": "Param Aggarwal",
   "contributors": [
     "Andrey Okonetchnikov <andrey@okonet.ru> (http://okonet.ru)",
@@ -45,7 +23,28 @@
     "Rick Markins <rmarkins@gmail.com>",
     "Roland Groza <rolandjitsu@gmail.com>"
   ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/react-dropzone/react-dropzone.git"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.spec.*"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -55,12 +54,12 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit -p typings/tests/tsconfig.json",
+    "type-check": "tsc --noEmit && tsc --noEmit -p tsconfig.type-tests.json",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "lint:type-aware": "oxlint --type-aware",
-    "format": "oxfmt vitest.config.ts tsdown.config.ts vocs.config.ts",
-    "format:check": "oxfmt --check vitest.config.ts tsdown.config.ts vocs.config.ts",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
     "pretest:cov": "npm run type-check && npm run lint && npm run format:check",
     "test": "vitest",
     "test:cov": "vitest run --coverage",
@@ -68,13 +67,9 @@
     "docs:build": "vocs build",
     "docs:preview": "vocs preview"
   },
-  "peerDependencies": {
-    "react": ">= 16.8 || 18.0.0"
-  },
   "dependencies": {
     "attr-accept": "^2.2.5",
-    "file-selector": "^2.1.0",
-    "prop-types": "^15.8.1"
+    "file-selector": "^2.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
@@ -105,6 +100,9 @@
     "vitest": "^4.1.10",
     "vocs": "^2.5.3",
     "waku": "^1.0.0-beta.6"
+  },
+  "peerDependencies": {
+    "react": ">= 18"
   },
   "engines": {
     "node": ">= 20"

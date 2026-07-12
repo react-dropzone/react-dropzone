@@ -2,12 +2,12 @@ import {defineConfig} from "tsdown";
 
 export default defineConfig({
   entry: {
-    index: "./src/index.jsx"
+    index: "./src/index.tsx"
   },
   format: ["esm", "cjs"],
-  // Step 1 keeps JavaScript source, so ship the hand-written typings/react-dropzone.d.ts
-  // instead of generating declarations. Step 2 (JS -> TS) turns on oxc-based `dts`.
-  dts: false,
+  // Emit type declarations from the TS source (oxc isolatedDeclarations). Use a build-only
+  // tsconfig that excludes the spec files so no declarations are emitted for tests.
+  dts: {tsconfig: "./tsconfig.build.json"},
   target: "es2020",
   sourcemap: true,
   // With `"type": "module"`, emit ESM as `.js` and CJS as `.cjs` (matching package.json `exports`).

@@ -276,11 +276,11 @@ function mockData(files) {
 
 **NOTE**: using [Enzyme](https://airbnb.io/enzyme) for testing is not supported at the moment, see [#2011](https://github.com/airbnb/enzyme/issues/2011).
 
-More examples for this can be found in `react-dropzone`'s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.jsx).
+More examples for this can be found in `react-dropzone`'s own [test suites](https://github.com/react-dropzone/react-dropzone/blob/master/src/index.spec.tsx).
 
 ## Caveats
 ### Required React Version
-React [16.8](https://reactjs.org/blog/2019/02/06/react-v16.8.0.html) or above is required because we use [hooks](https://reactjs.org/docs/hooks-intro.html) (the lib itself is a hook).
+React [18](https://react.dev/blog/2022/03/29/react-v18) or above is required because we use [hooks](https://react.dev/reference/react/hooks) (the lib itself is a hook).
 
 ### File Paths
 Files returned by the hook or passed as arg to the `onDrop` cb won't have the properties `path` or `fullPath`.

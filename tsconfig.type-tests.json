@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Type-tests are compile-only checks that never emit declarations,
+    // so isolatedDeclarations (which the library build relies on) does not apply.
+    "isolatedDeclarations": false,
+    // Type-tests import from ../src, so widen rootDir past the library's ./src.
+    "rootDir": "."
+  },
+  "include": ["type-tests"]
+}

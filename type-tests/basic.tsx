@@ -1,14 +1,16 @@
+import type {FileWithPath} from "file-selector";
 import React from "react";
-import Dropzone from "../../";
-import { FileWithPath } from "file-selector";
+import Dropzone from "../src";
 
-export default class Basic extends React.Component {
-  state = { files: [] };
+interface State {
+  files: readonly FileWithPath[];
+}
+
+export default class Basic extends React.Component<Record<string, never>, State> {
+  state: State = {files: []};
 
   onDrop = (files: FileWithPath[]) => {
-    this.setState({
-      files,
-    });
+    this.setState({files});
   };
 
   render() {
@@ -16,13 +18,10 @@ export default class Basic extends React.Component {
       <section>
         <div className="dropzone">
           <Dropzone onDrop={this.onDrop}>
-            {({ getRootProps, getInputProps }) => (
+            {({getRootProps, getInputProps}) => (
               <div {...getRootProps()}>
                 <input {...getInputProps()} />
-                <p>
-                  Try dropping some files here, or click to select files to
-                  upload.
-                </p>
+                <p>Try dropping some files here, or click to select files to upload.</p>
               </div>
             )}
           </Dropzone>
@@ -30,7 +29,7 @@ export default class Basic extends React.Component {
         <aside>
           <h2>Dropped files</h2>
           <ul>
-            {this.state.files.map((f) => (
+            {this.state.files.map(f => (
               <li key={f.name}>
                 {f.name} - {f.size} bytes
               </li>
@@ -44,7 +43,7 @@ export default class Basic extends React.Component {
 
 export const optional = (
   <Dropzone>
-    {({ getRootProps, getInputProps }) => (
+    {({getRootProps, getInputProps}) => (
       <div {...getRootProps()}>
         <input {...getInputProps()} />
       </div>
