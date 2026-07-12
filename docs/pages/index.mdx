@@ -3,15 +3,21 @@ layout: landing
 showSidebar: false
 ---
 
-import { HomePage } from 'vocs'
+import {HomePage} from "vocs";
 
 <HomePage.Root>
-  <HomePage.Tagline>Simple HTML5 drag 'n' drop zone with React</HomePage.Tagline>
-  <HomePage.Description>A hooks-first library for building file drag-and-drop zones — with folder support, validation, and full control over your markup.</HomePage.Description>
+  <HomePage.Tagline>{"Simple HTML5 drag 'n' drop zone with React"}</HomePage.Tagline>
+  <HomePage.Description>
+    {
+      "A hooks-first library for building file drag-and-drop zones — with folder support, validation, and full control over your markup."
+    }
+  </HomePage.Description>
   <HomePage.InstallPackage name="react-dropzone" type="install" />
   <HomePage.Buttons>
-    <HomePage.Button href="/guide/getting-started" variant="accent">Get started</HomePage.Button>
-    <HomePage.Button href="/examples/basic">Examples</HomePage.Button>
-    <HomePage.Button href="https://github.com/react-dropzone/react-dropzone">GitHub</HomePage.Button>
+    <HomePage.Button href="/guide/getting-started" variant="accent">
+      {"Get started"}
+    </HomePage.Button>
+    <HomePage.Button href="/examples/basic">{"Examples"}</HomePage.Button>
+    <HomePage.Button href="https://github.com/react-dropzone/react-dropzone">{"GitHub"}</HomePage.Button>
   </HomePage.Buttons>
 </HomePage.Root>

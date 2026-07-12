@@ -1,4 +1,4 @@
-import { CustomValidation } from '../../components/examples'
+import {CustomValidation} from "../../components/examples";
 
 # Custom validation
 
@@ -10,16 +10,16 @@ By providing the `validator` prop you can specify custom validation for files. I
 const maxLength = 20;
 
 function nameLengthValidator(file) {
-    if (file.name.length > maxLength) {
-        return { code: 'name-too-large', message: `Name is larger than ${maxLength} characters` };
-    }
-    return null;
+  if (file.name.length > maxLength) {
+    return {code: "name-too-large", message: `Name is larger than ${maxLength} characters`};
+  }
+  return null;
 }
 
 function CustomValidation() {
-    const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({
-        validator: nameLengthValidator
-    });
-    // ...render accepted/rejected lists
+  const {acceptedFiles, fileRejections, getRootProps, getInputProps} = useDropzone({
+    validator: nameLengthValidator
+  });
+  // ...render accepted/rejected lists
 }
 ```

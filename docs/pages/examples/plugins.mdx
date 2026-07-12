@@ -1,4 +1,4 @@
-import { Plugin } from '../../components/examples'
+import {Plugin} from "../../components/examples";
 
 # Extending the dropzone (plugins)
 
@@ -10,22 +10,22 @@ The provided function must return a `Promise` with a list of `File` objects (or 
 
 ```tsx
 async function myCustomFileGetter(event) {
-    const files = [];
-    const fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+  const files = [];
+  const fileList = event.dataTransfer ? event.dataTransfer.files : event.target.files;
 
-    for (let i = 0; i < fileList.length; i++) {
-        const file = fileList.item(i);
-        Object.defineProperty(file, 'myProp', { value: true });
-        files.push(file);
-    }
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList.item(i);
+    Object.defineProperty(file, "myProp", {value: true});
+    files.push(file);
+  }
 
-    return files;
+  return files;
 }
 
 function Plugin() {
-    const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-        getFilesFromEvent: event => myCustomFileGetter(event)
-    });
-    // ...render acceptedFiles, each with f.myProp
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
+    getFilesFromEvent: event => myCustomFileGetter(event)
+  });
+  // ...render acceptedFiles, each with f.myProp
 }
 ```

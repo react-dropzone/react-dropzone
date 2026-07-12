@@ -1,4 +1,4 @@
-import { DropzoneWithButton, RefDropzone } from '../../components/examples'
+import {DropzoneWithButton, RefDropzone} from "../../components/examples";
 
 # Opening the file dialog programmatically
 
@@ -8,17 +8,19 @@ You can open the native file prompt with the `open` method returned by the hook.
 
 ```tsx
 function DropzoneWithButton() {
-    const { getRootProps, getInputProps, open } = useDropzone({
-        noClick: true,
-        noKeyboard: true
-    });
+  const {getRootProps, getInputProps, open} = useDropzone({
+    noClick: true,
+    noKeyboard: true
+  });
 
-    return (
-        <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} />
-            <button type="button" onClick={open}>Open File Dialog</button>
-        </div>
-    );
+  return (
+    <div {...getRootProps({className: "dropzone"})}>
+      <input {...getInputProps()} />
+      <button type="button" onClick={open}>
+        Open File Dialog
+      </button>
+    </div>
+  );
 }
 ```
 
@@ -29,21 +31,21 @@ Or use the `ref` exposed by the `<Dropzone>` component:
 <RefDropzone />
 
 ```tsx
-import Dropzone, { DropzoneRef } from 'react-dropzone';
+import Dropzone, {DropzoneRef} from "react-dropzone";
 
 function RefDropzone() {
-    const dropzoneRef = useRef<DropzoneRef>(null);
-    return (
-        <Dropzone ref={dropzoneRef} noClick noKeyboard>
-            {({ getRootProps, getInputProps }) => (
-                <div {...getRootProps({ className: 'dropzone' })}>
-                    <input {...getInputProps()} />
-                    <button type="button" onClick={() => dropzoneRef.current?.open()}>
-                        Open File Dialog
-                    </button>
-                </div>
-            )}
-        </Dropzone>
-    );
+  const dropzoneRef = useRef<DropzoneRef>(null);
+  return (
+    <Dropzone ref={dropzoneRef} noClick noKeyboard>
+      {({getRootProps, getInputProps}) => (
+        <div {...getRootProps({className: "dropzone"})}>
+          <input {...getInputProps()} />
+          <button type="button" onClick={() => dropzoneRef.current?.open()}>
+            Open File Dialog
+          </button>
+        </div>
+      )}
+    </Dropzone>
+  );
 }
 ```

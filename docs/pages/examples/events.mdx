@@ -1,4 +1,10 @@
-import { DropzoneWithoutClick, DropzoneWithoutDrag, DropzoneWithoutKeyboard, OuterDropzone, StopPropagation } from '../../components/examples'
+import {
+  DropzoneWithoutClick,
+  DropzoneWithoutDrag,
+  DropzoneWithoutKeyboard,
+  OuterDropzone,
+  StopPropagation
+} from "../../components/examples";
 
 # Event propagation
 
@@ -8,20 +14,24 @@ If you'd like to prevent drag events propagation from the child to parent, use t
 
 ```tsx
 function InnerDropzone() {
-    const { getRootProps } = useDropzone({ noDragEventsBubbling: true });
-    return <div {...getRootProps({ className: 'dropzone' })}><p>Inner dropzone</p></div>;
+  const {getRootProps} = useDropzone({noDragEventsBubbling: true});
+  return (
+    <div {...getRootProps({className: "dropzone"})}>
+      <p>Inner dropzone</p>
+    </div>
+  );
 }
 
 function OuterDropzone() {
-    const { getRootProps } = useDropzone({ onDrop: files => console.log(files) });
-    return (
-        <div className="container">
-            <div {...getRootProps({ className: 'dropzone' })}>
-                <InnerDropzone />
-                <p>Outer dropzone</p>
-            </div>
-        </div>
-    );
+  const {getRootProps} = useDropzone({onDrop: files => console.log(files)});
+  return (
+    <div className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <InnerDropzone />
+        <p>Outer dropzone</p>
+      </div>
+    </div>
+  );
 }
 ```
 
@@ -32,7 +42,7 @@ Turn off the default click behavior with `noClick`:
 <DropzoneWithoutClick />
 
 ```tsx
-const { getRootProps, getInputProps } = useDropzone({ noClick: true });
+const {getRootProps, getInputProps} = useDropzone({noClick: true});
 ```
 
 ## Disabling keyboard
@@ -42,7 +52,7 @@ Turn off SPACE/ENTER and focus handling with `noKeyboard`:
 <DropzoneWithoutKeyboard />
 
 ```tsx
-const { getRootProps, getInputProps } = useDropzone({ noKeyboard: true });
+const {getRootProps, getInputProps} = useDropzone({noKeyboard: true});
 ```
 
 ## Disabling drag
@@ -52,7 +62,7 @@ Turn off drag 'n' drop with `noDrag`:
 <DropzoneWithoutDrag />
 
 ```tsx
-const { getRootProps, getInputProps } = useDropzone({ noDrag: true });
+const {getRootProps, getInputProps} = useDropzone({noDrag: true});
 ```
 
 ## Stopping propagation yourself
@@ -63,10 +73,10 @@ If you provide your own handlers and call `event.stopPropagation()`, it prevents
 
 ```tsx
 <Dropzone onDrop={files => console.log(files)}>
-    {({ getRootProps, getInputProps }) => (
-        <div {...getRootProps({ className: 'dropzone', onDrop: event => event.stopPropagation() })}>
-            <input {...getInputProps()} />
-        </div>
-    )}
+  {({getRootProps, getInputProps}) => (
+    <div {...getRootProps({className: "dropzone", onDrop: event => event.stopPropagation()})}>
+      <input {...getInputProps()} />
+    </div>
+  )}
 </Dropzone>
 ```

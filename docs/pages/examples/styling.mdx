@@ -1,4 +1,4 @@
-import { InlineStyledDropzone, StyledComponentsDropzone } from '../../components/examples'
+import {InlineStyledDropzone, StyledComponentsDropzone} from "../../components/examples";
 
 # Styling the dropzone
 
@@ -9,29 +9,32 @@ The hook doesn't set any styles on either of the prop fns (`getRootProps()` / `g
 <InlineStyledDropzone />
 
 ```tsx
-const baseStyle = { /* ... */ };
-const focusedStyle = { borderColor: '#2196f3' };
-const acceptStyle = { borderColor: '#00e676' };
-const rejectStyle = { borderColor: '#ff1744' };
+const baseStyle = {/* ... */};
+const focusedStyle = {borderColor: "#2196f3"};
+const acceptStyle = {borderColor: "#00e676"};
+const rejectStyle = {borderColor: "#ff1744"};
 
 function StyledDropzone() {
-    const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } = useDropzone({
-        accept: { 'image/*': [] }
-    });
+  const {getRootProps, getInputProps, isFocused, isDragAccept, isDragReject} = useDropzone({
+    accept: {"image/*": []}
+  });
 
-    const style = useMemo(() => ({
-        ...baseStyle,
-        ...(isFocused ? focusedStyle : {}),
-        ...(isDragAccept ? acceptStyle : {}),
-        ...(isDragReject ? rejectStyle : {})
-    }), [isFocused, isDragAccept, isDragReject]);
+  const style = useMemo(
+    () => ({
+      ...baseStyle,
+      ...(isFocused ? focusedStyle : {}),
+      ...(isDragAccept ? acceptStyle : {}),
+      ...(isDragReject ? rejectStyle : {})
+    }),
+    [isFocused, isDragAccept, isDragReject]
+  );
 
-    return (
-        <div {...getRootProps({ style })}>
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop some files here, or click to select files</p>
-        </div>
-    );
+  return (
+    <div {...getRootProps({style})}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </div>
+  );
 }
 ```
 
@@ -40,29 +43,29 @@ function StyledDropzone() {
 <StyledComponentsDropzone />
 
 ```tsx
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const getColor = props => {
-    if (props.isDragAccept) return '#00e676';
-    if (props.isDragReject) return '#ff1744';
-    if (props.isFocused) return '#2196f3';
-    return '#eeeeee';
+  if (props.isDragAccept) return "#00e676";
+  if (props.isDragReject) return "#ff1744";
+  if (props.isFocused) return "#2196f3";
+  return "#eeeeee";
 };
 
 const Container = styled.div`
-    /* ... */
-    border-color: ${props => getColor(props)};
+  /* ... */
+  border-color: ${props => getColor(props)};
 `;
 
 function StyledDropzone() {
-    const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } = useDropzone({
-        accept: { 'image/*': [] }
-    });
-    return (
-        <Container {...getRootProps({ isFocused, isDragAccept, isDragReject })}>
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop some files here, or click to select files</p>
-        </Container>
-    );
+  const {getRootProps, getInputProps, isFocused, isDragAccept, isDragReject} = useDropzone({
+    accept: {"image/*": []}
+  });
+  return (
+    <Container {...getRootProps({isFocused, isDragAccept, isDragReject})}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </Container>
+  );
 }
 ```

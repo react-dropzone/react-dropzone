@@ -1,6 +1,6 @@
 [build]
-  command = "npm run docs:build"
-  publish = "site/public"
+command = "npm run docs:build"
+publish = "site/public"
 
 [build.environment]
-  NODE_VERSION = "22"
+NODE_VERSION = "22"
