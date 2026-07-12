@@ -1,8 +1,8 @@
-import React, { createRef } from "react";
-import { act, cleanup, fireEvent, render, renderHook } from "@testing-library/react";
-import { fromEvent } from "file-selector";
+import React, {createRef} from "react";
+import {act, cleanup, fireEvent, render, renderHook} from "@testing-library/react";
+import {fromEvent} from "file-selector";
 import * as utils from "./utils";
-import Dropzone, { useDropzone } from "./index";
+import Dropzone, {useDropzone} from "./index";
 
 describe("useDropzone() hook", () => {
   let files;
@@ -10,19 +10,16 @@ describe("useDropzone() hook", () => {
 
   beforeEach(() => {
     files = [createFile("file1.pdf", 1111, "application/pdf")];
-    images = [
-      createFile("cats.gif", 1234, "image/gif"),
-      createFile("dogs.gif", 2345, "image/jpeg"),
-    ];
+    images = [createFile("cats.gif", 1234, "image/gif"), createFile("dogs.gif", 2345, "image/jpeg")];
   });
 
   afterEach(cleanup);
 
   describe("behavior", () => {
     it("renders the root and input nodes with the necessary props", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -34,11 +31,11 @@ describe("useDropzone() hook", () => {
 
     it("sets {accept} prop on the <input>", () => {
       const accept = {
-        "image/jpeg": [],
+        "image/jpeg": []
       };
-      const { container } = render(
+      const {container} = render(
         <Dropzone accept={accept}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -46,20 +43,17 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      expect(container.querySelector("input")).toHaveAttribute(
-        "accept",
-        "image/jpeg"
-      );
+      expect(container.querySelector("input")).toHaveAttribute("accept", "image/jpeg");
     });
 
     it("updates {multiple} prop on the <input> when it changes", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone
           accept={{
-            "image/jpeg": [],
+            "image/jpeg": []
           }}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -67,18 +61,15 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      expect(container.querySelector("input")).toHaveAttribute(
-        "accept",
-        "image/jpeg"
-      );
+      expect(container.querySelector("input")).toHaveAttribute("accept", "image/jpeg");
 
       rerender(
         <Dropzone
           accept={{
-            "image/png": [],
+            "image/png": []
           }}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -86,16 +77,13 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      expect(container.querySelector("input")).toHaveAttribute(
-        "accept",
-        "image/png"
-      );
+      expect(container.querySelector("input")).toHaveAttribute("accept", "image/png");
     });
 
     it("sets {multiple} prop on the <input>", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone multiple>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -107,9 +95,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("updates {multiple} prop on the <input> when it changes", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone multiple={false}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -121,7 +109,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone multiple>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -134,11 +122,11 @@ describe("useDropzone() hook", () => {
 
     it("sets any props passed to the input props getter on the <input>", () => {
       const name = "dropzone-input";
-      const { container } = render(
+      const {container} = render(
         <Dropzone multiple>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
-              <input {...getInputProps({ name })} />
+              <input {...getInputProps({name})} />
             </div>
           )}
         </Dropzone>
@@ -149,20 +137,17 @@ describe("useDropzone() hook", () => {
 
     it("sets any props passed to the root props getter on the root node", () => {
       const ariaLabel = "Dropzone area";
-      const { container } = render(
+      const {container} = render(
         <Dropzone multiple>
-          {({ getRootProps, getInputProps }) => (
-            <div {...getRootProps({ "aria-label": ariaLabel })}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({"aria-label": ariaLabel})}>
               <input {...getInputProps()} />
             </div>
           )}
         </Dropzone>
       );
 
-      expect(container.querySelector("div")).toHaveAttribute(
-        "aria-label",
-        ariaLabel
-      );
+      expect(container.querySelector("div")).toHaveAttribute("aria-label", ariaLabel);
     });
 
     it("runs the custom callback handlers provided to the root props getter", async () => {
@@ -176,12 +161,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps(rootProps)}>
               <input {...getInputProps()} />
             </div>
@@ -218,12 +203,12 @@ describe("useDropzone() hook", () => {
     it("runs the custom callback handlers provided to the input props getter", async () => {
       const inputProps = {
         onClick: vi.fn(),
-        onChange: vi.fn(),
+        onChange: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps(inputProps)} />
             </div>
@@ -236,7 +221,7 @@ describe("useDropzone() hook", () => {
       fireEvent.click(input);
       expect(inputProps.onClick).toHaveBeenCalled();
 
-      await act(async () => fireEvent.change(input, { target: { files: [] } }));
+      await act(async () => fireEvent.change(input, {target: {files: []}}));
       expect(inputProps.onChange).toHaveBeenCalled();
     });
 
@@ -251,17 +236,17 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
       const inputProps = {
         onClick: vi.fn(),
-        onChange: vi.fn(),
+        onChange: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone disabled>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps(rootProps)}>
               <input {...getInputProps(inputProps)} />
             </div>
@@ -304,10 +289,10 @@ describe("useDropzone() hook", () => {
     });
 
     test("{rootRef, inputRef} are exposed", () => {
-      const { result } = renderHook(() => useDropzone());
-      const { rootRef, inputRef, getRootProps, getInputProps } = result.current;
+      const {result} = renderHook(() => useDropzone());
+      const {rootRef, inputRef, getRootProps, getInputProps} = result.current;
 
-      const { container } = render(
+      const {container} = render(
         <div {...getRootProps()}>
           <input {...getInputProps()} />
         </div>
@@ -323,7 +308,7 @@ describe("useDropzone() hook", () => {
 
       const ui = (
         <Dropzone ref={dropzoneRef}>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -332,7 +317,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const { rerender } = render(ui);
+      const {rerender} = render(ui);
 
       expect(dropzoneRef.current).not.toBeNull();
       expect(typeof dropzoneRef.current.open).toEqual("function");
@@ -347,12 +332,12 @@ describe("useDropzone() hook", () => {
 
     test("<Dropzone> exposes and sets the ref if using a ref fn", () => {
       let dropzoneRef;
-      const setRef = (ref) => (dropzoneRef = ref);
+      const setRef = ref => (dropzoneRef = ref);
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
       const ui = (
         <Dropzone ref={setRef}>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -361,7 +346,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const { rerender } = render(ui);
+      const {rerender} = render(ui);
 
       expect(dropzoneRef).not.toBeNull();
       expect(typeof dropzoneRef.open).toEqual("function");
@@ -376,9 +361,9 @@ describe("useDropzone() hook", () => {
     test("<Dropzone> doesn't invoke the ref fn if it hasn't changed", () => {
       const setRef = vi.fn();
 
-      const { rerender } = render(
+      const {rerender} = render(
         <Dropzone ref={setRef}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -386,19 +371,15 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      rerender(
-        <Dropzone ref={setRef}>
-          {({ getRootProps }) => <div {...getRootProps()} />}
-        </Dropzone>
-      );
+      rerender(<Dropzone ref={setRef}>{({getRootProps}) => <div {...getRootProps()} />}</Dropzone>);
 
       expect(setRef).toHaveBeenCalledTimes(1);
     });
 
     it("sets {isFocused} to false if {disabled} is true", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -414,7 +395,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone disabled>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -427,9 +408,9 @@ describe("useDropzone() hook", () => {
     });
 
     test("{tabindex} is 0 if {disabled} is false", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -440,9 +421,9 @@ describe("useDropzone() hook", () => {
     });
 
     test("{tabindex} is not set if {disabled} is true", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -454,7 +435,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone disabled>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -466,9 +447,9 @@ describe("useDropzone() hook", () => {
     });
 
     test("{tabindex} is not set if {noKeyboard} is true", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -480,7 +461,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -496,7 +477,7 @@ describe("useDropzone() hook", () => {
 
       class MyView extends React.Component {
         render() {
-          const { children, innerRef, ...rest } = this.props;
+          const {children, innerRef, ...rest} = this.props;
           return (
             <div id="dropzone" ref={innerRef} {...rest}>
               <div>{children}</div>
@@ -507,15 +488,15 @@ describe("useDropzone() hook", () => {
 
       const ui = (
         <Dropzone>
-          {({ getRootProps }) => (
-            <MyView {...getRootProps({ refKey: "innerRef" })}>
+          {({getRootProps}) => (
+            <MyView {...getRootProps({refKey: "innerRef"})}>
               <span>Drop some files here ...</span>
             </MyView>
           )}
         </Dropzone>
       );
 
-      const { container, rerender } = render(ui);
+      const {container, rerender} = render(ui);
       const dropzone = container.querySelector("#dropzone");
 
       await act(() => fireEvent.drop(dropzone, data));
@@ -527,9 +508,9 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <label {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -540,7 +521,7 @@ describe("useDropzone() hook", () => {
 
       const dropzone = container.querySelector("label");
 
-      fireEvent.click(dropzone, { bubbles: true, cancelable: true });
+      fireEvent.click(dropzone, {bubbles: true, cancelable: true});
 
       expect(activeRef.current).not.toBeNull();
       expect(dropzone).toContainElement(activeRef.current);
@@ -552,11 +533,11 @@ describe("useDropzone() hook", () => {
     const addEventListenerSpy = vi.spyOn(document, "addEventListener");
     const removeEventListenerSpy = vi.spyOn(document, "removeEventListener");
     // Collect the list of addEventListener/removeEventListener spy calls into an object keyed by event name
-    const collectEventListenerCalls = (spy) =>
+    const collectEventListenerCalls = spy =>
       spy.mock.calls.reduce(
         (acc, [eventName, ...rest]) => ({
           ...acc,
-          [eventName]: rest,
+          [eventName]: rest
         }),
         {}
       );
@@ -564,7 +545,7 @@ describe("useDropzone() hook", () => {
     it("installs hooks to prevent stray drops from taking over the browser window", () => {
       render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -583,7 +564,7 @@ describe("useDropzone() hook", () => {
       expect(events).toContain("dragleave");
       expect(events).toContain("dragend");
 
-      events.forEach((eventName) => {
+      events.forEach(eventName => {
         const [fn, options] = addEventCalls[eventName];
         expect(fn).toBeDefined();
         expect(options).toBe(false);
@@ -591,9 +572,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("removes document hooks when unmounted", () => {
-      const { unmount } = render(
+      const {unmount} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -606,9 +587,7 @@ describe("useDropzone() hook", () => {
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(6);
 
       const addEventCalls = collectEventListenerCalls(addEventListenerSpy);
-      const removeEventCalls = collectEventListenerCalls(
-        removeEventListenerSpy
-      );
+      const removeEventCalls = collectEventListenerCalls(removeEventListenerSpy);
       const events = Object.keys(removeEventCalls);
 
       expect(events).toContain("dragover");
@@ -617,7 +596,7 @@ describe("useDropzone() hook", () => {
       expect(events).toContain("dragleave");
       expect(events).toContain("dragend");
 
-      events.forEach((eventName) => {
+      events.forEach(eventName => {
         const [a] = addEventCalls[eventName];
         const [b] = removeEventCalls[eventName];
         expect(a).toEqual(b);
@@ -627,7 +606,7 @@ describe("useDropzone() hook", () => {
     it("terminates drags and drops on elements outside our dropzone", () => {
       render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -635,21 +614,21 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const dragEvt = new Event("dragover", { bubbles: true });
+      const dragEvt = new Event("dragover", {bubbles: true});
       const dragEvtPreventDefaultSpy = vi.spyOn(dragEvt, "preventDefault");
       fireEvent(document.body, dragEvt);
       expect(dragEvtPreventDefaultSpy).toHaveBeenCalled();
 
-      const dropEvt = new Event("drop", { bubbles: true });
+      const dropEvt = new Event("drop", {bubbles: true});
       const dropEvtPreventDefaultSpy = vi.spyOn(dropEvt, "preventDefault");
       fireEvent(document.body, dropEvt);
       expect(dropEvtPreventDefaultSpy).toHaveBeenCalled();
     });
 
     it("permits drags and drops on elements inside our dropzone", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -657,7 +636,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const dropEvt = new Event("drop", { bubbles: true });
+      const dropEvt = new Event("drop", {bubbles: true});
       const dropEvtPreventDefaultSpy = vi.spyOn(dropEvt, "preventDefault");
 
       fireEvent(container.querySelector("div"), dropEvt);
@@ -669,7 +648,7 @@ describe("useDropzone() hook", () => {
     it("does not prevent stray drops when {preventDropOnDocument} is false", () => {
       render(
         <Dropzone preventDropOnDocument={false}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -677,7 +656,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const dropEvt = new Event("drop", { bubbles: true });
+      const dropEvt = new Event("drop", {bubbles: true});
       const dropEvtPreventDefaultSpy = vi.spyOn(dropEvt, "preventDefault");
       fireEvent(document.body, dropEvt);
       expect(dropEvtPreventDefaultSpy).toHaveBeenCalledTimes(0);
@@ -692,12 +671,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
       const InnerDropzone = () => (
         <Dropzone {...innerProps}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="inner-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -709,12 +688,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...parentProps}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <InnerDropzone />
@@ -747,10 +726,10 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      Object.keys(innerProps).forEach((prop) =>
+      Object.keys(innerProps).forEach(prop =>
         innerProps[prop].mockImplementation((...args) => {
           const event = prop === "onDrop" ? args.pop() : args.shift();
           event.stopPropagation();
@@ -759,7 +738,7 @@ describe("useDropzone() hook", () => {
 
       const InnerDropzone = () => (
         <Dropzone {...innerProps}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="inner-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -771,12 +750,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...parentProps}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <InnerDropzone />
@@ -809,12 +788,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
       const InnerDropzone = () => (
         <Dropzone {...innerProps} noDragEventsBubbling>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="inner-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -826,12 +805,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...parentProps}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="outer-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
               <InnerDropzone />
@@ -867,7 +846,7 @@ describe("useDropzone() hook", () => {
       const innerDragLeave = vi.fn();
       const InnerDropzone = () => (
         <Dropzone onDragLeave={innerDragLeave}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="inner-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -877,9 +856,9 @@ describe("useDropzone() hook", () => {
 
       const parentDragLeave = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDragLeave={parentDragLeave}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div id="parent-dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
               <InnerDropzone />
@@ -906,18 +885,16 @@ describe("useDropzone() hook", () => {
       const data = createDtWithFiles(files);
 
       const props = {
-        getFilesFromEvent: vi
-          .fn()
-          .mockImplementation((event) => fromEvent(event)),
+        getFilesFromEvent: vi.fn().mockImplementation(event => fromEvent(event)),
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -944,24 +921,22 @@ describe("useDropzone() hook", () => {
       const data = createDtWithFiles(files);
 
       const props = {
-        getFilesFromEvent: vi
-          .fn()
-          .mockImplementation(() => Promise.reject("oops :(")),
+        getFilesFromEvent: vi.fn().mockImplementation(() => Promise.reject("oops :(")),
         onDragEnter: vi.fn(),
         onDrop: vi.fn(),
-        onError: vi.fn(),
+        onError: vi.fn()
       };
 
       const ui = (
         <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
           )}
         </Dropzone>
       );
-      const { container } = render(ui);
+      const {container} = render(ui);
       const dropzone = container.querySelector("div");
 
       await act(() => fireEvent.dragEnter(dropzone, data));
@@ -977,9 +952,9 @@ describe("useDropzone() hook", () => {
 
   describe("onFocus", () => {
     it("sets focus state", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -995,12 +970,10 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not set focus state if user stopped event propagation", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
-            <div
-              {...getRootProps({ onFocus: (event) => event.stopPropagation() })}
-            >
+          {({getRootProps, getInputProps, isFocused}) => (
+            <div {...getRootProps({onFocus: event => event.stopPropagation()})}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
             </div>
@@ -1015,9 +988,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not set focus state if {noKeyboard} is true", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1033,9 +1006,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("restores focus behavior if {noKeyboard} is set back to false", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1051,7 +1024,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noKeyboard={false}>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1065,9 +1038,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("{autoFocus} sets the focus state on render", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1083,7 +1056,7 @@ describe("useDropzone() hook", () => {
       rerender(
         /* eslint-disable-next-line jsx-a11y/no-autofocus */
         <Dropzone autoFocus>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1097,7 +1070,7 @@ describe("useDropzone() hook", () => {
       rerender(
         /* eslint-disable-next-line jsx-a11y/no-autofocus */
         <Dropzone autoFocus disabled>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1112,9 +1085,9 @@ describe("useDropzone() hook", () => {
 
   describe("onBlur", () => {
     it("unsets focus state", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1133,12 +1106,10 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not unset focus state if user stopped event propagation", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
-            <div
-              {...getRootProps({ onBlur: (event) => event.stopPropagation() })}
-            >
+          {({getRootProps, getInputProps, isFocused}) => (
+            <div {...getRootProps({onBlur: event => event.stopPropagation()})}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
             </div>
@@ -1155,9 +1126,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not unset focus state if {noKeyboard} is true", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1173,7 +1144,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1187,9 +1158,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("restores blur behavior if {noKeyboard} is set back to false", () => {
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1205,7 +1176,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1219,7 +1190,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noKeyboard={false}>
-          {({ getRootProps, getInputProps, isFocused }) => (
+          {({getRootProps, getInputProps, isFocused}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFocused && <div id="focus" />}
@@ -1253,9 +1224,9 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1274,12 +1245,10 @@ describe("useDropzone() hook", () => {
 
     it("should not not proxy the click event to the input if event propagation was stopped", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
-            <div
-              {...getRootProps({ onClick: (event) => event.stopPropagation() })}
-            >
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({onClick: event => event.stopPropagation()})}>
               <input {...getInputProps()} />
             </div>
           )}
@@ -1292,9 +1261,9 @@ describe("useDropzone() hook", () => {
 
     it("should not not proxy the click event to the input if {noClick} is true", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone noClick>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1308,9 +1277,9 @@ describe("useDropzone() hook", () => {
 
     it("restores click behavior if {noClick} is set back to false", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone noClick>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1325,7 +1294,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone noClick={false}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1341,9 +1310,9 @@ describe("useDropzone() hook", () => {
     it("should continue event propagation if {noClick} is true", () => {
       const btnClickSpy = vi.fn();
       const inputClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone noClick>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <button onClick={btnClickSpy} />
@@ -1362,14 +1331,12 @@ describe("useDropzone() hook", () => {
     it("should schedule input click on next tick in Edge", () => {
       vi.useFakeTimers();
 
-      const isIeOrEdgeSpy = vi
-        .spyOn(utils, "isIeOrEdge")
-        .mockReturnValueOnce(true);
+      const isIeOrEdgeSpy = vi.spyOn(utils, "isIeOrEdge").mockReturnValueOnce(true);
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1399,16 +1366,16 @@ describe("useDropzone() hook", () => {
       const onDropSpy = vi.fn();
       const onFileDialogOpenSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
         >
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1452,16 +1419,16 @@ describe("useDropzone() hook", () => {
       const onDropSpy = vi.fn();
       const onFileDialogOpenSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
         >
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1497,28 +1464,26 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
-      const handlers = files.map((f) => createFileSystemFileHandle(f));
+      const handlers = files.map(f => createFileSystemFileHandle(f));
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
       const onDropSpy = vi.fn();
       const onFileDialogOpenSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
           useFsAccessApi
         >
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1536,9 +1501,9 @@ describe("useDropzone() hook", () => {
         types: [
           {
             description: "Files",
-            accept: { "application/pdf": [] },
-          },
-        ],
+            accept: {"application/pdf": []}
+          }
+        ]
       });
       expect(onClickSpy).not.toHaveBeenCalled();
       expect(onFileDialogOpenSpy).toHaveBeenCalled();
@@ -1558,26 +1523,18 @@ describe("useDropzone() hook", () => {
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
 
-      const handlers = files.map((f) => createFileSystemFileHandle(f));
+      const handlers = files.map(f => createFileSystemFileHandle(f));
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
       const onDropSpy = vi.fn();
       const onFileDialogOpenSpy = vi.fn();
 
-      const { container } = render(
-        <Dropzone
-          onDrop={onDropSpy}
-          onFileDialogOpen={onFileDialogOpenSpy}
-          useFsAccessApi
-        >
-          {({ getRootProps, isFileDialogActive }) => (
-            <div {...getRootProps()}>{isFileDialogActive && active}</div>
-          )}
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} onFileDialogOpen={onFileDialogOpenSpy} useFsAccessApi>
+          {({getRootProps, isFileDialogActive}) => <div {...getRootProps()}>{isFileDialogActive && active}</div>}
         </Dropzone>
       );
 
@@ -1600,24 +1557,16 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
       const onDropSpy = vi.fn();
       const onFileDialogCancelSpy = vi.fn();
 
-      const { container } = render(
-        <Dropzone
-          onDrop={onDropSpy}
-          onFileDialogCancel={onFileDialogCancelSpy}
-          useFsAccessApi
-        >
-          {({ getRootProps, isFileDialogActive }) => (
-            <div {...getRootProps()}>{isFileDialogActive && active}</div>
-          )}
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} onFileDialogCancel={onFileDialogCancelSpy} useFsAccessApi>
+          {({getRootProps, isFileDialogActive}) => <div {...getRootProps()}>{isFileDialogActive && active}</div>}
         </Dropzone>
       );
 
@@ -1627,9 +1576,7 @@ describe("useDropzone() hook", () => {
 
       expect(showOpenFilePickerMock).toHaveBeenCalled();
 
-      await act(() =>
-        thenable.cancel(new DOMException("user aborted request", "AbortError"))
-      );
+      await act(() => thenable.cancel(new DOMException("user aborted request", "AbortError")));
 
       expect(activeRef.current).toBeNull();
       expect(dropzone).not.toContainElement(activeRef.current);
@@ -1645,17 +1592,13 @@ describe("useDropzone() hook", () => {
       const onFileDialogCancelSpy = vi.fn();
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy} useFsAccessApi>
-          {({ getRootProps, isFileDialogActive }) => (
-            <div {...getRootProps()}>{isFileDialogActive && active}</div>
-          )}
+          {({getRootProps, isFileDialogActive}) => <div {...getRootProps()}>{isFileDialogActive && active}</div>}
         </Dropzone>
       );
 
@@ -1666,9 +1609,7 @@ describe("useDropzone() hook", () => {
       expect(activeRef.current).not.toBeNull();
       expect(dropzone).toContainElement(activeRef.current);
 
-      await act(() =>
-        thenable.cancel(new DOMException("user aborted request", "AbortError"))
-      );
+      await act(() => thenable.cancel(new DOMException("user aborted request", "AbortError")));
 
       // Try to focus window and run timers
       focusWindow();
@@ -1687,26 +1628,24 @@ describe("useDropzone() hook", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
       const onDropSpy = vi.fn();
       const onFileDialogOpenSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
           useFsAccessApi
         >
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1723,11 +1662,7 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toContainElement(activeRef.current);
       expect(onFileDialogOpenSpy).toHaveBeenCalled();
 
-      await act(() =>
-        thenable.cancel(
-          new DOMException("Cannot use this API cross-origin", "SecurityError")
-        )
-      );
+      await act(() => thenable.cancel(new DOMException("Cannot use this API cross-origin", "SecurityError")));
 
       expect(activeRef.current).not.toBeNull();
       expect(dropzone).toContainElement(activeRef.current);
@@ -1742,15 +1677,13 @@ describe("useDropzone() hook", () => {
       const onFileDialogCancelSpy = vi.fn();
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy} useFsAccessApi>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1766,11 +1699,7 @@ describe("useDropzone() hook", () => {
       expect(activeRef.current).not.toBeNull();
       expect(dropzone).toContainElement(activeRef.current);
 
-      await act(() =>
-        thenable.cancel(
-          new DOMException("Cannot use this API cross-origin", "SecurityError")
-        )
-      );
+      await act(() => thenable.cancel(new DOMException("Cannot use this API cross-origin", "SecurityError")));
 
       focusWindow();
       drainPendingTimers();
@@ -1786,9 +1715,7 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
@@ -1802,12 +1729,12 @@ describe("useDropzone() hook", () => {
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
           useFsAccessApi
         >
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1816,7 +1743,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const { container } = render(ui);
+      const {container} = render(ui);
 
       const dropzone = container.querySelector("div");
 
@@ -1838,9 +1765,7 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
 
       const thenable = createThenable();
-      const showOpenFilePickerMock = vi
-        .fn()
-        .mockReturnValue(thenable.promise);
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
 
       window.showOpenFilePicker = showOpenFilePickerMock;
 
@@ -1854,18 +1779,16 @@ describe("useDropzone() hook", () => {
           onDrop={onDropSpy}
           onFileDialogOpen={onFileDialogOpenSpy}
           accept={{
-            "application/pdf": [],
+            "application/pdf": []
           }}
           multiple
           useFsAccessApi
         >
-          {({ getRootProps, isFileDialogActive }) => (
-            <div {...getRootProps()}>{isFileDialogActive && active}</div>
-          )}
+          {({getRootProps, isFileDialogActive}) => <div {...getRootProps()}>{isFileDialogActive && active}</div>}
         </Dropzone>
       );
 
-      const { container } = render(ui);
+      const {container} = render(ui);
 
       const dropzone = container.querySelector("div");
 
@@ -1888,9 +1811,9 @@ describe("useDropzone() hook", () => {
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -1902,19 +1825,19 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 13, // Enter
+        keyCode: 13 // Enter
       });
 
       fireEvent.keyDown(dropzone, {
-        key: " ", // Space
+        key: " " // Space
       });
 
       fireEvent.keyDown(dropzone, {
-        key: "Enter",
+        key: "Enter"
       });
 
       const ref = activeRef.current;
@@ -1925,9 +1848,9 @@ describe("useDropzone() hook", () => {
 
     it("does not trigger the click event on the input if the dropzone is not in focus", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1938,11 +1861,11 @@ describe("useDropzone() hook", () => {
       const input = container.querySelector("input");
 
       fireEvent.keyDown(input, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
 
       fireEvent.keyDown(input, {
-        key: " ", // Space
+        key: " " // Space
       });
 
       expect(onClickSpy).not.toHaveBeenCalled();
@@ -1950,12 +1873,12 @@ describe("useDropzone() hook", () => {
 
     it("does not trigger the click event on the input if event propagation was stopped", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div
               {...getRootProps({
-                onKeyDown: (event) => event.stopPropagation(),
+                onKeyDown: event => event.stopPropagation()
               })}
             >
               <input {...getInputProps()} />
@@ -1967,19 +1890,19 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
       fireEvent.keyDown(dropzone, {
-        key: " ", // Space
+        key: " " // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
 
     it("does not trigger the click event on the input if {noKeyboard} is true", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -1990,19 +1913,19 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
       fireEvent.keyDown(dropzone, {
-        key: " ", // Space
+        key: " " // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
 
     it("restores the keydown behavior when {noKeyboard} is set back to false", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone noKeyboard>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2013,16 +1936,16 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
       fireEvent.keyDown(dropzone, {
-        key: " ", // Space
+        key: " " // Space
       });
       expect(onClickSpy).not.toHaveBeenCalled();
 
       rerender(
         <Dropzone noKeyboard={false}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2031,19 +1954,19 @@ describe("useDropzone() hook", () => {
       );
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 32, // Space
+        keyCode: 32 // Space
       });
       fireEvent.keyDown(dropzone, {
-        key: " ", // Space
+        key: " " // Space
       });
       expect(onClickSpy).toHaveBeenCalledTimes(2);
     });
 
     it("does not trigger the click event on the input for other keys", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2054,10 +1977,10 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       fireEvent.keyDown(dropzone, {
-        keyCode: 97, // Numpad1
+        keyCode: 97 // Numpad1
       });
       fireEvent.keyDown(dropzone, {
-        key: "1",
+        key: "1"
       });
       expect(onClickSpy).not.toHaveBeenCalled();
     });
@@ -2071,12 +1994,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2107,12 +2030,12 @@ describe("useDropzone() hook", () => {
         onDragLeave: vi.fn(),
         onDrop: vi.fn(),
         onDropAccepted: vi.fn(),
-        onDropRejected: vi.fn(),
+        onDropRejected: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2133,10 +2056,7 @@ describe("useDropzone() hook", () => {
       const data = createDtWithFiles(files);
       await act(() => fireEvent.drop(dropzone, data));
       expect(props.onDrop).toHaveBeenCalled();
-      expect(props.onDropAccepted).toHaveBeenCalledWith(
-        files,
-        expect.any(Object)
-      );
+      expect(props.onDropAccepted).toHaveBeenCalledWith(files, expect.any(Object));
       expect(props.onDropRejected).not.toHaveBeenCalled();
     });
 
@@ -2144,8 +2064,8 @@ describe("useDropzone() hook", () => {
       const data = {
         dataTransfer: {
           items: [],
-          types: ["text/html", "text/plain"],
-        },
+          types: ["text/html", "text/plain"]
+        }
       };
 
       const props = {
@@ -2154,12 +2074,12 @@ describe("useDropzone() hook", () => {
         onDragLeave: vi.fn(),
         onDrop: vi.fn(),
         onDropAccepted: vi.fn(),
-        onDropRejected: vi.fn(),
+        onDropRejected: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...props}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2192,12 +2112,12 @@ describe("useDropzone() hook", () => {
         onDragLeave: vi.fn(),
         onDrop: vi.fn(),
         onDropAccepted: vi.fn(),
-        onDropRejected: vi.fn(),
+        onDropRejected: vi.fn()
       };
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone {...props} noDrag>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2228,12 +2148,12 @@ describe("useDropzone() hook", () => {
         onDragEnter: vi.fn(),
         onDragOver: vi.fn(),
         onDragLeave: vi.fn(),
-        onDrop: vi.fn(),
+        onDrop: vi.fn()
       };
 
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone {...props} noDrag>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2256,7 +2176,7 @@ describe("useDropzone() hook", () => {
 
       rerender(
         <Dropzone {...props} noDrag={false}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2278,15 +2198,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragActive} and {isDragAccept} if some files are accepted on dragenter", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2306,19 +2220,13 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragActive} and {isDragReject} of some files are not accepted on dragenter", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2330,9 +2238,7 @@ describe("useDropzone() hook", () => {
       );
       const dropzone = container.querySelector("div");
 
-      await act(() =>
-        fireEvent.dragEnter(dropzone, createDtWithFiles([...files, ...images]))
-      );
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles([...files, ...images])));
 
       expect(dropzone).toHaveTextContent("dragActive");
       expect(dropzone).not.toHaveTextContent("dragAccept");
@@ -2340,9 +2246,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragReject} if some files are too large", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone maxSize={0}>
-          {({ getRootProps, getInputProps, isDragAccept, isDragReject }) => (
+          {({getRootProps, getInputProps, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragAccept && "dragAccept"}
@@ -2362,19 +2268,13 @@ describe("useDropzone() hook", () => {
     it("accepts files with empty type during dragenter (Chrome .md file issue)", async () => {
       const markdownFiles = [createFile("README.md", 1234, "text/markdown")];
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "text/markdown": [".md"],
+            "text/markdown": [".md"]
           }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2387,12 +2287,7 @@ describe("useDropzone() hook", () => {
       const dropzone = container.querySelector("div");
 
       // Simulate Chrome's behavior: during drag, .md files have empty type
-      await act(() =>
-        fireEvent.dragEnter(
-          dropzone,
-          createDtWithFiles(markdownFiles, { emptyTypes: true })
-        )
-      );
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles(markdownFiles, {emptyTypes: true})));
 
       expect(dropzone).toHaveTextContent("dragActive");
       expect(dropzone).toHaveTextContent("dragAccept");
@@ -2400,20 +2295,14 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragActive, isDragAccept, isDragReject} if any files are rejected and {multiple} is false on dragenter", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           multiple={false}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2433,17 +2322,11 @@ describe("useDropzone() hook", () => {
     });
 
     it("keeps {isDragActive} if dragleave is triggered for some arbitrary node", async () => {
-      const { container: overlayContainer } = render(<div />);
+      const {container: overlayContainer} = render(<div />);
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2459,38 +2342,26 @@ describe("useDropzone() hook", () => {
 
       fireEvent.dragLeave(dropzone, {
         bubbles: true,
-        target: overlayContainer.querySelector("div"),
+        target: overlayContainer.querySelector("div")
       });
 
       expect(dropzone).toHaveTextContent("dragActive");
     });
 
     it("resets {isDragActive, isDragAccept, isDragReject} on dragleave", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
               {isDragAccept && "dragAccept"}
               {isDragReject && "dragReject"}
-              {!isDragActive && (
-                <span
-                  id="child"
-                  data-accept={isDragAccept}
-                  data-reject={isDragReject}
-                />
-              )}
+              {!isDragActive && <span id="child" data-accept={isDragAccept} data-reject={isDragReject} />}
             </div>
           )}
         </Dropzone>
@@ -2499,9 +2370,7 @@ describe("useDropzone() hook", () => {
 
       const data = createDtWithFiles(images);
 
-      await act(() =>
-        fireEvent.dragEnter(container.querySelector("#child"), data)
-      );
+      await act(() => fireEvent.dragEnter(container.querySelector("#child"), data));
       await act(() => fireEvent.dragEnter(dropzone, data));
 
       await act(() => fireEvent.dragEnter(dropzone, data));
@@ -2530,9 +2399,9 @@ describe("useDropzone() hook", () => {
     test("callback is invoked when <input> change event occurs", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDrop={onDropSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2542,7 +2411,7 @@ describe("useDropzone() hook", () => {
 
       await act(async () =>
         fireEvent.change(container.querySelector("input"), {
-          target: { files },
+          target: {files}
         })
       );
 
@@ -2550,9 +2419,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {acceptedFiles, fileRejections, isDragReject}", async () => {
-      const FileList = ({ files = [] }) => (
+      const FileList = ({files = []}) => (
         <ul>
-          {files.map((file) => (
+          {files.map(file => (
             <li key={file.name} data-type={"accepted"}>
               {file.name}
             </li>
@@ -2560,13 +2429,13 @@ describe("useDropzone() hook", () => {
         </ul>
       );
 
-      const RejectedFileList = ({ fileRejections = [] }) => (
+      const RejectedFileList = ({fileRejections = []}) => (
         <ul>
-          {fileRejections.map(({ file, errors }) => (
+          {fileRejections.map(({file, errors}) => (
             <li key={file.name}>
               <span data-type={"rejected"}>{file.name}</span>
               <ul>
-                {errors.map((e) => (
+                {errors.map(e => (
                   <li key={e.code} data-type={"error"}>
                     {e.code}
                   </li>
@@ -2577,33 +2446,21 @@ describe("useDropzone() hook", () => {
         </ul>
       );
 
-      const getAcceptedFiles = (node) =>
-        node.querySelectorAll(`[data-type="accepted"]`);
-      const getRejectedFiles = (node) =>
-        node.querySelectorAll(`[data-type="rejected"]`);
-      const getRejectedFilesErrors = (node) =>
-        node.querySelectorAll(`[data-type="error"]`);
+      const getAcceptedFiles = node => node.querySelectorAll(`[data-type="accepted"]`);
+      const getRejectedFiles = node => node.querySelectorAll(`[data-type="rejected"]`);
+      const getRejectedFilesErrors = node => node.querySelectorAll(`[data-type="error"]`);
 
       const matchToFiles = (fileList, files) =>
-        Array.from(fileList).every(
-          (item) => !!files.find((file) => file.name === item.textContent)
-        );
-      const matchToErrorCode = (errorList, code) =>
-        Array.from(errorList).every((item) => item.textContent === code);
+        Array.from(fileList).every(item => !!files.find(file => file.name === item.textContent));
+      const matchToErrorCode = (errorList, code) => Array.from(errorList).every(item => item.textContent === code);
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            acceptedFiles,
-            fileRejections,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, acceptedFiles, fileRejections, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <FileList files={acceptedFiles} />
@@ -2629,23 +2486,15 @@ describe("useDropzone() hook", () => {
       expect(matchToFiles(rejectedFileList, files)).toBe(true);
       const rejectedFileErrorList = getRejectedFilesErrors(dropzone);
       expect(rejectedFileErrorList).toHaveLength(files.length);
-      expect(matchToErrorCode(rejectedFileErrorList, "file-invalid-type")).toBe(
-        true
-      );
+      expect(matchToErrorCode(rejectedFileErrorList, "file-invalid-type")).toBe(true);
       // After drop, isDragReject should be false even if files were rejected
       expect(dropzone).not.toHaveTextContent("dragReject");
     });
 
     it("resets {isDragActive, isDragAccept, isDragReject}", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2673,20 +2522,13 @@ describe("useDropzone() hook", () => {
     });
 
     it("isDragReject is false after rejected drop and updates correctly on new drag", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
         >
-          {({
-            getRootProps,
-            getInputProps,
-            isDragActive,
-            isDragAccept,
-            isDragReject,
-            fileRejections,
-          }) => (
+          {({getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, fileRejections}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragActive && "dragActive"}
@@ -2733,9 +2575,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragGlobal} to true when drag event is detected on document", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isDragGlobal }) => (
+          {({getRootProps, getInputProps, isDragGlobal}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragGlobal && "dragGlobal"}
@@ -2745,17 +2587,15 @@ describe("useDropzone() hook", () => {
       );
       const dropzone = container.querySelector("div");
 
-      await act(() =>
-        fireEvent.dragEnter(document.body, createDtWithFiles(files))
-      );
+      await act(() => fireEvent.dragEnter(document.body, createDtWithFiles(files)));
 
       expect(dropzone).toHaveTextContent("dragGlobal");
     });
 
     it("sets {isDragGlobal} to false when drag leaves document", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isDragGlobal }) => (
+          {({getRootProps, getInputProps, isDragGlobal}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragGlobal && "dragGlobal"}
@@ -2765,21 +2605,17 @@ describe("useDropzone() hook", () => {
       );
       const dropzone = container.querySelector("div");
 
-      await act(() =>
-        fireEvent.dragEnter(document.body, createDtWithFiles(files))
-      );
+      await act(() => fireEvent.dragEnter(document.body, createDtWithFiles(files)));
       expect(dropzone).toHaveTextContent("dragGlobal");
 
-      await act(() =>
-        fireEvent.dragLeave(document.body, createDtWithFiles(files))
-      );
+      await act(() => fireEvent.dragLeave(document.body, createDtWithFiles(files)));
       expect(dropzone).not.toHaveTextContent("dragGlobal");
     });
 
     it("sets {isDragGlobal} to false when drop occurs on document", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isDragGlobal }) => (
+          {({getRootProps, getInputProps, isDragGlobal}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragGlobal && "dragGlobal"}
@@ -2789,9 +2625,7 @@ describe("useDropzone() hook", () => {
       );
       const dropzone = container.querySelector("div");
 
-      await act(() =>
-        fireEvent.dragEnter(document.body, createDtWithFiles(files))
-      );
+      await act(() => fireEvent.dragEnter(document.body, createDtWithFiles(files)));
       expect(dropzone).toHaveTextContent("dragGlobal");
 
       await act(() => fireEvent.drop(document.body, createDtWithFiles(files)));
@@ -2799,9 +2633,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("sets {isDragGlobal} to false when dragend occurs on document", async () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isDragGlobal }) => (
+          {({getRootProps, getInputProps, isDragGlobal}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragGlobal && "dragGlobal"}
@@ -2811,9 +2645,7 @@ describe("useDropzone() hook", () => {
       );
       const dropzone = container.querySelector("div");
 
-      await act(() =>
-        fireEvent.dragEnter(document.body, createDtWithFiles(files))
-      );
+      await act(() => fireEvent.dragEnter(document.body, createDtWithFiles(files)));
       expect(dropzone).toHaveTextContent("dragGlobal");
 
       fireEvent.dragEnd(document.body, createDtWithFiles(files));
@@ -2823,15 +2655,15 @@ describe("useDropzone() hook", () => {
     it("rejects all files if {multiple} is false and {accept} criteria is not met", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           multiple={false}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2850,10 +2682,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-invalid-type",
-                message: "File type must be image/*",
-              },
-            ],
-          },
+                message: "File type must be image/*"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -2862,15 +2694,15 @@ describe("useDropzone() hook", () => {
     it("rejects all files if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           multiple={false}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -2889,19 +2721,19 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "too-many-files",
-                message: "Too many files",
-              },
-            ],
+                message: "Too many files"
+              }
+            ]
           },
           {
             file: images[1],
             errors: [
               {
                 code: "too-many-files",
-                message: "Too many files",
-              },
-            ],
-          },
+                message: "Too many files"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -2911,17 +2743,17 @@ describe("useDropzone() hook", () => {
       const onDropSpy = vi.fn();
       const onDropRejectedSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           onDropRejected={onDropRejectedSpy}
           multiple={true}
           maxFiles={1}
         >
-          {({ getRootProps, getInputProps, isDragReject, isDragAccept }) => (
+          {({getRootProps, getInputProps, isDragReject, isDragAccept}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragReject && "dragReject"}
@@ -2948,19 +2780,19 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "too-many-files",
-                message: "Too many files",
-              },
-            ],
+                message: "Too many files"
+              }
+            ]
           },
           {
             file: images[1],
             errors: [
               {
                 code: "too-many-files",
-                message: "Too many files",
-              },
-            ],
-          },
+                message: "Too many files"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -2969,24 +2801,24 @@ describe("useDropzone() hook", () => {
     it("rejects all files if {multiple} is true and maxFiles has been updated so that it is less than files", async () => {
       const onDropSpy = vi.fn();
       const onDropRejectedSpy = vi.fn();
-      const ui = (maxFiles) => (
+      const ui = maxFiles => (
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           multiple={true}
           maxFiles={maxFiles}
           onDropRejected={onDropRejectedSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
           )}
         </Dropzone>
       );
-      const { container, rerender } = render(ui(3));
+      const {container, rerender} = render(ui(3));
       const dropzone = container.querySelector("div");
 
       await act(() => fireEvent.drop(dropzone, createDtWithFiles(images)));
@@ -3001,11 +2833,7 @@ describe("useDropzone() hook", () => {
       rerender(ui(1));
 
       expect(onDropRejectedSpy).toHaveBeenCalledWith(
-        expect.arrayContaining(
-          images.map((image) =>
-            expect.objectContaining({ errors: expect.any(Array), file: image })
-          )
-        ),
+        expect.arrayContaining(images.map(image => expect.objectContaining({errors: expect.any(Array), file: image}))),
         expect.anything()
       );
     });
@@ -3014,17 +2842,17 @@ describe("useDropzone() hook", () => {
       const onDropSpy = vi.fn();
       const onDropRejectedSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           multiple={true}
           maxFiles={3}
           onDropRejected={onDropRejectedSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3032,12 +2860,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      await act(() =>
-        fireEvent.drop(
-          container.querySelector("div"),
-          createDtWithFiles(images)
-        )
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
 
       expect(onDropRejectedSpy).not.toHaveBeenCalled();
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
@@ -3046,15 +2869,15 @@ describe("useDropzone() hook", () => {
     it("accepts a single files if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
           multiple={false}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3063,12 +2886,7 @@ describe("useDropzone() hook", () => {
       );
 
       const [image] = images;
-      await act(() =>
-        fireEvent.drop(
-          container.querySelector("div"),
-          createDtWithFiles([image])
-        )
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles([image])));
 
       expect(onDropSpy).toHaveBeenCalledWith([image], [], expect.anything());
     });
@@ -3076,9 +2894,9 @@ describe("useDropzone() hook", () => {
     it("accepts all files if {multiple} is true", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDrop={onDropSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3086,9 +2904,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      await act(() =>
-        fireEvent.drop(container.querySelector("div"), createDtWithFiles(files))
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(files)));
 
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
     });
@@ -3098,9 +2914,9 @@ describe("useDropzone() hook", () => {
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDrop={onDropSpy}>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -3125,14 +2941,14 @@ describe("useDropzone() hook", () => {
     it("gets invoked with both accepted/rejected files", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3151,10 +2967,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-invalid-type",
-                message: "File type must be image/*",
-              },
-            ],
-          },
+                message: "File type must be image/*"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3165,9 +2981,7 @@ describe("useDropzone() hook", () => {
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
       onDropSpy.mockClear();
 
-      await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
-      );
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])));
 
       expect(onDropSpy).toHaveBeenCalledWith(
         images,
@@ -3177,10 +2991,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-invalid-type",
-                message: "File type must be image/*",
-              },
-            ],
-          },
+                message: "File type must be image/*"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3189,14 +3003,14 @@ describe("useDropzone() hook", () => {
     test("onDropAccepted callback is invoked if some files are accepted", async () => {
       const onDropAcceptedSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDropAccepted={onDropAcceptedSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3214,9 +3028,7 @@ describe("useDropzone() hook", () => {
       expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything());
       onDropAcceptedSpy.mockClear();
 
-      await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
-      );
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])));
 
       expect(onDropAcceptedSpy).toHaveBeenCalledWith(images, expect.anything());
     });
@@ -3224,14 +3036,14 @@ describe("useDropzone() hook", () => {
     test("onDropRejected callback is invoked if some files are rejected", async () => {
       const onDropRejectedSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDropRejected={onDropRejectedSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3249,10 +3061,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-invalid-type",
-                message: "File type must be image/*",
-              },
-            ],
-          },
+                message: "File type must be image/*"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3263,9 +3075,7 @@ describe("useDropzone() hook", () => {
       expect(onDropRejectedSpy).not.toHaveBeenCalled();
       onDropRejectedSpy.mockClear();
 
-      await act(() =>
-        fireEvent.drop(dropzone, createDtWithFiles([...files, ...images]))
-      );
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles([...files, ...images])));
 
       expect(onDropRejectedSpy).toHaveBeenCalledWith(
         [
@@ -3274,10 +3084,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-invalid-type",
-                message: "File type must be image/*",
-              },
-            ],
-          },
+                message: "File type must be image/*"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3286,14 +3096,14 @@ describe("useDropzone() hook", () => {
     it("accepts a dropped image when Firefox provides a bogus file type", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone
           accept={{
-            "image/*": [],
+            "image/*": []
           }}
           onDrop={onDropSpy}
         >
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3302,12 +3112,7 @@ describe("useDropzone() hook", () => {
       );
 
       const images = [createFile("bogus.gif", 1234, "application/x-moz-file")];
-      await act(() =>
-        fireEvent.drop(
-          container.querySelector("div"),
-          createDtWithFiles(images)
-        )
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
 
       expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
     });
@@ -3315,9 +3120,9 @@ describe("useDropzone() hook", () => {
     it("filters files according to {maxSize}", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDrop={onDropSpy} maxSize={1111}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3325,12 +3130,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      await act(() =>
-        fireEvent.drop(
-          container.querySelector("div"),
-          createDtWithFiles(images)
-        )
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
 
       expect(onDropSpy).toHaveBeenCalledWith(
         [],
@@ -3340,19 +3140,19 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-too-large",
-                message: "File is larger than 1111 bytes",
-              },
-            ],
+                message: "File is larger than 1111 bytes"
+              }
+            ]
           },
           {
             file: images[1],
             errors: [
               {
                 code: "file-too-large",
-                message: "File is larger than 1111 bytes",
-              },
-            ],
-          },
+                message: "File is larger than 1111 bytes"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3361,9 +3161,9 @@ describe("useDropzone() hook", () => {
     it("filters files according to {minSize}", async () => {
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onDrop={onDropSpy} minSize={1112}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3382,10 +3182,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-too-small",
-                message: "File is smaller than 1112 bytes",
-              },
-            ],
-          },
+                message: "File is smaller than 1112 bytes"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3406,7 +3206,7 @@ describe("useDropzone() hook", () => {
 
       render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3425,9 +3225,9 @@ describe("useDropzone() hook", () => {
       const active = <span ref={activeRef}>I am active</span>;
       const onFileDialogCancelSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
-          {({ getRootProps, getInputProps, isFileDialogActive }) => (
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -3452,9 +3252,9 @@ describe("useDropzone() hook", () => {
 
     it("is not invoked if <input> is not rendered", () => {
       const onFileDialogCancelSpy = vi.fn();
-      const { container, rerender } = render(
+      const {container, rerender} = render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3467,7 +3267,7 @@ describe("useDropzone() hook", () => {
       // Remove the input, then on window focus nothing should happen because we check if the input ref is set
       rerender(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
-          {({ getRootProps }) => <div {...getRootProps()} />}
+          {({getRootProps}) => <div {...getRootProps()} />}
         </Dropzone>
       );
 
@@ -3480,9 +3280,9 @@ describe("useDropzone() hook", () => {
     it("is not invoked if files were selected", async () => {
       const onFileDialogCancelSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogCancel={onFileDialogCancelSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3492,7 +3292,7 @@ describe("useDropzone() hook", () => {
 
       await act(async () =>
         fireEvent.change(container.querySelector("input"), {
-          target: { files },
+          target: {files}
         })
       );
       fireEvent.click(container.querySelector("div"));
@@ -3504,9 +3304,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not throw if callback is not provided", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogCancel={null}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3527,9 +3327,9 @@ describe("useDropzone() hook", () => {
   describe("onFileDialogOpen", () => {
     it("is invoked when opening the file dialog", () => {
       const onFileDialogOpenSpy = vi.fn();
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogOpen={onFileDialogOpenSpy}>
-          {({ getRootProps, getInputProps }) => (
+          {({getRootProps, getInputProps}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
             </div>
@@ -3544,9 +3344,9 @@ describe("useDropzone() hook", () => {
 
     it("is invoked when opening the file dialog programmatically", () => {
       const onFileDialogOpenSpy = vi.fn();
-      const { container } = render(
+      const {container} = render(
         <Dropzone onFileDialogOpen={onFileDialogOpenSpy}>
-          {({ getRootProps, getInputProps, open }) => (
+          {({getRootProps, getInputProps, open}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <button type="button" onClick={open}>
@@ -3566,9 +3366,9 @@ describe("useDropzone() hook", () => {
   describe("{open}", () => {
     it("can open file dialog programmatically", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, open }) => (
+          {({getRootProps, getInputProps, open}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <button type="button" onClick={open}>
@@ -3587,9 +3387,9 @@ describe("useDropzone() hook", () => {
     it("sets {isFileDialogActive} state", () => {
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, getInputProps, isFileDialogActive, open }) => (
+          {({getRootProps, getInputProps, isFileDialogActive, open}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isFileDialogActive && active}
@@ -3604,16 +3404,14 @@ describe("useDropzone() hook", () => {
       fireEvent.click(container.querySelector("button"));
 
       expect(activeRef.current).not.toBeNull();
-      expect(container.querySelector("div")).toContainElement(
-        activeRef.current
-      );
+      expect(container.querySelector("div")).toContainElement(activeRef.current);
     });
 
     it("does nothing if {disabled} is true", () => {
       const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
-      const { container } = render(
+      const {container} = render(
         <Dropzone disabled>
-          {({ getRootProps, getInputProps, open }) => (
+          {({getRootProps, getInputProps, open}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               <button type="button" onClick={open}>
@@ -3630,9 +3428,9 @@ describe("useDropzone() hook", () => {
     });
 
     it("does not throw if <input> is missing", () => {
-      const { container } = render(
+      const {container} = render(
         <Dropzone>
-          {({ getRootProps, open }) => (
+          {({getRootProps, open}) => (
             <div {...getRootProps()}>
               <button type="button" onClick={open}>
                 Open
@@ -3649,27 +3447,21 @@ describe("useDropzone() hook", () => {
 
   describe("validator", () => {
     it("rejects with custom error", async () => {
-      const validator = (file) => {
-        if (/dogs/i.test(file.name))
-          return { code: "dogs-not-allowed", message: "Dogs not allowed" };
+      const validator = file => {
+        if (/dogs/i.test(file.name)) return {code: "dogs-not-allowed", message: "Dogs not allowed"};
 
         return null;
       };
 
       const onDropSpy = vi.fn();
 
-      const { container } = render(
+      const {container} = render(
         <Dropzone validator={validator} onDrop={onDropSpy} multiple={true}>
-          {({ getRootProps }) => <div {...getRootProps()} />}
+          {({getRootProps}) => <div {...getRootProps()} />}
         </Dropzone>
       );
 
-      await act(() =>
-        fireEvent.drop(
-          container.querySelector("div"),
-          createDtWithFiles(images)
-        )
-      );
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
 
       expect(onDropSpy).toHaveBeenCalledWith(
         [images[0]],
@@ -3679,10 +3471,10 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "dogs-not-allowed",
-                message: "Dogs not allowed",
-              },
-            ],
-          },
+                message: "Dogs not allowed"
+              }
+            ]
+          }
         ],
         expect.anything()
       );
@@ -3692,12 +3484,12 @@ describe("useDropzone() hook", () => {
       const data = createDtWithFiles(images);
       const validator = () => ({
         code: "not-allowed",
-        message: "Cannot do this!",
+        message: "Cannot do this!"
       });
 
       const ui = (
         <Dropzone validator={validator} multiple={true}>
-          {({ getRootProps, getInputProps, isDragAccept, isDragReject }) => (
+          {({getRootProps, getInputProps, isDragAccept, isDragReject}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragAccept && "dragAccept"}
@@ -3707,7 +3499,7 @@ describe("useDropzone() hook", () => {
         </Dropzone>
       );
 
-      const { container } = render(ui);
+      const {container} = render(ui);
       const dropzone = container.querySelector("div");
 
       await act(() => fireEvent.dragEnter(dropzone, data));
@@ -3719,31 +3511,17 @@ describe("useDropzone() hook", () => {
 
   describe("accessibility", () => {
     it("sets the role attribute to button by default on the root", () => {
-      const { container } = render(
-        <Dropzone>
-          {({ getRootProps }) => <div id="root" {...getRootProps()} />}
-        </Dropzone>
-      );
+      const {container} = render(<Dropzone>{({getRootProps}) => <div id="root" {...getRootProps()} />}</Dropzone>);
 
-      expect(container.querySelector("#root")).toHaveAttribute(
-        "role",
-        "presentation"
-      );
+      expect(container.querySelector("#root")).toHaveAttribute("role", "presentation");
     });
 
     test("users can override the default role attribute on the root", () => {
-      const { container } = render(
-        <Dropzone>
-          {({ getRootProps }) => (
-            <div id="root" {...getRootProps({ role: "generic" })} />
-          )}
-        </Dropzone>
+      const {container} = render(
+        <Dropzone>{({getRootProps}) => <div id="root" {...getRootProps({role: "generic"})} />}</Dropzone>
       );
 
-      expect(container.querySelector("#root")).toHaveAttribute(
-        "role",
-        "generic"
-      );
+      expect(container.querySelector("#root")).toHaveAttribute("role", "generic");
     });
   });
 });
@@ -3763,7 +3541,7 @@ function drainPendingTimers() {
  * focusWindow triggers focus on the window
  */
 function focusWindow() {
-  return fireEvent.focus(document.body, { bubbles: true });
+  return fireEvent.focus(document.body, {bubbles: true});
 }
 
 /**
@@ -3773,18 +3551,18 @@ function focusWindow() {
  * @param {boolean} options.emptyTypes - If true, sets item types to empty string (simulates Chrome drag behavior)
  */
 function createDtWithFiles(files = [], options = {}) {
-  const { emptyTypes = false } = options;
+  const {emptyTypes = false} = options;
   return {
     dataTransfer: {
       files,
-      items: files.map((file) => ({
+      items: files.map(file => ({
         kind: "file",
         size: file.size,
         type: emptyTypes ? "" : file.type,
-        getAsFile: () => file,
+        getAsFile: () => file
       })),
-      types: ["Files"],
-    },
+      types: ["Files"]
+    }
   };
 }
 
@@ -3793,7 +3571,7 @@ function createDtWithFiles(files = [], options = {}) {
  * @param {File} file
  */
 function createFileSystemFileHandle(file) {
-  return { getFile: () => Promise.resolve(file) };
+  return {getFile: () => Promise.resolve(file)};
 }
 
 /**
@@ -3803,11 +3581,11 @@ function createFileSystemFileHandle(file) {
  * @param {string} type
  */
 function createFile(name, size, type) {
-  const file = new File([], name, { type });
+  const file = new File([], name, {type});
   Object.defineProperty(file, "size", {
     get() {
       return size;
-    },
+    }
   });
   return file;
 }
@@ -3826,6 +3604,6 @@ function createThenable() {
   return {
     promise,
     done,
-    cancel,
+    cancel
   };
 }

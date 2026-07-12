@@ -1,26 +1,26 @@
 {
-    "$schema": "./node_modules/oxlint/configuration_schema.json",
-    "plugins": ["typescript", "react"],
-    "categories": {
-        "correctness": "error"
-    },
-    "rules": {
-        "typescript/no-explicit-any": "off",
-        "typescript/no-non-null-assertion": "off",
-        "typescript/no-floating-promises": "error",
-        "typescript/no-redundant-type-constituents": "off",
-        "typescript/require-array-sort-compare": "off",
-        "typescript/no-base-to-string": "off",
-        "typescript/restrict-template-expressions": "off",
-        "react-hooks/exhaustive-deps": "off"
-    },
-    "overrides": [
-        {
-            "files": ["**/*.spec.js", "**/*.spec.jsx"],
-            "rules": {
-                "typescript/no-floating-promises": "off"
-            }
-        }
-    ],
-    "ignorePatterns": ["dist", "coverage", "site", "typings", "docs"]
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "typescript/no-explicit-any": "off",
+    "typescript/no-non-null-assertion": "off",
+    "typescript/no-floating-promises": "error",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/no-base-to-string": "off",
+    "typescript/restrict-template-expressions": "off",
+    "react-hooks/exhaustive-deps": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts", "**/*.spec.tsx"],
+      "rules": {
+        "typescript/no-floating-promises": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist", "coverage", "site", "docs"]
 }

@@ -6,12 +6,12 @@ export default defineConfig({
     clearMocks: true,
     environment: "jsdom",
     setupFiles: ["./test-setup.js"],
-    include: ["src/**/*.spec.{js,jsx}"],
+    include: ["src/**/*.spec.{ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
-      include: ["src/**/*.{js,jsx}"],
-      exclude: ["src/**/*.spec.{js,jsx}"]
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.spec.{ts,tsx}"]
     }
   }
 });
