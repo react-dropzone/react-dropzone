@@ -29,23 +29,23 @@ yarn add react-dropzone
 Use the `useDropzone` hook to bind the necessary handlers to any element:
 
 ```tsx
-import React from 'react';
-import { useDropzone } from 'react-dropzone';
+import React from "react";
+import {useDropzone} from "react-dropzone";
 
 function MyDropzone() {
-    const { getRootProps, getInputProps } = useDropzone({
-        onDrop: acceptedFiles => {
-            // Do something with the files, e.g. upload to a server
-            console.log(acceptedFiles);
-        }
-    });
+  const {getRootProps, getInputProps} = useDropzone({
+    onDrop: acceptedFiles => {
+      // Do something with the files, e.g. upload to a server
+      console.log(acceptedFiles);
+    }
+  });
 
-    return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop some files here, or click to select files</p>
-        </div>
-    );
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop some files here, or click to select files</p>
+    </div>
+  );
 }
 ```
 

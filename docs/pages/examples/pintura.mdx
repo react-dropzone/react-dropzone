@@ -7,64 +7,69 @@ This example uses the commercial `pintura` package, so it's shown as static code
 :::
 
 ```tsx
-import React, { useState, useEffect } from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, {useState, useEffect} from "react";
+import {useDropzone} from "react-dropzone";
 
-import 'pintura/pintura.css';
-import { openDefaultEditor } from 'pintura';
+import "pintura/pintura.css";
+import {openDefaultEditor} from "pintura";
 
 // Called when the user taps the edit button: opens the editor and returns the modified file.
 const editImage = (image, done) => {
-    const imageFile = image.pintura ? image.pintura.file : image;
-    const imageState = image.pintura ? image.pintura.data : {};
+  const imageFile = image.pintura ? image.pintura.file : image;
+  const imageState = image.pintura ? image.pintura.data : {};
 
-    const editor = openDefaultEditor({ src: imageFile, imageState });
+  const editor = openDefaultEditor({src: imageFile, imageState});
 
-    editor.on('process', ({ dest, imageState }) => {
-        Object.assign(dest, { pintura: { file: imageFile, data: imageState } });
-        done(dest);
-    });
+  editor.on("process", ({dest, imageState}) => {
+    Object.assign(dest, {pintura: {file: imageFile, data: imageState}});
+    done(dest);
+  });
 };
 
 function App() {
-    const [files, setFiles] = useState([]);
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: { 'image/*': [] },
-        onDrop: acceptedFiles => {
-            setFiles(acceptedFiles.map(file =>
-                Object.assign(file, { preview: URL.createObjectURL(file) })
-            ));
+  const [files, setFiles] = useState([]);
+  const {getRootProps, getInputProps} = useDropzone({
+    accept: {"image/*": []},
+    onDrop: acceptedFiles => {
+      setFiles(acceptedFiles.map(file => Object.assign(file, {preview: URL.createObjectURL(file)})));
+    }
+  });
+
+  const thumbs = files.map((file, index) => (
+    <div key={file.name}>
+      <img src={file.preview} alt="" />
+      <button
+        onClick={() =>
+          editImage(file, output => {
+            const updatedFiles = [...files];
+            updatedFiles[index] = output;
+            if (file.preview) URL.revokeObjectURL(file.preview);
+            Object.assign(output, {preview: URL.createObjectURL(output)});
+            setFiles(updatedFiles);
+          })
         }
-    });
+      >
+        Edit
+      </button>
+    </div>
+  ));
 
-    const thumbs = files.map((file, index) => (
-        <div key={file.name}>
-            <img src={file.preview} alt="" />
-            <button onClick={() => editImage(file, output => {
-                const updatedFiles = [...files];
-                updatedFiles[index] = output;
-                if (file.preview) URL.revokeObjectURL(file.preview);
-                Object.assign(output, { preview: URL.createObjectURL(output) });
-                setFiles(updatedFiles);
-            })}>
-                Edit
-            </button>
-        </div>
-    ));
+  useEffect(
+    () => () => {
+      files.forEach(file => URL.revokeObjectURL(file.preview));
+    },
+    [files]
+  );
 
-    useEffect(() => () => {
-        files.forEach(file => URL.revokeObjectURL(file.preview));
-    }, [files]);
-
-    return (
-        <section className="container">
-            <div {...getRootProps({ className: 'dropzone' })}>
-                <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
-            </div>
-            <aside>{thumbs}</aside>
-        </section>
-    );
+  return (
+    <section className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div>
+      <aside>{thumbs}</aside>
+    </section>
+  );
 }
 
 export default App;

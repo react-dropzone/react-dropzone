@@ -1,4 +1,4 @@
-import { FormExample } from '../../components/examples'
+import {FormExample} from "../../components/examples";
 
 # Using Dropzone inside a form
 
@@ -7,26 +7,28 @@ react-dropzone does not submit files in form submissions by default. If you need
 <FormExample />
 
 ```tsx
-function DropzoneField({ required, name }) {
-    const hiddenInputRef = useRef(null);
+function DropzoneField({required, name}) {
+  const hiddenInputRef = useRef(null);
 
-    const { getRootProps, getInputProps, open } = useDropzone({
-        onDrop: incomingFiles => {
-            if (hiddenInputRef.current) {
-                // https://stackoverflow.com/a/68182158/1068446
-                const dataTransfer = new DataTransfer();
-                incomingFiles.forEach(v => dataTransfer.items.add(v));
-                hiddenInputRef.current.files = dataTransfer.files;
-            }
-        }
-    });
+  const {getRootProps, getInputProps, open} = useDropzone({
+    onDrop: incomingFiles => {
+      if (hiddenInputRef.current) {
+        // https://stackoverflow.com/a/68182158/1068446
+        const dataTransfer = new DataTransfer();
+        incomingFiles.forEach(v => dataTransfer.items.add(v));
+        hiddenInputRef.current.files = dataTransfer.files;
+      }
+    }
+  });
 
-    return (
-        <div {...getRootProps({ className: 'dropzone' })}>
-            <input type="file" name={name} required={required} style={{ opacity: 0 }} ref={hiddenInputRef} />
-            <input {...getInputProps()} />
-            <button type="button" onClick={open}>Open File Dialog</button>
-        </div>
-    );
+  return (
+    <div {...getRootProps({className: "dropzone"})}>
+      <input type="file" name={name} required={required} style={{opacity: 0}} ref={hiddenInputRef} />
+      <input {...getInputProps()} />
+      <button type="button" onClick={open}>
+        Open File Dialog
+      </button>
+    </div>
+  );
 }
 ```

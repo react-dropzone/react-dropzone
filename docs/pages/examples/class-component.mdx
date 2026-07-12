@@ -1,4 +1,4 @@
-import { ClassComponentBasic } from '../../components/examples'
+import {ClassComponentBasic} from "../../components/examples";
 
 # Class components
 
@@ -7,37 +7,39 @@ If you're still using class components, use the `<Dropzone>` component provided 
 <ClassComponentBasic />
 
 ```tsx
-import React, { Component } from 'react';
-import Dropzone from 'react-dropzone';
+import React, {Component} from "react";
+import Dropzone from "react-dropzone";
 
 class Basic extends Component {
-    constructor() {
-        super();
-        this.onDrop = files => this.setState({ files });
-        this.state = { files: [] };
-    }
+  constructor() {
+    super();
+    this.onDrop = files => this.setState({files});
+    this.state = {files: []};
+  }
 
-    render() {
-        const files = this.state.files.map(file => (
-            <li key={file.name}>{file.name} - {file.size} bytes</li>
-        ));
+  render() {
+    const files = this.state.files.map(file => (
+      <li key={file.name}>
+        {file.name} - {file.size} bytes
+      </li>
+    ));
 
-        return (
-            <Dropzone onDrop={this.onDrop}>
-                {({ getRootProps, getInputProps }) => (
-                    <section className="container">
-                        <div {...getRootProps({ className: 'dropzone' })}>
-                            <input {...getInputProps()} />
-                            <p>Drag 'n' drop some files here, or click to select files</p>
-                        </div>
-                        <aside>
-                            <h4>Files</h4>
-                            <ul>{files}</ul>
-                        </aside>
-                    </section>
-                )}
-            </Dropzone>
-        );
-    }
+    return (
+      <Dropzone onDrop={this.onDrop}>
+        {({getRootProps, getInputProps}) => (
+          <section className="container">
+            <div {...getRootProps({className: "dropzone"})}>
+              <input {...getInputProps()} />
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+            <aside>
+              <h4>Files</h4>
+              <ul>{files}</ul>
+            </aside>
+          </section>
+        )}
+      </Dropzone>
+    );
+  }
 }
 ```
