@@ -1,15 +1,14 @@
-import type {FileWithPath} from "file-selector";
 import React from "react";
 import Dropzone from "../src";
 
 interface State {
-  files: readonly FileWithPath[];
+  files: readonly File[];
 }
 
 export default class Basic extends React.Component<Record<string, never>, State> {
   state: State = {files: []};
 
-  onDrop = (files: FileWithPath[]) => {
+  onDrop = (files: File[]) => {
     this.setState({files});
   };
 

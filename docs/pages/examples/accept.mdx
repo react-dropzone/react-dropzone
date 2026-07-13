@@ -60,3 +60,26 @@ const {isDragActive, isDragAccept, isDragReject, getRootProps, getInputProps} = 
 ```
 
 > Mime type determination is not reliable across platforms. CSV files, for example, are reported as `text/plain` under macOS but as `application/vnd.ms-excel` under Windows.
+
+## Restoring the full MIME-type table
+
+`react-dropzone` resolves each file's MIME `type` through [file-selector](https://github.com/react-dropzone/file-selector)'s `fromEvent` — the default for the [`getFilesFromEvent`](/examples/plugins) prop — which infers the `type` from the file extension when the browser leaves a file typeless (common with drag 'n' drop and File System Access sources).
+
+As of `file-selector` v4, only a **small built-in set** of common extensions is bundled, so the core stays lightweight. Because `accept` matches by file **extension** as well as MIME type, most configurations keep working regardless. You only need the full table when matching purely by MIME type (e.g. `image/*`) against typeless sources — pass the full `COMMON_MIME_TYPES` table via `getFilesFromEvent` (add `file-selector` to your dependencies to import from it):
+
+```bash
+npm install file-selector
+```
+
+```tsx
+import {useDropzone} from "react-dropzone";
+import {fromEvent} from "file-selector";
+import {COMMON_MIME_TYPES} from "file-selector/mime";
+
+function FullMimeCoverage() {
+  const {getRootProps, getInputProps} = useDropzone({
+    getFilesFromEvent: event => fromEvent(event, {mimeTypes: COMMON_MIME_TYPES})
+  });
+  // ...
+}
+```

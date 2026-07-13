@@ -1,9 +1,8 @@
-import type {FileWithPath} from "file-selector";
 import React from "react";
 import Dropzone, {type FileRejection} from "../src";
 
 interface State {
-  accepted: readonly FileWithPath[];
+  accepted: readonly File[];
   rejected: readonly FileRejection[];
 }
 
