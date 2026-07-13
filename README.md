@@ -1,4 +1,6 @@
-![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/.github/main/brand/assets/logo.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/react-dropzone/.github/main/brand/assets/logo.png" alt="react-dropzone logo" width="120" />
+</p>
 
 # react-dropzone
 
