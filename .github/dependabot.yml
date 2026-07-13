@@ -6,9 +6,19 @@ updates:
     rebase-strategy: auto
     schedule:
       interval: "weekly"
-    allow:
-      - dependency-name: "*"
-        dependency-type: "production"
     commit-message:
-      prefix: "feat(deps):"
-    versioning-strategy: widen
+      prefix: "chore(deps):"
+    versioning-strategy: increase
+    # Patch bumps grouped into one PR (auto-merged on green CI); minor bumps
+    # grouped into a separate PR for manual review; majors open individually.
+    groups:
+      patch:
+        patterns:
+          - "*"
+        update-types:
+          - patch
+      minor:
+        patterns:
+          - "*"
+        update-types:
+          - minor
