@@ -94,7 +94,7 @@
     "react-dom": "^19.0.0",
     "semantic-release": "^25.0.2",
     "styled-components": "^6.4.3",
-    "tsdown": "^0.22.4",
+    "tsdown": "^0.22.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "vocs": "^2.5.3",
