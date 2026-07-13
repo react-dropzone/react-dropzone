@@ -24,6 +24,10 @@ yarn add react-dropzone
 `react-dropzone` ships as ESM and CommonJS with TypeScript types included, and lists
 `react` as a peer dependency (`>= 18`).
 
+:::warning[Breaking change]
+`FileWithPath` (re-exported from [file-selector](https://github.com/react-dropzone/file-selector)) now types `path` and `relativePath` as **required** — a plain `File` is no longer assignable to it. The `onDrop`/`onDropAccepted` callbacks still hand you `File` objects, so type those handlers as `File[]` rather than `FileWithPath[]`.
+:::
+
 ## Usage
 
 Use the `useDropzone` hook to bind the necessary handlers to any element:
