@@ -49,7 +49,9 @@
     "access": "public"
   },
   "scripts": {
-    "prepare": "husky",
+    "prepare": "prek install || exit 0",
+    "hooks:install": "prek install",
+    "hooks:run": "prek run --all-files",
     "prebuild": "npm run clean",
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -72,8 +74,6 @@
     "file-selector": "^2.1.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.0.0",
-    "@commitlint/config-conventional": "^19.0.0",
     "@semantic-release/changelog": "^6.0.0",
     "@semantic-release/commit-analyzer": "^12.0.0",
     "@semantic-release/github": "^10.0.0",
@@ -86,7 +86,6 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitest/coverage-v8": "^4.1.10",
-    "husky": "^9.1.0",
     "jsdom": "^29.1.1",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",

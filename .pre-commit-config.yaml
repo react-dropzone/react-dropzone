@@ -1,0 +1,43 @@
+# Git hooks, managed by prek (https://github.com/j178/prek).
+#
+#   prek install            wire up the git hooks (run once, or via `npm install`)
+#   prek run --all-files    run every hook over the whole repo
+#
+# Config reference: https://pre-commit.com/#pre-commit-configyaml---top-level
+
+# `prek install` sets up both git hooks in one go.
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  # Conventional Commits.
+  # Validates the commit message; the default type set (feat, fix, chore, ci,
+  # docs, style, refactor, perf, test, build, revert) matches this repo's history
+  # and what semantic-release consumes.
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+  # Project toolchain on staged files. Reuses the oxfmt /
+  # oxlint binaries already in node_modules (via npx), so there's no second
+  # toolchain to install or keep in sync. `require_serial` gives each tool a
+  # single invocation with all files — the tools parallelize internally, and it
+  # avoids paying npx startup once per batch.
+  - repo: local
+    hooks:
+      - id: oxfmt
+        name: oxfmt
+        entry: npx oxfmt
+        language: system
+        types_or: [ts, tsx, javascript, jsx, json]
+        exclude: (^|/)package-lock\.json$ # never rewrite the generated lockfile
+        stages: [pre-commit]
+        require_serial: true
+      - id: oxlint
+        name: oxlint
+        entry: npx oxlint --fix
+        language: system
+        types_or: [ts, tsx, javascript, jsx]
+        stages: [pre-commit]
+        require_serial: true
