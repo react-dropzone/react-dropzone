@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "attr-accept": "^2.2.5",
-    "file-selector": "^2.1.0"
+    "file-selector": "^4.0.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.0",
