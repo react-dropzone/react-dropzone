@@ -8,6 +8,9 @@ export default defineConfig({
   renderStrategy: "static",
   title: "react-dropzone",
   description: "Simple HTML5 drag 'n' drop zone with React.js",
+  // Favicon + header logo (assets live in /public, served at the site root).
+  iconUrl: "/favicon.svg",
+  logoUrl: {light: "/dropzone-lockup.svg", dark: "/dropzone-lockup-dark.svg"},
   // Global CSS tweaks injected into every page:
   // 1. The copy button is absolutely positioned inside the horizontally-scrolling <pre>,
   //    so it rides the scroll; anchor it to the non-scrolling code-block wrapper instead.

@@ -1,4 +1,4 @@
-![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/react-dropzone/master/logo/logo.png)
+![react-dropzone logo](https://raw.githubusercontent.com/react-dropzone/.github/main/brand/assets/logo.png)
 
 # react-dropzone
 

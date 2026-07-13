@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="3 3 90 90" fill="none" role="img" aria-label="dropzone">
+  <title>dropzone</title>
+  <rect x="9.5" y="9.5" width="77" height="77" rx="22" fill="none" stroke="#C9B8B4" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="12 11"/>
+  <g stroke="#E23A2C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M48 29 V62"/>
+    <path d="M31 47 L48 65 L65 47"/>
+  </g>
+</svg>
