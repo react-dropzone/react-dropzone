@@ -388,6 +388,45 @@ function MyDropzone() {
 }
 ```
 
+### Camera Option Missing on Android
+
+On Android 13+, Chrome and Edge open the native [Android photo picker](https://developer.android.com/training/data-storage/shared/photopicker) whenever a file input's `accept` attribute resolves to _only_ image and/or video types (e.g. `accept={{"image/*": []}}`). That picker only lists the gallery and files - it has no "take a photo"/camera action - so the camera appears to be missing. See [#1417](https://github.com/react-dropzone/react-dropzone/issues/1417).
+
+This is browser/OS behavior, not something the lib controls, and it's unrelated to how the `<input>` is styled: a plain `<input type="file">` with no `accept` (or one that also allows a non-media type) falls back to the older chooser that _does_ include the Camera app.
+
+If you need the camera, use the [`capture`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#capture) attribute, which you can pass straight through `getInputProps()`:
+
+```jsx static
+// Camera only (no gallery/files)
+<input {...getInputProps({capture: "environment"})} />
+```
+
+To offer both the camera and the gallery, render one dropzone per input (each with its own `open`) and let the user pick which one to trigger:
+
+```jsx static
+import React from "react";
+import {useDropzone} from "react-dropzone";
+
+function MyDropzone({onDrop}) {
+  const gallery = useDropzone({accept: {"image/*": []}, noClick: true, onDrop});
+  const camera = useDropzone({accept: {"image/*": []}, noClick: true, onDrop});
+
+  return (
+    <>
+      <button type="button" onClick={gallery.open}>
+        Choose from gallery
+      </button>
+      <input {...gallery.getInputProps()} />
+
+      <button type="button" onClick={camera.open}>
+        Take a photo
+      </button>
+      <input {...camera.getInputProps({capture: "environment"})} />
+    </>
+  );
+}
+```
+
 ### File Dialog Cancel Callback
 
 The `onFileDialogCancel()` cb is unstable in most browsers, meaning, there's a good chance of it being triggered even though you have selected files.
