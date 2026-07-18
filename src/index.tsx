@@ -54,6 +54,12 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   onFileDialogOpen?: () => void;
   onError?: (err: Error) => void;
   validator?: <T extends File>(file: T) => FileError | readonly FileError[] | null;
+  /**
+   * Override the message of any rejection error (built-in or custom). Called once per error;
+   * receives the error and the file it belongs to and returns the message to use. Return
+   * `error.message` for codes you don't want to change. Useful for localizing error messages.
+   */
+  getErrorMessage?: (error: FileError, file: File) => string;
   useFsAccessApi?: boolean;
   autoFocus?: boolean;
 };
@@ -183,7 +189,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     noDrag = false,
     noDragEventsBubbling = false,
     onError,
-    validator
+    validator,
+    getErrorMessage
   } = props;
 
   // `acceptAttr` keeps wildcard MIME types (e.g. `image/*`) so the drag-time
@@ -455,6 +462,9 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       const acceptedFiles: FileWithPath[] = [];
       const fileRejections: FileRejection[] = [];
 
+      const localizeError = (error: FileError, file: File): FileError =>
+        getErrorMessage ? {...error, message: getErrorMessage(error, file)} : error;
+
       files.forEach(file => {
         const [accepted, acceptError] = fileAccepted(file, inputAcceptAttr);
         const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize);
@@ -471,7 +481,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
 
           fileRejections.push({
             file,
-            errors: errors.filter((e): e is FileError => e != null)
+            errors: errors.filter((e): e is FileError => e != null).map(error => localizeError(error, file))
           });
         }
       });
@@ -479,7 +489,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       if ((!multiple && acceptedFiles.length > 1) || (multiple && maxFiles >= 1 && acceptedFiles.length > maxFiles)) {
         // Reject everything and empty accepted files
         acceptedFiles.forEach(file => {
-          fileRejections.push({file, errors: [TOO_MANY_FILES_REJECTION]});
+          fileRejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
         });
         acceptedFiles.splice(0);
       }
@@ -502,7 +512,19 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         onDropAccepted(acceptedFiles, event);
       }
     },
-    [dispatch, multiple, inputAcceptAttr, minSize, maxSize, maxFiles, onDrop, onDropAccepted, onDropRejected, validator]
+    [
+      dispatch,
+      multiple,
+      inputAcceptAttr,
+      minSize,
+      maxSize,
+      maxFiles,
+      onDrop,
+      onDropAccepted,
+      onDropRejected,
+      validator,
+      getErrorMessage
+    ]
   );
 
   const onDropCb = useCallback(
