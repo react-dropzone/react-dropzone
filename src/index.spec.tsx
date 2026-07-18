@@ -135,6 +135,20 @@ describe("useDropzone() hook", () => {
       expect(container.querySelector("input")).toHaveAttribute("name", name);
     });
 
+    it("labels the hidden file input for accessibility", () => {
+      const {container} = render(
+        <Dropzone multiple>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      expect(container.querySelector("input")).toHaveAttribute("aria-label", "file upload");
+    });
+
     it("sets any props passed to the root props getter on the root node", () => {
       const ariaLabel = "Dropzone area";
       const {container} = render(
