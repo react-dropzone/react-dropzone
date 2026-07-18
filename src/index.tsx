@@ -696,6 +696,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
           accept: inputAcceptAttr,
           multiple,
           type: "file",
+          "aria-label": "file upload",
           style: {
             border: 0,
             clip: "rect(0, 0, 0, 0)",
