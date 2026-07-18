@@ -2691,6 +2691,83 @@ describe("useDropzone() hook", () => {
       );
     });
 
+    // https://github.com/react-dropzone/react-dropzone/issues/1220
+    describe("wildcard MIME type paired with extensions", () => {
+      const accept = {"image/*": [".jpeg", ".png"]};
+
+      it("sets only the extensions on the <input> {accept} attribute", () => {
+        const {container} = render(
+          <Dropzone accept={accept}>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        );
+
+        expect(container.querySelector("input")).toHaveAttribute("accept", ".jpeg,.png");
+      });
+
+      it("accepts files whose extension matches and rejects the others on drop", async () => {
+        const onDropSpy = vi.fn();
+        const png = createFile("cats.png", 1234, "image/png");
+        const gif = createFile("cats.gif", 1234, "image/gif");
+
+        const {container} = render(
+          <Dropzone accept={accept} onDrop={onDropSpy} multiple>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        );
+        const dropzone = container.querySelector("div");
+
+        await act(() => fireEvent.drop(dropzone, createDtWithFiles([png, gif])));
+
+        expect(onDropSpy).toHaveBeenCalledWith(
+          [png],
+          [
+            {
+              file: gif,
+              errors: [
+                {
+                  code: "file-invalid-type",
+                  message: "File type must be one of .jpeg, .png"
+                }
+              ]
+            }
+          ],
+          expect.anything()
+        );
+      });
+
+      it("still reacts with {isDragAccept} via the MIME type during a drag", async () => {
+        const {container} = render(
+          <Dropzone accept={accept}>
+            {({getRootProps, getInputProps, isDragAccept, isDragReject}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                {isDragAccept && "dragAccept"}
+                {isDragReject && "dragReject"}
+              </div>
+            )}
+          </Dropzone>
+        );
+        const dropzone = container.querySelector("div");
+
+        // File names (hence extensions) aren't readable during a drag, so the wildcard
+        // MIME type is what drives {isDragAccept} - even for an image whose extension is
+        // ultimately rejected on drop.
+        await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles([createFile("cats.gif", 1234, "image/gif")])));
+
+        expect(dropzone).toHaveTextContent("dragAccept");
+        expect(dropzone).not.toHaveTextContent("dragReject");
+      });
+    });
+
     it("rejects all files if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = vi.fn();
 

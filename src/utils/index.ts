@@ -250,14 +250,30 @@ export function pickerOptionsFromAccept(accept?: Accept): Array<{description: st
 }
 
 /**
- * Convert the `{accept}` dropzone prop to an array of MIME types/extensions.
+ * Convert the `{accept}` dropzone prop to a comma-separated accept attribute string.
+ *
+ * When `omitWildcardMimeTypesWithExtensions` is set, a wildcard MIME type (e.g. `image/*`)
+ * that is paired with explicit extensions is dropped in favour of those extensions. The
+ * accept attribute is an OR list, so leaving `image/*` in would make both the native file
+ * picker and the drop-time validator accept ANY file of that type, ignoring the extension
+ * restriction. The drag-time `isDragAccept` check keeps the wildcard because file names
+ * (and therefore extensions) aren't readable during a drag.
+ *
+ * See https://github.com/react-dropzone/react-dropzone/issues/1220
  */
-export function acceptPropAsAcceptAttr(accept?: Accept): string | undefined {
+export function acceptPropAsAcceptAttr(
+  accept?: Accept,
+  {omitWildcardMimeTypesWithExtensions = false}: {omitWildcardMimeTypesWithExtensions?: boolean} = {}
+): string | undefined {
   if (isDefined(accept)) {
     return (
       Object.entries(accept)
         .reduce<string[]>((a, [mimeType, ext]) => {
-          a.push(mimeType, ...ext);
+          if (omitWildcardMimeTypesWithExtensions && isMIMETypeWildcard(mimeType) && ext.some(isExt)) {
+            a.push(...ext);
+          } else {
+            a.push(mimeType, ...ext);
+          }
           return a;
         }, [])
         // Silently discard invalid entries as pickerOptionsFromAccept warns about these
@@ -295,6 +311,13 @@ export function isMIMEType(v: string): boolean {
     v === "application/*" ||
     /\w+\/[-+.\w]+/g.test(v)
   );
+}
+
+/**
+ * Check if v is a wildcard MIME type (e.g. `image/*`).
+ */
+export function isMIMETypeWildcard(v: string): boolean {
+  return v.endsWith("/*");
 }
 
 /**

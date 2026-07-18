@@ -295,6 +295,23 @@ describe("fileAccepted()", () => {
       }
     ]);
   });
+
+  // https://github.com/react-dropzone/react-dropzone/issues/1220
+  it("enforces the extensions when a wildcard MIME type is paired with them", () => {
+    const accept = utils.acceptPropAsAcceptAttr(
+      {"image/*": [".jpeg", ".png"]},
+      {omitWildcardMimeTypesWithExtensions: true}
+    );
+
+    const png = createFile("cats.png", 100, "image/png");
+    expect(utils.fileAccepted(png, accept)).toEqual([true, null]);
+
+    const gif = createFile("cats.gif", 100, "image/gif");
+    expect(utils.fileAccepted(gif, accept)).toEqual([
+      false,
+      {code: "file-invalid-type", message: "File type must be one of .jpeg, .png"}
+    ]);
+  });
 });
 
 describe("getTooLargeRejectionErr()", () => {
@@ -460,6 +477,34 @@ describe("acceptPropAsAcceptAttr()", () => {
       })
     ).toEqual("image/*,.png,.jpg,text/*,.txt,.pdf,audio/*,.p12");
   });
+
+  // https://github.com/react-dropzone/react-dropzone/issues/1220
+  describe("with {omitWildcardMimeTypesWithExtensions}", () => {
+    const opts = {omitWildcardMimeTypesWithExtensions: true};
+
+    it("drops a wildcard MIME type when it is paired with extensions", () => {
+      expect(utils.acceptPropAsAcceptAttr({"image/*": [".jpeg", ".png"]}, opts)).toEqual(".jpeg,.png");
+    });
+
+    it("only drops the wildcards, keeping specific MIME types and their extensions", () => {
+      expect(
+        utils.acceptPropAsAcceptAttr(
+          {
+            "image/*": [".png", ".jpg"], // wildcard dropped in favour of extensions
+            "text/*": [".txt", ".pdf"], // wildcard dropped in favour of extensions
+            "audio/*": ["mp3"], // `mp3` not a valid extension, so the wildcard is kept
+            "application/pdf": [".pdf"] // specific MIME type is always kept
+          },
+          opts
+        )
+      ).toEqual(".png,.jpg,.txt,.pdf,audio/*,application/pdf,.pdf");
+    });
+
+    it("keeps a wildcard MIME type when no valid extensions are provided", () => {
+      expect(utils.acceptPropAsAcceptAttr({"image/*": []}, opts)).toEqual("image/*");
+      expect(utils.acceptPropAsAcceptAttr({"image/*": ["png"]}, opts)).toEqual("image/*");
+    });
+  });
 });
 
 describe("isMIMEType()", () => {
@@ -483,6 +528,26 @@ describe("isMIMEType()", () => {
     expect(utils.isMIMEType("text")).toBe(false);
     expect(utils.isMIMEType("")).toBe(false);
     expect(utils.isMIMEType(undefined)).toBe(false);
+  });
+});
+
+describe("isMIMETypeWildcard()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("checks that the value is a wildcard MIME type string", () => {
+    expect(utils.isMIMETypeWildcard("image/*")).toBe(true);
+    expect(utils.isMIMETypeWildcard("audio/*")).toBe(true);
+    expect(utils.isMIMETypeWildcard("*/*")).toBe(true);
+    expect(utils.isMIMETypeWildcard("image/png")).toBe(false);
+    expect(utils.isMIMETypeWildcard(".png")).toBe(false);
+    expect(utils.isMIMETypeWildcard("")).toBe(false);
   });
 });
 
