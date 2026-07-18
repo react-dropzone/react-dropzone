@@ -4,6 +4,10 @@ import {FormExample} from "../../components/examples";
 
 react-dropzone does not submit files in form submissions by default. If you need this, add a hidden file input and set the files into it.
 
+:::warning[Spreading `getRootProps()` onto a `<button>`?]
+Set `type="button"` on it. A `<button>` inside a `<form>` defaults to `type="submit"`, so clicking it to open the file dialog also submits (and reloads) the form, clearing its fields.
+:::
+
 <FormExample />
 
 ```tsx

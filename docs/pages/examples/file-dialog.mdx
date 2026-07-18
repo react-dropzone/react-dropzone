@@ -4,6 +4,8 @@ import {DropzoneWithButton, RefDropzone} from "../../components/examples";
 
 You can open the native file prompt with the `open` method returned by the hook. Most browsers require the call to originate from a direct user interaction (e.g. a click).
 
+Note the `type="button"` on the button below: inside a `<form>` a `<button>` defaults to `type="submit"`, which would submit the form instead of just opening the dialog.
+
 <DropzoneWithButton />
 
 ```tsx
