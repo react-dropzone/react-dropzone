@@ -2916,7 +2916,7 @@ describe("useDropzone() hook", () => {
       });
     });
 
-    it("rejects all files if {multiple} is false and {accept} criteria is met", async () => {
+    it("accepts the first file and rejects the surplus if {multiple} is false and {accept} criteria is met", async () => {
       const onDropSpy = vi.fn();
 
       const {container} = render(
@@ -2939,17 +2939,8 @@ describe("useDropzone() hook", () => {
       await act(() => fireEvent.drop(dropzone, createDtWithFiles(images)));
 
       expect(onDropSpy).toHaveBeenCalledWith(
-        [],
+        [images[0]],
         [
-          {
-            file: images[0],
-            errors: [
-              {
-                code: "too-many-files",
-                message: "Too many files"
-              }
-            ]
-          },
           {
             file: images[1],
             errors: [
@@ -2964,7 +2955,7 @@ describe("useDropzone() hook", () => {
       );
     });
 
-    it("rejects all files if {multiple} is true and maxFiles is less than files and {accept} criteria is met", async () => {
+    it("accepts up to {maxFiles} and rejects the surplus if {multiple} is true and {accept} criteria is met", async () => {
       const onDropSpy = vi.fn();
       const onDropRejectedSpy = vi.fn();
 
@@ -2998,17 +2989,8 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toHaveTextContent("dragReject");
       expect(dropzone).not.toHaveTextContent("dragAccept");
       expect(onDropSpy).toHaveBeenCalledWith(
-        [],
+        [images[0]],
         [
-          {
-            file: images[0],
-            errors: [
-              {
-                code: "too-many-files",
-                message: "Too many files"
-              }
-            ]
-          },
           {
             file: images[1],
             errors: [
@@ -3023,7 +3005,7 @@ describe("useDropzone() hook", () => {
       );
     });
 
-    it("rejects all files if {multiple} is true and maxFiles has been updated so that it is less than files", async () => {
+    it("accepts up to {maxFiles} and rejects the surplus when {maxFiles} is updated to be less than files", async () => {
       const onDropSpy = vi.fn();
       const onDropRejectedSpy = vi.fn();
       const ui = maxFiles => (
@@ -3057,10 +3039,100 @@ describe("useDropzone() hook", () => {
       await act(() => fireEvent.drop(dropzone, createDtWithFiles(images)));
       rerender(ui(1));
 
+      // Only the surplus file (beyond {maxFiles}) is rejected; the first file is still accepted.
       expect(onDropRejectedSpy).toHaveBeenCalledWith(
-        expect.arrayContaining(images.map(image => expect.objectContaining({errors: expect.any(Array), file: image}))),
+        [{file: images[1], errors: [{code: "too-many-files", message: "Too many files"}]}],
         expect.anything()
       );
+      expect(onDropSpy).toHaveBeenLastCalledWith(
+        [images[0]],
+        [{file: images[1], errors: [{code: "too-many-files", message: "Too many files"}]}],
+        expect.anything()
+      );
+    });
+
+    // https://github.com/react-dropzone/react-dropzone/issues/1355
+    // https://github.com/react-dropzone/react-dropzone/issues/1358
+    describe("when more files are dropped than allowed", () => {
+      it("accepts the first {maxFiles} valid files and rejects only the surplus (issue #1355)", async () => {
+        const onDropSpy = vi.fn();
+        const a = createFile("a.png", 1, "image/png");
+        const b = createFile("b.png", 1, "image/png");
+        const c = createFile("c.png", 1, "image/png");
+
+        const {container} = render(
+          <Dropzone accept={{"image/*": []}} onDrop={onDropSpy} multiple maxFiles={2}>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        );
+
+        await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles([a, b, c])));
+
+        expect(onDropSpy).toHaveBeenCalledWith(
+          [a, b],
+          [{file: c, errors: [{code: "too-many-files", message: "Too many files"}]}],
+          expect.anything()
+        );
+      });
+
+      it("accepts the first valid file and rejects the rest when {multiple} is false (issue #1355)", async () => {
+        const onDropSpy = vi.fn();
+        const a = createFile("a.png", 1, "image/png");
+        const b = createFile("b.png", 1, "image/png");
+        const c = createFile("c.png", 1, "image/png");
+
+        const {container} = render(
+          <Dropzone accept={{"image/*": []}} onDrop={onDropSpy} multiple={false}>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        );
+
+        await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles([a, b, c])));
+
+        expect(onDropSpy).toHaveBeenCalledWith(
+          [a],
+          [
+            {file: b, errors: [{code: "too-many-files", message: "Too many files"}]},
+            {file: c, errors: [{code: "too-many-files", message: "Too many files"}]}
+          ],
+          expect.anything()
+        );
+      });
+
+      it("keeps a valid file within the limit and rejects the one failing its own check (issue #1358)", async () => {
+        // A file that fails an individual check (here, size) is rejected with that error and does not
+        // count towards the limit, so a second file that is both valid and within the limit is still
+        // accepted - the drop is not rejected wholesale.
+        const onDropSpy = vi.fn();
+        const big = createFile("big.png", 2048, "image/png");
+        const small = createFile("small.png", 512, "image/png");
+
+        const {container} = render(
+          <Dropzone accept={{"image/*": []}} onDrop={onDropSpy} multiple={false} maxSize={1024}>
+            {({getRootProps, getInputProps}) => (
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+              </div>
+            )}
+          </Dropzone>
+        );
+
+        await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles([big, small])));
+
+        expect(onDropSpy).toHaveBeenCalledWith(
+          [small],
+          [{file: big, errors: [{code: "file-too-large", message: "File is larger than 1 KB"}]}],
+          expect.anything()
+        );
+      });
     });
 
     it("accepts multiple files if {multiple} is true and {accept} criteria is met", async () => {
@@ -3859,11 +3931,8 @@ describe("useDropzone() hook", () => {
       await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
 
       expect(onDropSpy).toHaveBeenCalledWith(
-        [],
-        [
-          {file: images[0], errors: [{code: "too-many-files", message: "Too many!"}]},
-          {file: images[1], errors: [{code: "too-many-files", message: "Too many!"}]}
-        ],
+        [images[0]],
+        [{file: images[1], errors: [{code: "too-many-files", message: "Too many!"}]}],
         expect.anything()
       );
     });
