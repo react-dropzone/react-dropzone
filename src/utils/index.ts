@@ -322,6 +322,18 @@ export function isSecurityError(v: any): boolean {
 }
 
 /**
+ * Check if v is a "not allowed" error.
+ *
+ * Some browsers/configurations block `window.showOpenFilePicker()` outright and reject with a
+ * `NotAllowedError` instead of showing the picker (e.g. Microsoft Edge for Business, or other
+ * restrictive enterprise/security policies). We treat this like a security error and fall back
+ * to the native `<input>`. See https://github.com/react-dropzone/react-dropzone/issues/1429
+ */
+export function isNotAllowedError(v: any): boolean {
+  return v instanceof DOMException && v.name === "NotAllowedError";
+}
+
+/**
  * Check if v is a MIME type string.
  */
 export function isMIMEType(v: string): boolean {
