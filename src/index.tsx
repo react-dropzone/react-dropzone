@@ -191,7 +191,20 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     validator
   } = props;
 
+  // `acceptAttr` keeps wildcard MIME types (e.g. `image/*`) so the drag-time
+  // `isDragAccept`/`isDragReject` check can react to a file's MIME type - file names
+  // (hence extensions) aren't readable during a drag.
   const acceptAttr = useMemo(() => acceptPropAsAcceptAttr(accept), [accept]);
+  // `inputAcceptAttr` drops a wildcard MIME type when it is paired with extensions, so the
+  // native picker and drop-time validation enforce the extensions instead of accepting any
+  // file of that type. See https://github.com/react-dropzone/react-dropzone/issues/1220
+  const inputAcceptAttr = useMemo(
+    () =>
+      acceptPropAsAcceptAttr(accept, {
+        omitWildcardMimeTypesWithExtensions: true
+      }),
+    [accept]
+  );
   const pickerTypes = useMemo(() => pickerOptionsFromAccept(accept), [accept]);
 
   const onFileDialogOpenCb = useMemo<(...args: any[]) => void>(
@@ -448,7 +461,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       const fileRejections: FileRejection[] = [];
 
       files.forEach(file => {
-        const [accepted, acceptError] = fileAccepted(file, acceptAttr);
+        const [accepted, acceptError] = fileAccepted(file, inputAcceptAttr);
         const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize);
         const customErrors = validator ? validator(file) : null;
 
@@ -461,7 +474,10 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
             errors = errors.concat(customErrors);
           }
 
-          fileRejections.push({file, errors: errors.filter((e): e is FileError => e != null)});
+          fileRejections.push({
+            file,
+            errors: errors.filter((e): e is FileError => e != null)
+          });
         }
       });
 
@@ -491,7 +507,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         onDropAccepted(acceptedFiles, event);
       }
     },
-    [dispatch, multiple, acceptAttr, minSize, maxSize, maxFiles, onDrop, onDropAccepted, onDropRejected, validator]
+    [dispatch, multiple, inputAcceptAttr, minSize, maxSize, maxFiles, onDrop, onDropAccepted, onDropRejected, validator]
   );
 
   const onDropCb = useCallback(
@@ -681,7 +697,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     () =>
       ({refKey = "ref", onChange, onClick, ...rest}: DropzoneInputProps = {}) => {
         const inputProps = {
-          accept: acceptAttr,
+          accept: inputAcceptAttr,
           multiple,
           type: "file",
           style: {

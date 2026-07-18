@@ -4,6 +4,8 @@ import {Accept, AcceptDuringDrag} from "../../components/examples";
 
 By providing the `accept` prop you can make the dropzone accept specific file types and reject the others. The value is an object keyed by [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) with an array of file extensions as values.
 
+Pairing a wildcard MIME type with extensions narrows it down to those extensions - `{"image/*": [".jpeg", ".png"]}` accepts only `.jpeg` and `.png` files, not every image type. Use an empty array (`{"image/*": []}`) to accept all files of that type.
+
 <Accept />
 
 ```tsx
