@@ -4,6 +4,8 @@ import {AcceptMaxFiles} from "../../components/examples";
 
 By providing the `maxFiles` prop you can limit how many files the dropzone accepts. It applies when `multiple` is enabled; the default of `0` means no limit.
 
+When more valid files are dropped than allowed, the first `maxFiles` are accepted and each surplus file is rejected with a `too-many-files` error (rather than rejecting the whole batch). When `multiple` is `false` the limit is always `1`, so the first valid file is accepted and the rest are rejected the same way. Files that fail their own checks (wrong type, out of the `[minSize, maxSize]` range, or a custom `validator` error) are rejected with those errors and don't count towards the limit.
+
 <AcceptMaxFiles />
 
 ```tsx

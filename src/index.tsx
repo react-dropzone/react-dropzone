@@ -502,12 +502,18 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         }
       });
 
-      if ((!multiple && acceptedFiles.length > 1) || (multiple && maxFiles >= 1 && acceptedFiles.length > maxFiles)) {
-        // Reject everything and empty accepted files
-        acceptedFiles.forEach(file => {
+      // Cap the accepted files at the configured limit and reject only the surplus (the files past
+      // the limit) with a too-many-files error, instead of rejecting the whole batch. The limit is 1
+      // when {multiple} is false, and {maxFiles} when {multiple} is true (0 means no limit). Files
+      // that already failed the per-file checks above are in {fileRejections} and don't count here.
+      // See https://github.com/react-dropzone/react-dropzone/issues/1355
+      // and https://github.com/react-dropzone/react-dropzone/issues/1358
+      const acceptedFilesLimit = multiple ? (maxFiles >= 1 ? maxFiles : Number.POSITIVE_INFINITY) : 1;
+      if (acceptedFiles.length > acceptedFilesLimit) {
+        const surplusFiles = acceptedFiles.splice(acceptedFilesLimit);
+        surplusFiles.forEach(file => {
           fileRejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
         });
-        acceptedFiles.splice(0);
       }
 
       dispatch({
