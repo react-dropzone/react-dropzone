@@ -255,8 +255,15 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
   const dragTargetsRef = useRef<EventTarget[]>([]);
   const globalDragTargetsRef = useRef<EventTarget[]>([]);
   const onDocumentDrop = (event: DragEvent) => {
-    if (rootRef.current && event.target && rootRef.current.contains(event.target as Node)) {
-      // If we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
+    // This is a document-level, bubble-phase listener, so it runs *after* the event has already
+    // bubbled through the dropzone root. If the drop landed inside the root and the instance's own
+    // onDrop handler already prevented the default, there's nothing left to do.
+    //
+    // We must NOT bail out on `contains()` alone: when the dropzone is `disabled` or has `noDrag`,
+    // the root has no onDrop handler, so nothing prevents the browser's default action and the file
+    // is opened in the tab. Falling through to `preventDefault()` here keeps that from happening.
+    // See https://github.com/react-dropzone/react-dropzone/issues/1362
+    if (rootRef.current && event.target && rootRef.current.contains(event.target as Node) && event.defaultPrevented) {
       return;
     }
     event.preventDefault();
