@@ -170,6 +170,30 @@ describe("isEvtWithFiles()", () => {
     ).toBe(true);
   });
 
+  it("should return true if items contain a file kind even when types omit Files (#1409)", () => {
+    // Some Chromium drags report only ["text/plain"] in types but still expose a
+    // kind: "file" item; detection should not depend solely on types.
+    expect(
+      utils.isEvtWithFiles({
+        dataTransfer: {types: ["text/plain"], items: [{kind: "file"}]}
+      })
+    ).toBe(true);
+    expect(
+      utils.isEvtWithFiles({
+        dataTransfer: {types: [], items: [{kind: "string"}, {kind: "file"}]}
+      })
+    ).toBe(true);
+  });
+
+  it("should return false if items contain no file kind and types omit Files", () => {
+    expect(
+      utils.isEvtWithFiles({
+        dataTransfer: {types: ["text/plain"], items: [{kind: "string"}]}
+      })
+    ).toBe(false);
+    expect(utils.isEvtWithFiles({dataTransfer: {types: ["text/plain"], items: []}})).toBe(false);
+  });
+
   it("should return true if the event has a target with files", () => {
     expect(utils.isEvtWithFiles({target: {files: []}})).toBe(true);
   });
