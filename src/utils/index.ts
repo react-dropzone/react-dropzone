@@ -244,9 +244,14 @@ export function isEvtWithFiles(event: any): boolean {
   }
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
   // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
-  return Array.prototype.some.call(
-    event.dataTransfer.types,
-    (type: string) => type === "Files" || type === "application/x-moz-file"
+  // Some Chromium drags omit "Files" from types (e.g. reporting only ["text/plain"])
+  // while still exposing a kind: "file" entry in items - the same signal file-selector
+  // uses to extract the files. Accept either so detection stays consistent. See #1409.
+  return (
+    Array.prototype.some.call(
+      event.dataTransfer.types,
+      (type: string) => type === "Files" || type === "application/x-moz-file"
+    ) || Array.prototype.some.call(event.dataTransfer.items ?? [], isKindFile)
   );
 }
 
