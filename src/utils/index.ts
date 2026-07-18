@@ -162,6 +162,70 @@ export function allFilesAccepted({
   });
 }
 
+/**
+ * The outcome of the drag-time acceptance check.
+ *
+ * - `accept`  - every file passes the checks we can evaluate during a drag.
+ * - `reject`  - at least one file confidently fails a check we can fully evaluate during a
+ *               drag (the file count, or a non-empty MIME type that doesn't match `accept`).
+ * - `unknown` - nothing confidently fails, but the outcome can't be confirmed until drop,
+ *               because a custom `validator` is configured and can't be evaluated yet.
+ */
+export type DragVerdict = "accept" | "reject" | "unknown";
+
+/**
+ * Classify a set of dragged files for the `isDragAccept`/`isDragReject`/`isDragUnknown` states.
+ *
+ * During `dragenter`/`dragover` the browser only exposes `DataTransferItem`s, which carry a MIME
+ * `type` but no file name, extension or size (see https://html.spec.whatwg.org/multipage/dnd.html#dndevents).
+ * So the drag-time check is deliberately optimistic about anything it can't see:
+ *
+ * - The custom `validator` is **never** run here. It is typed `(file: File) => ...` and users
+ *   routinely read `file.name`/`file.size`, which are `undefined` on a `DataTransferItem` - running
+ *   it would throw and abort the whole drag handler (leaving `isDragActive` stuck at `false`).
+ *   See https://github.com/react-dropzone/react-dropzone/issues/1408
+ * - When a `validator` is configured we therefore can't promise the files are acceptable, so the
+ *   verdict is `unknown` rather than a misleading `reject` (or a premature `accept`).
+ *   See https://github.com/react-dropzone/react-dropzone/issues/1244
+ *
+ * The full check (including the `validator`) still runs on drop in {@link fileAccepted}/`setFiles`.
+ */
+export function getDragVerdict({
+  files,
+  accept,
+  minSize,
+  maxSize,
+  multiple,
+  maxFiles = 0,
+  validator
+}: {
+  files: Array<File | DataTransferItem>;
+  accept?: string;
+  minSize?: number;
+  maxSize?: number;
+  multiple?: boolean;
+  maxFiles?: number;
+  validator?: (file: File) => FileError | readonly FileError[] | null;
+}): DragVerdict {
+  // The file count is knowable during a drag, so an over-the-limit selection is a confident reject.
+  if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 && files.length > maxFiles)) {
+    return "reject";
+  }
+
+  const confidentlyRejected = files.some(file => {
+    const [accepted] = fileAccepted(file as File, accept);
+    const [sizeMatch] = fileMatchSize(file as File, minSize, maxSize);
+    return !accepted || !sizeMatch;
+  });
+  if (confidentlyRejected) {
+    return "reject";
+  }
+
+  // Built-in checks pass. A custom validator can only ever add rejections on drop, never rescue
+  // one - so with a validator present the drag outcome is unknown until we have real Files.
+  return validator ? "unknown" : "accept";
+}
+
 // React's synthetic events has event.isPropagationStopped,
 // but to remain compatibility with other libs (Preact) fall back
 // to check event.cancelBubble

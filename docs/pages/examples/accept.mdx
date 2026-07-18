@@ -63,6 +63,20 @@ const {isDragActive, isDragAccept, isDragReject, getRootProps, getInputProps} = 
 
 > Mime type determination is not reliable across platforms. CSV files, for example, are reported as `text/plain` under macOS but as `application/vnd.ms-excel` under Windows.
 
+### `isDragUnknown` and custom validators
+
+Your custom `validator` is typed `(file: File) => …` and usually reads `file.name`, `file.size`, etc. During a drag those aren't available (the browser only exposes a MIME `type`), so react-dropzone **doesn't run the validator until drop**. While a validator is configured and the built-in checks pass, the drag state is neither accept nor reject but `isDragUnknown` — the outcome can only be confirmed once the real files are dropped:
+
+```tsx
+const {isDragAccept, isDragReject, isDragUnknown, getRootProps, getInputProps} = useDropzone({
+  validator: myValidator
+});
+
+// isDragUnknown === true  → "these files might be rejected on drop"
+```
+
+A file whose MIME type is _confidently_ wrong (or a selection that breaks `multiple`/`maxFiles`) is still `isDragReject` during the drag, even with a validator — a validator can only ever add rejections on drop, never rescue one.
+
 ## Restoring the full MIME-type table
 
 `react-dropzone` resolves each file's MIME `type` through [file-selector](https://github.com/react-dropzone/file-selector)'s `fromEvent` — the default for the [`getFilesFromEvent`](/examples/plugins) prop — which infers the `type` from the file extension when the browser leaves a file typeless (common with drag 'n' drop and File System Access sources).

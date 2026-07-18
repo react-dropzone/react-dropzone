@@ -3705,7 +3705,10 @@ describe("useDropzone() hook", () => {
       );
     });
 
-    it("sets {isDragAccept, isDragReject}", async () => {
+    // A custom validator is typed `(file: File) => ...` but during a drag we only have
+    // DataTransferItems (no name/size), so we can't run it - the drag outcome is {isDragUnknown}
+    // rather than a misleading accept/reject. See https://github.com/react-dropzone/react-dropzone/issues/1244
+    it("sets {isDragUnknown} during a drag when a validator is set", async () => {
       const data = createDtWithFiles(images);
       const validator = () => ({
         code: "not-allowed",
@@ -3714,11 +3717,12 @@ describe("useDropzone() hook", () => {
 
       const ui = (
         <Dropzone validator={validator} multiple={true}>
-          {({getRootProps, getInputProps, isDragAccept, isDragReject}) => (
+          {({getRootProps, getInputProps, isDragAccept, isDragReject, isDragUnknown}) => (
             <div {...getRootProps()}>
               <input {...getInputProps()} />
               {isDragAccept && "dragAccept"}
               {isDragReject && "dragReject"}
+              {isDragUnknown && "dragUnknown"}
             </div>
           )}
         </Dropzone>
@@ -3730,7 +3734,68 @@ describe("useDropzone() hook", () => {
       await act(() => fireEvent.dragEnter(dropzone, data));
 
       expect(dropzone).not.toHaveTextContent("dragAccept");
+      expect(dropzone).not.toHaveTextContent("dragReject");
+      expect(dropzone).toHaveTextContent("dragUnknown");
+    });
+
+    // A confidently-failing MIME check can't be rescued by a validator on drop, so it stays a
+    // reject during the drag even when a validator is configured.
+    it("keeps {isDragReject} over {isDragUnknown} when a file's MIME type is confidently rejected", async () => {
+      const data = createDtWithFiles(images);
+      const validator = () => null;
+
+      const ui = (
+        <Dropzone validator={validator} accept={{"application/pdf": [".pdf"]}} multiple={true}>
+          {({getRootProps, getInputProps, isDragAccept, isDragReject, isDragUnknown}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragAccept && "dragAccept"}
+              {isDragReject && "dragReject"}
+              {isDragUnknown && "dragUnknown"}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const {container} = render(ui);
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, data));
+
       expect(dropzone).toHaveTextContent("dragReject");
+      expect(dropzone).not.toHaveTextContent("dragUnknown");
+      expect(dropzone).not.toHaveTextContent("dragAccept");
+    });
+
+    // Regression for https://github.com/react-dropzone/react-dropzone/issues/1408: a validator
+    // that reads `file.name` throws on a DataTransferItem (name is undefined). Previously the throw
+    // aborted the drag handler and {isDragActive} never flipped to true. We must not run the
+    // validator during a drag.
+    it("still activates the drag when a validator reads file.name (#1408)", async () => {
+      const data = createDtWithFiles(images);
+      const onErrorSpy = vi.fn();
+      const validator = file => (file.name.endsWith(".csv") ? null : {code: "file-invalid-type", message: "nope"});
+
+      const ui = (
+        <Dropzone validator={validator} onError={onErrorSpy} multiple={true}>
+          {({getRootProps, getInputProps, isDragActive, isDragUnknown}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isDragActive && "dragActive"}
+              {isDragUnknown && "dragUnknown"}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const {container} = render(ui);
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, data));
+
+      expect(dropzone).toHaveTextContent("dragActive");
+      expect(dropzone).toHaveTextContent("dragUnknown");
+      expect(onErrorSpy).not.toHaveBeenCalled();
     });
   });
 
