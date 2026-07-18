@@ -49,7 +49,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   onDrop?: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
   onDropAccepted?: <T extends File>(files: T[], event: DropEvent) => void;
   onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
-  getFilesFromEvent?: (event: DropEvent) => Promise<Array<File | DataTransferItem>>;
+  getFilesFromEvent?: (event: DropEvent | Array<FileSystemFileHandle>) => Promise<Array<File | DataTransferItem>>;
   onFileDialogCancel?: () => void;
   onFileDialogOpen?: () => void;
   onError?: (err: Error) => void;
@@ -58,12 +58,7 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   autoFocus?: boolean;
 };
 
-export type DropEvent =
-  | React.DragEvent<HTMLElement>
-  | React.ChangeEvent<HTMLInputElement>
-  | DragEvent
-  | Event
-  | Array<FileSystemFileHandle>;
+export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
 
 export interface DropzoneRef {
   open: () => void;

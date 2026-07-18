@@ -1,13 +1,20 @@
 import Dropzone from "../src";
 import type {DropEvent} from "../src";
 
-// A custom file aggregator receives the full DropEvent union and narrows internally.
-const fromDragEvent = async (event: DropEvent): Promise<File[]> => {
+// A custom file aggregator receives the full input union (a DropEvent or a
+// FileSystemFileHandle array) and narrows internally.
+const fromDragEvent = async (event: DropEvent | Array<FileSystemFileHandle>): Promise<File[]> => {
+  if (Array.isArray(event)) {
+    return [];
+  }
   const dt = (event as DragEvent).dataTransfer;
   return dt ? Array.from(dt.files) : [];
 };
 
-const fromDataTransferItems = async (event: DropEvent): Promise<DataTransferItem[]> => {
+const fromDataTransferItems = async (event: DropEvent | Array<FileSystemFileHandle>): Promise<DataTransferItem[]> => {
+  if (Array.isArray(event)) {
+    return [];
+  }
   const dt = (event as DragEvent).dataTransfer;
   return dt ? Array.from(dt.items) : [];
 };
