@@ -29,6 +29,33 @@ describe("useDropzone() hook", () => {
       expect(container.innerHTML).toMatchSnapshot();
     });
 
+    it("hides the <input> without {position: absolute} (#1413) while keeping it focusable (#1268)", () => {
+      const {container} = render(
+        <Dropzone>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const input = container.querySelector("input")!;
+
+      // {position: absolute} makes the browser scroll the page to the input when it is
+      // focused (e.g. inside a collapsed accordion), which is the regression in #1413.
+      expect(input.style.position).not.toBe("absolute");
+      expect(input.style.position).not.toBe("fixed");
+
+      // The input must stay focusable so a {required} input still triggers form validation
+      // (#1268); {display: none} / {visibility: hidden} would break that.
+      expect(input.style.display).not.toBe("none");
+      expect(input.style.visibility).not.toBe("hidden");
+
+      // Still visually hidden.
+      expect(input.style.opacity).toBe("0");
+    });
+
     it("sets {accept} prop on the <input>", () => {
       const accept = {
         "image/jpeg": []

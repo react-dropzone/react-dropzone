@@ -743,17 +743,21 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
           multiple,
           type: "file",
           "aria-label": "file upload",
+          // Hide the input without taking it out of flow. A visually-hidden input with
+          // {position: absolute} makes the browser scroll the page to it whenever it gets
+          // focus (e.g. inside a collapsed accordion), see #1413. Keeping it in flow as a
+          // zero-size, transparent block avoids that while staying focusable so a {required}
+          // input still triggers form validation, see #1268. Don't use {display: none} or
+          // {visibility: hidden}: those make the input unfocusable and reintroduce #1268.
           style: {
             border: 0,
-            clip: "rect(0, 0, 0, 0)",
-            clipPath: "inset(50%)",
-            height: "1px",
-            margin: "0 -1px -1px 0",
+            display: "block",
+            height: 0,
+            margin: 0,
+            opacity: 0,
             overflow: "hidden",
             padding: 0,
-            position: "absolute",
-            width: "1px",
-            whiteSpace: "nowrap"
+            width: 0
           },
           onChange: composeHandler(composeEventHandlers(onChange, onDropCb)),
           onClick: composeHandler(composeEventHandlers(onClick, onInputElementClick)),
