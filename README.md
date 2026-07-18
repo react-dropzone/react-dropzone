@@ -299,7 +299,7 @@ This lib is not a file uploader; as such, it does not process files or provide a
 
 ### Using \<label\> as Root
 
-If you use [\<label\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label) as the root element, the file dialog will be opened twice; see [#1107](https://github.com/react-dropzone/react-dropzone/issues/1107) why. To avoid this, use `noClick`:
+If you use [\<label\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label) as the root element, the file dialog will be opened twice; see [#1107](https://github.com/react-dropzone/react-dropzone/issues/1107) and [#1432](https://github.com/react-dropzone/react-dropzone/issues/1432) why. A `<label>` natively forwards clicks to the `<input>` it wraps, so the dialog opens once from that and once from our own click handler. To avoid this, use `noClick`:
 
 ```jsx static
 import React, {useCallback} from "react";
@@ -338,6 +338,56 @@ function MyDropzone() {
 }
 ```
 
+### Changing Props Before open()
+
+Browsers only let you open the file dialog from within a short window after a user gesture (a "[transient user activation](https://developer.mozilla.org/en-US/docs/Web/Security/User_activation)"). Because of this, `open()` must run synchronously in the same event that the user triggered - it cannot wait for React to re-render.
+
+So if you update a prop (e.g. `accept`) and call `open()` in the same handler, `open()` runs against the _previous_ render, before the new prop is applied. Some browsers (notably Safari) may also drop the file dialog entirely, so it appears to require a second click. See [#1188](https://github.com/react-dropzone/react-dropzone/issues/1188).
+
+```jsx static
+// 🚫 open() runs with the old `accept` - and may not open at all on Safari
+function MyDropzone() {
+  const [accept, setAccept] = useState({"image/*": []});
+  const {getRootProps, getInputProps, open} = useDropzone({accept, noClick: true});
+
+  const pickPdfs = () => {
+    setAccept({"application/pdf": []}); // applied on the next render
+    open(); // still uses {"image/*": []}
+  };
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <button type="button" onClick={pickPdfs}>
+        Pick PDFs
+      </button>
+    </div>
+  );
+}
+```
+
+Instead, render one dropzone per set of props (each with its own `open`) and call the right one, so no state change has to land before opening:
+
+```jsx static
+function MyDropzone() {
+  const images = useDropzone({accept: {"image/*": []}, noClick: true});
+  const pdfs = useDropzone({accept: {"application/pdf": []}, noClick: true});
+
+  return (
+    <div {...images.getRootProps()}>
+      <input {...images.getInputProps()} />
+      <input {...pdfs.getInputProps()} />
+      <button type="button" onClick={images.open}>
+        Pick images
+      </button>
+      <button type="button" onClick={pdfs.open}>
+        Pick PDFs
+      </button>
+    </div>
+  );
+}
+```
+
 ### File Dialog Cancel Callback
 
 The `onFileDialogCancel()` cb is unstable in most browsers, meaning, there's a good chance of it being triggered even though you have selected files.
@@ -365,6 +415,7 @@ With the use of the file system access API enabled, there's a couple of caveats 
 1. The users will not be able to select directories
 2. It requires the app to run in a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts)
 3. In [Electron](https://www.electronjs.org/), the path may not be set (see [#1249](https://github.com/react-dropzone/react-dropzone/issues/1249))
+4. Some browsers/configurations block `showOpenFilePicker()` and reject with a `NotAllowedError` (e.g. Microsoft Edge for Business or other restrictive enterprise/security policies). When this happens we automatically fall back to the native `<input>` so the file dialog still opens, provided you render one via `getInputProps()` (see [#1429](https://github.com/react-dropzone/react-dropzone/issues/1429))
 
 ## Supported Browsers
 
