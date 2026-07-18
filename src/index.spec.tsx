@@ -701,6 +701,60 @@ describe("useDropzone() hook", () => {
       fireEvent(document.body, dropEvt);
       expect(dropEvtPreventDefaultSpy).toHaveBeenCalledTimes(0);
     });
+
+    // https://github.com/react-dropzone/react-dropzone/issues/1362
+    // When the root has no onDrop handler (disabled/noDrag), the document handler must still
+    // prevent the browser from opening a file dropped onto the root.
+    it("prevents the browser from opening a file dropped on a {disabled} dropzone", () => {
+      const {container} = render(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropEvt = new Event("drop", {bubbles: true, cancelable: true});
+      fireEvent(container.querySelector("div"), dropEvt);
+      expect(dropEvt.defaultPrevented).toBe(true);
+    });
+
+    it("prevents the browser from opening a file dropped on a {noDrag} dropzone", () => {
+      const {container} = render(
+        <Dropzone noDrag>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropEvt = new Event("drop", {bubbles: true, cancelable: true});
+      fireEvent(container.querySelector("div"), dropEvt);
+      expect(dropEvt.defaultPrevented).toBe(true);
+    });
+
+    it("still lets an enabled dropzone handle its own drops (no double prevent)", () => {
+      const {container} = render(
+        <Dropzone>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropEvt = new Event("drop", {bubbles: true, cancelable: true});
+      const dropEvtPreventDefaultSpy = vi.spyOn(dropEvt, "preventDefault");
+      fireEvent(container.querySelector("div"), dropEvt);
+      // The instance's own onDrop handler prevents the default; the document handler bails out
+      // because the event is already defaultPrevented, so preventDefault runs exactly once.
+      expect(dropEvtPreventDefaultSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("event propagation", () => {
