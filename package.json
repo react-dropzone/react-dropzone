@@ -101,7 +101,13 @@
     "waku": "^1.0.0-beta.6"
   },
   "peerDependencies": {
+    "@types/react": "*",
     "react": ">= 18"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">= 20"
