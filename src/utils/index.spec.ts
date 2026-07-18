@@ -401,6 +401,68 @@ describe("allFilesAccepted()", () => {
   });
 });
 
+describe("getDragVerdict()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  const pdfs = () => [
+    createFile("hamster.pdf", 100, "application/pdf"),
+    createFile("fish.pdf", 100, "application/pdf")
+  ];
+
+  it("returns 'accept' when every file passes the drag-evaluable checks", () => {
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true})).toEqual("accept");
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, accept: "application/pdf"})).toEqual("accept");
+  });
+
+  it("returns 'reject' when the file count exceeds the limit", () => {
+    expect(utils.getDragVerdict({files: pdfs(), multiple: false})).toEqual("reject");
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, maxFiles: 1})).toEqual("reject");
+  });
+
+  it("returns 'reject' when a non-empty MIME type doesn't match {accept}", () => {
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, accept: "image/*"})).toEqual("reject");
+  });
+
+  it("returns 'reject' when a file falls outside the size bounds", () => {
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, minSize: 110})).toEqual("reject");
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, maxSize: 99})).toEqual("reject");
+  });
+
+  it("returns 'unknown' (never runs the validator) when a validator is configured and built-in checks pass", () => {
+    const validator = vi.fn(() => ({code: "not-allowed", message: "Cannot do this!"}));
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, validator})).toEqual("unknown");
+    // The validator must not run during a drag - it's typed (file: File) and would throw on a
+    // DataTransferItem. See https://github.com/react-dropzone/react-dropzone/issues/1408
+    expect(validator).not.toHaveBeenCalled();
+  });
+
+  it("prefers a confident 'reject' over 'unknown' even with a validator", () => {
+    const validator = () => null;
+    expect(utils.getDragVerdict({files: pdfs(), multiple: true, accept: "image/*", validator})).toEqual("reject");
+    expect(utils.getDragVerdict({files: pdfs(), multiple: false, validator})).toEqual("reject");
+  });
+
+  it("treats empty-type DataTransferItems as 'accept', or 'unknown' when a validator is set", () => {
+    const emptyTypeItems = [
+      {type: "", getAsFile: () => null},
+      {type: "", getAsFile: () => null}
+    ];
+    expect(utils.getDragVerdict({files: emptyTypeItems, multiple: true, accept: "text/markdown,.md"})).toEqual(
+      "accept"
+    );
+    expect(
+      utils.getDragVerdict({files: emptyTypeItems, multiple: true, accept: "text/markdown,.md", validator: () => null})
+    ).toEqual("unknown");
+  });
+});
+
 describe("ErrorCode", () => {
   /**
    * @constant
