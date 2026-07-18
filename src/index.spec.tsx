@@ -3626,6 +3626,76 @@ describe("useDropzone() hook", () => {
     });
   });
 
+  describe("getErrorMessage", () => {
+    it("overrides built-in rejection messages by code and receives the file", async () => {
+      const onDropSpy = vi.fn();
+      const getErrorMessage = (error, file) =>
+        error.code === "file-too-large" ? `${file.name} is too big` : error.message;
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} maxSize={1000} multiple getErrorMessage={getErrorMessage}>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [],
+        [
+          {file: images[0], errors: [{code: "file-too-large", message: "cats.gif is too big"}]},
+          {file: images[1], errors: [{code: "file-too-large", message: "dogs.gif is too big"}]}
+        ],
+        expect.anything()
+      );
+    });
+
+    it("also overrides custom validator error messages", async () => {
+      const onDropSpy = vi.fn();
+      const validator = () => ({code: "not-allowed", message: "Cannot do this!"});
+      const getErrorMessage = error => (error.code === "not-allowed" ? "Localized: not allowed" : error.message);
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} validator={validator} multiple getErrorMessage={getErrorMessage}>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [],
+        [
+          {file: images[0], errors: [{code: "not-allowed", message: "Localized: not allowed"}]},
+          {file: images[1], errors: [{code: "not-allowed", message: "Localized: not allowed"}]}
+        ],
+        expect.anything()
+      );
+    });
+
+    it("overrides the too-many-files rejection message", async () => {
+      const onDropSpy = vi.fn();
+      const getErrorMessage = error => (error.code === "too-many-files" ? "Too many!" : error.message);
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} maxFiles={1} multiple getErrorMessage={getErrorMessage}>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [],
+        [
+          {file: images[0], errors: [{code: "too-many-files", message: "Too many!"}]},
+          {file: images[1], errors: [{code: "too-many-files", message: "Too many!"}]}
+        ],
+        expect.anything()
+      );
+    });
+  });
+
   describe("accessibility", () => {
     it("sets the role attribute to button by default on the root", () => {
       const {container} = render(<Dropzone>{({getRootProps}) => <div id="root" {...getRootProps()} />}</Dropzone>);

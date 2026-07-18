@@ -23,3 +23,26 @@ function CustomValidation() {
   // ...render accepted/rejected lists
 }
 ```
+
+## Overriding error messages
+
+The built-in rejection messages (`file-invalid-type`, `file-too-large`, `file-too-small`, `too-many-files`) are in English. Use the `getErrorMessage` prop to override them — e.g. to localize. It's called once per error with the error and the file it belongs to, and its return value replaces the message. Return `error.message` for codes you don't want to change (this also applies to your own `validator` errors).
+
+```tsx
+function LocalizedDropzone() {
+  const {getRootProps, getInputProps} = useDropzone({
+    maxSize: 1024,
+    getErrorMessage: (error, file) => {
+      switch (error.code) {
+        case "file-too-large":
+          return `${file.name} dépasse la taille maximale`;
+        case "too-many-files":
+          return "Trop de fichiers";
+        default:
+          return error.message;
+      }
+    }
+  });
+  // ...
+}
+```
