@@ -331,6 +331,13 @@ describe("getTooLargeRejectionErr()", () => {
   it("prints bytes when maxSize > 1", () => {
     expect(utils.getTooLargeRejectionErr(100).message).toEqual("File is larger than 100 bytes");
   });
+
+  it("formats larger sizes using human-readable units", () => {
+    expect(utils.getTooLargeRejectionErr(1024).message).toEqual("File is larger than 1 KB");
+    expect(utils.getTooLargeRejectionErr(1536).message).toEqual("File is larger than 1.5 KB");
+    expect(utils.getTooLargeRejectionErr(1111).message).toEqual("File is larger than 1.08 KB");
+    expect(utils.getTooLargeRejectionErr(5 * 1024 * 1024).message).toEqual("File is larger than 5 MB");
+  });
 });
 
 describe("getTooSmallRejectionErr()", () => {
@@ -349,6 +356,12 @@ describe("getTooSmallRejectionErr()", () => {
 
   it("prints bytes when minSize > 1", () => {
     expect(utils.getTooSmallRejectionErr(100).message).toEqual("File is smaller than 100 bytes");
+  });
+
+  it("formats larger sizes using human-readable units", () => {
+    expect(utils.getTooSmallRejectionErr(1024).message).toEqual("File is smaller than 1 KB");
+    expect(utils.getTooSmallRejectionErr(1112).message).toEqual("File is smaller than 1.09 KB");
+    expect(utils.getTooSmallRejectionErr(5 * 1024 * 1024).message).toEqual("File is smaller than 5 MB");
   });
 });
 

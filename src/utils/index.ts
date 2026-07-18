@@ -44,17 +44,39 @@ export function getInvalidTypeRejectionErr(accept: string = ""): FileError {
   };
 }
 
+const FILE_SIZE_UNITS = ["KB", "MB", "GB", "TB", "PB"];
+
+/**
+ * Format a byte count into a human-readable string, e.g. `1111` -> `1.08 KB`.
+ * Values below 1 KB are kept in bytes to preserve the singular/plural wording.
+ */
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} ${bytes === 1 ? "byte" : "bytes"}`;
+  }
+
+  let size = bytes / 1024;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < FILE_SIZE_UNITS.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+
+  // Round to 2 decimals, then drop trailing zeros (1.00 -> 1, 1.50 -> 1.5).
+  return `${Number(size.toFixed(2))} ${FILE_SIZE_UNITS[unitIndex]}`;
+}
+
 export function getTooLargeRejectionErr(maxSize: number): FileError {
   return {
     code: FILE_TOO_LARGE,
-    message: `File is larger than ${maxSize} ${maxSize === 1 ? "byte" : "bytes"}`
+    message: `File is larger than ${formatBytes(maxSize)}`
   };
 }
 
 export function getTooSmallRejectionErr(minSize: number): FileError {
   return {
     code: FILE_TOO_SMALL,
-    message: `File is smaller than ${minSize} ${minSize === 1 ? "byte" : "bytes"}`
+    message: `File is smaller than ${formatBytes(minSize)}`
   };
 }
 

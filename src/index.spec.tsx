@@ -3257,7 +3257,7 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-too-large",
-                message: "File is larger than 1111 bytes"
+                message: "File is larger than 1.08 KB"
               }
             ]
           },
@@ -3266,7 +3266,7 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-too-large",
-                message: "File is larger than 1111 bytes"
+                message: "File is larger than 1.08 KB"
               }
             ]
           }
@@ -3299,7 +3299,7 @@ describe("useDropzone() hook", () => {
             errors: [
               {
                 code: "file-too-small",
-                message: "File is smaller than 1112 bytes"
+                message: "File is smaller than 1.09 KB"
               }
             ]
           }
