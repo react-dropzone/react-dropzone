@@ -640,6 +640,26 @@ describe("isSecurityError()", () => {
   });
 });
 
+describe("isNotAllowedError()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("should work as expected", () => {
+    expect(utils.isNotAllowedError(new Error("some err"))).toBe(false);
+    expect(utils.isNotAllowedError(new DOMException())).toBe(false);
+    expect(utils.isNotAllowedError(new DOMException("some err"))).toBe(false);
+    expect(utils.isNotAllowedError(new DOMException("some err", "Noop"))).toBe(false);
+    expect(utils.isNotAllowedError(new DOMException("some err", "SecurityError"))).toBe(false);
+    expect(utils.isNotAllowedError(new DOMException("some err", "NotAllowedError"))).toBe(true);
+  });
+});
+
 function createFile(name, size, type) {
   const file = new File([], name, {type});
   Object.defineProperty(file, "size", {

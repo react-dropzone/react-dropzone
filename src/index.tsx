@@ -13,6 +13,7 @@ import {
   isAbort,
   isEvtWithFiles,
   isIeOrEdge,
+  isNotAllowedError,
   isPropagationStopped,
   isSecurityError,
   onDocumentDragOver,
@@ -575,10 +576,12 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
           if (isAbort(e)) {
             onFileDialogCancelCb(e);
             dispatch({type: "closeDialog"});
-          } else if (isSecurityError(e)) {
+          } else if (isSecurityError(e) || isNotAllowedError(e)) {
+            // The FS access API is unusable here: either the context forbids it (SecurityError,
+            // e.g. CORS) or the browser/platform blocked the picker (NotAllowedError, e.g. Edge
+            // for Business - see https://github.com/react-dropzone/react-dropzone/issues/1429).
+            // Stop using it and fall back to the native <input>.
             fsAccessApiWorksRef.current = false;
-            // CORS, so cannot use this API
-            // Try using the input
             if (inputRef.current) {
               inputRef.current.value = "";
               inputRef.current.click();

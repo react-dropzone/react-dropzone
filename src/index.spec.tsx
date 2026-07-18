@@ -1709,6 +1709,60 @@ describe("useDropzone() hook", () => {
       expect(onClickSpy).toHaveBeenCalled();
     });
 
+    it("should try to use showOpenFilePicker() and fallback to input in case of a not allowed error", async () => {
+      // Some browsers/configurations (e.g. Microsoft Edge for Business) block showOpenFilePicker()
+      // and reject with a NotAllowedError instead of showing the picker.
+      // See https://github.com/react-dropzone/react-dropzone/issues/1429
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+      const onClickSpy = vi.spyOn(HTMLInputElement.prototype, "click");
+
+      const thenable = createThenable();
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const onDropSpy = vi.fn();
+      const onErrorSpy = vi.fn();
+      const onFileDialogOpenSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone
+          onDrop={onDropSpy}
+          onError={onErrorSpy}
+          onFileDialogOpen={onFileDialogOpenSpy}
+          accept={{
+            "application/pdf": []
+          }}
+          multiple
+          useFsAccessApi
+        >
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      fireEvent.click(dropzone);
+
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+      expect(onFileDialogOpenSpy).toHaveBeenCalled();
+
+      await act(() =>
+        thenable.cancel(new DOMException("The request is not allowed by the user agent", "NotAllowedError"))
+      );
+
+      expect(onClickSpy).toHaveBeenCalled();
+      // A blocked picker is not an error the consumer should see - we fall back silently
+      expect(onErrorSpy).not.toHaveBeenCalled();
+    });
+
     test("window focus evt is bound if showOpenFilePicker() is supported but errors due to a security error", async () => {
       vi.useFakeTimers();
 
