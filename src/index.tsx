@@ -14,15 +14,16 @@ import {
   isEvtWithFiles,
   isIeOrEdge,
   isNotAllowedError,
+  isThenable,
   isPropagationStopped,
   isSecurityError,
   onDocumentDragOver,
   pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION
 } from "./utils";
-import type {Accept, FileError} from "./utils";
+import type {Accept, FileError, ValidatorResult} from "./utils";
 
-export type {Accept, FileError, FileWithPath};
+export type {Accept, FileError, FileWithPath, ValidatorResult};
 export {ErrorCode};
 
 export interface DropzoneProps extends DropzoneOptions {
@@ -54,7 +55,18 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   onFileDialogCancel?: () => void;
   onFileDialogOpen?: () => void;
   onError?: (err: Error) => void;
-  validator?: <T extends File>(file: T) => FileError | readonly FileError[] | null;
+  /**
+   * Custom validation, run once per file on drop/selection. Return `null` to accept the file, or a
+   * {@link FileError} (or array of them) to reject it. May be `async` (return a `Promise`) to support
+   * checks that can't run synchronously - e.g. reading image dimensions, inspecting file contents,
+   * or calling an external service. While an async validator is pending, {@link DropzoneState.isProcessing}
+   * is `true`, and `onDrop`/`onDropAccepted`/`onDropRejected` fire only once it settles. If the
+   * validator throws or rejects, `onError` is called and the drop is discarded.
+   *
+   * Note: the validator never runs during a drag (a `DataTransferItem` has no name/size), so a
+   * validator-configured dropzone is `isDragUnknown` until drop.
+   */
+  validator?: <T extends File>(file: T) => ValidatorResult | Promise<ValidatorResult>;
   /**
    * Override the message of any rejection error (built-in or custom). Called once per error;
    * receives the error and the file it belongs to and returns the message to use. Return
@@ -79,6 +91,14 @@ export type DropzoneState = DropzoneRef & {
   isDragUnknown: boolean;
   isDragGlobal: boolean;
   isFileDialogActive: boolean;
+  /**
+   * `true` while a drop/selection is being processed asynchronously - i.e. while `getFilesFromEvent`
+   * reads the files and/or an async {@link DropzoneOptions.validator} runs. Spans the whole pipeline,
+   * from when files start being read until validation settles. When both are synchronous (the default
+   * `getFilesFromEvent` with no/async-free validator) the work resolves within a microtask, so it's
+   * only observable for genuinely async work. Use it to show a spinner or disable UI while processing.
+   */
+  isProcessing: boolean;
   acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
   rootRef: React.RefObject<HTMLElement>;
@@ -133,8 +153,22 @@ interface DropzoneInternalState {
   isDragReject: boolean;
   isDragUnknown: boolean;
   isDragGlobal: boolean;
+  isProcessing: boolean;
   acceptedFiles: FileWithPath[];
   fileRejections: FileRejection[];
+}
+
+/**
+ * The per-file outcome of the built-in checks plus the (resolved) custom validator, assembled in
+ * setFiles before the accepted/rejected split.
+ */
+interface PerFileResult {
+  file: FileWithPath;
+  accepted: boolean;
+  acceptError: FileError | null;
+  sizeMatch: boolean;
+  sizeError: FileError | null;
+  customErrors: ValidatorResult;
 }
 
 const initialState: DropzoneInternalState = {
@@ -145,6 +179,7 @@ const initialState: DropzoneInternalState = {
   isDragReject: false,
   isDragUnknown: false,
   isDragGlobal: false,
+  isProcessing: false,
   acceptedFiles: [],
   fileRejections: []
 };
@@ -227,6 +262,29 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const {isFocused, isFileDialogActive} = state;
+
+  // Tracks the in-flight processing run - reading files (getFilesFromEvent) plus running an async
+  // validator. A newer drop/selection aborts the previous run so slow async work can't resolve late
+  // and clobber the state with stale results.
+  const processingAbortRef = useRef<AbortController | null>(null);
+
+  // Begin a processing run: supersede any run still in flight and flip {isProcessing} on. Returns
+  // the run's AbortSignal, which downstream async steps check to bail if a newer run took over.
+  const beginProcessing = useCallback(() => {
+    processingAbortRef.current?.abort();
+    const controller = new AbortController();
+    processingAbortRef.current = controller;
+    dispatch({type: "setProcessing", isProcessing: true});
+    return controller.signal;
+  }, []);
+
+  // End a processing run by clearing {isProcessing} - but only if this run is still the active one.
+  // A superseded run (signal aborted) leaves the flag to the run that replaced it.
+  const endProcessing = useCallback((signal: AbortSignal) => {
+    if (!signal.aborted) {
+      dispatch({type: "setProcessing", isProcessing: false});
+    }
+  }, []);
 
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" && window.isSecureContext && useFsAccessApi && canUseFileSystemAccessAPI()
@@ -474,65 +532,114 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
   );
 
   const setFiles = useCallback(
-    (files: FileWithPath[], event: any) => {
-      const acceptedFiles: FileWithPath[] = [];
-      const fileRejections: FileRejection[] = [];
-
+    async (files: FileWithPath[], event: any, signal: AbortSignal) => {
       const localizeError = (error: FileError, file: File): FileError =>
         getErrorMessage ? {...error, message: getErrorMessage(error, file)} : error;
 
-      files.forEach(file => {
+      // Commit the per-file verdicts: split accepted/rejected, cap the surplus, update state and
+      // fire the onDrop callbacks. Runs synchronously so nested-dropzone ordering is preserved on
+      // the fast path (an onDrop handler calling stopPropagation must do so before a parent's onDrop
+      // check - see the noDragEventsBubbling tests).
+      const commit = (results: Array<PerFileResult>) => {
+        const acceptedFiles: FileWithPath[] = [];
+        const fileRejections: FileRejection[] = [];
+
+        results.forEach(({file, accepted, acceptError, sizeMatch, sizeError, customErrors}) => {
+          if (accepted && sizeMatch && !customErrors) {
+            acceptedFiles.push(file);
+          } else {
+            let errors: Array<FileError | null> = [acceptError, sizeError];
+
+            if (customErrors) {
+              errors = errors.concat(customErrors);
+            }
+
+            fileRejections.push({
+              file,
+              errors: errors.filter((e): e is FileError => e != null).map(error => localizeError(error, file))
+            });
+          }
+        });
+
+        // Cap the accepted files at the configured limit and reject only the surplus (the files past
+        // the limit) with a too-many-files error, instead of rejecting the whole batch. The limit is 1
+        // when {multiple} is false, and {maxFiles} when {multiple} is true (0 means no limit). Files
+        // that already failed the per-file checks above are in {fileRejections} and don't count here.
+        // See https://github.com/react-dropzone/react-dropzone/issues/1355
+        // and https://github.com/react-dropzone/react-dropzone/issues/1358
+        const acceptedFilesLimit = multiple ? (maxFiles >= 1 ? maxFiles : Number.POSITIVE_INFINITY) : 1;
+        if (acceptedFiles.length > acceptedFilesLimit) {
+          const surplusFiles = acceptedFiles.splice(acceptedFilesLimit);
+          surplusFiles.forEach(file => {
+            fileRejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
+          });
+        }
+
+        // Clears isProcessing back to false (see the reducer) in the same update that sets the files.
+        dispatch({
+          acceptedFiles,
+          fileRejections,
+          type: "setFiles"
+        });
+
+        if (onDrop) {
+          onDrop(acceptedFiles, fileRejections, event);
+        }
+
+        if (fileRejections.length > 0 && onDropRejected) {
+          onDropRejected(fileRejections, event);
+        }
+
+        if (acceptedFiles.length > 0 && onDropAccepted) {
+          onDropAccepted(acceptedFiles, event);
+        }
+      };
+
+      // Run the built-in checks synchronously and invoke the validator (which may return a value or
+      // a Promise). customErrors is left as-is here so we can tell sync from async below.
+      const pending = files.map(file => {
         const [accepted, acceptError] = fileAccepted(file, inputAcceptAttr);
         const [sizeMatch, sizeError] = fileMatchSize(file, minSize, maxSize);
         const customErrors = validator ? validator(file) : null;
+        return {file, accepted, acceptError, sizeMatch, sizeError, customErrors};
+      });
 
-        if (accepted && sizeMatch && !customErrors) {
-          acceptedFiles.push(file);
-        } else {
-          let errors: Array<FileError | null> = [acceptError, sizeError];
+      // Callers check signal.aborted right before invoking setFiles (synchronously, no await in
+      // between), so this run is guaranteed live here - the supersession guards below only matter
+      // after we await the validator.
 
-          if (customErrors) {
-            errors = errors.concat(customErrors);
-          }
+      // Fast path: no validator, or a synchronous one. Commit synchronously - no extra microtask
+      // hop, so nested-dropzone ordering is preserved (an onDrop handler calling stopPropagation
+      // must run before a parent's onDrop check - see the noDragEventsBubbling tests). commit's
+      // dispatch also clears isProcessing.
+      if (!pending.some(({customErrors}) => isThenable(customErrors))) {
+        commit(pending as Array<PerFileResult>);
+        return;
+      }
 
-          fileRejections.push({
-            file,
-            errors: errors.filter((e): e is FileError => e != null).map(error => localizeError(error, file))
-          });
+      // Async path: at least one validator returned a Promise. isProcessing is already on (set when
+      // the run began, before getFilesFromEvent); keep guarding against supersession while we await.
+      let results: Array<PerFileResult>;
+      try {
+        results = await Promise.all(
+          pending.map(async ({customErrors, ...rest}) => ({...rest, customErrors: await customErrors}))
+        );
+      } catch (e) {
+        // A validator threw/rejected. If a newer run already superseded this one, let it own the
+        // state; otherwise clear the processing flag and report the error via onError.
+        if (!signal.aborted) {
+          endProcessing(signal);
+          onErrCb(e as Error);
         }
-      });
-
-      // Cap the accepted files at the configured limit and reject only the surplus (the files past
-      // the limit) with a too-many-files error, instead of rejecting the whole batch. The limit is 1
-      // when {multiple} is false, and {maxFiles} when {multiple} is true (0 means no limit). Files
-      // that already failed the per-file checks above are in {fileRejections} and don't count here.
-      // See https://github.com/react-dropzone/react-dropzone/issues/1355
-      // and https://github.com/react-dropzone/react-dropzone/issues/1358
-      const acceptedFilesLimit = multiple ? (maxFiles >= 1 ? maxFiles : Number.POSITIVE_INFINITY) : 1;
-      if (acceptedFiles.length > acceptedFilesLimit) {
-        const surplusFiles = acceptedFiles.splice(acceptedFilesLimit);
-        surplusFiles.forEach(file => {
-          fileRejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
-        });
+        return;
       }
 
-      dispatch({
-        acceptedFiles,
-        fileRejections,
-        type: "setFiles"
-      });
-
-      if (onDrop) {
-        onDrop(acceptedFiles, fileRejections, event);
+      // A newer drop landed while we were validating - discard these stale results.
+      if (signal.aborted) {
+        return;
       }
 
-      if (fileRejections.length > 0 && onDropRejected) {
-        onDropRejected(fileRejections, event);
-      }
-
-      if (acceptedFiles.length > 0 && onDropAccepted) {
-        onDropAccepted(acceptedFiles, event);
-      }
+      commit(results);
     },
     [
       dispatch,
@@ -545,7 +652,9 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       onDropAccepted,
       onDropRejected,
       validator,
-      getErrorMessage
+      getErrorMessage,
+      onErrCb,
+      endProcessing
     ]
   );
 
@@ -558,19 +667,35 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
 
       dragTargetsRef.current = [];
 
+      // Clear drag state before we begin processing so beginProcessing's isProcessing isn't reset.
+      dispatch({type: "reset"});
+
       if (isEvtWithFiles(event)) {
+        // Processing spans reading the files (getFilesFromEvent) and running the validator.
+        const signal = beginProcessing();
         Promise.resolve(getFilesFromEvent(event))
           .then(files => {
-            if (isPropagationStopped(event) && !noDragEventsBubbling) {
+            // A newer drop superseded this one while reading files - it owns isProcessing now.
+            if (signal.aborted) {
               return;
             }
-            setFiles(files as FileWithPath[], event);
+            if (isPropagationStopped(event) && !noDragEventsBubbling) {
+              endProcessing(signal);
+              return;
+            }
+            // setFiles handles validator errors internally (routing them to onError); the outer
+            // catch here only fires for a getFilesFromEvent failure.
+            return setFiles(files as FileWithPath[], event, signal);
           })
-          .catch(e => onErrCb(e));
+          .catch(e => {
+            if (!signal.aborted) {
+              endProcessing(signal);
+              onErrCb(e);
+            }
+          });
       }
-      dispatch({type: "reset"});
     },
-    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling]
+    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling, beginProcessing, endProcessing]
   );
 
   // Fn for opening the file dialog programmatically
@@ -585,14 +710,31 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         multiple,
         types: pickerTypes
       };
+      // Set once the user has picked file(s); processing then spans reading them (getFilesFromEvent)
+      // and running the validator. Picker rejections (cancel, security) happen before this, so it
+      // stays undefined there and no processing state is touched.
+      let signal: AbortSignal | undefined;
       (window as any)
         .showOpenFilePicker(opts)
-        .then((handles: any) => getFilesFromEvent(handles))
+        .then((handles: any) => {
+          signal = beginProcessing();
+          return getFilesFromEvent(handles);
+        })
         .then((files: Array<File | DataTransferItem>) => {
-          setFiles(files as FileWithPath[], null);
+          // Close the dialog as soon as we have the selection; validation runs afterwards and is
+          // reflected by isProcessing rather than by keeping the dialog "active".
           dispatch({type: "closeDialog"});
+          // A drop elsewhere superseded this selection while reading files - it owns isProcessing.
+          if (signal!.aborted) {
+            return;
+          }
+          return setFiles(files as FileWithPath[], null, signal!);
         })
         .catch((e: any) => {
+          // Clear any processing this run started (e.g. a getFilesFromEvent failure).
+          if (signal) {
+            endProcessing(signal);
+          }
           // AbortError means the user canceled
           if (isAbort(e)) {
             onFileDialogCancelCb(e);
@@ -626,7 +768,18 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       inputRef.current.value = "";
       inputRef.current.click();
     }
-  }, [dispatch, onFileDialogOpenCb, onFileDialogCancelCb, useFsAccessApi, setFiles, onErrCb, pickerTypes, multiple]);
+  }, [
+    dispatch,
+    onFileDialogOpenCb,
+    onFileDialogCancelCb,
+    useFsAccessApi,
+    setFiles,
+    onErrCb,
+    pickerTypes,
+    multiple,
+    beginProcessing,
+    endProcessing
+  ]);
 
   // Cb to open the file dialog when SPACE/ENTER occurs on the dropzone
   const onKeyDownCb = useCallback(
@@ -814,11 +967,17 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         isDragReject: action.isDragReject,
         isDragUnknown: action.isDragUnknown
       };
+    case "setProcessing":
+      return {
+        ...state,
+        isProcessing: action.isProcessing
+      };
     case "setFiles":
       return {
         ...state,
         acceptedFiles: action.acceptedFiles,
         fileRejections: action.fileRejections,
+        isProcessing: false,
         isDragReject: false,
         isDragUnknown: false
       };

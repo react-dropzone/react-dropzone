@@ -11,7 +11,10 @@ const maxLength = 20;
 
 function nameLengthValidator(file) {
   if (file.name.length > maxLength) {
-    return {code: "name-too-large", message: `Name is larger than ${maxLength} characters`};
+    return {
+      code: "name-too-large",
+      message: `Name is larger than ${maxLength} characters`
+    };
   }
   return null;
 }
@@ -24,9 +27,50 @@ function CustomValidation() {
 }
 ```
 
+## Async validation
+
+The `validator` may be `async` (return a `Promise`) for checks that can't run synchronously - reading
+image dimensions or video duration, inspecting file contents with a library like [`file-type`](https://www.npmjs.com/package/file-type), or calling an external service. Resolve with `null` to accept the file, or an error object / array to reject it.
+
+While a drop is being processed asynchronously, `isProcessing` is `true` and `onDrop`/`onDropAccepted`/`onDropRejected`
+fire only once it settles - use it to show a spinner or disable the UI. It spans the whole pipeline: reading
+the files (an async [`getFilesFromEvent`](/examples/plugins)) and running an async validator.
+With the default synchronous file reading and no async validator, the work resolves within a microtask, so
+`isProcessing` is only observable for genuinely async work. If the validator throws or rejects, the drop is
+discarded and `onError` is called with the error. If a new drop lands while one is still processing, the
+earlier run is superseded and only the latest result is committed.
+
+```tsx
+async function imageDimensionsValidator(file) {
+  const bitmap = await createImageBitmap(file);
+  if (bitmap.width < 250) {
+    return {code: "too-narrow", message: "Image must be at least 250px wide"};
+  }
+  return null;
+}
+
+function AsyncValidation() {
+  const {getRootProps, getInputProps, isProcessing} = useDropzone({
+    validator: imageDimensionsValidator,
+    accept: {"image/*": []},
+    onError: err => console.error(err)
+  });
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>{isProcessing ? "Validating…" : "Drag 'n' drop some images here"}</p>
+    </div>
+  );
+}
+```
+
+> The validator never runs during a drag (a dragged item exposes no name/size), so a validator-configured
+> dropzone reports `isDragUnknown` until drop - this is unchanged for async validators.
+
 ## Overriding error messages
 
-The built-in rejection messages (`file-invalid-type`, `file-too-large`, `file-too-small`, `too-many-files`) are in English. Use the `getErrorMessage` prop to override them — e.g. to localize. It's called once per error with the error and the file it belongs to, and its return value replaces the message. Return `error.message` for codes you don't want to change (this also applies to your own `validator` errors).
+The built-in rejection messages (`file-invalid-type`, `file-too-large`, `file-too-small`, `too-many-files`) are in English. Use the `getErrorMessage` prop to override them - e.g. to localize. It's called once per error with the error and the file it belongs to, and its return value replaces the message. Return `error.message` for codes you don't want to change (this also applies to your own `validator` errors).
 
 ```tsx
 function LocalizedDropzone() {

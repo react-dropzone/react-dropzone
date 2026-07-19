@@ -3898,6 +3898,179 @@ describe("useDropzone() hook", () => {
     });
   });
 
+  describe("async validator", () => {
+    it("awaits the validator and splits accepted/rejected files by its resolved result", async () => {
+      const validator = async file =>
+        /dogs/i.test(file.name) ? {code: "dogs-not-allowed", message: "Dogs not allowed"} : null;
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} multiple>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [images[0]],
+        [{file: images[1], errors: [{code: "dogs-not-allowed", message: "Dogs not allowed"}]}],
+        expect.anything()
+      );
+    });
+
+    it("sets {isProcessing} while a validator is pending and clears it once resolved, deferring onDrop", async () => {
+      const thenable = createThenable();
+      const validator = () => thenable.promise;
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} multiple>
+          {({getRootProps, isProcessing}) => <div {...getRootProps()}>{isProcessing && "processing"}</div>}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      // Validator hasn't resolved yet: we're processing and onDrop hasn't fired.
+      expect(dropzone).toHaveTextContent("processing");
+      expect(onDropSpy).not.toHaveBeenCalled();
+
+      // Resolve the validator (accept the file).
+      await act(() => thenable.done(null));
+
+      expect(dropzone).not.toHaveTextContent("processing");
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
+    });
+
+    it("sets {isProcessing} while an async getFilesFromEvent runs, even without a validator", async () => {
+      const thenable = createThenable();
+      const getFilesFromEvent = () => thenable.promise;
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone getFilesFromEvent={getFilesFromEvent} onDrop={onDropSpy} multiple>
+          {({getRootProps, isProcessing}) => <div {...getRootProps()}>{isProcessing && "processing"}</div>}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      // Files haven't been read yet: we're processing and onDrop hasn't fired.
+      expect(dropzone).toHaveTextContent("processing");
+      expect(onDropSpy).not.toHaveBeenCalled();
+
+      // Resolve getFilesFromEvent with the files.
+      await act(() => thenable.done(files));
+
+      expect(dropzone).not.toHaveTextContent("processing");
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
+    });
+
+    it("routes a rejected validator to onError, does not call onDrop, and clears {isProcessing}", async () => {
+      const thenable = createThenable();
+      const validator = () => thenable.promise;
+      const onDropSpy = vi.fn();
+      const onErrorSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} onError={onErrorSpy} multiple>
+          {({getRootProps, isProcessing}) => <div {...getRootProps()}>{isProcessing && "processing"}</div>}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+      expect(dropzone).toHaveTextContent("processing");
+
+      const err = new Error("validation service unavailable");
+      await act(() => thenable.cancel(err));
+
+      expect(onErrorSpy).toHaveBeenCalledWith(err);
+      expect(onDropSpy).not.toHaveBeenCalled();
+      expect(dropzone).not.toHaveTextContent("processing");
+    });
+
+    it("supersedes an in-flight validation when a second drop lands, only committing the latest", async () => {
+      const first = createThenable();
+      const second = createThenable();
+      const promises = [first.promise, second.promise];
+      let call = 0;
+      const validator = () => promises[call++];
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} multiple>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      // First drop (images), validation left pending.
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(images)));
+      // Second drop (files) supersedes the first before it resolves.
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      // Resolve the superseded first run last - it must not commit its (stale) results.
+      await act(() => second.done(null));
+      await act(() => first.done(null));
+
+      expect(onDropSpy).toHaveBeenCalledTimes(1);
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
+    });
+
+    it("supersedes a run whose getFilesFromEvent is still pending when a newer drop lands", async () => {
+      const first = createThenable();
+      const second = createThenable();
+      const promises = [first.promise, second.promise];
+      let call = 0;
+      const getFilesFromEvent = () => promises[call++];
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone getFilesFromEvent={getFilesFromEvent} onDrop={onDropSpy} multiple>
+          {({getRootProps, isProcessing}) => <div {...getRootProps()}>{isProcessing && "processing"}</div>}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      // Two drops land while the first's getFilesFromEvent is still pending.
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(images)));
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      // Resolve the superseded first run last - it must not commit or resurrect the processing flag.
+      await act(() => second.done(files));
+      await act(() => first.done(images));
+
+      expect(onDropSpy).toHaveBeenCalledTimes(1);
+      expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
+      expect(dropzone).not.toHaveTextContent("processing");
+    });
+
+    it("still caps accepted files at {maxFiles} after async validation resolves", async () => {
+      const validator = async () => null;
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} multiple maxFiles={1}>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [images[0]],
+        [{file: images[1], errors: [{code: "too-many-files", message: "Too many files"}]}],
+        expect.anything()
+      );
+    });
+  });
+
   describe("getErrorMessage", () => {
     it("overrides built-in rejection messages by code and receives the file", async () => {
       const onDropSpy = vi.fn();
