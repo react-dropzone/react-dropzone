@@ -263,6 +263,11 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {isFocused, isFileDialogActive} = state;
 
+  // Mirror {isFileDialogActive} into a ref so the memoized drag handlers can read the current value
+  // without being recreated (and churning getRootProps/getInputProps) every time the dialog toggles.
+  const isFileDialogActiveRef = useRef(isFileDialogActive);
+  isFileDialogActiveRef.current = isFileDialogActive;
+
   // Tracks the in-flight processing run - reading files (getFilesFromEvent) plus running an async
   // validator. A newer drop/selection aborts the previous run so slow async work can't resolve late
   // and clobber the state with stale results.
@@ -418,6 +423,13 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       event.persist?.();
       stopPropagation(event);
 
+      // Ignore drags onto the dropzone while the file picker dialog is open: the page underneath a
+      // live picker shouldn't react to (or accept) dropped files. See #1455. preventDefault() above
+      // still runs so the browser doesn't try to open/navigate to a dropped file.
+      if (isFileDialogActiveRef.current) {
+        return;
+      }
+
       dragTargetsRef.current = [...dragTargetsRef.current, event.target];
 
       if (isEvtWithFiles(event)) {
@@ -478,6 +490,11 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       event.preventDefault();
       event.persist?.();
       stopPropagation(event);
+
+      // Ignore drags over the dropzone while the file picker dialog is open. See #1455.
+      if (isFileDialogActiveRef.current) {
+        return false;
+      }
 
       const hasFiles = isEvtWithFiles(event);
       if (hasFiles && event.dataTransfer) {
@@ -666,6 +683,15 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       stopPropagation(event);
 
       dragTargetsRef.current = [];
+
+      // Ignore a drop landing on the dropzone while the file picker dialog is open (see #1455).
+      // Guard on {event.dataTransfer} so only real drag-drops are suppressed: the input's change
+      // event (a file picked from the dialog) also runs through here while the dialog is still
+      // flagged active, and that path must keep working. Returning before the reset below leaves
+      // the dialog flag intact.
+      if (isFileDialogActiveRef.current && event.dataTransfer) {
+        return;
+      }
 
       // Clear drag state before we begin processing so beginProcessing's isProcessing isn't reset.
       dispatch({type: "reset"});
