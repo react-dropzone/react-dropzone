@@ -50,6 +50,29 @@ export function DisabledDropzone() {
   );
 }
 
+/* ----------------------------- Directory ----------------------------- */
+
+export function Directory() {
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+  const files = acceptedFiles.map(file => (
+    <li key={file.path}>
+      {file.path} - {file.size} bytes
+    </li>
+  ));
+  return (
+    <section className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <input {...getInputProps({webkitdirectory: "true"})} />
+        <p>Drag 'n' drop a folder here, or click to select a folder</p>
+      </div>
+      <aside>
+        <h4>Files</h4>
+        <ul>{files}</ul>
+      </aside>
+    </section>
+  );
+}
+
 /* ----------------------------- Events ----------------------------- */
 
 function InnerDropzone() {

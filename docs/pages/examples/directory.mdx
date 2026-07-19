@@ -1,0 +1,32 @@
+import {Directory} from "../../components/examples";
+
+# Selecting a directory
+
+Passing the non-standard [`webkitdirectory`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#webkitdirectory) attribute through `getInputProps` makes clicking the dropzone open a **folder** picker instead of a file picker. The browser recursively lists the folder's files, each with its relative path exposed on `file.path` (via [file-selector](https://github.com/react-dropzone/file-selector)).
+
+<Directory />
+
+```tsx
+function Directory() {
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+  const files = acceptedFiles.map(file => (
+    <li key={file.path}>
+      {file.path} - {file.size} bytes
+    </li>
+  ));
+  return (
+    <section className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <input {...getInputProps({webkitdirectory: "true"})} />
+        <p>Drag 'n' drop a folder here, or click to select a folder</p>
+      </div>
+      <aside>
+        <h4>Files</h4>
+        <ul>{files}</ul>
+      </aside>
+    </section>
+  );
+}
+```
+
+> Directory selection works only through the native `<input>`, so it requires `useFsAccessApi` to be `false` (the default) - the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API) cannot select directories. Note that `webkitdirectory`, while widely supported, is [non-standard](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#webkitdirectory).

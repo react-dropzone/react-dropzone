@@ -15,3 +15,14 @@ export const hookExample = (
     )}
   </HookDropzone>
 );
+
+// getInputProps accepts the webkitdirectory attribute for directory selection (#1344).
+export const directoryExample = (
+  <HookDropzone>
+    {({getRootProps, getInputProps}) => (
+      <div {...getRootProps()}>
+        <input {...getInputProps({webkitdirectory: "true"})} />
+      </div>
+    )}
+  </HookDropzone>
+);

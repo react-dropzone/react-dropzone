@@ -47,6 +47,7 @@ export default defineConfig({
         {text: "Max files", link: "/examples/max-files"},
         {text: "Custom validation", link: "/examples/validator"},
         {text: "Opening file dialog", link: "/examples/file-dialog"},
+        {text: "Selecting a directory", link: "/examples/directory"},
         {text: "Previews", link: "/examples/previews"},
         {text: "Class components", link: "/examples/class-component"},
         {text: "No JSX", link: "/examples/no-jsx"},

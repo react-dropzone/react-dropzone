@@ -116,6 +116,20 @@ export interface DropzoneInputProps extends React.InputHTMLAttributes<HTMLInputE
   refKey?: string;
 }
 
+declare module "react" {
+  interface InputHTMLAttributes<T> {
+    /**
+     * Opens a directory picker on click instead of a file picker (the non-standard
+     * [`webkitdirectory`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#webkitdirectory)
+     * attribute), letting a whole folder be selected. Requires `useFsAccessApi` to be `false` (the
+     * default) - the File System Access API cannot select directories. React's own types don't
+     * declare it yet, so react-dropzone augments them. See
+     * https://github.com/react-dropzone/react-dropzone/issues/1344
+     */
+    webkitdirectory?: string | undefined;
+  }
+}
+
 /**
  * Convenience wrapper component for the `useDropzone` hook
  *
