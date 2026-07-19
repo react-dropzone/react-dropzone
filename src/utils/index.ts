@@ -21,6 +21,13 @@ export interface FileError {
   code: ErrorCode | string;
 }
 
+/**
+ * What a custom `validator` returns: a single error, a list of errors, or `null` when the file
+ * passes. A validator may return the result directly (synchronous) or wrapped in a `Promise`
+ * (asynchronous, e.g. reading image dimensions or calling an external service).
+ */
+export type ValidatorResult = FileError | readonly FileError[] | null;
+
 // Error codes
 export const FILE_INVALID_TYPE = "file-invalid-type";
 export const FILE_TOO_LARGE = "file-too-large";
@@ -133,6 +140,14 @@ function isDefined<T>(value: T): value is NonNullable<T> {
   return value !== undefined && value !== null;
 }
 
+/**
+ * Check if a value is thenable (Promise-like), used to tell a synchronous validator result from an
+ * asynchronous one.
+ */
+export function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return value != null && typeof (value as {then?: unknown}).then === "function";
+}
+
 export function allFilesAccepted({
   files,
   accept,
@@ -205,7 +220,9 @@ export function getDragVerdict({
   maxSize?: number;
   multiple?: boolean;
   maxFiles?: number;
-  validator?: (file: File) => FileError | readonly FileError[] | null;
+  // The validator is never invoked here (see the note above), so its async variant is accepted
+  // purely so the same `validator` prop is assignable during a drag.
+  validator?: (file: File) => ValidatorResult | Promise<ValidatorResult>;
 }): DragVerdict {
   // The file count is knowable during a drag, so an over-the-limit selection is a confident reject.
   if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 && files.length > maxFiles)) {
