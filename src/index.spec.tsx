@@ -3233,7 +3233,7 @@ describe("useDropzone() hook", () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
     });
 
-    it("resets {isFileDialogActive} state", async () => {
+    it("resets {isFileDialogActive} state once a file is selected", async () => {
       const onDropSpy = vi.fn();
       const activeRef = createRef();
       const active = <span ref={activeRef}>I am active</span>;
@@ -3250,13 +3250,17 @@ describe("useDropzone() hook", () => {
       );
 
       const dropzone = container.querySelector("div");
+      const input = container.querySelector("input");
 
       fireEvent.click(dropzone);
 
       expect(activeRef.current).not.toBeNull();
       expect(dropzone).toContainElement(activeRef.current);
 
-      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+      // Selecting a file from the dialog (input change) runs through onDrop and resets the flag. A
+      // drag-drop landing on the dropzone while the dialog is open is ignored instead, and leaves
+      // the flag set - see the "file dialog open (#1455)" tests.
+      await act(async () => fireEvent.change(input, {target: {files}}));
 
       expect(activeRef.current).toBeNull();
       expect(dropzone).not.toContainElement(activeRef.current);
@@ -3684,6 +3688,94 @@ describe("useDropzone() hook", () => {
       fireEvent.click(container.querySelector("button"));
 
       expect(onFileDialogOpenSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe("file dialog open (#1455)", () => {
+    it("ignores files dropped on the dropzone while the file picker dialog is open", async () => {
+      const activeRef = createRef();
+      const active = <span ref={activeRef}>I am active</span>;
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps, isFileDialogActive}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {isFileDialogActive && active}
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      // Open the file picker dialog
+      fireEvent.click(dropzone);
+      expect(activeRef.current).not.toBeNull();
+
+      // A drop landing on the dropzone while the dialog is open must be ignored...
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+      // ...and it must not clear the still-open dialog state
+      expect(activeRef.current).not.toBeNull();
+      expect(dropzone).toContainElement(activeRef.current);
+    });
+
+    it("still processes a file selected from the open dialog (input change)", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      const input = container.querySelector("input");
+
+      // Pick a file from the open dialog: the input's change event fires while the dialog is still
+      // flagged active, so this path must NOT be suppressed by the drag guard.
+      fireEvent.click(dropzone);
+      await act(async () => fireEvent.change(input, {target: {files}}));
+
+      expect(onDropSpy).toHaveBeenCalled();
+      const [accepted] = onDropSpy.mock.calls[0];
+      expect(accepted).toEqual(files);
+    });
+
+    it("resumes accepting drops after the dialog closes", async () => {
+      vi.useFakeTimers();
+
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      // Open then cancel the dialog (window regains focus with no file selected)
+      fireEvent.click(dropzone);
+      focusWindow();
+      drainPendingTimers();
+      vi.useRealTimers();
+
+      // Drops work again once the dialog is closed
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      expect(onDropSpy).toHaveBeenCalled();
     });
   });
 
