@@ -35,6 +35,11 @@ export interface FileRejection {
   errors: readonly FileError[];
 }
 
+export interface DragFileRejection {
+  file: FileWithPath | DataTransferItem;
+  errors: readonly FileError[];
+}
+
 type SharedProps = "multiple" | "onDragEnter" | "onDragOver" | "onDragLeave";
 
 export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & {
@@ -101,6 +106,7 @@ export type DropzoneState = DropzoneRef & {
   isProcessing: boolean;
   acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
+  dragFileRejections: readonly DragFileRejection[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
   getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
@@ -156,6 +162,7 @@ interface DropzoneInternalState {
   isProcessing: boolean;
   acceptedFiles: FileWithPath[];
   fileRejections: FileRejection[];
+  dragFileRejections: DragFileRejection[];
 }
 
 /**
@@ -181,7 +188,8 @@ const initialState: DropzoneInternalState = {
   isDragGlobal: false,
   isProcessing: false,
   acceptedFiles: [],
-  fileRejections: []
+  fileRejections: [],
+  dragFileRejections: []
 };
 
 /**
@@ -449,6 +457,15 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
               isDragReject: verdict === "reject",
               isDragUnknown: verdict === "unknown",
               isDragActive: true,
+              dragFileRejections: getDragFileRejections({
+                files: files as Array<FileWithPath | DataTransferItem>,
+                accept: inputAcceptAttr,
+                minSize,
+                maxSize,
+                multiple,
+                maxFiles,
+                getErrorMessage
+              }),
               type: "setDraggedFiles"
             });
 
@@ -465,11 +482,13 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       onErrCb,
       noDragEventsBubbling,
       acceptAttr,
+      inputAcceptAttr,
       minSize,
       maxSize,
       multiple,
       maxFiles,
-      validator
+      validator,
+      getErrorMessage
     ]
   );
 
@@ -521,7 +540,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         isDragActive: false,
         isDragAccept: false,
         isDragReject: false,
-        isDragUnknown: false
+        isDragUnknown: false,
+        dragFileRejections: []
       });
 
       if (isEvtWithFiles(event) && onDragLeave) {
@@ -965,7 +985,8 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         isDragActive: action.isDragActive,
         isDragAccept: action.isDragAccept,
         isDragReject: action.isDragReject,
-        isDragUnknown: action.isDragUnknown
+        isDragUnknown: action.isDragUnknown,
+        dragFileRejections: action.dragFileRejections
       };
     case "setProcessing":
       return {
@@ -977,6 +998,7 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         ...state,
         acceptedFiles: action.acceptedFiles,
         fileRejections: action.fileRejections,
+        dragFileRejections: [],
         isProcessing: false,
         isDragReject: false,
         isDragUnknown: false
@@ -993,6 +1015,56 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
     default:
       return state;
   }
+}
+
+function getDragFileRejections({
+  files,
+  accept,
+  minSize,
+  maxSize,
+  multiple,
+  maxFiles = 0,
+  getErrorMessage
+}: {
+  files: Array<FileWithPath | DataTransferItem>;
+  accept?: string;
+  minSize?: number;
+  maxSize?: number;
+  multiple?: boolean;
+  maxFiles?: number;
+  getErrorMessage?: (error: FileError, file: File) => string;
+}): DragFileRejection[] {
+  const dragAcceptedFiles: Array<FileWithPath | DataTransferItem> = [];
+  const dragFileRejections: DragFileRejection[] = [];
+
+  const localizeError = (error: FileError, file: FileWithPath | DataTransferItem): FileError =>
+    getErrorMessage && file instanceof File ? {...error, message: getErrorMessage(error, file)} : error;
+
+  files.forEach(file => {
+    const [accepted, acceptError] = fileAccepted(file as File, accept);
+    const [sizeMatch, sizeError] = fileMatchSize(file as File, minSize, maxSize);
+
+    if (accepted && sizeMatch) {
+      dragAcceptedFiles.push(file);
+    } else {
+      dragFileRejections.push({
+        file,
+        errors: [acceptError, sizeError]
+          .filter((error): error is FileError => error != null)
+          .map(error => localizeError(error, file))
+      });
+    }
+  });
+
+  const acceptedFilesLimit = multiple ? (maxFiles >= 1 ? maxFiles : Number.POSITIVE_INFINITY) : 1;
+  if (dragAcceptedFiles.length > acceptedFilesLimit) {
+    const surplusFiles = dragAcceptedFiles.slice(acceptedFilesLimit);
+    surplusFiles.forEach(file => {
+      dragFileRejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
+    });
+  }
+
+  return dragFileRejections;
 }
 
 function noop() {}
