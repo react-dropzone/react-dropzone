@@ -98,7 +98,7 @@
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "vocs": "^2.5.3",
-    "waku": "^1.0.0-beta.6"
+    "waku": "^1.0.0-beta.7"
   },
   "peerDependencies": {
     "@types/react": "*",
