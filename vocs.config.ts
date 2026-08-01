@@ -32,7 +32,10 @@ export default defineConfig({
     {
       text: "Guide",
       collapsed: false,
-      items: [{text: "Getting Started", link: "/guide/getting-started"}]
+      items: [
+        {text: "Getting Started", link: "/guide/getting-started"},
+        {text: "Using with Tauri", link: "/guide/tauri"}
+      ]
     },
     {
       text: "Examples",
