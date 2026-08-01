@@ -1,0 +1,111 @@
+# Using with Tauri (desktop apps)
+
+Inside a [Tauri](https://tauri.app/) webview, dragging a file onto the window does **not**
+fire the browser's `dragenter`/`dragover`/`drop` events by default, so a `react-dropzone`
+dropzone appears to ignore drops. This is not a bug in `react-dropzone`: Tauri's native
+window layer intercepts OS file drops **before** the webview sees them and emits its own
+events instead. This has been the behaviour since the early betas
+([tauri-apps/tauri#2768](https://github.com/tauri-apps/tauri/issues/2768)).
+
+You have two options, depending on whether you need the real filesystem paths of dropped
+files.
+
+## Recommended: let the webview handle drops
+
+Disable Tauri's native drag-and-drop handling. Once it's off, standard HTML5 drag-and-drop
+events flow to the webview and `react-dropzone` works with **no code changes** - drag state,
+`onDrop`, validation, everything. Disabling it is also required to use HTML5 drag-and-drop on
+Windows.
+
+:::code-group
+
+```json [Tauri v2 - tauri.conf.json]
+{
+  "app": {
+    "windows": [
+      {
+        "dragDropEnabled": false
+      }
+    ]
+  }
+}
+```
+
+```json [Tauri v1 - tauri.conf.json]
+{
+  "tauri": {
+    "windows": [
+      {
+        "fileDropEnabled": false
+      }
+    ]
+  }
+}
+```
+
+:::
+
+:::warning[Trade-off]
+With native handling off you get sandboxed browser `File` objects, exactly as in a normal
+browser - you do **not** get the absolute filesystem path of a dropped file. If you need real
+paths, keep native handling on and use the approach below.
+:::
+
+## If you need absolute file paths: keep native handling on
+
+Keep `dragDropEnabled` at its default (`true`) and listen to Tauri's own drag-and-drop event,
+which hands you the absolute paths. Read each path into a `File` with the
+[fs plugin](https://v2.tauri.app/plugin/file-system/), then run it through your own validation
+or `react-dropzone`'s `getFilesFromEvent` helper. In this mode `react-dropzone` is only
+driving the click-to-open picker and your styling - the drop itself and the drag-active state
+are yours to manage, since the DOM drag events never fire.
+
+```tsx
+import {getCurrentWebviewWindow} from "@tauri-apps/api/webviewWindow";
+import {readFile} from "@tauri-apps/plugin-fs";
+
+const webview = getCurrentWebviewWindow();
+
+const unlisten = await webview.onDragDropEvent(async event => {
+  // event.payload.type is "enter" | "over" | "drop" | "leave"
+  if (event.payload.type === "drop") {
+    const files = await Promise.all(
+      event.payload.paths.map(async path => {
+        const bytes = await readFile(path);
+        const name = path.split(/[\\/]/).pop() ?? path;
+        return new File([bytes], name);
+      })
+    );
+
+    // Hand `files` to your own state, or validate them with react-dropzone's
+    // getFilesFromEvent / the same accept/size rules you pass to useDropzone.
+  }
+});
+```
+
+:::note
+`react-dropzone`'s built-in drop pipeline can't currently be driven directly from Tauri's
+events - that would need a pluggable event source in the core, tracked in
+[#1316](https://github.com/react-dropzone/react-dropzone/issues/1316). For now, manage the
+dropped files in your own React state and derive the drag-active UI from the `enter`/`over`/
+`leave` payload types.
+:::
+
+## Version notes
+
+Tauri renamed the config flag and the events between v1 and v2:
+
+|             | Tauri v1                                                                      | Tauri v2                                                                             |
+| ----------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Config flag | `tauri.windows[].fileDropEnabled`                                             | `app.windows[].dragDropEnabled`                                                      |
+| JS listener | `appWindow.onFileDropEvent()`                                                 | `getCurrentWebviewWindow().onDragDropEvent()`                                        |
+| Events      | `tauri://file-drop`, `tauri://file-drop-hover`, `tauri://file-drop-cancelled` | `tauri://drag-enter`, `tauri://drag-over`, `tauri://drag-drop`, `tauri://drag-leave` |
+
+Both default to enabled. Setting the flag to `false` is what lets `react-dropzone` handle
+drops itself.
+
+## References
+
+- [Tauri config reference - `dragDropEnabled`](https://v2.tauri.app/reference/config/)
+- [Tauri drag-and-drop discussion (v1/v2)](https://github.com/tauri-apps/tauri/discussions/9696)
+- [tauri-apps/tauri#2768 - original "no support for dropping files?"](https://github.com/tauri-apps/tauri/issues/2768)

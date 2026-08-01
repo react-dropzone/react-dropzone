@@ -293,6 +293,10 @@ React [18](https://react.dev/blog/2022/03/29/react-v18) or above is required bec
 Files returned by the hook or passed as arg to the `onDrop` cb won't have the properties `path` or `fullPath`.
 For more inf check [this SO question](https://stackoverflow.com/a/23005925/2275818) and [this issue](https://github.com/react-dropzone/react-dropzone/issues/477).
 
+### Tauri (and other native webviews)
+
+Inside a [Tauri](https://tauri.app/) webview, OS file drops are intercepted by the native window layer before the webview sees them, so the browser's drag 'n' drop events never fire and the dropzone appears to ignore drops. Disable Tauri's native handling to let `react-dropzone` work unchanged: set `dragDropEnabled: false` (Tauri v2) or `fileDropEnabled: false` (Tauri v1) in `tauri.conf.json`. If you instead need the absolute paths of dropped files, keep native handling on and drive your own state from Tauri's drag-drop event. See the [Using with Tauri](https://react-dropzone.js.org/guide/tauri) guide and [#1316](https://github.com/react-dropzone/react-dropzone/issues/1316).
+
 ### Not a File Uploader
 
 This lib is not a file uploader; as such, it does not process files or provide any way to make HTTP requests to some server; if you're looking for that, checkout [filepond](https://pqina.nl/filepond) or [uppy.io](https://uppy.io/).
