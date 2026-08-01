@@ -3520,6 +3520,149 @@ describe("useDropzone() hook", () => {
     });
   });
 
+  describe("onPaste (#1210)", () => {
+    // These exercise the default getFilesFromEvent (file-selector's fromEvent), which reads files
+    // from a paste's clipboardData as of file-selector 4.1.
+    it("invokes onDrop with the files carried by a paste", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(images)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
+    });
+
+    it("runs pasted files through {accept} validation", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} accept={{"image/*": []}}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      // {files} is a PDF, which the image-only dropzone must reject.
+      await act(() => fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(files)));
+
+      expect(onDropSpy).toHaveBeenCalledWith(
+        [],
+        [{file: files[0], errors: [{code: "file-invalid-type", message: expect.any(String)}]}],
+        expect.anything()
+      );
+    });
+
+    it("ignores a paste that carries no files (e.g. plain text) and does not preventDefault", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      let notPrevented;
+      await act(async () => {
+        notPrevented = fireEvent.paste(container.querySelector("div"), createClipboardWithText());
+      });
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+      // Text pastes must fall through untouched so pasting into a child input keeps working.
+      expect(notPrevented).toBe(true);
+    });
+
+    it("preventDefault()s a paste that carries files", async () => {
+      const {container} = render(
+        <Dropzone>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      let notPrevented;
+      await act(async () => {
+        notPrevented = fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(images));
+      });
+
+      expect(notPrevented).toBe(false);
+    });
+
+    it("does not handle pastes when {noPaste} is set", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} noPaste>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(images)));
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+    });
+
+    it("does not handle pastes when {disabled}", async () => {
+      const onDropSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy} disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(images)));
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+    });
+
+    it("still calls a user-supplied onPaste passed through getRootProps", async () => {
+      const onDropSpy = vi.fn();
+      const onPasteSpy = vi.fn();
+
+      const {container} = render(
+        <Dropzone onDrop={onDropSpy}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({onPaste: onPasteSpy})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.paste(container.querySelector("div"), createClipboardWithFiles(images)));
+
+      expect(onPasteSpy).toHaveBeenCalledTimes(1);
+      expect(onDropSpy).toHaveBeenCalledWith(images, [], expect.anything());
+    });
+  });
+
   describe("onFileDialogCancel", () => {
     beforeEach(() => {
       vi.useFakeTimers();
@@ -4283,6 +4426,37 @@ function createDtWithFiles(files = [], options = {}) {
         getAsFile: () => file
       })),
       types: ["Files"]
+    }
+  };
+}
+
+/**
+ * createClipboardWithFiles creates a mock clipboard event payload for paste events (#1210)
+ * @param {File[]} files
+ */
+function createClipboardWithFiles(files = []) {
+  return {
+    clipboardData: {
+      files,
+      items: files.map(file => ({
+        kind: "file",
+        type: file.type,
+        getAsFile: () => file
+      })),
+      types: ["Files"]
+    }
+  };
+}
+
+/**
+ * createClipboardWithText creates a mock paste payload that carries text but no files
+ */
+function createClipboardWithText() {
+  return {
+    clipboardData: {
+      files: [],
+      items: [{kind: "string", type: "text/plain", getAsFile: () => null}],
+      types: ["text/plain"]
     }
   };
 }
