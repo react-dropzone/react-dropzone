@@ -256,7 +256,10 @@ export function isPropagationStopped(event: any): boolean {
 }
 
 export function isEvtWithFiles(event: any): boolean {
-  if (!event.dataTransfer) {
+  // A paste (ClipboardEvent) carries its DataTransfer under {clipboardData} rather than
+  // {dataTransfer}, so a pasted screenshot is detected the same way as a drop.
+  const dataTransfer = event.dataTransfer ?? event.clipboardData;
+  if (!dataTransfer) {
     return !!event.target && !!event.target.files;
   }
   // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
@@ -266,9 +269,9 @@ export function isEvtWithFiles(event: any): boolean {
   // uses to extract the files. Accept either so detection stays consistent. See #1409.
   return (
     Array.prototype.some.call(
-      event.dataTransfer.types,
+      dataTransfer.types,
       (type: string) => type === "Files" || type === "application/x-moz-file"
-    ) || Array.prototype.some.call(event.dataTransfer.items ?? [], isKindFile)
+    ) || Array.prototype.some.call(dataTransfer.items ?? [], isKindFile)
   );
 }
 

@@ -47,6 +47,14 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   noKeyboard?: boolean;
   noDrag?: boolean;
   noDragEventsBubbling?: boolean;
+  /**
+   * If true, disables paste-to-upload. By default, when the dropzone (or a focused child) receives a
+   * paste that carries files - e.g. a screenshot pasted with Ctrl/Cmd+V - those files go through the
+   * same `accept`/size/`validator` checks and `onDrop` callbacks as a drop. Pastes with no files
+   * (plain text, etc.) are ignored and left untouched. See
+   * https://github.com/react-dropzone/react-dropzone/issues/1210
+   */
+  noPaste?: boolean;
   disabled?: boolean;
   onDrop?: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
   onDropAccepted?: <T extends File>(files: T[], event: DropEvent) => void;
@@ -77,7 +85,13 @@ export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & 
   autoFocus?: boolean;
 };
 
-export type DropEvent = React.DragEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement> | DragEvent | Event;
+export type DropEvent =
+  | React.DragEvent<HTMLElement>
+  | React.ChangeEvent<HTMLInputElement>
+  | React.ClipboardEvent<HTMLElement>
+  | DragEvent
+  | ClipboardEvent
+  | Event;
 
 export interface DropzoneRef {
   open: () => void;
@@ -227,6 +241,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     noKeyboard = false,
     noDrag = false,
     noDragEventsBubbling = false,
+    noPaste = false,
     onError,
     validator,
     getErrorMessage
@@ -724,6 +739,45 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling, beginProcessing, endProcessing]
   );
 
+  // Cb to add files pasted into the dropzone (e.g. a screenshot pasted with Ctrl/Cmd+V). Fires when
+  // the root - or a focused descendant, so a child <textarea> works too - receives a paste. Reuses
+  // the same read/validate/onDrop pipeline as a drop.
+  const onPasteCb = useCallback(
+    (event: any) => {
+      // Only act on a paste that carries files. Bail before preventDefault() for text/other pastes
+      // so pasting into a child input keeps working normally.
+      if (!isEvtWithFiles(event)) {
+        return;
+      }
+      event.preventDefault();
+      // Persist here because we need the event later after getFilesFromEvent() is done
+      event.persist?.();
+      stopPropagation(event);
+
+      // Processing spans reading the files (getFilesFromEvent) and running the validator.
+      const signal = beginProcessing();
+      Promise.resolve(getFilesFromEvent(event))
+        .then(files => {
+          // A newer drop/paste superseded this one while reading files - it owns isProcessing now.
+          if (signal.aborted) {
+            return;
+          }
+          if (isPropagationStopped(event) && !noDragEventsBubbling) {
+            endProcessing(signal);
+            return;
+          }
+          return setFiles(files as FileWithPath[], event, signal);
+        })
+        .catch(e => {
+          if (!signal.aborted) {
+            endProcessing(signal);
+            onErrCb(e);
+          }
+        });
+    },
+    [getFilesFromEvent, setFiles, onErrCb, noDragEventsBubbling, beginProcessing, endProcessing]
+  );
+
   // Fn for opening the file dialog programmatically
   const openFileDialog = useCallback(() => {
     // No point to use FS access APIs if context is not secure
@@ -859,6 +913,10 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     return noDrag ? null : composeHandler(fn);
   };
 
+  const composePasteHandler = (fn: any) => {
+    return noPaste ? null : composeHandler(fn);
+  };
+
   const stopPropagation = (event: any) => {
     if (noDragEventsBubbling) {
       event.stopPropagation();
@@ -878,6 +936,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         onDragOver,
         onDragLeave,
         onDrop,
+        onPaste,
         ...rest
       }: DropzoneRootProps = {}) => ({
         onKeyDown: composeKeyboardHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
@@ -888,6 +947,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         onDragOver: composeDragHandler(composeEventHandlers(onDragOver, onDragOverCb)),
         onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
         onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
+        onPaste: composePasteHandler(composeEventHandlers(onPaste, onPasteCb)),
         role: typeof role === "string" && role !== "" ? role : "presentation",
         [refKey]: rootRef,
         ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
@@ -904,8 +964,10 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       onDragOverCb,
       onDragLeaveCb,
       onDropCb,
+      onPasteCb,
       noKeyboard,
       noDrag,
+      noPaste,
       disabled
     ]
   );

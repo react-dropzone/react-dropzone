@@ -297,6 +297,28 @@ For more inf check [this SO question](https://stackoverflow.com/a/23005925/22758
 
 This lib is not a file uploader; as such, it does not process files or provide any way to make HTTP requests to some server; if you're looking for that, checkout [filepond](https://pqina.nl/filepond) or [uppy.io](https://uppy.io/).
 
+### Paste to Upload
+
+Pasting files into the dropzone is supported out of the box: when the dropzone (or a focused child, e.g. a `<textarea>`) has focus and the user pastes files with <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>V</kbd> - for instance a screenshot copied to the clipboard - those files run through the same `accept`, size and `validator` checks and the same `onDrop`/`onDropAccepted`/`onDropRejected` callbacks as a drop. Pastes that carry no files (plain text and the like) are ignored and left untouched, so pasting into inputs keeps working.
+
+The paste is only received when the dropzone has focus, so pair it with [`autoFocus`](https://react-dropzone.js.org) or let the user click/tab into it first. To disable paste handling, set `noPaste`:
+
+```jsx static
+import React from "react";
+import {useDropzone} from "react-dropzone";
+
+function MyDropzone() {
+  const {getRootProps, getInputProps} = useDropzone({noPaste: true});
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>Drag 'n' drop or click - pasting is disabled</p>
+    </div>
+  );
+}
+```
+
 ### Using \<label\> as Root
 
 If you use [\<label\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label) as the root element, the file dialog will be opened twice; see [#1107](https://github.com/react-dropzone/react-dropzone/issues/1107) and [#1432](https://github.com/react-dropzone/react-dropzone/issues/1432) why. A `<label>` natively forwards clicks to the `<input>` it wraps, so the dialog opens once from that and once from our own click handler. To avoid this, use `noClick`:

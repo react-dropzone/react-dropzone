@@ -20,6 +20,7 @@ export const all = (
     noKeyboard={false}
     noDrag={false}
     noDragEventsBubbling={false}
+    noPaste={false}
     disabled
     multiple={false}
     accept={{"image/*": [".png"]}}

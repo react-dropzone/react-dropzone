@@ -194,6 +194,26 @@ describe("isEvtWithFiles()", () => {
     expect(utils.isEvtWithFiles({dataTransfer: {types: ["text/plain"], items: []}})).toBe(false);
   });
 
+  it("should return true if a paste carries files via clipboardData (#1210)", () => {
+    expect(utils.isEvtWithFiles({clipboardData: {types: ["Files"]}})).toBe(true);
+    expect(utils.isEvtWithFiles({clipboardData: {types: ["Files", "text/html"]}})).toBe(true);
+    // Some browsers only expose the file via items, not types.
+    expect(
+      utils.isEvtWithFiles({
+        clipboardData: {types: [], items: [{kind: "file"}]}
+      })
+    ).toBe(true);
+  });
+
+  it("should return false for a paste with no files (e.g. plain text)", () => {
+    expect(utils.isEvtWithFiles({clipboardData: {types: ["text/plain"]}})).toBe(false);
+    expect(
+      utils.isEvtWithFiles({
+        clipboardData: {types: ["text/plain"], items: [{kind: "string"}]}
+      })
+    ).toBe(false);
+  });
+
   it("should return true if the event has a target with files", () => {
     expect(utils.isEvtWithFiles({target: {files: []}})).toBe(true);
   });
