@@ -9,6 +9,7 @@ import {
   ErrorCode,
   fileAccepted,
   fileMatchSize,
+  flattenAccept,
   getDragVerdict,
   isAbort,
   isEvtWithFiles,
@@ -21,9 +22,9 @@ import {
   pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION
 } from "./utils";
-import type {Accept, FileError, ValidatorResult} from "./utils";
+import type {Accept, AcceptGroup, FileError, ValidatorResult} from "./utils";
 
-export type {Accept, FileError, FileWithPath, ValidatorResult};
+export type {Accept, AcceptGroup, FileError, FileWithPath, ValidatorResult};
 export {ErrorCode};
 
 export interface DropzoneProps extends DropzoneOptions {
@@ -38,7 +39,7 @@ export interface FileRejection {
 type SharedProps = "multiple" | "onDragEnter" | "onDragOver" | "onDragLeave";
 
 export type DropzoneOptions = Pick<React.HTMLProps<HTMLElement>, SharedProps> & {
-  accept?: Accept;
+  accept?: Accept | AcceptGroup[];
   minSize?: number;
   maxSize?: number;
   maxFiles?: number;
@@ -247,19 +248,23 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     getErrorMessage
   } = props;
 
+  // `accept` may be a MIME->extensions map or an array of labeled groups (for the FS Access
+  // picker). Flatten it to a single map for the native `<input>` and the drag/drop validators,
+  // which have no concept of groups; the picker keeps the groups via `pickerTypes` below.
+  const flatAccept = useMemo(() => flattenAccept(accept), [accept]);
   // `acceptAttr` keeps wildcard MIME types (e.g. `image/*`) so the drag-time
   // `isDragAccept`/`isDragReject` check can react to a file's MIME type - file names
   // (hence extensions) aren't readable during a drag.
-  const acceptAttr = useMemo(() => acceptPropAsAcceptAttr(accept), [accept]);
+  const acceptAttr = useMemo(() => acceptPropAsAcceptAttr(flatAccept), [flatAccept]);
   // `inputAcceptAttr` drops a wildcard MIME type when it is paired with extensions, so the
   // native picker and drop-time validation enforce the extensions instead of accepting any
   // file of that type. See https://github.com/react-dropzone/react-dropzone/issues/1220
   const inputAcceptAttr = useMemo(
     () =>
-      acceptPropAsAcceptAttr(accept, {
+      acceptPropAsAcceptAttr(flatAccept, {
         omitWildcardMimeTypesWithExtensions: true
       }),
-    [accept]
+    [flatAccept]
   );
   const pickerTypes = useMemo(() => pickerOptionsFromAccept(accept), [accept]);
 

@@ -556,7 +556,7 @@ describe("pickerOptionsFromAccept()", () => {
     utils = await import("./index");
   });
 
-  it("converts the {accept} prop to file picker options", () => {
+  it("converts the {accept} prop to file picker options, deriving the description from the extensions", () => {
     expect(
       utils.pickerOptionsFromAccept({
         "image/*": [".png", ".jpg"], // ok
@@ -566,13 +566,94 @@ describe("pickerOptionsFromAccept()", () => {
       })
     ).toEqual([
       {
-        description: "Files",
+        description: ".png, .jpg, .txt, .pdf",
         accept: {
           "image/*": [".png", ".jpg"],
           "text/*": [".txt", ".pdf"]
         }
       }
     ]);
+  });
+
+  it("returns undefined for an empty object form", () => {
+    expect(utils.pickerOptionsFromAccept({})).toBeUndefined();
+  });
+
+  it("keeps each group as its own picker entry with a custom description", () => {
+    expect(
+      utils.pickerOptionsFromAccept([
+        {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+        {description: "Documents", accept: {"application/pdf": [".pdf"]}}
+      ])
+    ).toEqual([
+      {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+      {description: "Documents", accept: {"application/pdf": [".pdf"]}}
+    ]);
+  });
+
+  it("derives a group's description from its extensions when omitted", () => {
+    expect(utils.pickerOptionsFromAccept([{accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"]}}])).toEqual(
+      [{description: ".jpg, .jpeg, .png", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"]}}]
+    );
+  });
+
+  it("falls back to the MIME types when a group has no extensions", () => {
+    expect(utils.pickerOptionsFromAccept([{accept: {"image/jpeg": [], "image/png": []}}])).toEqual([
+      {description: "image/jpeg, image/png", accept: {"image/jpeg": [], "image/png": []}}
+    ]);
+  });
+
+  it("accepts a bare string extension value, matching showOpenFilePicker", () => {
+    expect(utils.pickerOptionsFromAccept([{description: "PDF", accept: {"application/pdf": ".pdf"}}])).toEqual([
+      {description: "PDF", accept: {"application/pdf": [".pdf"]}}
+    ]);
+  });
+
+  it("drops groups left with no valid entries and returns undefined when none remain", () => {
+    expect(
+      utils.pickerOptionsFromAccept([
+        {description: "Bad", accept: {"audio/*": ["mp3"], "*": [".p12"]}},
+        {description: "Empty", accept: {}}
+      ])
+    ).toBeUndefined();
+  });
+
+  it("returns undefined for an empty group array", () => {
+    expect(utils.pickerOptionsFromAccept([])).toBeUndefined();
+  });
+});
+
+describe("flattenAccept()", () => {
+  /**
+   * @constant
+   * @type {import('./index')}
+   */
+  let utils;
+  beforeEach(async () => {
+    utils = await import("./index");
+  });
+
+  it("returns undefined when accept is not provided", () => {
+    expect(utils.flattenAccept(undefined)).toBeUndefined();
+  });
+
+  it("passes the object form through unchanged (as an array-valued map)", () => {
+    expect(utils.flattenAccept({"image/png": [".png"], "application/pdf": ".pdf"})).toEqual({
+      "image/png": [".png"],
+      "application/pdf": [".pdf"]
+    });
+  });
+
+  it("merges groups and unions extensions of duplicate MIME keys", () => {
+    expect(
+      utils.flattenAccept([
+        {description: "A", accept: {"image/*": [".png"], "application/pdf": [".pdf"]}},
+        {description: "B", accept: {"image/*": [".png", ".jpg"]}}
+      ])
+    ).toEqual({
+      "image/*": [".png", ".jpg"],
+      "application/pdf": [".pdf"]
+    });
   });
 });
 

@@ -1621,7 +1621,7 @@ describe("useDropzone() hook", () => {
         multiple: true,
         types: [
           {
-            description: "Files",
+            description: "application/pdf",
             accept: {"application/pdf": []}
           }
         ]
@@ -1638,6 +1638,54 @@ describe("useDropzone() hook", () => {
       expect(dropzone).not.toContainElement(activeRef.current);
 
       expect(onDropSpy).toHaveBeenCalledWith(files, [], null);
+    });
+
+    it("passes grouped {accept} to showOpenFilePicker() as separate picker types and flattens it for the <input>", async () => {
+      const handlers = files.map(f => createFileSystemFileHandle(f));
+      const thenable = createThenable();
+      const showOpenFilePickerMock = vi.fn().mockReturnValue(thenable.promise);
+
+      window.showOpenFilePicker = showOpenFilePickerMock;
+
+      const {container} = render(
+        <Dropzone
+          onDrop={vi.fn()}
+          accept={[
+            {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+            {accept: {"application/pdf": ".pdf"}}
+          ]}
+          multiple
+          useFsAccessApi
+        >
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+
+      // The native <input> gets the flattened accept attribute (no groups/descriptions).
+      expect(container.querySelector("input")).toHaveAttribute(
+        "accept",
+        "image/jpeg,.jpg,.jpeg,image/png,application/pdf,.pdf"
+      );
+
+      fireEvent.click(dropzone);
+
+      // The FS Access picker keeps each group as its own type; the description-less group is
+      // derived from its extensions, and the bare string extension is normalized to an array.
+      expect(showOpenFilePickerMock).toHaveBeenCalledWith({
+        multiple: true,
+        types: [
+          {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+          {description: ".pdf", accept: {"application/pdf": [".pdf"]}}
+        ]
+      });
+
+      await act(() => thenable.done(handlers));
     });
 
     test("if showOpenFilePicker() is supported and {useFsAccessApi} is true, it should work without the <input>", async () => {
