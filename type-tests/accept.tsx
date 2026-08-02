@@ -27,6 +27,26 @@ export default class Accept extends React.Component<Record<string, never>, State
             )}
           </Dropzone>
         </div>
+        <div className="dropzone">
+          {/* The grouped form: an array of {description, accept} entries for the FS Access
+              picker. `description` is optional, and an extension value may be a bare string. */}
+          <Dropzone
+            useFsAccessApi
+            accept={[
+              {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+              {accept: {"application/pdf": ".pdf"}}
+            ]}
+            onDrop={(accepted, rejected) => {
+              this.setState({accepted, rejected});
+            }}
+          >
+            {({getRootProps}) => (
+              <div {...getRootProps()}>
+                <p>Try dropping some files here, or click to select files to upload.</p>
+              </div>
+            )}
+          </Dropzone>
+        </div>
         <aside>
           <h2>Accepted files</h2>
           <ul>

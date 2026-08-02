@@ -49,6 +49,24 @@ function Accept() {
 }
 ```
 
+## Grouping types for the file picker
+
+When the [File System Access picker](/examples/file-dialog) is used (`useFsAccessApi: true`, in a secure context, on a supporting browser), `showOpenFilePicker` renders one filter row per _group_ of types. To control that grouping and label each row, pass `accept` as an **array** of `{description, accept}` entries instead of a single map:
+
+```tsx
+const {getRootProps, getInputProps} = useDropzone({
+  useFsAccessApi: true,
+  accept: [
+    {description: "Images", accept: {"image/jpeg": [".jpg", ".jpeg"], "image/png": []}},
+    {description: "Documents", accept: {"application/pdf": [".pdf"]}}
+  ]
+});
+```
+
+The picker then shows two rows - "Images" and "Documents" - rather than a single combined entry. `description` is optional; when omitted it is derived from the group's extensions (the plain object form, which can't express a description, is labeled this way too). Extension values may be a single string or an array (`".pdf"` and `[".pdf"]` are equivalent), matching `showOpenFilePicker`.
+
+> Grouping only affects the File System Access picker. On the native `<input>` fallback - the default, and where the browser doesn't support the FS Access API - all groups are flattened into one `accept` attribute and the descriptions are dropped. Accepted/rejected file validation is identical to listing the same types in the flat object form.
+
 ## Reacting during the drag
 
 Because of HTML5 File API limitations, file names/extensions aren't readable _during_ a drag, so use MIME types (e.g. `image/*`) if you want to react with `isDragAccept` / `isDragReject`:

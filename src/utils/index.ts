@@ -8,9 +8,28 @@ const accepts =
 
 /**
  * A map of accepted MIME types to file extensions, as passed to the `accept` prop.
+ *
+ * An extension value may be a single extension string or an array of them - both are
+ * accepted, mirroring the shape of `window.showOpenFilePicker`'s `accept`.
  */
 export interface Accept {
-  [key: string]: readonly string[];
+  [key: string]: string | readonly string[];
+}
+
+/**
+ * A labeled group of accepted types, mirroring one entry of `window.showOpenFilePicker`'s
+ * `types` option. Passing the `accept` prop as an array of these lets the File System Access
+ * picker present multiple named filter rows instead of a single one (see
+ * {@link pickerOptionsFromAccept}). The optional `description` labels the row; when omitted it
+ * is derived from the group's extensions.
+ *
+ * Grouping only surfaces when the FS Access picker is actually used (`useFsAccessApi` +
+ * a secure context + browser support). The native `<input>` fallback has no concept of groups
+ * or descriptions, so every group is flattened into one accept attribute there.
+ */
+export interface AcceptGroup {
+  description?: string;
+  accept: Accept;
 }
 
 /**
@@ -323,41 +342,142 @@ export function canUseFileSystemAccessAPI(): boolean {
 }
 
 /**
- * Convert the `{accept}` dropzone prop to the `{types}` option for showOpenFilePicker.
+ * Coerce an `accept` extension value to an array. `window.showOpenFilePicker` allows a single
+ * extension string as well as an array, so we accept both and normalize to an array. Anything
+ * else (a malformed value) collapses to an empty list.
  */
-export function pickerOptionsFromAccept(accept?: Accept): Array<{description: string; accept: Accept}> | undefined {
-  if (isDefined(accept)) {
-    const acceptForPicker = Object.entries(accept)
-      .filter(([mimeType, ext]) => {
-        let ok = true;
-
-        if (!isMIMEType(mimeType)) {
-          console.warn(
-            `Skipped "${mimeType}" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.`
-          );
-          ok = false;
-        }
-
-        if (!Array.isArray(ext) || !ext.every(isExt)) {
-          console.warn(`Skipped "${mimeType}" because an invalid file extension was provided.`);
-          ok = false;
-        }
-
-        return ok;
-      })
-      .reduce<Accept>((agg, [mimeType, ext]) => {
-        agg[mimeType] = ext;
-        return agg;
-      }, {});
-    return [
-      {
-        // description is required due to https://crbug.com/1264708
-        description: "Files",
-        accept: acceptForPicker
-      }
-    ];
+function toExtensions(ext: string | readonly string[] | undefined): readonly string[] {
+  if (Array.isArray(ext)) {
+    return ext;
   }
-  return undefined;
+  if (typeof ext === "string") {
+    return [ext];
+  }
+  return [];
+}
+
+/**
+ * Normalize either `accept` form to the internal array of `{description, accept}` groups.
+ *
+ * - The object form (`{mime: ext}`) becomes a single group; its `description` (which the object
+ *   form can't express) is derived from the extensions like any other group.
+ * - The array form is passed through; entries missing an `accept` map are dropped.
+ *
+ * In both cases a missing `description` is filled in later from the group's extensions (see
+ * {@link describeAccept}), so the picker always gets the non-empty description it requires
+ * (https://crbug.com/1264708). Returns `undefined` when no `accept` is provided.
+ */
+function normalizeAcceptGroups(accept?: Accept | readonly AcceptGroup[]): AcceptGroup[] | undefined {
+  if (!isDefined(accept)) {
+    return undefined;
+  }
+  if (Array.isArray(accept)) {
+    return (accept as readonly AcceptGroup[]).filter(group => isDefined(group) && isDefined(group.accept));
+  }
+  return [{accept: accept as Accept}];
+}
+
+/**
+ * Build a human-readable label for a picker group from its (validated) accept map, used when the
+ * caller doesn't supply a `description`. Prefer the file extensions, fall back to the MIME types,
+ * then to a generic label - `showOpenFilePicker` requires a non-empty description (crbug 1264708).
+ */
+function describeAccept(accept: Accept): string {
+  const extensions: string[] = [];
+  const mimeTypes = Object.keys(accept);
+  for (const ext of Object.values(accept)) {
+    for (const e of toExtensions(ext)) {
+      if (!extensions.includes(e)) {
+        extensions.push(e);
+      }
+    }
+  }
+  if (extensions.length > 0) {
+    return extensions.join(", ");
+  }
+  if (mimeTypes.length > 0) {
+    return mimeTypes.join(", ");
+  }
+  return "Files";
+}
+
+/**
+ * Merge every `accept` group into a single MIME-type -> extensions map. Duplicate MIME keys union
+ * their extensions. This flattened map drives the native `<input accept>` attribute and the
+ * drag/drop validators, which have no concept of groups or descriptions.
+ */
+export function flattenAccept(accept?: Accept | readonly AcceptGroup[]): Accept | undefined {
+  const groups = normalizeAcceptGroups(accept);
+  if (!isDefined(groups)) {
+    return undefined;
+  }
+  const merged: Record<string, string[]> = {};
+  for (const group of groups) {
+    for (const [mimeType, ext] of Object.entries(group.accept)) {
+      const existing = merged[mimeType] ?? (merged[mimeType] = []);
+      for (const e of toExtensions(ext)) {
+        if (!existing.includes(e)) {
+          existing.push(e);
+        }
+      }
+    }
+  }
+  return merged;
+}
+
+/**
+ * Convert the `{accept}` dropzone prop to the `{types}` option for showOpenFilePicker.
+ *
+ * Each group becomes one filter row in the picker. Invalid MIME types / extensions are dropped
+ * with a warning; a group left with no valid entries is omitted entirely (showOpenFilePicker
+ * rejects an empty `accept`). Returns `undefined` when nothing valid remains.
+ */
+export function pickerOptionsFromAccept(
+  accept?: Accept | readonly AcceptGroup[]
+): Array<{description: string; accept: Accept}> | undefined {
+  const groups = normalizeAcceptGroups(accept);
+  if (!isDefined(groups)) {
+    return undefined;
+  }
+
+  const options = groups
+    .map(group => {
+      const acceptForPicker = Object.entries(group.accept)
+        .filter(([mimeType, ext]) => {
+          let ok = true;
+
+          if (!isMIMEType(mimeType)) {
+            console.warn(
+              `Skipped "${mimeType}" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.`
+            );
+            ok = false;
+          }
+
+          const isExtInput = Array.isArray(ext) || typeof ext === "string";
+          if (!isExtInput || !toExtensions(ext).every(isExt)) {
+            console.warn(`Skipped "${mimeType}" because an invalid file extension was provided.`);
+            ok = false;
+          }
+
+          return ok;
+        })
+        .reduce<Accept>((agg, [mimeType, ext]) => {
+          agg[mimeType] = toExtensions(ext);
+          return agg;
+        }, {});
+
+      return {
+        description:
+          isDefined(group.description) && group.description !== ""
+            ? group.description
+            : describeAccept(acceptForPicker),
+        accept: acceptForPicker
+      };
+    })
+    // Drop groups with no valid entries - showOpenFilePicker rejects an empty accept map.
+    .filter(option => Object.keys(option.accept).length > 0);
+
+  return options.length > 0 ? options : undefined;
 }
 
 /**
@@ -379,7 +499,8 @@ export function acceptPropAsAcceptAttr(
   if (isDefined(accept)) {
     return (
       Object.entries(accept)
-        .reduce<string[]>((a, [mimeType, ext]) => {
+        .reduce<string[]>((a, [mimeType, extVal]) => {
+          const ext = toExtensions(extVal);
           if (omitWildcardMimeTypesWithExtensions && isMIMETypeWildcard(mimeType) && ext.some(isExt)) {
             a.push(...ext);
           } else {
