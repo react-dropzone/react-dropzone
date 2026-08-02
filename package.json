@@ -86,7 +86,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitest/coverage-v8": "^4.1.10",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "oxfmt": "^0.60.0",
     "oxlint": "^1.75.0",
     "oxlint-tsgolint": "^0.24.0",
@@ -110,6 +110,6 @@
     }
   },
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   }
 }
