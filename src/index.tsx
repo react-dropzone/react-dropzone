@@ -7,10 +7,10 @@ import {
   canUseFileSystemAccessAPI,
   composeEventHandlers,
   ErrorCode,
+  evaluateDragFiles,
   fileAccepted,
   fileMatchSize,
   flattenAccept,
-  getDragVerdict,
   isAbort,
   isEvtWithFiles,
   isIeOrEdge,
@@ -22,7 +22,13 @@ import {
   pickerOptionsFromAccept,
   TOO_MANY_FILES_REJECTION
 } from "./utils";
-import type {Accept, AcceptGroup, FileError, ValidatorResult} from "./utils";
+import type {
+  Accept,
+  AcceptGroup,
+  DragFileRejection as UtilsDragFileRejection,
+  FileError,
+  ValidatorResult
+} from "./utils";
 
 export type {Accept, AcceptGroup, FileError, FileWithPath, ValidatorResult};
 export {ErrorCode};
@@ -35,6 +41,8 @@ export interface FileRejection {
   file: FileWithPath;
   errors: readonly FileError[];
 }
+
+export type DragFileRejection = UtilsDragFileRejection<FileWithPath | DataTransferItem>;
 
 type SharedProps = "multiple" | "onDragEnter" | "onDragOver" | "onDragLeave";
 
@@ -116,6 +124,13 @@ export type DropzoneState = DropzoneRef & {
   isProcessing: boolean;
   acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
+  /**
+   * Rejections that can be determined before drop. Standard drag events expose
+   * `DataTransferItem`s with a MIME type but no name or size, so extension, size, and custom
+   * validator failures are only available in {@link fileRejections} after drop. In practice this
+   * state can report MIME-type and surplus-file errors during a standard browser drag.
+   */
+  dragFileRejections: readonly DragFileRejection[];
   rootRef: React.RefObject<HTMLElement>;
   inputRef: React.RefObject<HTMLInputElement>;
   getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
@@ -171,6 +186,7 @@ interface DropzoneInternalState {
   isProcessing: boolean;
   acceptedFiles: FileWithPath[];
   fileRejections: FileRejection[];
+  dragFileRejections: DragFileRejection[];
 }
 
 /**
@@ -196,7 +212,8 @@ const initialState: DropzoneInternalState = {
   isDragGlobal: false,
   isProcessing: false,
   acceptedFiles: [],
-  fileRejections: []
+  fileRejections: [],
+  dragFileRejections: []
 };
 
 /**
@@ -459,28 +476,30 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
               return;
             }
 
-            const fileCount = files.length;
             // During a drag we only have DataTransferItems (MIME type, no name/size), so the
             // custom validator can't run yet - a validator-configured dropzone is "unknown" until
-            // drop rather than a misleading accept/reject. See getDragVerdict for the details.
-            const verdict =
-              fileCount > 0
-                ? getDragVerdict({
-                    files: files as Array<File | DataTransferItem>,
+            // drop rather than a misleading accept/reject. The verdict and rejection details come
+            // from one evaluation so the two states cannot disagree.
+            const evaluation =
+              files.length > 0
+                ? evaluateDragFiles({
+                    files: files as Array<FileWithPath | DataTransferItem>,
                     accept: acceptAttr,
                     minSize,
                     maxSize,
                     multiple,
                     maxFiles,
-                    validator
+                    validator,
+                    getErrorMessage
                   })
                 : null;
 
             dispatch({
-              isDragAccept: verdict === "accept",
-              isDragReject: verdict === "reject",
-              isDragUnknown: verdict === "unknown",
+              isDragAccept: evaluation?.verdict === "accept",
+              isDragReject: evaluation?.verdict === "reject",
+              isDragUnknown: evaluation?.verdict === "unknown",
               isDragActive: true,
+              dragFileRejections: evaluation?.rejections ?? [],
               type: "setDraggedFiles"
             });
 
@@ -501,7 +520,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       maxSize,
       multiple,
       maxFiles,
-      validator
+      validator,
+      getErrorMessage
     ]
   );
 
@@ -558,7 +578,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         isDragActive: false,
         isDragAccept: false,
         isDragReject: false,
-        isDragUnknown: false
+        isDragUnknown: false,
+        dragFileRejections: []
       });
 
       if (isEvtWithFiles(event) && onDragLeave) {
@@ -1058,7 +1079,8 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         isDragActive: action.isDragActive,
         isDragAccept: action.isDragAccept,
         isDragReject: action.isDragReject,
-        isDragUnknown: action.isDragUnknown
+        isDragUnknown: action.isDragUnknown,
+        dragFileRejections: action.dragFileRejections
       };
     case "setProcessing":
       return {
@@ -1070,6 +1092,7 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         ...state,
         acceptedFiles: action.acceptedFiles,
         fileRejections: action.fileRejections,
+        dragFileRejections: [],
         isProcessing: false,
         isDragReject: false,
         isDragUnknown: false

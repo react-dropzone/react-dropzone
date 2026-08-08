@@ -208,6 +208,19 @@ export function allFilesAccepted({
 export type DragVerdict = "accept" | "reject" | "unknown";
 
 /**
+ * A file rejected by the checks that can run during a drag.
+ */
+export interface DragFileRejection<T extends File | DataTransferItem = File | DataTransferItem> {
+  file: T;
+  errors: readonly FileError[];
+}
+
+export interface DragEvaluation<T extends File | DataTransferItem = File | DataTransferItem> {
+  verdict: DragVerdict;
+  rejections: DragFileRejection<T>[];
+}
+
+/**
  * Classify a set of dragged files for the `isDragAccept`/`isDragReject`/`isDragUnknown` states.
  *
  * During `dragenter`/`dragover` the browser only exposes `DataTransferItem`s, which carry a MIME
@@ -224,16 +237,17 @@ export type DragVerdict = "accept" | "reject" | "unknown";
  *
  * The full check (including the `validator`) still runs on drop in {@link fileAccepted}/`setFiles`.
  */
-export function getDragVerdict({
+export function evaluateDragFiles<T extends File | DataTransferItem>({
   files,
   accept,
   minSize,
   maxSize,
   multiple,
   maxFiles = 0,
-  validator
+  validator,
+  getErrorMessage
 }: {
-  files: Array<File | DataTransferItem>;
+  files: T[];
   accept?: string;
   minSize?: number;
   maxSize?: number;
@@ -242,24 +256,52 @@ export function getDragVerdict({
   // The validator is never invoked here (see the note above), so its async variant is accepted
   // purely so the same `validator` prop is assignable during a drag.
   validator?: (file: File) => ValidatorResult | Promise<ValidatorResult>;
-}): DragVerdict {
-  // The file count is knowable during a drag, so an over-the-limit selection is a confident reject.
-  if ((!multiple && files.length > 1) || (multiple && maxFiles >= 1 && files.length > maxFiles)) {
-    return "reject";
+  getErrorMessage?: (error: FileError, file: File) => string;
+}): DragEvaluation<T> {
+  const acceptedFiles: T[] = [];
+  const rejections: DragFileRejection<T>[] = [];
+
+  const localizeError = (error: FileError, file: T): FileError =>
+    getErrorMessage && typeof File !== "undefined" && file instanceof File
+      ? {...error, message: getErrorMessage(error, file)}
+      : error;
+
+  files.forEach(file => {
+    const [accepted, acceptError] = fileAccepted(file as File, accept);
+    const [sizeMatch, sizeError] = fileMatchSize(file as File, minSize, maxSize);
+
+    if (accepted && sizeMatch) {
+      acceptedFiles.push(file);
+    } else {
+      rejections.push({
+        file,
+        errors: [acceptError, sizeError]
+          .filter((error): error is FileError => error != null)
+          .map(error => localizeError(error, file))
+      });
+    }
+  });
+
+  // Match the drop path: files that already failed a per-file check do not consume the limit,
+  // and only otherwise-valid surplus files receive a too-many-files rejection.
+  const acceptedFilesLimit = multiple ? (maxFiles >= 1 ? maxFiles : Number.POSITIVE_INFINITY) : 1;
+  if (acceptedFiles.length > acceptedFilesLimit) {
+    acceptedFiles.slice(acceptedFilesLimit).forEach(file => {
+      rejections.push({file, errors: [localizeError(TOO_MANY_FILES_REJECTION, file)]});
+    });
   }
 
-  const confidentlyRejected = files.some(file => {
-    const [accepted] = fileAccepted(file as File, accept);
-    const [sizeMatch] = fileMatchSize(file as File, minSize, maxSize);
-    return !accepted || !sizeMatch;
-  });
-  if (confidentlyRejected) {
-    return "reject";
+  if (rejections.length > 0) {
+    return {verdict: "reject", rejections};
   }
 
   // Built-in checks pass. A custom validator can only ever add rejections on drop, never rescue
   // one - so with a validator present the drag outcome is unknown until we have real Files.
-  return validator ? "unknown" : "accept";
+  return {verdict: validator ? "unknown" : "accept", rejections};
+}
+
+export function getDragVerdict(options: Parameters<typeof evaluateDragFiles>[0]): DragVerdict {
+  return evaluateDragFiles(options).verdict;
 }
 
 // React's synthetic events has event.isPropagationStopped,

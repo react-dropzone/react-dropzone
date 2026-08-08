@@ -505,6 +505,15 @@ describe("getDragVerdict()", () => {
       utils.getDragVerdict({files: emptyTypeItems, multiple: true, accept: "text/markdown,.md", validator: () => null})
     ).toEqual("unknown");
   });
+
+  it("derives the verdict and rejection details from the same wildcard MIME evaluation", () => {
+    const item = {kind: "file", type: "image/gif", getAsFile: () => null};
+
+    expect(utils.evaluateDragFiles({files: [item], multiple: true, accept: "image/*,.png"})).toEqual({
+      verdict: "accept",
+      rejections: []
+    });
+  });
 });
 
 describe("ErrorCode", () => {

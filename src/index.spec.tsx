@@ -2468,6 +2468,88 @@ describe("useDropzone() hook", () => {
       expect(dropzone).toHaveTextContent("dragReject");
     });
 
+    it("sets {dragFileRejections} with errors while files are dragged", async () => {
+      const {container} = render(
+        <Dropzone
+          accept={{
+            "image/*": []
+          }}
+        >
+          {({getRootProps, getInputProps, dragFileRejections, fileRejections}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <span data-testid="drop-rejections">{fileRejections.length}</span>
+              <ul>
+                {dragFileRejections.flatMap(({errors}, rejectionIndex) =>
+                  errors.map(error => (
+                    <li key={`${rejectionIndex}-${error.code}`} data-type="drag-error">
+                      {error.code}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles(files)));
+
+      expect(container.querySelector(`[data-testid="drop-rejections"]`)).toHaveTextContent("0");
+      expect(container.querySelectorAll(`[data-type="drag-error"]`)).toHaveLength(files.length);
+      expect(dropzone).toHaveTextContent("file-invalid-type");
+
+      fireEvent.dragLeave(dropzone, createDtWithFiles(files));
+
+      expect(container.querySelectorAll(`[data-type="drag-error"]`)).toHaveLength(0);
+    });
+
+    it("sets {dragFileRejections} for surplus files while dragging", async () => {
+      const {container} = render(
+        <Dropzone multiple={false}>
+          {({getRootProps, getInputProps, dragFileRejections}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {dragFileRejections.map(({errors}, rejectionIndex) =>
+                errors.map(error => (
+                  <span key={`${rejectionIndex}-${error.code}`} data-type="drag-error">
+                    {error.code}
+                  </span>
+                ))
+              )}
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles(images)));
+
+      expect(container.querySelectorAll(`[data-type="drag-error"]`)).toHaveLength(1);
+      expect(dropzone).toHaveTextContent("too-many-files");
+    });
+
+    it("keeps drag acceptance and rejections aligned for wildcard MIME types with extensions", async () => {
+      const {container} = render(
+        <Dropzone accept={{"image/*": [".png"]}}>
+          {({getRootProps, getInputProps, isDragReject, dragFileRejections}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <span data-testid="drag-reject">{String(isDragReject)}</span>
+              <span data-testid="drag-rejections">{dragFileRejections.length}</span>
+            </div>
+          )}
+        </Dropzone>
+      );
+      const dropzone = container.querySelector("div");
+
+      await act(() => fireEvent.dragEnter(dropzone, createDtWithFiles([images[0]])));
+
+      expect(container.querySelector(`[data-testid="drag-reject"]`)).toHaveTextContent("false");
+      expect(container.querySelector(`[data-testid="drag-rejections"]`)).toHaveTextContent("0");
+    });
+
     it("sets {isDragReject} if some files are too large", async () => {
       const {container} = render(
         <Dropzone maxSize={0}>
