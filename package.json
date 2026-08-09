@@ -70,7 +70,7 @@
     "docs:preview": "vocs preview"
   },
   "dependencies": {
-    "attr-accept": "^2.2.5",
+    "attr-accept": "^4.0.0",
     "file-selector": "^4.1.0"
   },
   "devDependencies": {
