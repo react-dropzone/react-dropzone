@@ -67,13 +67,16 @@
     "test:cov": "vitest run --coverage",
     "docs:dev": "vocs dev",
     "docs:build": "vocs build",
-    "docs:preview": "vocs preview"
+    "docs:preview": "vocs preview",
+    "pretest:docs:e2e": "npm run docs:build",
+    "test:docs:e2e": "playwright test"
   },
   "dependencies": {
     "attr-accept": "^4.0.0",
     "file-selector": "^5.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^12.0.0",
     "@semantic-release/github": "^10.0.0",

@@ -18,6 +18,11 @@ dist
 coverage
 site
 
+# Playwright
+test-results
+playwright-report
+.playwright
+
 # Vocs generated artifacts
 .vocs
 docs/.vocs
