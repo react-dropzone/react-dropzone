@@ -9,6 +9,12 @@ updates:
     commit-message:
       prefix: "chore(deps):"
     versioning-strategy: increase
+    ignore:
+      # Pinned to 1.0.0-beta.8: waku 1.0.0-beta.9 removed the router's
+      # `unstable_events` API that vocs' ScrollRestoration still relies on,
+      # which white-screens the docs site (react-dropzone#1512). Unpin once
+      # vocs ships a release compatible with a newer waku beta.
+      - dependency-name: "waku"
     # Patch bumps grouped into one PR (auto-merged on green CI); minor bumps
     # grouped into a separate PR for manual review; majors open individually.
     groups:
