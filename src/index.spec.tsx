@@ -4135,6 +4135,52 @@ describe("useDropzone() hook", () => {
   });
 
   describe("validator", () => {
+    it.each([false, true])("accepts empty error arrays and preserves non-empty errors (async: %s)", async isAsync => {
+      const error = {code: "dogs-not-allowed", message: "Dogs not allowed"};
+      const validator = file => {
+        const errors = /dogs/i.test(file.name) ? [error] : Object.freeze([]);
+        return isAsync ? Promise.resolve(errors) : errors;
+      };
+      const onDrop = vi.fn();
+      const onDropAccepted = vi.fn();
+      const onDropRejected = vi.fn();
+      const {container} = render(
+        <Dropzone
+          validator={validator}
+          onDrop={onDrop}
+          onDropAccepted={onDropAccepted}
+          onDropRejected={onDropRejected}
+          multiple
+        >
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      const rejections = [{file: images[1], errors: [error]}];
+      expect(onDrop).toHaveBeenCalledWith([images[0]], rejections, expect.anything());
+      expect(onDropAccepted).toHaveBeenCalledWith([images[0]], expect.anything());
+      expect(onDropRejected).toHaveBeenCalledWith(rejections, expect.anything());
+    });
+
+    it("still applies built-in file checks when the validator returns an empty array", async () => {
+      const onDrop = vi.fn();
+      const {container} = render(
+        <Dropzone validator={() => []} accept={{"application/pdf": []}} onDrop={onDrop} multiple>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      await act(() => fireEvent.drop(container.querySelector("div"), createDtWithFiles(images)));
+
+      expect(onDrop).toHaveBeenCalledWith(
+        [],
+        images.map(file => ({file, errors: [expect.objectContaining({code: "file-invalid-type"})]})),
+        expect.anything()
+      );
+    });
+
     it("rejects with custom error", async () => {
       const validator = file => {
         if (/dogs/i.test(file.name)) return {code: "dogs-not-allowed", message: "Dogs not allowed"};

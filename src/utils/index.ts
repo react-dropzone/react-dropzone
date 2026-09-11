@@ -41,8 +41,8 @@ export interface FileError {
 }
 
 /**
- * What a custom `validator` returns: a single error, a list of errors, or `null` when the file
- * passes. A validator may return the result directly (synchronous) or wrapped in a `Promise`
+ * What a custom `validator` returns: a single error, a list of errors, or `null`. An empty list
+ * or `null` means the file passes. A validator may return the result directly (synchronous) or wrapped in a `Promise`
  * (asynchronous, e.g. reading image dimensions or calling an external service).
  */
 export type ValidatorResult = FileError | readonly FileError[] | null;
@@ -192,7 +192,8 @@ export function allFilesAccepted({
     const [accepted] = fileAccepted(file, accept);
     const [sizeMatch] = fileMatchSize(file, minSize, maxSize);
     const customErrors = validator ? validator(file) : null;
-    return accepted && sizeMatch && !customErrors;
+    const valid = !customErrors || (Array.isArray(customErrors) && customErrors.length === 0);
+    return accepted && sizeMatch && valid;
   });
 }
 

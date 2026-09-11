@@ -410,6 +410,15 @@ describe("getTooSmallRejectionErr()", () => {
 });
 
 describe("allFilesAccepted()", () => {
+  it("accepts an empty validator error array while preserving built-in checks", () => {
+    const files = [createFile("document.pdf", 100, "application/pdf")];
+    const validator = () => Object.freeze([]);
+    expect(utils.allFilesAccepted({files, validator})).toBe(true);
+    expect(utils.allFilesAccepted({files, validator, accept: "image/*"})).toBe(false);
+    expect(utils.allFilesAccepted({files, validator, maxSize: 99})).toBe(false);
+    expect(utils.allFilesAccepted({files, validator: () => [{code: "invalid", message: "Invalid file"}]})).toBe(false);
+  });
+
   /**
    * @constant
    * @type {import('./index')}
