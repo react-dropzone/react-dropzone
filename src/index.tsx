@@ -603,7 +603,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         const fileRejections: FileRejection[] = [];
 
         results.forEach(({file, accepted, acceptError, sizeMatch, sizeError, customErrors}) => {
-          if (accepted && sizeMatch && !customErrors) {
+          const valid = !customErrors || (Array.isArray(customErrors) && customErrors.length === 0);
+          if (accepted && sizeMatch && valid) {
             acceptedFiles.push(file);
           } else {
             let errors: Array<FileError | null> = [acceptError, sizeError];
