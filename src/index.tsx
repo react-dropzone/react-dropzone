@@ -328,6 +328,11 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     }
   }, []);
 
+  // Unmounting supersedes an in-flight run the same way a newer drop does: without this, a slow
+  // getFilesFromEvent or validator resolves against a component that is gone and still fires
+  // onDrop.
+  useEffect(() => () => processingAbortRef.current?.abort(), []);
+
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" && window.isSecureContext && useFsAccessApi && canUseFileSystemAccessAPI()
   );
