@@ -4380,6 +4380,48 @@ describe("useDropzone() hook", () => {
       expect(onDropSpy).toHaveBeenCalledWith(files, [], expect.anything());
     });
 
+    it("does not call onDrop when the dropzone unmounts before the files are read", async () => {
+      const thenable = createThenable();
+      const getFilesFromEvent = () => thenable.promise;
+      const onDropSpy = vi.fn();
+
+      const {container, unmount} = render(
+        <Dropzone getFilesFromEvent={getFilesFromEvent} onDrop={onDropSpy} multiple>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      unmount();
+      await act(() => thenable.done(files));
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+    });
+
+    it("does not call onDrop when the dropzone unmounts while an async validator runs", async () => {
+      const thenable = createThenable();
+      const validator = () => thenable.promise;
+      const onDropSpy = vi.fn();
+      const onErrorSpy = vi.fn();
+
+      const {container, unmount} = render(
+        <Dropzone validator={validator} onDrop={onDropSpy} onError={onErrorSpy} multiple>
+          {({getRootProps}) => <div {...getRootProps()} />}
+        </Dropzone>
+      );
+
+      const dropzone = container.querySelector("div");
+      await act(() => fireEvent.drop(dropzone, createDtWithFiles(files)));
+
+      unmount();
+      await act(() => thenable.done(null));
+
+      expect(onDropSpy).not.toHaveBeenCalled();
+      expect(onErrorSpy).not.toHaveBeenCalled();
+    });
+
     it("routes a rejected validator to onError, does not call onDrop, and clears {isProcessing}", async () => {
       const thenable = createThenable();
       const validator = () => thenable.promise;
