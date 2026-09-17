@@ -12,7 +12,23 @@
     "typescript/require-array-sort-compare": "off",
     "typescript/no-base-to-string": "off",
     "typescript/restrict-template-expressions": "off",
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    // React Compiler rules: oxlint 1.79.0 split react/react-compiler into per-category rules and
+    // activated them under `correctness`. This project does not use React Compiler, and these fire
+    // on deliberate patterns (a state value mirrored into a ref, refs read in memoized handlers) and
+    // a false positive (a callback closing over a const helper declared later). Keep them off.
+    "react/error-boundaries": "off",
+    "react/globals": "off",
+    "react/immutability": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/purity": "off",
+    "react/refs": "off",
+    "react/set-state-in-effect": "off",
+    "react/set-state-in-render": "off",
+    "react/static-components": "off",
+    "react/use-memo": "off",
+    "react/void-use-memo": "off"
   },
   "overrides": [
     {
