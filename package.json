@@ -88,7 +88,7 @@
     "@types/node": "^26.5.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.1",
     "jsdom": "^30.0.1",
     "oxfmt": "^0.67.0",
     "oxlint": "^1.82.0",
