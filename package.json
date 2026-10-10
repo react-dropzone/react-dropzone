@@ -79,7 +79,7 @@
     "@playwright/test": "^1.63.0",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^12.0.0",
-    "@semantic-release/github": "^10.0.0",
+    "@semantic-release/github": "^12.0.10",
     "@semantic-release/npm": "^13.2.0",
     "@semantic-release/release-notes-generator": "^14.1.0",
     "@testing-library/dom": "^10.4.2",
