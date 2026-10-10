@@ -112,6 +112,9 @@
       "optional": true
     }
   },
+  "overrides": {
+    "toml": "^5.0.0"
+  },
   "engines": {
     "node": ">= 22"
   }
