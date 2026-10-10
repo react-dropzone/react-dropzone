@@ -15,6 +15,14 @@ updates:
       # which white-screens the docs site (react-dropzone#1512). Unpin once
       # vocs ships a release compatible with a newer waku beta.
       - dependency-name: "waku"
+      # Held below 2.10: vocs 2.10 imports waku's `./router/client-core`, which
+      # the pinned waku 1.0.0-beta.8 does not export, so `vocs build` fails and
+      # the docs smoke test breaks (react-dropzone#1531). Raise this ceiling
+      # together with the waku unpin above once the docs smoke test confirms a
+      # compatible pair.
+      - dependency-name: "vocs"
+        versions:
+          - ">=2.10.0"
     # Patch bumps grouped into one PR (auto-merged on green CI); minor bumps
     # grouped into a separate PR for manual review; majors open individually.
     groups:
