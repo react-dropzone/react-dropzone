@@ -18,6 +18,14 @@ updates:
     # Patch bumps grouped into one PR (auto-merged on green CI); minor bumps
     # grouped into a separate PR for manual review; majors open individually.
     groups:
+      # Vitest and @vitest/coverage-v8 share a version-coupled coverage payload
+      # format, so bumping one without the other breaks `vitest run --coverage`
+      # (react-dropzone#1530). Keep them in lockstep across every update type;
+      # listed first so it wins over the catch-all groups below.
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
       patch:
         patterns:
           - "*"
