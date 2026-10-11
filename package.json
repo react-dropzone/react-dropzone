@@ -76,7 +76,7 @@
     "file-selector": "^5.0.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/commit-analyzer": "^12.0.0",
     "@semantic-release/github": "^12.0.10",
