@@ -231,7 +231,7 @@ const dropzoneRef = createRef();
   )}
 </Dropzone>;
 
-dropzoneRef.open();
+dropzoneRef.current.open();
 ```
 
 ## Testing
