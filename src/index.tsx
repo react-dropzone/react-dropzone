@@ -1022,11 +1022,14 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
           // zero-size, transparent block avoids that while staying focusable so a {required}
           // input still triggers form validation, see #1268. Don't use {display: none} or
           // {visibility: hidden}: those make the input unfocusable and reintroduce #1268.
+          // WebKit ignores {width: 0} in the intrinsic width of a file input, so {maxWidth: 0}
+          // keeps it from widening a shrink-to-fit parent in Safari.
           style: {
             border: 0,
             display: "block",
             height: 0,
             margin: 0,
+            maxWidth: 0,
             opacity: 0,
             overflow: "hidden",
             padding: 0,
