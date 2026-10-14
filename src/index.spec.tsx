@@ -54,6 +54,10 @@ describe("useDropzone() hook", () => {
 
       // Still visually hidden.
       expect(input.style.opacity).toBe("0");
+
+      // WebKit sizes a file input with {width: 0} by its chooser button in a shrink-to-fit
+      // parent; {maxWidth: 0} caps that.
+      expect(input.style.maxWidth).toBe("0px");
     });
 
     it("sets {accept} prop on the <input>", () => {
