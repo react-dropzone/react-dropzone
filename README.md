@@ -103,6 +103,32 @@ function MyDropzone() {
 }
 ```
 
+## Removing selected files
+
+`useDropzone()` and `<Dropzone>` render props expose `removeFile(file)` and `clearFiles()`.
+Pass an exact File object from `acceptedFiles` or `fileRejections` to `removeFile` to remove it
+from that list. `clearFiles` clears both lists, resets the native input, and discards pending
+file reads or validation results. Neither method fires the drop callbacks or cancels an upload.
+File lists maintained separately by your application remain your responsibility.
+
+```tsx
+const {acceptedFiles, removeFile, clearFiles} = useDropzone();
+
+// In a file row's remove button:
+<button type="button" onClick={() => removeFile(acceptedFiles[0])}>
+  Remove file
+</button>;
+
+// In a reset button:
+<button type="button" onClick={clearFiles}>
+  Clear files
+</button>;
+```
+
+`removeFile` matches by object identity and does not modify the native input's `FileList`.
+Use the remaining `acceptedFiles` when constructing your upload request. See the
+[basic example](https://react-dropzone.js.org/examples/basic#removing-files) for a working file list.
+
 ## Dropzone Props Getters
 
 The dropzone property getters are just two functions that return objects with properties which you need to use to create the drag 'n' drop zone.

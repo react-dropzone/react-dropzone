@@ -25,3 +25,34 @@ for (const route of routes) {
     await expect(content).not.toBeEmpty();
   });
 }
+
+test("selected files can be removed and cleared using the keyboard", async ({page}) => {
+  await page.goto("/examples/basic", {waitUntil: "networkidle"});
+  const example = page.locator("section.container").filter({has: page.getByRole("heading", {name: "Selected files"})});
+  const input = example.locator('input[type="file"]');
+  const files = [
+    {name: "first.txt", mimeType: "text/plain", buffer: Buffer.from("first")},
+    {name: "second.txt", mimeType: "text/plain", buffer: Buffer.from("second")}
+  ];
+  let dialogs = 0;
+  page.on("filechooser", () => dialogs++);
+  await input.setInputFiles(files);
+  await expect(example.getByRole("listitem")).toHaveCount(2);
+
+  const remove = example.getByRole("button", {name: "Remove first.txt"});
+  await remove.focus();
+  await page.keyboard.press("Enter");
+  await expect(example.getByRole("listitem")).toHaveCount(1);
+  await expect(example.getByRole("listitem")).toContainText("second.txt");
+
+  const clear = example.getByRole("button", {name: "Clear files"});
+  await clear.focus();
+  await page.keyboard.press("Enter");
+  await expect(example.getByRole("listitem")).toHaveCount(0);
+  await expect(clear).toBeDisabled();
+  expect(await input.evaluate((element: HTMLInputElement) => element.files?.length)).toBe(0);
+
+  await input.setInputFiles(files);
+  await expect(example.getByRole("listitem")).toHaveCount(2);
+  expect(dialogs).toBe(0);
+});
