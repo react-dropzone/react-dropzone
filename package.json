@@ -113,7 +113,7 @@
     }
   },
   "overrides": {
-    "toml": "^5.0.0"
+    "toml": "^5.0.1"
   },
   "engines": {
     "node": ">= 22"
