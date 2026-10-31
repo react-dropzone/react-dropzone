@@ -100,8 +100,8 @@
     "tsdown": "^0.23.1",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
-    "vocs": "^2.9.0",
-    "waku": "1.0.0-beta.8"
+    "vocs": "^2.10.3",
+    "waku": "1.0.0-rc.1"
   },
   "peerDependencies": {
     "@types/react": "*",
