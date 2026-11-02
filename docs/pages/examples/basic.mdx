@@ -1,4 +1,4 @@
-import {Basic, DisabledDropzone} from "../../components/examples";
+import {Basic, DisabledDropzone, RemovableFiles} from "../../components/examples";
 
 # Basic example
 
@@ -47,3 +47,36 @@ Dropzone with the `disabled` property:
 ```tsx
 const {getRootProps, getInputProps} = useDropzone({disabled: true});
 ```
+
+## Removing files
+
+<RemovableFiles />
+
+Use `removeFile(file)` with a File object from `acceptedFiles` or `fileRejections` to remove that
+file from the hook's state. Matching uses object identity, so different files with the same name
+are kept separate. An unknown file is ignored. Use `clearFiles()` to clear both lists and reset
+the native input. It also discards pending file reads or validation results, so they cannot
+restore the cleared files.
+
+```tsx
+const {acceptedFiles, removeFile, clearFiles} = useDropzone();
+
+<ul>
+  {acceptedFiles.map((file, index) => (
+    <li key={index}>
+      {file.name}
+      <button type="button" onClick={() => removeFile(file)}>
+        Remove
+      </button>
+    </li>
+  ))}
+</ul>;
+<button type="button" onClick={clearFiles}>
+  Clear files
+</button>;
+```
+
+Neither method fires `onDrop`, `onDropAccepted`, or `onDropRejected`. They only change the hook's
+file state; they do not cancel uploads or update file lists stored separately by your application.
+`removeFile` does not change the native input's `FileList`; submit the remaining `acceptedFiles`
+when building an upload request. Both methods are also available through `<Dropzone>` render props.
