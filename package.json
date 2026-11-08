@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "attr-accept": "^4.0.1",
-    "file-selector": "^5.0.1"
+    "file-selector": "^5.0.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
@@ -97,7 +97,7 @@
     "react-dom": "^19.3.1",
     "semantic-release": "^25.0.9",
     "styled-components": "^6.6.0",
-    "tsdown": "^0.23.3",
+    "tsdown": "^0.23.5",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
     "vocs": "^2.10.3",
