@@ -122,6 +122,10 @@ export type DropzoneState = DropzoneRef & {
    * only observable for genuinely async work. Use it to show a spinner or disable UI while processing.
    */
   isProcessing: boolean;
+  /** Remove an accepted or rejected file by object identity. Does not fire drop callbacks. */
+  removeFile: (file: File) => void;
+  /** Clear accepted/rejected files, reset the input, and discard pending processing results. */
+  clearFiles: () => void;
   acceptedFiles: readonly FileWithPath[];
   fileRejections: readonly FileRejection[];
   /**
@@ -332,6 +336,19 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
   // getFilesFromEvent or validator resolves against a component that is gone and still fires
   // onDrop.
   useEffect(() => () => processingAbortRef.current?.abort(), []);
+
+  const removeFile = useCallback((file: File) => {
+    dispatch({type: "removeFile", file});
+  }, []);
+
+  const clearFiles = useCallback(() => {
+    // Reuse processing cancellation so a late read or validator cannot restore cleared files.
+    processingAbortRef.current?.abort();
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+    dispatch({type: "clearFiles"});
+  }, []);
 
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" && window.isSecureContext && useFsAccessApi && canUseFileSystemAccessAPI()
@@ -1056,6 +1073,8 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
     getInputProps,
     rootRef,
     inputRef,
+    removeFile,
+    clearFiles,
     open: composeHandler(openFileDialog)
   } as unknown as DropzoneState;
 }
@@ -1105,6 +1124,19 @@ function reducer(state: DropzoneInternalState, action: any): DropzoneInternalSta
         isProcessing: false,
         isDragReject: false,
         isDragUnknown: false
+      };
+    case "removeFile":
+      return {
+        ...state,
+        acceptedFiles: state.acceptedFiles.filter(file => file !== action.file),
+        fileRejections: state.fileRejections.filter(({file}) => file !== action.file)
+      };
+    case "clearFiles":
+      return {
+        ...state,
+        acceptedFiles: [],
+        fileRejections: [],
+        isProcessing: false
       };
     case "setDragGlobal":
       return {
