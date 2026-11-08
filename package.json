@@ -113,10 +113,13 @@
     }
   },
   "overrides": {
+    "body-parser": "^2.4.0",
+    "ip-address": "^10.7.4",
     "toml": "^5.0.1",
     "undici@6": "^6.29.1",
     "undici@7": "^7.30.1",
-    "undici@8": "^8.12.2"
+    "undici@8": "^8.12.2",
+    "zod": "^4.6.6"
   },
   "engines": {
     "node": ">= 22"
