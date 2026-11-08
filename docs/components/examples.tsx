@@ -29,6 +29,34 @@ export function Basic() {
   );
 }
 
+export function RemovableFiles() {
+  const {acceptedFiles, getRootProps, getInputProps, removeFile, clearFiles} = useDropzone();
+  return (
+    <section className="container">
+      <div {...getRootProps({className: "dropzone"})}>
+        <input {...getInputProps()} />
+        <p>Drop files here, or click to select files</p>
+      </div>
+      <aside>
+        <h4>Selected files</h4>
+        <ul>
+          {acceptedFiles.map((file, index) => (
+            <li key={index}>
+              {file.name} - {file.size} bytes{" "}
+              <button type="button" onClick={() => removeFile(file)} aria-label={`Remove ${file.name}`}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button type="button" onClick={clearFiles} disabled={!acceptedFiles.length}>
+          Clear files
+        </button>
+      </aside>
+    </section>
+  );
+}
+
 export function DisabledDropzone() {
   const {acceptedFiles, getRootProps, getInputProps} = useDropzone({disabled: true});
   const files = acceptedFiles.map(file => (
