@@ -1000,7 +1000,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         role: typeof role === "string" && role !== "" ? role : "presentation",
         [refKey]: rootRef,
         ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
-        ...(disabled ? {"aria-disabled": true} : {}),
+        ...(disabled && !(noClick && noKeyboard) ? {"aria-disabled": true} : {}),
         ...rest
       }),
     [
@@ -1014,6 +1014,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       onDragLeaveCb,
       onDropCb,
       onPasteCb,
+      noClick,
       noKeyboard,
       noDrag,
       noPaste,

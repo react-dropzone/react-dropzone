@@ -504,6 +504,19 @@ describe("useDropzone() hook", () => {
       expect(container.querySelector("div")).toHaveAttribute("aria-disabled", "true");
     });
 
+    test("{aria-disabled} is not set if {disabled} is true and the root is not interactive", () => {
+      const {container} = render(
+        <Dropzone disabled noClick noKeyboard>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).not.toHaveAttribute("aria-disabled");
+    });
+
     test("{aria-disabled} is not set if {disabled} is false", () => {
       const {container} = render(
         <Dropzone>
