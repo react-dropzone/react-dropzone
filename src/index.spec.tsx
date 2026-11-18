@@ -578,6 +578,56 @@ describe("useDropzone() hook", () => {
       expect(container.querySelector("div")).toHaveAttribute("aria-disabled", "true");
     });
 
+    test("{disabled} sets disabled on <input> if {disabled} is true", () => {
+      const {container} = render(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("input")).toBeDisabled();
+    });
+
+    test("<input> is not disabled if {disabled} is false", () => {
+      const {container} = render(
+        <Dropzone>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("input")).not.toBeDisabled();
+    });
+
+    test("<input> disabled state can be explicitly overridden via getInputProps", () => {
+      const {container, rerender} = render(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps({disabled: false})} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("input")).not.toBeDisabled();
+
+      rerender(
+        <Dropzone disabled={false}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps()}>
+              <input {...getInputProps({disabled: true})} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("input")).toBeDisabled();
+    });
+
     test("{tabindex} is not set if {noKeyboard} is true", () => {
       const {container, rerender} = render(
         <Dropzone>

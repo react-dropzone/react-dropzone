@@ -1033,6 +1033,7 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
       ({refKey = "ref", onChange, onClick, ...rest}: DropzoneInputProps = {}) => {
         const inputProps = {
           accept: inputAcceptAttr,
+          disabled,
           multiple,
           type: "file",
           "aria-label": "file upload",
