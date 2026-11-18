@@ -987,22 +987,25 @@ export function useDropzone(props: DropzoneOptions = {}): DropzoneState {
         onDrop,
         onPaste,
         ...rest
-      }: DropzoneRootProps = {}) => ({
-        onKeyDown: composeKeyboardHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
-        onFocus: composeKeyboardHandler(composeEventHandlers(onFocus, onFocusCb)),
-        onBlur: composeKeyboardHandler(composeEventHandlers(onBlur, onBlurCb)),
-        onClick: composeHandler(composeEventHandlers(onClick, onClickCb)),
-        onDragEnter: composeDragHandler(composeEventHandlers(onDragEnter, onDragEnterCb)),
-        onDragOver: composeDragHandler(composeEventHandlers(onDragOver, onDragOverCb)),
-        onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
-        onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
-        onPaste: composePasteHandler(composeEventHandlers(onPaste, onPasteCb)),
-        role: typeof role === "string" && role !== "" ? role : "presentation",
-        [refKey]: rootRef,
-        ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
-        ...(disabled ? {"aria-disabled": true} : {}),
-        ...rest
-      }),
+      }: DropzoneRootProps = {}) => {
+        const resolvedRole = typeof role === "string" && role !== "" ? role : "presentation";
+        return {
+          onKeyDown: composeKeyboardHandler(composeEventHandlers(onKeyDown, onKeyDownCb)),
+          onFocus: composeKeyboardHandler(composeEventHandlers(onFocus, onFocusCb)),
+          onBlur: composeKeyboardHandler(composeEventHandlers(onBlur, onBlurCb)),
+          onClick: composeHandler(composeEventHandlers(onClick, onClickCb)),
+          onDragEnter: composeDragHandler(composeEventHandlers(onDragEnter, onDragEnterCb)),
+          onDragOver: composeDragHandler(composeEventHandlers(onDragOver, onDragOverCb)),
+          onDragLeave: composeDragHandler(composeEventHandlers(onDragLeave, onDragLeaveCb)),
+          onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
+          onPaste: composePasteHandler(composeEventHandlers(onPaste, onPasteCb)),
+          role: resolvedRole,
+          [refKey]: rootRef,
+          ...(!disabled && !noKeyboard ? {tabIndex: 0} : {}),
+          ...(disabled && resolvedRole !== "presentation" && resolvedRole !== "none" ? {"aria-disabled": true} : {}),
+          ...rest
+        };
+      },
     [
       rootRef,
       onKeyDownCb,

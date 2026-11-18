@@ -491,7 +491,7 @@ describe("useDropzone() hook", () => {
       expect(container.querySelector("div")).not.toHaveAttribute("tabindex");
     });
 
-    test("{aria-disabled} is true if {disabled} is true", () => {
+    test("{aria-disabled} is not set by default if {disabled} is true", () => {
       const {container} = render(
         <Dropzone disabled>
           {({getRootProps, getInputProps}) => (
@@ -501,20 +501,81 @@ describe("useDropzone() hook", () => {
           )}
         </Dropzone>
       );
+      expect(container.querySelector("div")).not.toHaveAttribute("aria-disabled");
+    });
+
+    test("{aria-disabled} is true if {disabled} is true and root has a non-presentation role", () => {
+      const {container} = render(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({role: "region"})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
       expect(container.querySelector("div")).toHaveAttribute("aria-disabled", "true");
     });
 
-    test("{aria-disabled} is not set if {disabled} is false", () => {
-      const {container} = render(
-        <Dropzone>
+    test("{aria-disabled} is not set if {disabled} is true and root has presentational role", () => {
+      const {container, rerender} = render(
+        <Dropzone disabled>
           {({getRootProps, getInputProps}) => (
-            <div {...getRootProps()}>
+            <div {...getRootProps({role: "presentation"})}>
               <input {...getInputProps()} />
             </div>
           )}
         </Dropzone>
       );
       expect(container.querySelector("div")).not.toHaveAttribute("aria-disabled");
+
+      rerender(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({role: "none"})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).not.toHaveAttribute("aria-disabled");
+    });
+
+    test("{aria-disabled} is not set if {disabled} is false even with a non-presentation role", () => {
+      const {container} = render(
+        <Dropzone>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({role: "region"})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).not.toHaveAttribute("aria-disabled");
+    });
+
+    test("{aria-disabled} can be explicitly overridden via getRootProps", () => {
+      const {container, rerender} = render(
+        <Dropzone disabled>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({role: "region", "aria-disabled": false})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).toHaveAttribute("aria-disabled", "false");
+
+      rerender(
+        <Dropzone disabled={false}>
+          {({getRootProps, getInputProps}) => (
+            <div {...getRootProps({"aria-disabled": true})}>
+              <input {...getInputProps()} />
+            </div>
+          )}
+        </Dropzone>
+      );
+      expect(container.querySelector("div")).toHaveAttribute("aria-disabled", "true");
     });
 
     test("{tabindex} is not set if {noKeyboard} is true", () => {
