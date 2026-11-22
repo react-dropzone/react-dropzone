@@ -90,8 +90,8 @@
     "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.1.1",
     "jsdom": "^31.0.1",
-    "oxfmt": "^0.78.0",
-    "oxlint": "^1.93.0",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
     "oxlint-tsgolint": "^7.0.2007",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -100,7 +100,7 @@
     "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1",
-    "vocs": "^2.10.3",
+    "vocs": "^2.14.1",
     "waku": "1.0.0-rc.1"
   },
   "peerDependencies": {
