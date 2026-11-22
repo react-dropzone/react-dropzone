@@ -88,7 +88,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitest/coverage-v8": "^5.1.0",
+    "@vitest/coverage-v8": "^5.1.1",
     "jsdom": "^31.0.0",
     "oxfmt": "^0.78.0",
     "oxlint": "^1.93.0",
@@ -99,7 +99,7 @@
     "styled-components": "^6.6.0",
     "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "vocs": "^2.10.3",
     "waku": "1.0.0-rc.1"
   },
