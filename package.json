@@ -95,7 +95,7 @@
     "oxlint-tsgolint": "^7.0.2007",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "semantic-release": "^25.0.9",
+    "semantic-release": "^26.0.1",
     "styled-components": "^6.6.0",
     "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
